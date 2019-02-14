@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+	<meta name="Description" content="..." />
+	<meta name="Keywords" content="..." />
+	<meta name="robots" content="all,follow" />
+	<meta name="author" content="..." />
+	<meta name="copyright" content="Mantis-a [http://www.mantisa.cz/]" />
+
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection, tv" />
+	<link rel="stylesheet" href="css/style-print.css" type="text/css" media="print" />
+
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+	<title>NapominalKo | Домашняя страница</title>
+</head>
+
+<body>
+<div id="wrapper">
+
+	<!-- Title -->
+	<div class="title">
+		<div class="title-top">
+			<div class="title-left">
+				<div class="title-right">
+					<div class="title-bottom">
+						<div class="title-top-left">
+							<div class="title-bottom-left">
+								<div class="title-top-right">
+									<div class="title-bottom-right">
+										<h1><a href="/" title="Go to homepage">NAPOMINAL <span>KO</span></a></h1>
+										<p>Всегда на страже твоей памяти</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Title end -->
+
+	<hr class="noscreen" />
+
+	<div class="content">
+
+		<div class="column-left">
+			<h3>Меню</h3>
+			<a href="#skip-menu" class="hidden">Skip menu</a>
+			<ul class="menu">
+				<li><a href="/home" class="active">Домашняя страница</a></li>
+				<li><a href="/notes">Мои напоминалки</a></li>
+				<li><a href="/search">Поиск напоминаний</a></li>
+				<li class="last"><a href="/logout">Выйти из аккаунта</a></li>
+			</ul>
+		</div>
+
+		<div id="skip-menu"></div>
+		<div class="column-right">
+			<div class="box">
+				<div class="box-top"></div>
+				<div class="box-in">
+					<h2>Описание</h2>
+					<p><div id="description"></div></p>
+                    Привет   <%=obj%>  ! Это приложение используется для тайм-менеджмента ваших будущих событий. С ним вы сможете распланировать встречи, праздники, быт и т.д., а также не забыть о них.
+					<br />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
