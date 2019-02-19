@@ -2,7 +2,7 @@
   "name": "test",
   "version": "1.0.0",
   "description": "",
-  "main": "bockend/server.js",
+  "main": "backend/server.js",
   "dependencies": {
     "ejs": "^2.6.1",
     "express": "^4.16.4",
