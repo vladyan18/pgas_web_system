@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Моё портфолио</title>
+    <link rel="icon" href="img/icon.png" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="style/user_main.css" />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <header>
+        <div class="row page_top">
+          <div class="col-9 block_header">
+            <img src="img/gerb.png" class="logo_img" />
+            <div class="p_header">
+              Санкт-Петербургский государственный университет <br />
+              Личный кабинет портфолио
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="exit">
+              <a href="/logout">Выход из личного кабинета</a>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div class="container main_block">
+        <div class="row">
+          <div class="col-md-3 leftBlock">
+            <div class="left_navbar">
+              <ul class="ul_nav">
+                <li class="element element_active">
+                  <a class="a_element" href="/home" id="1"> Мое портфолио</a>
+                </li>
+                <li class=" element">
+                  <a class="" href="/upload">Загрузить в портфолио</a>
+                </li>
+                <li class=" element">
+                  <a class="" href="/documents">Документы</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-9 rightBlock">
+            <p id="username" class="headline"></p>
+            <hr class="hr_blue" />
+            <div class="profile">
+              <div>Факультет: <faculty class="info">ПМ-ПУ</faculty></div>
+            </div>
+
+            <div class="category">
+              <h3>Текущие достижения</h3>
+              <block_1> <div id="row_docs"></div> </block_1>
+            </div>
+
+            <div class="category">
+              <h3>Архив достижений</h3>
+              <block_1> <div id="archive_docs"></div> </block_1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="js/user_main.js"></script>
+  </body>
+</html>
