@@ -6,6 +6,7 @@ const achieveSchema = mongoose.Schema({
   crit: String,
   chars: [String],
   files: [String],
+  comment: String,
   status: String
 })
 
