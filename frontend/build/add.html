@@ -34,15 +34,17 @@
             <div class="row">
                 <div class="col-md-3 leftBlock">
                     <div class="left_navbar">
-                            <div class='balls'>
-                                    <p><form method = 'post'  action="/balls">
-                                        <input type='submit' , class='button btn btn-succes'  , value='Посчитать баллы'>
-                                    </form></p>
-                                    <p></p>
-                                    <p><form method = 'post'  action="/delete">
-                                        <input type='submit' , class='button btn btn-succes'  , value='Удалить все достижения'>
-                                    </form></p>                            
-                            </div>
+                        <ul class="ul_nav">
+                            <li class="element">
+                                <a class="a_element" href="/home">  Мое портфолио</a>
+                            </li>
+                            <li class=" element element_active">
+                                <a class="" href="/upload">Загрузить в портфолио</a>
+                            </li>
+                            <li class=" element">
+                                <a class="" href="/documents">  Документы</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="col-md-9 rightBlock">

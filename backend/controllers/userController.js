@@ -1,9 +1,22 @@
 const path = require('path')
+const passport = require(path.join(__dirname, '../config/passport'))
 const upload = require(path.join(__dirname, '../config/multer'))
 const db = require('./dbController')
 const fs = require('fs')
-const Kri = require(__dirname + "\\Kriterii.json")
+
+
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
+
+module.exports.dynamic = async function (req, res) {
+  let Achs = []
+  let User= await db.findUserById(req.user._json.email)
+  let W = User.Achievement
+  for (let i of W) {
+     let Ach = await db.findAchieveById(i)  
+    await Achs.push(Ach)
+  }
+  res.status(200).send({ LastName: req.user.name.familyName, FirstName: req.user.name.givenName, Achs: Achs })
+}
 
 module.exports.addAchieve = function (req, res) {
   if (!fs.existsSync(uploadsPath)) {
@@ -31,6 +44,7 @@ module.exports.addAchieve = function (req, res) {
       achieve.files = arr
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
+      await db.addAchieveToUser(req.user._json.email, createdAchieve._id)
       res.sendStatus(200)
     }
     catch (err) {
@@ -38,59 +52,4 @@ module.exports.addAchieve = function (req, res) {
       res.status(500).send(err)
     }
   })
-}
-
-module.exports.balls = async function (req, res) {
-  let kri = JSON.parse(JSON.stringify(Kri))
-  let balls = 0
-  let Achs = await db.allAchieves()
-  let kriteries = {}
-
-  for (key of Object.keys(kri)) {
-    kriteries[key] = []
-  }
-
-  for(let ach of Achs) {
-      console.log(ach);
-      let curKrit = kri[ach.crit];
-      if (Array.isArray(curKrit)) {
-          kriteries[ach.crit].push(curKrit)
-      }
-      else {
-          for (let ch of ach.chars) {
-              console.log(Object.keys(curKrit), ch)
-              curKrit = curKrit[ch]
-          }
-          kriteries[ach.crit].push(curKrit)
-      }
-  }
-
-    for (key of Object.keys(kri)) {
-        balls += MatrBalls(kriteries[key])
-    }
-
-  res.render('add',{obj: balls})
-}
-
-module.exports.delete = async function(req,res){
-  await db.deleteAchieves()
-  res.render('add',{obj: 0})
-}
-
-const MatrBalls = function(M){
-  let S = 0
-  let max = 0
-    console.log(M)
-  for(let i = 0; i < M.length; ++i){
-      for(let j=0; j < M.length; ++j){
-        if(M[j][i] > max){
-          max = M[j][i]
-          var q = j
-        }
-      }
-      M[q] = [0,0,0,0,0,0]
-      S+=max
-      max = 0
-  }
-  return S
 }
