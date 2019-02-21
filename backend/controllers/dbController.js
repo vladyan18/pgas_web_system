@@ -5,6 +5,10 @@ exports.findUserById= function (id) {
   return UserModel.findOne({ id: id})
 }
 
+exports.findUser = function(id){
+  return UserModel.findById(id)
+}
+
 exports.allUsers = function () {
   return UserModel.find({})
 }
@@ -68,4 +72,17 @@ exports.setBalls = function(id,balls){
   return UserModel.findOneAndUpdate({ id: id }, { $set: { Ball: balls} }, function (err, result) {
     console.log(result)
   })
+}
+
+exports.UserSeccesAchs = async function(id){
+  let User = await UserModel.findOne({ id: id})
+  let Achs = User.Achievement
+  let SucAchs = []
+  for(let achID of Achs) {
+    let ach =  await AchieveModel.findById(achID)
+    if(ach.status === 'Принято'){
+      SucAchs.push(ach)
+    }
+  }
+  return SucAchs
 }

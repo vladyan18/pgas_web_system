@@ -61,20 +61,43 @@ module.exports.Checked = async function (req, res) {
   res.status(200).send({ Info: info })
 }
 
+module.exports.allUsers = async function (req, res) {
+  let ip = await req.url.slice(6)
+  let User = await db.findUser(ip)
+  let Achs = []
+  for (let i of User.Achievement) {
+    let Ach = await db.findAchieveById(i)
+    let files = Ach.files
+    let date = Ach.date
+    let crit = Ach.crit
+    let popisal = Ach.comment
+    let status = Ach.status
+    let Achieve = {
+      Files: files,
+      Date: date,
+      Crit: crit,
+      Popisal: popisal,
+      Status: status
+    }
+    Achs.push(Achieve)
+  }
+  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Achs: Achs })
+}
+
+
 module.exports.getRating = async function (req, res) {
   let users = []
   let Users = await db.allUsers()
   for (let user of Users) {
-    console.log(user)
     let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
     users.push({ Name: str, Ball: user.Ball })
   }
-  console.log(users)
   res.status(200).send({ Users: users })
 }
 
 const balls = async function (id) {
   let kri = JSON.parse(JSON.stringify(Kri))
+
   let balls = 0;
   let User = await db.findUserById(id);
   Achs = User.Achievement;
@@ -84,6 +107,7 @@ const balls = async function (id) {
     kriteries[key] = []
   }
 
+
   for(let achID of Achs) {
       ach = await db.findAchieveById(achID);
       let curKrit = kri[ach.crit];
@@ -92,6 +116,7 @@ const balls = async function (id) {
       }
       else {
           for (let ch of ach.chars) {
+              console.log(Object.keys(curKrit), ch)
               curKrit = curKrit[ch]
           }
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
