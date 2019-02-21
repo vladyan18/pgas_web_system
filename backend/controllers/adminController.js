@@ -27,15 +27,15 @@ module.exports.dynamic = async function (req, res) {
 }
 
 module.exports.AchSuccess = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, true)
-    if (req.body.user._json.email)
-        id = req.body.user._json.email
+  await db.ChangeAchieve(req.body.Id, req.body.Comm, true)
+    if (req.user._json.email)
+        id = req.user._json.email
     else id = req.user.user_id
   balls(id)
 }
 
 module.exports.AchFailed = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, false)
+  await db.ChangeAchieve(req.body.Id, req.body.Comm, false)
 }
 
 module.exports.Checked = async function (req, res) {
@@ -75,49 +75,53 @@ module.exports.getRating = async function (req, res) {
 
 const balls = async function (id) {
   let kri = JSON.parse(JSON.stringify(Kri))
-  let balls = 0
-  let User = await db.findUserById(id)
-  Achs = User.Achievement
-  let kriteries = {}
+  let balls = 0;
+  let User = await db.findUserById(id);
+  Achs = User.Achievement;
+  let kriteries = {};
 
   for (key of Object.keys(kri)) {
     kriteries[key] = []
   }
 
   for(let achID of Achs) {
-      ach = await db.findAchieveById(achID)
+      ach = await db.findAchieveById(achID);
       let curKrit = kri[ach.crit];
       if (Array.isArray(curKrit)) {
-          kriteries[ach.crit].push(curKrit)
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
       else {
           for (let ch of ach.chars) {
               curKrit = curKrit[ch]
           }
-          kriteries[ach.crit].push(curKrit)
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
   }
 
     for (key of Object.keys(kri)) {
         balls += MatrBalls(kriteries[key])
+        for (curAch of kriteries[key]) {
+          db.updateAchieve(curAch['ach']._id, curAch['ach'])
+        }
     }
 
   db.setBalls(id,balls)
 }
 
 const MatrBalls = function(M){
-  let S = 0
-  let max = 0
-    console.log(M)
+  let S = 0;
+  let max = 0;
+    console.log(M);
   for(let i = 0; i < M.length; ++i){
       for(let j=0; j < M.length; ++j){
-        if(M[j][i] > max){
-          max = M[j][i]
+        if(M[j]['balls'][i] > max){
+          max = M[j]['balls'][i];
           var q = j
         }
       }
-      M[q] = [0,0,0,0,0,0]
-      S+=max
+      M[q]['ach'].ball = max;
+      M[q]['balls'] = [0,0,0,0,0,0];
+      S+=max;
       max = 0
   }
   return S

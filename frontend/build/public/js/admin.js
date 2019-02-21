@@ -1,11 +1,13 @@
 function Success (button) {
   let id = button.value
-  $.post('/AchSuccess', { Id: id })
+    let comm = $('#comment').val()
+  $.post('/AchSuccess', { Id: id, Comm: comm })
 }
 
 function Failed (button) {
   let id = button.value
-  $.post('/AchFailed', { Id: id })
+    let comm = $('#comment').val()
+  $.post('/AchFailed', { Id: id, Comm: comm })
 }
 
 function getUsers () {
@@ -21,7 +23,7 @@ function getUsers () {
         qq += '<div class="name"><h3>' + data.Info[i].user + '</h3><block><p><a href="/user/' + data.Info[i].Id + '" class="goto">Перейти к профилю</a></p>'
         qq += '<br><p>Критерий: <criteria>' + data.Info[i].Achievements[j] + '</criteria></p>'
         qq += '<div>Достижение: <desc>' + data.Info[i].AchTexts[j] + '</desc></div>'
-        qq += ' <br><div class="input-container"><textarea class="form-control" rows="3" placeholder="Введите комментарий..."></textarea></div><br><button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button><button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button><br>'
+        qq += ' <br><div class="input-container"><textarea id="comment" class="form-control" rows="3" placeholder="Введите комментарий..."></textarea></div><br><button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button><button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button><br>'
         qq += '</block></div>'
       }
     }

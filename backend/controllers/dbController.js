@@ -34,7 +34,7 @@ exports.createAchieve = function (achieve) {
 }
 
 exports.updateAchieve = function (id, achieve) {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { crit: achieve.crit, chars: achieve.chars, status: achieve.status, achievement: achieve.achievement } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { crit: achieve.crit, chars: achieve.chars, status: achieve.status, achievement: achieve.achievement, ball: achieve.ball } }, function (err, result) {
         console.log('')
     })
 }
@@ -47,14 +47,14 @@ exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 }
 
-exports.ChangeAchieve = function (id, isGood) {
+exports.ChangeAchieve = function (id, comm, isGood) {
   if (isGood === true) {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято' } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято', comment: comm } }, function (err, result) {
       console.log('')
     })
   }
   else {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано' } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано', comment: comm } }, function (err, result) {
       console.log('')
     })
   }
