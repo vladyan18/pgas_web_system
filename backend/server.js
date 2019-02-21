@@ -5,7 +5,7 @@ const path = require('path')
 const passport = require('./config/passport') // configuring passport here
 
 const frontendPath = path.join(__dirname, '../frontend', '/build')
-const port = 8080
+const port = 80
 
 const app = express()
 

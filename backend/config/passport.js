@@ -4,9 +4,9 @@ const db = require('../controllers/dbController')
 
 var strategy = new Auth0Strategy(
     {
-      domain: 'auction.eu.auth0.com',
-      clientID: 'I87ucuIlQ2Wx9X12z1cjJiDC4214290i',
-      clientSecret: '-drLRTUhYhiWXc2m7kj2iuWconNFd05Zesj-aMkrmpqmofYTnxs7FLQtiOeZ69yE',
+      domain: 'vladyan18.eu.auth0.com',
+      clientID: 'GioyT7jHzp8opB8ZdMNeJsPRkID4RJNI',
+      clientSecret: 'jrV4PqnRFNVTjWwm2IY0sJ405h1Shl_501JZ1teBjqHbSN_22h00BhsQNq2dG5IY',
       callbackURL:
         process.env.AUTH0_CALLBACK_URL || '/callback'
     },

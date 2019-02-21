@@ -1,5 +1,5 @@
 const db = require('./dbController')
-const Kri = require(__dirname + "\\Kriterii.json")
+const Kri = require(__dirname + "/Kriterii.json")
 
 module.exports.dynamic = async function (req, res) {
   let info = []
