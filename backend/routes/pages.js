@@ -6,11 +6,25 @@ const frontendPath = path.join(__dirname, '../../frontend', '/build')
 
 const auth = (req, res, next) => {
   if (req.isAuthenticated()) {
-    next()
+
+    if (req.user.Registered)
+      next()
+    else return res.redirect('/register')
   }
   else {
     return res.redirect('/login')
   }
+}
+
+const regAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+      console.log(req.user._json.email)
+        console.log(req.body)
+       next()
+    }
+    else {
+        return res.redirect('/login')
+    }
 }
 
 const adminAuth = (req, res, next) => {
@@ -48,8 +62,17 @@ router.get('/home', auth,  (req, res) => {
   res.sendFile(path.join(frontendPath, '/user_main.html'))
 })
 
+router.get('/register',regAuth, (req, res) => {
+    res.sendFile(path.join(frontendPath, '/register.html'))
+})
+
+
 router.get('/upload',auth,(req, res) => {
   res.sendFile(path.join(frontendPath, '/add.html'))
+})
+
+router.get('/achievement/*',auth,(req, res) => {
+    res.sendFile(path.join(frontendPath, '/achievement.html'))
 })
 
 router.get('/documents',auth,(req, res) => {
@@ -77,6 +100,7 @@ router.get('/rating',adminAuth, (req, res) => {
 router.get('/info',adminAuth, (req, res) => {
   res.sendFile(path.join(frontendPath, '/info.html'))
 })
+
 
 router.get('/user/*',adminAuth, (req, res) => {
   res.sendFile(path.join(frontendPath, '/profile_admin.html'))

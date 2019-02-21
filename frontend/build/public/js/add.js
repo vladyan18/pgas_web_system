@@ -74,7 +74,7 @@ function sendKrit() {
     console.log(res.chars);
 
 
-    res.comment = $('#comment').val()
+    res.achievement = $('#comment').val()
     res.status = 'Ожидает проверки'
     var form = document.forms.namedItem('fileinfo')
     console.log(form)
@@ -84,10 +84,7 @@ function sendKrit() {
     oReq.open('POST', '/add_achieve', true)
     oReq.onload = function (oEvent) {
         if (oReq.status === 200) {
-            console.log('Uploaded!')
-            $('#myModal').on('shown.bs.modal', function () {
-                $('#myInput').trigger('focus')
-            })
+            $(location).attr('href','/home')
         }
         else {
             console.log(

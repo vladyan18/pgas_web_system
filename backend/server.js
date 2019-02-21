@@ -37,7 +37,7 @@ app.use(function (req, res, next) {
 })
 
 if (app.get('env') === 'production') {
-    sess.cookie.secure = true;
+    //sess.cookie.secure = true;
 }
 
 app.use(express.json())

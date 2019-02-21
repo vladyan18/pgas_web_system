@@ -7,6 +7,12 @@ router.get('/getUserInfo', userController.dynamic)
 
 router.post('/add_achieve', userController.addAchieve)
 
+router.post('/update_achieve', userController.updateAchieve)
+
+router.get('/getAch/', userController.getAch)
+
+router.post('/registerUser', userController.registerUser)
+
 router.get('/getUsersForAdmin', adminController.dynamic)
 
 router.post('/AchSuccess', adminController.AchSuccess)

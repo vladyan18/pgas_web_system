@@ -6,7 +6,10 @@ const achieveSchema = mongoose.Schema({
   crit: String,
   chars: [String],
   files: [String],
-  status: String
+  status: String,
+    achievement: String,
+    comment: String,
+    ball: Number
 })
 
 const Achieve = connection.model('Achieve', achieveSchema)

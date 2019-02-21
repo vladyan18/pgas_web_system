@@ -3,8 +3,13 @@ const connection = require('../config/db')
 
 const userSchema = mongoose.Schema({
   id: String,
+    Registered: Boolean,
   LastName: String,
+  Patronymic: String,
   FirstName: String,
+    Faculty: String,
+    Course: Number,
+    Type: String,
   Ball: Number,
   Achievement: [String]
 })

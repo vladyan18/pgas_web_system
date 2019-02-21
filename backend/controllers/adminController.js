@@ -5,20 +5,23 @@ module.exports.dynamic = async function (req, res) {
   let info = []
   let Users = await db.allUsers()
   for (let user of Users) {
-    let str = user.LastName + ' ' + user.FirstName
+    if (!user) continue;
+    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
     let Achievements = []
-    let Comments = []
+    let AchTexts = []
     let AchId = []
     for (let achievement of user.Achievement) {
+
       let ach = await db.findAchieveById(achievement)
+        if (!ach) continue;
       if (ach.status === 'Ожидает проверки') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
-        Comments.push(ach.comment)
+          AchTexts.push(ach.achievement)
       }
     }
     console.log(Achievements)
-    info.push({ Id: user._id, user: str, Comments: Comments, Achievements: Achievements, AchId: AchId })
+    info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId })
   }
   res.status(200).send({ Info: info })
 }
@@ -38,7 +41,7 @@ module.exports.Checked = async function (req, res) {
   for (let user of Users) {
     let str = user.LastName + ' ' + user.FirstName
     let Achievements = []
-    let Comments = []
+    let AchTexts = []
     let AchId = []
     let Status = []
     for (let achievement of user.Achievement) {
@@ -46,11 +49,11 @@ module.exports.Checked = async function (req, res) {
       if (ach.status !== 'Ожидает проверки') {
         Achievements.push(ach.type)
         AchId.push(ach._id)
-        Comments.push(ach.comment)
+          AchTexts.push(ach.achievement)
         Status.push(ach.status)
       }
     }
-    info.push({ Id: user._id, user: str, Comments: Comments, Achievements: Achievements, AchId: AchId, Status: Status })
+    info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Status: Status })
   }
   res.status(200).send({ Info: info })
 }
@@ -60,7 +63,7 @@ module.exports.getRating = async function (req, res) {
   let Users = await db.allUsers()
   for (let user of Users) {
     console.log(user)
-    let str = user.LastName + ' ' + user.FirstName
+    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
     users.push({ Name: str, Ball: user.Ball })
   }
   console.log(users)
