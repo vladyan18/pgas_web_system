@@ -9,7 +9,9 @@ const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
 
 module.exports.dynamic = async function (req, res) {
   let Achs = []
-  let User= await db.findUserById(req.user._json.email)
+    if (req.user._json.email)
+       User = await db.findUserById(req.user._json.email)
+    else  User = await db.findUserById(req.user.user_id)
   let W = User.Achievement
   for (let i of W) {
      let Ach = await db.findAchieveById(i)  
@@ -28,7 +30,10 @@ module.exports.registerUser = async function (req, res) {
   try {
       let data = req.body;
       console.log(data)
-      await db.registerUser(req.user._json.email, data.lastname, data.name, data.patronymic, data.faculty, data.course, data.type);
+      if (req.user && req.user._json.email)
+        id = req.user._json.email
+      else id = req.user.user_id
+      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.faculty, data.course, data.type);
       res.sendStatus(200)
   } catch (err) {
       console.log(err)
@@ -62,7 +67,10 @@ module.exports.addAchieve = function (req, res) {
       achieve.files = arr
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
-      await db.addAchieveToUser(req.user._json.email, createdAchieve._id)
+        if (req.user._json && req.user._json.email)
+            id = req.user._json.email
+        else id = req.user.user_id
+      await db.addAchieveToUser(id, createdAchieve._id)
       res.sendStatus(200)
     }
     catch (err) {

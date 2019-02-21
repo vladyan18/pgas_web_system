@@ -28,7 +28,10 @@ module.exports.dynamic = async function (req, res) {
 
 module.exports.AchSuccess = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, true)
-  balls(req.user._json.email)
+    if (req.body.user._json.email)
+        id = req.body.user._json.email
+    else id = req.user.user_id
+  balls(id)
 }
 
 module.exports.AchFailed = async function (req, res) {

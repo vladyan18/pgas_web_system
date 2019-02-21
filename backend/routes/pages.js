@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
 
 const regAuth = (req, res, next) => {
     if (req.isAuthenticated()) {
-      console.log(req.user._json.email)
+
         console.log(req.body)
        next()
     }
@@ -49,6 +49,7 @@ router.get('/callback', function (req, res, next) {
     passport.authenticate('auth0', function (err, user, info) {
       if (err) { return next(err) }
       if (!user) { return res.redirect('/login') }
+      console.log(user)
       req.logIn(user, function (err) {
         if (err) { return next(err) }
         const returnTo = req.session.returnTo
