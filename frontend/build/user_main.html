@@ -53,13 +53,17 @@
           <div class="col-md-9 rightBlock">
             <p id="username" class="headline"></p>
             <hr class="hr_blue" />
-            <div class="profile">
-              <div>Факультет: <faculty id="faculty" class="info">ПМ-ПУ</faculty></div>
+            <div class="profile" style="display: flex; justify-content: space-between;">
+              <div><div style="vertical-align: middle">Факультет: <faculty id="faculty" class="info">ПМ-ПУ</faculty> </div></div>
+              <form action="/getAnket" >
+                <input type="submit" class="btn btn-primary" value="Скачать анкету" />
+              </form>
             </div>
 
             <div class="category">
               <h3>Текущие достижения</h3>
               <block_1 style="display: block"> <div id="row_docs"></div> </block_1>
+
             </div>
 
             <div class="category">

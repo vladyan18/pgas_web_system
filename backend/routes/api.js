@@ -2,12 +2,15 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController.js')
 const adminController = require('../controllers/adminController.js')
+const docxController = require('../controllers/docxController')
 
 router.get('/getUserInfo', userController.dynamic)
 
 router.post('/add_achieve', userController.addAchieve)
 
 router.post('/update_achieve', userController.updateAchieve)
+
+router.get('/getAnket', docxController.getAnket)
 
 router.get('/getAch/', userController.getAch)
 
