@@ -7,8 +7,8 @@ function getUsers () {
 
   xhr.onload = function () {
     let data = JSON.parse(xhr.responseText)
-    let qq = '<p class="headline">' + data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic + '</p><hr class="hr_blue"><div class="profile"><div>Факультет: <faculty class="info">' + data.Faculty + '</faculty></div>'
-    qq += '<div>Курс: <course class="info">' + data.Course + '</course></div><div>Средний балл: <ave_ball class="info">' + data.AverageMark + '</ave_ball></div></div><p class="headline">Текущие достижения</p><hr class="hr_blue">'
+    let qq = '<p class="headline">' + data.LastName + ' ' + data.FirstName + '</p><hr class="hr_blue"><div class="profile"><div>Факультет: <faculty class="info">ПМ-ПУ</faculty></div>'
+    qq += '</div><p class="headline">Текущие достижения</p><hr class="hr_blue">'
     for (let i = 0; i < data.Achs.length; ++i) {
       qq += '<div class="name"><h3>' + data.Achs[i].Date + '</h3><block>'
       for (let j of data.Achs[i].Files) {
