@@ -10,6 +10,12 @@ const port = 8080
 const app = express()
 
 
+app.set('views', path.join(__dirname, 'views'));
+app.engine('html', require('ejs').renderFile);
+
+app.set("view engine", "ejs")
+
+
 
 const sess = {
   secret: '5c6a5cc5f3fd8718f419ff27',
@@ -17,6 +23,7 @@ const sess = {
   resave: false,
   saveUninitialized: true
 }
+
 
 app.use(morgan('dev'))
 
@@ -30,7 +37,7 @@ app.use(function (req, res, next) {
 })
 
 if (app.get('env') === 'production') {
-    sess.cookie.secure = true;
+    //sess.cookie.secure = true;
 }
 
 app.use(express.json())

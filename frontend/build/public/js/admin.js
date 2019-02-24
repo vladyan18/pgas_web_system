@@ -15,15 +15,21 @@ function getUsers () {
 
   xhr.onload = function () {
     let data = JSON.parse(xhr.responseText)
+    console.log(data)
     let qq = ''
     for (let i = 0; i < data.Info.length; ++i) {
+      qq += '<div class="name"><h3>' + data.Info[i].user + '</h3><block>'
+      qq += '<table class="table"><thead><th>Критерий</th><th>Достижение</th><th>Комментарий</th><th></th><th></th><th></th></thead><tbody>'
       for (let j = 0; j < data.Info[i].Achievements.length; ++j) {
-        qq += '<div class="name"><h3>' + data.Info[i].user + '</h3><block><p><a href="/user/' + data.Info[i].Id + '" class="goto">Перейти к профилю</a></p>'
-        qq += '<br><p>Критерий: <criteria>' + data.Info[i].Achievements[j] + '</criteria></p>'
-        qq += '<div>Описание: <desc>' + data.Info[i].Comments[j] + '</desc></div>'
-        qq += ' <br><div class="input-container"><textarea class="form-control" rows="3" placeholder="Введите комментарий..."></textarea></div><br><button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button><button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button><br>'
-        qq += '</block></div>'
+        qq += '<tr id="TR " style="cursor: pointer"><td>'+ data.Info[i].Achievements[j]+ '</td>';
+        qq += '<td></td>';
+        qq += '<td>'+ data.Info[i].AchTexts[j] +'</td>';
+        qq += '<td><button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button></td>'
+        qq += '<td><button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button></td>'
+        qq += '<td> <form action="achievement/' + data.Info[i].AchId[j] + '" method="get"><button type="submit" onclick="Change(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-warning btn-sm">Изменить</button></form></td>'
+        qq += '</tr>'
       }
+      qq += '</tbody></table></block></div>'
     }
     document.getElementById('users').innerHTML = qq
 

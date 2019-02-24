@@ -37,18 +37,28 @@ exports.createAchieve = function (achieve) {
   return AchieveModel.create(achieve)
 }
 
+exports.updateAchieve = function (id, achieve) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { crit: achieve.crit, chars: achieve.chars, status: achieve.status, achievement: achieve.achievement, ball: achieve.ball } }, function (err, result) {
+        console.log('')
+    })
+}
+
+exports.registerUser = function (userId, lastname, name, patronymic, faculty, course, type) {
+    return UserModel.findOneAndUpdate({ id: userId }, { $set: { LastName: lastname, FirstName: name, Patronymic: patronymic, Faculty: faculty, Course: course, Type: type, Registered: true } })
+}
+
 exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 }
 
-exports.ChangeAchieve = function (id, isGood) {
+exports.ChangeAchieve = function (id, comm, isGood) {
   if (isGood === true) {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято' } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято', comment: comm } }, function (err, result) {
       console.log('')
     })
   }
   else {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано' } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано', comment: comm } }, function (err, result) {
       console.log('')
     })
   }
@@ -64,7 +74,7 @@ exports.setBalls = function(id,balls){
   })
 }
 
-exports.UserSeccesAchs = async function(id){
+exports.UserSuccesAchs = async function(id){
   let User = await UserModel.findOne({ id: id})
   let Achs = User.Achievement
   let SucAchs = []
@@ -75,4 +85,19 @@ exports.UserSeccesAchs = async function(id){
     }
   }
   return SucAchs
+}
+
+
+exports.ChangeRole = function (id, isAdmin) {
+  console.log(id)
+  if (isAdmin === true) {
+    return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'Admin'} }, function (err, result) {
+      console.log(result)
+    })
+  }
+  else {
+    return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'User' } }, function (err, result) {
+      console.log(result)
+    })
+  }
 }

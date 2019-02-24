@@ -34,17 +34,15 @@
             <div class="row">
                 <div class="col-md-3 leftBlock">
                     <div class="left_navbar">
-                        <ul class="ul_nav">
-                            <li class="element">
-                                <a class="a_element" href="/home">  Мое портфолио</a>
-                            </li>
-                            <li class=" element element_active">
-                                <a class="" href="/upload">Загрузить в портфолио</a>
-                            </li>
-                            <li class=" element">
-                                <a class="" href="/documents">  Документы</a>
-                            </li>
-                        </ul>
+                            <div class='balls'>
+                                    <p><form method = 'post'  action="/balls">
+                                        <input type='submit' , class='button btn btn-succes'  , value='Посчитать баллы'>
+                                    </form></p>
+                                    <p><%=obj%></p>
+                                    <p><form method = 'post'  action="/delete">
+                                        <input type='submit' , class='button btn btn-succes'  , value='Удалить все достижения'>
+                                    </form></p>   
+                            </div>
                     </div>
                 </div>
                 <div class="col-md-9 rightBlock">
@@ -102,8 +100,6 @@
                         </select>
                         <div id="form">
                         </div>
-                        <div class="show_hide_c11">
-                        </div>
                         <textarea class="form-control area_text" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
                         <div class="input-group">
                             <span class="input-group-btn">
@@ -119,7 +115,7 @@
                             </span>
                             <span class="file-input-label"></span>
                         </div>
-                        <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send" data-toggle="modal"
+                        <button id="sendButton" type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send" data-toggle="modal"
                             data-target="#exampleModal" value="отправить">
                             отправить
                         </button>
@@ -143,7 +139,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        Достижение добавлено
+                        Заявка принята
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -159,6 +155,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="js/add.js"></script>
+
     <script>
     </script>
 </body>

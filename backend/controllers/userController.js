@@ -9,14 +9,36 @@ const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
 
 module.exports.dynamic = async function (req, res) {
   let Achs = []
-  let User= await db.findUserById(req.user._json.email)
+    if (req.user._json.email)
+       User = await db.findUserById(req.user._json.email)
+    else  User = await db.findUserById(req.user.user_id)
   let W = User.Achievement
   for (let i of W) {
      let Ach = await db.findAchieveById(i)  
     await Achs.push(Ach)
   }
-  res.status(200).send({ LastName: req.user.name.familyName, FirstName: req.user.name.givenName, Achs: Achs })
+  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Faculty: User.Faculty, Achs: Achs })
 }
+
+module.exports.getAch = async function (req, res) {
+  id = req.query.achievement.slice(0,24)
+  res.status(200).send( await db.findAchieveById(id))
+}
+
+module.exports.registerUser = async function (req, res) {
+  try {
+      let data = req.body;
+      console.log(data)
+      if (req.user && req.user._json.email)
+        id = req.user._json.email
+      else id = req.user.user_id
+      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.faculty, data.course, data.type);
+      res.sendStatus(200)
+  } catch (err) {
+      console.log(err)
+      res.status(500).send(err)
+  }
+};
 
 module.exports.addAchieve = function (req, res) {
   if (!fs.existsSync(uploadsPath)) {
@@ -36,15 +58,19 @@ module.exports.addAchieve = function (req, res) {
       }
       achieve.status = 'Ожидает проверки'
       achieve.date = new Date().toLocaleString('ru', options)
-
+      
       let arr = []
       for (let file of req.files) {
         arr.push(file.filename)
       }
       achieve.files = arr
+      achieve.comment = ''
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
-      await db.addAchieveToUser(req.user._json.email, createdAchieve._id)
+        if (req.user._json && req.user._json.email)
+            id = req.user._json.email
+        else id = req.user.user_id
+      await db.addAchieveToUser(id, createdAchieve._id)
       res.sendStatus(200)
     }
     catch (err) {
@@ -54,3 +80,37 @@ module.exports.addAchieve = function (req, res) {
   })
 }
 
+module.exports.updateAchieve = function (req, res) {
+    if (!fs.existsSync(uploadsPath)) {
+        fs.mkdirSync(uploadsPath)
+    }
+    upload(req, res, async function (err) {
+        try {
+            if (err || !req.files) {
+                return res.status(400).send('ERROR: Max file size = 15MB')
+            }
+            let achieve = JSON.parse(req.body.data)
+            let id = req.body.achId.slice(0,24)
+            let options = {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            }
+            achieve.status = 'Ожидает проверки'
+            achieve.date = new Date().toLocaleString('ru', options)
+
+            let arr = []
+            for (let file of req.files) {
+                arr.push(file.filename)
+            }
+            achieve.files = arr
+            console.log(achieve)
+            let createdAchieve = await db.updateAchieve(id, achieve)
+            res.sendStatus(200)
+        }
+        catch (err) {
+            console.log(err)
+            res.status(500).send(err)
+        }
+    })
+  }

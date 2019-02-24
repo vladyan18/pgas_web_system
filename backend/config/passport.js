@@ -11,8 +11,18 @@ var strategy = new Auth0Strategy(
         process.env.AUTH0_CALLBACK_URL || '/callback'
     },
     async function (accessToken, refreshToken, extraParams, profile, done) {
-      if(!await db.isUser(profile._json.email)){
-        await db.createUser({Role : "User", id: profile._json.email, FirstName : profile.name.givenName, LastName: profile.name.familyName, Ball: 0,  Achievement: []})
+        if (profile._json && profile._json.email) id = profile._json.email
+        else id = profile.user_id
+      if(!await db.isUser(id)){
+        await db.createUser({Role : "User", id: id, Ball: 0,  Achievement: [], Registered: false})
+      }
+
+      user = await db.findUserById(id);
+      if (user.registered)
+      {
+          profile.LastName = user.LastName;
+          profile.Name = user.Name;
+          profile.Patronymic = user.Patronymic;
       }
       return done(null, profile)
     }
@@ -24,8 +34,13 @@ var strategy = new Auth0Strategy(
     done(null, user)
   })
   
-  passport.deserializeUser(function (user, done) {
-    done(null, user)
+  passport.deserializeUser(async function (user, done) {
+      if (user._json && user._json.email) id = user._json.email
+      else id = user.user_id
+      let u =  await db.findUserById(id)
+      user.Registered = u.Registered;
+          done(null, user)
+
   })
 
 module.exports = passport

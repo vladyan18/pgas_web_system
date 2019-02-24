@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 mongoose.connect(
-  'mongodb://admin:adpass1@ds127624.mlab.com:27624/portfolio',
+  'mongodb://user:password1@ds127624.mlab.com:27624/portfolio',
   { useNewUrlParser: true }
 )
 
