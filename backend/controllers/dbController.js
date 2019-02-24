@@ -43,8 +43,8 @@ exports.updateAchieve = function (id, achieve) {
     })
 }
 
-exports.registerUser = function (userId, lastname, name, patronymic, faculty, course, type) {
-    return UserModel.findOneAndUpdate({ id: userId }, { $set: { LastName: lastname, FirstName: name, Patronymic: patronymic, Faculty: faculty, Course: course, Type: type, Registered: true } })
+exports.registerUser = function (userId, lastname, name, patronymic, birthdate, faculty, course, type) {
+    return UserModel.findOneAndUpdate({ id: userId }, { $set: { LastName: lastname, FirstName: name, Patronymic: patronymic, Birthdate: birthdate, Faculty: faculty, Course: course, Type: type, Registered: true } })
 }
 
 exports.addAchieveToUser = function (userId, achieveId) {

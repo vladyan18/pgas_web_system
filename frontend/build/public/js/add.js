@@ -30,6 +30,7 @@ function addKrit(self, krit) {
     createdKrits.push(k)
 }
 
+
 function getChars(self, array) {
     array.push(self.val())
     console.log(self.val())
@@ -38,6 +39,7 @@ function getChars(self, array) {
 
 var kritSelector;
 var createdKrits = []
+var hasSZ = false;
 
 $(document).ready(function () {
     krit = Kri;
@@ -58,8 +60,22 @@ $(document).ready(function () {
         addKrit(kritSelector, krit)
     });
 
+    $("#szBox").change(function () {
+        hasSZ = this.checked
+        console.log(this.checked)
 
-
+        if (hasSZ) {
+            $('<br/><input type="number" id="szNum" required placeholder="Номер СЗ"/>').insertAfter('#szBox');
+            $('<input type="date" id="szDate" required placeholder="Дата СЗ">').insertAfter('#szNum');
+            $('<input type="number" id="szPril" placeholder="Номер приложения">').insertAfter('#szDate');
+            $('<input type="number" id="szPunkt" placeholder="Номер пункта">').insertAfter('#szPril');
+        } else {
+            $('#szNum').remove()
+            $('#szDate').remove()
+            $('#szPril').remove()
+            $('#szPunkt').remove()
+        }
+    })
 });
 
 function sendKrit() {
@@ -67,6 +83,13 @@ function sendKrit() {
     res.type = $('#check1').val();
     res.crit = $('#check2').val();
     res.chars = [];
+
+
+     res.szDate = $('#szDate').val();
+    res.szNum = $('#szNum').val();
+    res.szPril = $('#szPril').val();
+    res.szPunkt = $('#szPunkt').val();
+
 
     // получение списка характеристик
     if (kritSelector.kritChild)

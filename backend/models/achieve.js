@@ -9,7 +9,8 @@ const achieveSchema = mongoose.Schema({
   status: String,
     achievement: String,
     comment: String,
-    ball: Number
+    ball: Number,
+    szstr: String
 })
 
 const Achieve = connection.model('Achieve', achieveSchema)

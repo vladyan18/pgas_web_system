@@ -41,20 +41,22 @@
                 <!--- Отправляем данные формы   --->
                 <form id = 'register'>
                     <label>Фамилия</label><br>
-                    <input type='text'  id='lastname' name = 'lastname' class="form-control" required/><br>
+                    <input type='text'  id='lastname' name = 'lastname' class="form-control" required autocomplete="off"/><br>
                     <label>Имя</label><br>
-                    <input type='text'  id='name' name = 'name' class="form-control" required/><br>
+                    <input type='text'  id='name' name = 'name' class="form-control" required autocomplete="off"/><br>
                     <label>Отчество</label><br>
-                    <input type='text'  id='patronymic' name = 'patronymic' class="form-control" required/><br>
+                    <input type='text'  id='patronymic' name = 'patronymic' class="form-control" required autocomplete="off"/><br>
+                    <label>Дата рождения</label><br>
+                    <input type='date'  id='date' name = 'date' class="form-control" required autocomplete="off"/><br>
                     <label>Факультет</label><br>
-                    <select id="faculty" class="form-control " required>
+                    <select id="faculty" class="form-control " required >
                         <option disabled>Факультет</option>
                         <option selected value="ПМ-ПУ">
                             ПМ-ПУ
                         </option>
                     </select><br>
                     <label>Курс</label><br>
-                    <input type='number'  id='course' name = 'course' class="form-control" required/><br>
+                    <input type='number'  id='course' name = 'course' class="form-control" required min="1" max="6" autocomplete="off"/><br>
                     <label>Ступень обучения</label><br>
                     <select id="type" class="form-control " required>
                         <option disabled>Ступень</option>

@@ -6,6 +6,12 @@ function register() {
     res.faculty = $('#faculty').val();
     res.course = $('#course').val();
     res.type = $('#type').val();
+    res.birthdate = $('#date').val();
+
+    if (!res.lastname || !res.name || !res.patronymic || !res.faculty || !res.course || !res.type || !res.birthdate)
+
+        return false;
+    if (res.course < 1 || res.course > 6) return false;
 
     var oReq = new XMLHttpRequest()
     oReq.open('POST', '/registerUser', true)

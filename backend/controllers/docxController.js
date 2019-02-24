@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 
 const anketPath = path.join(__dirname, '..')
+const studyDirections = {"ПМ-ПУ": 'Процессы управления'}
 
 module.exports.getAnket = async function (req, res) {
     try {
@@ -59,6 +60,9 @@ module.exports.getAnket = async function (req, res) {
         f06 = String(f06).replace("FIO", user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic);
         f06 = String(f06).replace("&lt;TYPE&gt;", user.Type);
         f06 = String(f06).replace("&lt;COURSE&gt;", user.Course);
+        f06 = String(f06).replace("STDIR", studyDirections[user.Faculty]);
+        datestring = user.Birthdate.getDate()  + "." + (user.Birthdate.getMonth()+1) + "." + user.Birthdate.getFullYear();
+        f06 = String(f06).replace("BD", datestring);
 
         crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)']
 

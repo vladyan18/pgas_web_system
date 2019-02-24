@@ -33,7 +33,7 @@ module.exports.registerUser = async function (req, res) {
       if (req.user && req.user._json.email)
         id = req.user._json.email
       else id = req.user.user_id
-      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.faculty, data.course, data.type);
+      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.birthdate, data.faculty, data.course, data.type);
       res.sendStatus(200)
   } catch (err) {
       console.log(err)

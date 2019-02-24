@@ -28,8 +28,8 @@ function getAcievement () {
         qq += '<tr id="TR' + i + '" style="cursor: pointer"><td>'+ data.Achs[i].crit+ '</td>';
         qq += '<td>'+data.Achs[i].achievement+'</td>';
         qq += '<td>'+ data.Achs[i].status +'</td>';
-        qq += '<td>'+ (data.Achs[i].ball ?  data.Achs[i].ball : 0)+ '</td>';
-        qq += '<td>'+ data.Achs[i].comment +'</td>';
+        qq += '<td>'+ (data.Achs[i].ball ?  data.Achs[i].ball : '-')+ '</td>';
+        qq += '<td>'+ (data.Achs[i].comment ? data.Achs[i].comment : '') +'</td>';
         //qq += '<td>'
 
       //for (let j of data.Achs[i].files) {
