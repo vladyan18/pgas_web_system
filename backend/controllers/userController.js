@@ -17,7 +17,6 @@ module.exports.dynamic = async function (req, res) {
      let Ach = await db.findAchieveById(i)  
     await Achs.push(Ach)
   }
-
   res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Faculty: User.Faculty, Achs: Achs })
 }
 
@@ -65,6 +64,7 @@ module.exports.addAchieve = function (req, res) {
         arr.push(file.filename)
       }
       achieve.files = arr
+      achieve.comment = ''
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
         if (req.user._json && req.user._json.email)
@@ -113,4 +113,4 @@ module.exports.updateAchieve = function (req, res) {
             res.status(500).send(err)
         }
     })
-}
+  }

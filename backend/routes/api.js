@@ -22,9 +22,15 @@ router.post('/AchSuccess', adminController.AchSuccess)
 
 router.post('/AchFailed', adminController.AchFailed)
 
+router.post('/setUser', adminController.setUser)
+
+router.post('/setAdmin', adminController.setAdmin)
+
 router.get('/checked', adminController.Checked)
 
 router.get('/getRating', adminController.getRating)
+
+router.get('/getAdmins', adminController.getAdmins)
 
 router.get('/user=*', adminController.allUsers)
 

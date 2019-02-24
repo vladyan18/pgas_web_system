@@ -1,6 +1,24 @@
 const db = require('./dbController')
 const Kri = require(__dirname + "/Kriterii.json")
 
+module.exports.setUser = async function(req,res){
+  db.ChangeRole(req.body.Id,false)
+}
+
+module.exports.setAdmin = async function(req,res){
+  db.ChangeRole(req.body.Id,true)
+}
+
+module.exports.getAdmins = async function (req,res){
+  let users = []
+  let Users = await db.allUsers()
+  for (let user of Users) {
+    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
+    users.push({ Name: str, Role: user.Role, Id: user.id })
+  }
+  res.status(200).send({ Users: users })
+}
+
 module.exports.dynamic = async function (req, res) {
   let info = []
   let Users = await db.allUsers()
@@ -20,14 +38,15 @@ module.exports.dynamic = async function (req, res) {
           AchTexts.push(ach.achievement)
       }
     }
-    console.log(Achievements)
-    info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId })
+    if( AchId.length > 0){
+      info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId })
+    }
   }
   res.status(200).send({ Info: info })
 }
 
 module.exports.AchSuccess = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, req.body.Comm, true);
+  await db.ChangeAchieve(req.body.Id, req.body.Comm, true)
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
@@ -84,7 +103,6 @@ module.exports.allUsers = async function (req, res) {
   res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Achs: Achs })
 }
 
-
 module.exports.getRating = async function (req, res) {
   let kri = JSON.parse(JSON.stringify(Kri))
 
@@ -112,8 +130,7 @@ const balls = async function (id) {
   let kri = JSON.parse(JSON.stringify(Kri))
 
   let balls = 0;
-  let User = await db.findUserById(id);
-  Achs = User.Achievement;
+  let Achs = await db.UserSuccesAchs(id)
   let kriteries = {};
 
   for (key of Object.keys(kri)) {
@@ -123,7 +140,6 @@ const balls = async function (id) {
 
   for(let achID of Achs) {
       ach = await db.findAchieveById(achID);
-      if (ach.status != "Принято") continue;
       let curKrit = kri[ach.crit];
       if (Array.isArray(curKrit)) {
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
@@ -137,10 +153,9 @@ const balls = async function (id) {
   }
 
     for (key of Object.keys(kri)) {
-        balls += MatrBalls(kriteries[key]);
+        balls += MatrBalls(kriteries[key])
         for (curAch of kriteries[key]) {
           db.updateAchieve(curAch['ach']._id, curAch['ach'])
-            console.log(curAch['ach'])
         }
     }
 

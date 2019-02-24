@@ -10,7 +10,6 @@ function getAch() {
 
     xhr.onload = function () {
         let data = JSON.parse(xhr.responseText)
-
         krit = Kri;
 
         var chars = Object.keys(krit);

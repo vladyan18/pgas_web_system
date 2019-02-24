@@ -14,7 +14,6 @@ var strategy = new Auth0Strategy(
         if (profile._json && profile._json.email) id = profile._json.email
         else id = profile.user_id
       if(!await db.isUser(id)){
-
         await db.createUser({Role : "User", id: id, Ball: 0,  Achievement: [], Registered: false})
       }
 

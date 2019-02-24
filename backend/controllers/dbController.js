@@ -74,7 +74,7 @@ exports.setBalls = function(id,balls){
   })
 }
 
-exports.UserSeccesAchs = async function(id){
+exports.UserSuccesAchs = async function(id){
   let User = await UserModel.findOne({ id: id})
   let Achs = User.Achievement
   let SucAchs = []
@@ -85,4 +85,19 @@ exports.UserSeccesAchs = async function(id){
     }
   }
   return SucAchs
+}
+
+
+exports.ChangeRole = function (id, isAdmin) {
+  console.log(id)
+  if (isAdmin === true) {
+    return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'Admin'} }, function (err, result) {
+      console.log(result)
+    })
+  }
+  else {
+    return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'User' } }, function (err, result) {
+      console.log(result)
+    })
+  }
 }

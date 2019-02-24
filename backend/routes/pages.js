@@ -3,10 +3,10 @@ const router = express.Router()
 const path = require('path')
 const passport = require('passport')
 const frontendPath = path.join(__dirname, '../../frontend', '/build')
+const db = require('../controllers/dbController.js')
 
 const auth = (req, res, next) => {
   if (req.isAuthenticated()) {
-
     if (req.user.Registered)
       next()
     else return res.redirect('/register')
@@ -18,7 +18,6 @@ const auth = (req, res, next) => {
 
 const regAuth = (req, res, next) => {
     if (req.isAuthenticated()) {
-
         console.log(req.body)
        next()
     }
@@ -27,9 +26,19 @@ const regAuth = (req, res, next) => {
     }
 }
 
-const adminAuth = (req, res, next) => {
-  console.log(req)
-  if (req.isAuthenticated() && req.user._json.email === 'vladyan18@gmail.com') {
+const adminAuth = async (req, res, next) => {
+  let User = await db.findUserById(req.user.id)
+  if (req.isAuthenticated() && User.Role === 'Admin') {
+    next()
+  }
+  else {
+    return res.redirect('/404')
+  }
+}
+
+const superAdminAuth = async (req, res, next) => {
+  let User = await db.findUserById(req.user.id)
+  if (req.isAuthenticated()) {
     next()
   }
   else {
@@ -105,6 +114,22 @@ router.get('/info',adminAuth, (req, res) => {
 
 router.get('/user/*',adminAuth, (req, res) => {
   res.sendFile(path.join(frontendPath, '/profile_admin.html'))
+})
+
+router.get('/superAdmin', superAdminAuth, (req,res)=>{
+  res.sendFile(path.join(frontendPath, '/superAdmin.html'))
+})
+
+router.get('/superProcessed', superAdminAuth, (req,res)=>{
+  res.sendFile(path.join(frontendPath, '/superProcessed.html'))
+})
+
+router.get('/superRating', superAdminAuth, (req,res)=>{
+  res.sendFile(path.join(frontendPath, '/superRating.html'))
+})
+
+router.get('/admins', superAdminAuth, (req,res)=>{
+  res.sendFile(path.join(frontendPath, '/adminList.html'))
 })
 
 router.get('*', function (req, res) {
