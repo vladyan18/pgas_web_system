@@ -115,31 +115,36 @@ module.exports.getRating = async function (req, res) {
 
 const balls = async function (id) {
   let kri = JSON.parse(JSON.stringify(Kri))
-  let balls = 0
+
+  let balls = 0;
   let Achs = await db.UserSuccesAchs(id)
-  let kriteries = {}
+  let kriteries = {};
 
   for (key of Object.keys(kri)) {
     kriteries[key] = []
   }
 
-  for(let ach of Achs) {
-      console.log(ach);
+
+  for(let achID of Achs) {
+      ach = await db.findAchieveById(achID);
       let curKrit = kri[ach.crit];
       if (Array.isArray(curKrit)) {
-          kriteries[ach.crit].push(curKrit)
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
       else {
           for (let ch of ach.chars) {
               console.log(Object.keys(curKrit), ch)
               curKrit = curKrit[ch]
           }
-          kriteries[ach.crit].push(curKrit)
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
   }
 
     for (key of Object.keys(kri)) {
         balls += MatrBalls(kriteries[key])
+        for (curAch of kriteries[key]) {
+          db.updateAchieve(curAch['ach']._id, curAch['ach'])
+        }
     }
 
   db.setBalls(id,balls)
