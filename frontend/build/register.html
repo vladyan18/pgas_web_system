@@ -8,7 +8,6 @@
           crossorigin="anonymous">
     <link rel="icon" href="img/icon.png">
     <link rel="stylesheet" , href="style/start_style.css">
-    <link rel="stylesheet" , href="public/style/start_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -37,28 +36,26 @@
                 <img src='img/lock.png' , class="pic_lock">
                 <div class="title_text">Регистрация в системе ПГАС</div>
                 <div class="header_logo_text">Для использования системы необходимо пройти регистрацию.<br>
-                    Регистрируясь вы разрешаете СПбГУ и Студсовету обрабатывать ваши персональные данные (согласно анкете на ПГАС).</div>
+                    Запрашиваемые данные необходимы для формирования анкеты. Регистрируясь вы разрешаете СПбГУ и Студсовету обрабатывать ваши персональные данные (согласно анкете на ПГАС).</div>
                 <!--- Отправляем данные формы   --->
                 <form id = 'register'>
-                    <label>Фамилия</label><br>
-                    <input type='text'  id='lastname' name = 'lastname' class="form-control" required autocomplete="off"/><br>
-                    <label>Имя</label><br>
-                    <input type='text'  id='name' name = 'name' class="form-control" required autocomplete="off"/><br>
-                    <label>Отчество</label><br>
-                    <input type='text'  id='patronymic' name = 'patronymic' class="form-control" required autocomplete="off"/><br>
-                    <label>Дата рождения</label><br>
-                    <input type='date'  id='date' name = 'date' class="form-control" required autocomplete="off"/><br>
-                    <label>Факультет</label><br>
-                    <select id="faculty" class="form-control " required >
+                    <span style="color:#FF0000">*</span><label>Фамилия</label><br>
+                    <input type='text'  id='lastname' name = 'lastname' oninput="$(this).validate()" onblur="$(this).validate()" class="form-control" required autocomplete="off"/><br>
+                    <span style="color:#FF0000">*</span><label>Имя</label><br>
+                    <input type='text'  id='name' name = 'name' oninput="$(this).validate()" class="form-control" required autocomplete="off"/><br>
+                    <span style="color:#FF0000">*</span><label>Отчество</label><br>
+                    <input type='text'  id='patronymic' name = 'patronymic' oninput="$(this).validate()" class="form-control" required autocomplete="off"/><br>
+                    <span style="color:#FF0000">*</span><label>Дата рождения</label><br>
+                    <input type='text' placeholder="дд.мм.гггг" id='date' name = 'date' oninput="$(this).validate()" class="form-control" required autocomplete="off"/><br>
+                    <span style="color:#FF0000">*</span><label>Факультет</label><br>
+                    <select id="faculty" class="form-control " oninput="$(this).validate()" required >
                         <option disabled>Факультет</option>
                         <option selected value="ПМ-ПУ">
                             ПМ-ПУ
                         </option>
                     </select><br>
-                    <label>Курс</label><br>
-                    <input type='number'  id='course' name = 'course' class="form-control" required min="1" max="6" autocomplete="off"/><br>
-                    <label>Ступень обучения</label><br>
-                    <select id="type" class="form-control " required>
+                    <span style="color:#FF0000">*</span><label>Ступень обучения</label><br>
+                    <select id="type" name="type" class="form-control " oninput="$(this).validate()" required>
                         <option disabled>Ступень</option>
                         <option selected value="Бакалавриат">
                             Бакалавриат
@@ -70,6 +67,9 @@
                             Специалитет
                         </option>
                     </select><br>
+                    <span style="color:#FF0000">*</span><label>Курс</label><br>
+                    <input type='number' id='course' oninput="$(this).validate()" name ='course' class="form-control" required  autocomplete="off"/><br>
+
 
                     <button type="button" onclick="register()" class="btn btn-primary btn-md button_send"
                              value="регистрация">
@@ -87,6 +87,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 <script src="js/register.js"></script>
+<script src="/jquery-validation/dist/jquery.validate.js"></script>
 </body>
 
 </html>

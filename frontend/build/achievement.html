@@ -39,10 +39,10 @@
                             <a class="a_element" href="/home">  Мое портфолио</a>
                         </li>
                         <li class=" element">
-                            <a class="" href="/upload">Загрузить в портфолио</a>
+                            <a class="" href="/upload">Добавить достижение</a>
                         </li>
                         <li class=" element">
-                            <a class="" href="/documents">  Документы</a>
+                            <a class="" href="/documents">  Информация</a>
                         </li>
                         <li class=" element element_active">
                             <a class="" href="/">Достижение</a>
@@ -59,11 +59,59 @@
                     <p class="desc_headline">
                         Изменение загруженного достижения
                     </p>
-                    <div id="form">
-                    </div>
+                    <form id="critForm">
+                        <label for="check2" class="label_direction">Критерий:</label>
+                        <br />
+                        <select id="check2" class="form-control firstCourse" required name="check2">
+                            <option disabled>Критерий</option>
+                            <option selected value="1 (7а)">
+                                7а
+                            </option>
+                            <option value="2 (7б)">
+                                7б
+                            </option>
+                            <option value="3 (7в)">
+                                7в
+                            </option>
+                            <option value="4 (8а)">
+                                8а
+                            </option>
+                            <option value="5 (8б)">
+                                8б
+                            </option>
+                            <option value="6 (9а)">
+                                9а
+                            </option>
+                            <option value="7 (9б)">
+                                9б
+                            </option>
+                            <option value="8 (10а)">
+                                10а
+                            </option>
+                            <option value="9 (10б)">
+                                10б
+                            </option>
+                            <option value="10 (10в)">
+                                10в
+                            </option>
+                            <option value="11 (11а)">
+                                11а
+                            </option>
+                            <option value="12 (11б)">
+                                11б
+                            </option>
+                            <option value="13 (11в)">
+                                11в
+                            </option>
+                        </select>
+                    </form>
+                    <form id="form" class="form-horizontal">
+                    </form>
                     <div class="show_hide_c11">
                     </div>
-                    <textarea class="form-control area_text" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
+                    <form id="textForm">
+                    <textarea class="form-control area_text" placeholder="Введите достижение (четкое, однозначное и полное описание)" name="comment" id="comment" required></textarea>
+                    </form>
                     <div class="input-group" style="display: none">
                             <span class="input-group-btn">
                                 <form enctype="multipart/form-data" method="post" name="fileinfo">
@@ -78,7 +126,7 @@
                             </span>
                         <span class="file-input-label"></span>
                     </div>
-                    <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send" data-toggle="modal"
+                    <button type="button" onclick="editCrit()" class="btn btn-primary btn-md button_send"
                             data-target="#exampleModal" value="отправить">
                         Изменить
                     </button>
@@ -117,6 +165,8 @@
         crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+<script src="../jquery-validation/dist/jquery.validate.js"></script>
+<script src="../js/add.js"></script>
 <script src="../js/edit.js"></script>
 <script>
 </script>
