@@ -4,8 +4,8 @@ function addKrit(self, krit) {
     val = self.val();
     if (Array.isArray(krit[val])) return false;
     var chars = Object.keys(krit[val]);
-    var sel = '<select id="index_type" class="form-control selectors ">';
-    sel += '<option selected disabled>Выберите характеристику</option>'
+    var sel = '<select required="true" name="F' + createdKrits.length+ '"class="form-control selectors " title="Укажите характеристику">';
+    sel += '<option selected disabled value="">Выберите характеристику</option>'
     for (ch of chars) {
         sel += '<option>' + ch + '</option>';
     }
@@ -68,10 +68,10 @@ $(document).ready(function () {
 
                 if (hasSZ) {
                     $('<div id="szForm" style="display: flex; flex-wrap: wrap"></div>').appendTo('#SZ')
-                    $('<br/><div id="dateWr">СЗ от <input style="alignment: right" type="date" id="szDate" required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
-                    $('<div id="numWr">№ <input type="number" id="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
-                    $('<div id="prilWr">прил. <input type="number" id="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
-                    $('<div>п. <input type="number" id="szPunkt" placeholder="Номер пункта"/></div>').insertAfter('#prilWr');
+                    $('<br/><div id="dateWr">СЗ от <input style="alignment: right" title=" Укажите дату! " type="date" id="szDate" name="szDate"required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
+                    $('<div id="numWr">№ <input type="number" id="szNum" title=" Укажите номер! " name="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
+                    $('<div id="prilWr">прил. <input type="number" id="szPril" name="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
+                    $('<div>п. <input type="number" id="szPunkt" name="szPunkt" placeholder="Номер пункта"/></div>').insertAfter('#prilWr');
                 } else {
                     $('#szForm').remove()
                 }
@@ -80,13 +80,16 @@ $(document).ready(function () {
 
         $("#DateWr").remove()
         if ($(this).val() != '1 (7а)') {
-            $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" placeholder="Дата достижения"/></div>').insertBefore('#comment')
+            $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" name="Date" required placeholder="Дата достижения"/></div>').insertBefore('#comment')
         }
     });
 
 });
 
 function sendKrit() {
+    var validator = $( "#form" ).validate();
+    var validator2 = $( "#textForm" ).validate();
+    if (!validator.form() || !validator2.form()) return false;
     var res = {}
     res.type = $('#check1').val();
     res.crit = $('#check2').val();

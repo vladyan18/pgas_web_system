@@ -118,6 +118,7 @@ module.exports.getRating = async function (req, res) {
     Achs = user.Achievement;
     for(let achID of Achs) {
         ach = await db.findAchieveById(achID);
+        if (!ach) continue
         if (ach.ball) crits[ach.crit] += ach.ball;
     }
     let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic

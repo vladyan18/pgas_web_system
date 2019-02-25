@@ -13,9 +13,9 @@ function getAch() {
         krit = Kri;
 
         var chars = Object.keys(krit);
-        var sel = '<label for="check2" class="label_direction">Критерий:</label>' +
-            '<br /><select id="check2" class="form-control selectors ">';
-        sel += '<option selected disabled>Критерий</option>'
+        var sel = '<label for="check2"  class="label_direction">Критерий:</label>' +
+            '<br /><select id="check2" name="F'+ createdKrits.length +'" required class="form-control selectors " title="Укажите характеристику">';
+        sel += '<option selected disabled value="">Критерий</option>'
         for (ch of chars) {
             sel += '<option>' + ch + '</option>';
         }
@@ -46,9 +46,9 @@ function getAch() {
 
                     if (hasSZ) {
                         $('<div id="szForm" style="display: flex; flex-wrap: wrap"></div>').appendTo('#SZ')
-                        $('<br/><div id="dateWr">СЗ от <input style="alignment: right" type="date" id="szDate" required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
-                        $('<div id="numWr">№ <input type="number" id="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
-                        $('<div id="prilWr">прил. <input type="number" id="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
+                        $('<br/><div id="dateWr">СЗ от <input style="alignment: right" type="date" name="szDate" id="szDate" required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
+                        $('<div id="numWr">№ <input type="number" id="szNum" name="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
+                        $('<div id="prilWr">прил. <input type="number" id="szPril" name="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
                         $('<div>п. <input type="number" id="szPunkt" placeholder="Номер пункта"/></div>').insertAfter('#prilWr');
                     } else {
                         $('#szForm').remove()
@@ -57,7 +57,7 @@ function getAch() {
             }
             $("#DateWr").remove()
             if ($(this).val() != '1 (7а)') {
-                $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" placeholder="Дата достижения"/></div>').insertAfter('#comment')
+                $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" name="Date" required placeholder="Дата достижения"/></div>').insertAfter('#comment')
             }
         });
 
@@ -80,7 +80,14 @@ function getAch() {
             $('#szPunkt').val(data.SZ['Punkt'])
         }
 
+        if (kritSelector.val() != '1 (7а)'){
+            date = new Date(data.achDate)
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
 
+            var today = date.getFullYear()+"-"+(month)+"-"+(day) ;
+            $('#Date').val(today).change()
+        }
     }
     xhr.send()
 
@@ -126,9 +133,13 @@ function getChars(self, array) {
 
 var kritSelector;
 var createdKrits = []
-
+var hasSZ = false;
 
 function sendKrit() {
+    var validator = $( "#form" ).validate();
+    var validator2 = $( "#textForm" ).validate();
+    if (!validator.form() || !validator2.form()) return false;
+
     var res = {}
     res.type = $('#check1').val();
     res.crit = $('#check2').val();
@@ -141,6 +152,14 @@ function sendKrit() {
 
 
     res.achievement = $('#comment').val()
+    res.achDate = $('#Date').val()
+    if (hasSZ) {
+        res.SZ = {}
+        res.SZ['Date'] = $('#szDate').val();
+        res.SZ['Num'] = $('#szNum').val();
+        res.SZ['Pril'] = $('#szPril').val();
+        res.SZ['Punkt'] = $('#szPunkt').val();
+    }
     res.status = 'Ожидает проверки'
     var form = document.forms.namedItem('fileinfo')
     console.log(form)

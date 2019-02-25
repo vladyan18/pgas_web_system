@@ -42,7 +42,7 @@
                                 <a class="" href="/upload">Загрузить в портфолио</a>
                             </li>
                             <li class=" element">
-                                <a class="" href="/documents">  Документы</a>
+                                <a class="" href="/documents">  Информация</a>
                             </li>
                         </ul>
                     </div>
@@ -100,12 +100,14 @@
                                 11в
                             </option>
                         </select>
-                        <div id="form">
-                        </div>
+                        <form id="form">
+                        </form>
                         <div class="show_hide_c11">
                         </div>
-                        <textarea class="form-control area_text" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
-                        <br/>
+                        <form id="textForm">
+                        <textarea class="form-control area_text" title="Нужно указать достижение" name="comment" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
+                        </form>
+                         <br/>
 
                         <div class="input-group" style="display: none">
                             <span class="input-group-btn">
@@ -121,7 +123,7 @@
                             </span>
                             <span class="file-input-label"></span>
                         </div>
-                        <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send" data-toggle="modal"
+                        <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send"
                             data-target="#exampleModal" value="отправить">
                             отправить
                         </button>
@@ -161,6 +163,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="js/add.js"></script>
+    <script src="/jquery-validation/dist/jquery.validate.js"></script>
     <script>
     </script>
 </body>

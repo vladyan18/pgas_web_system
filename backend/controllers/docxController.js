@@ -77,8 +77,8 @@ module.exports.getAnket = async function (req, res) {
             else {
                 str = "";
                 let num = 1;
-                proof = 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ'
                 for (ach of curAchs) {
+                    proof = 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ'
                     if (ach.SZ) {
                         proof = 'СЗ от ' + getDate(new Date(ach.SZ['Date']))
                         proof += ' № ' + ach.SZ['Num'] + '-СС-' + user.Faculty
