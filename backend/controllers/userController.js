@@ -67,9 +67,9 @@ module.exports.addAchieve = function (req, res) {
       achieve.comment = ''
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
-        if (req.user._json && req.user._json.email)
-            id = req.user._json.email
-        else id = req.user.user_id
+      if (req.user._json && req.user._json.email)
+        id = req.user._json.email
+      else id = req.user.user_id
       await db.addAchieveToUser(id, createdAchieve._id)
       res.sendStatus(200)
     }

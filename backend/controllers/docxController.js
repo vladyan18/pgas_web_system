@@ -61,28 +61,35 @@ module.exports.getAnket = async function (req, res) {
         f06 = String(f06).replace("&lt;TYPE&gt;", user.Type);
         f06 = String(f06).replace("&lt;COURSE&gt;", user.Course);
         f06 = String(f06).replace("STDIR", studyDirections[user.Faculty]);
-        datestring = user.Birthdate.getDate()  + "." + (user.Birthdate.getMonth()+1) + "." + user.Birthdate.getFullYear();
+        if (user.Birthdate) datestring = getDate(user.Birthdate)
         f06 = String(f06).replace("BD", datestring);
 
         crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)']
 
         for (var i = 0; i < 13; i++) {
-            curAchs = achievs.filter(o => o.crit == crits[i]);
+            curAchs = achievs.filter(o => (o && o.crit == crits[i]));
             cStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>A';
 
             if (curAchs.length == 0) {
-                nStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>Нет</w:t></w:r></w:p>';
+                nStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>Нет</w:t></w:r></w:p>';
                 f06 = String(f06).replace(cStr + (i + 1) + '</w:t></w:r></w:p>', nStr);
             }
             else {
                 str = "";
                 let num = 1;
-                proofStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>УКАЗАТЬ ПОДТВЕРЖДЕНИЕ</w:t></w:r></w:p>';
+                proof = 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ'
                 for (ach of curAchs) {
+                    if (ach.SZ) {
+                        proof = 'СЗ от ' + getDate(new Date(ach.SZ['Date']))
+                        proof += ' № ' + ach.SZ['Num'] + '-СС-' + user.Faculty
+                        if (ach.SZ['Pril']) proof += ', прил. ' + ach.SZ['Pril']
+                        if (ach.SZ['Punkt']) proof += ', п. ' + ach.SZ['Punkt']
+                    }
+                    proofStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>'+ proof +'</w:t></w:r></w:p>';
                     if (i == 0) str = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>Да</w:t></w:r></w:p>';
                     else {
                         str += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>'
-                            + ((num != 1) ? '<w:br />' : '') + num + '. ' + ach.achievement + '</w:t></w:r></w:p>';
+                            + ((num != 1) ? '<w:br />' : '') + num + '. ' + ach.achievement + (ach.achDate ? (' (' + getDate(ach.achDate) + ')' ) : '') + '</w:t></w:r></w:p>';
                         charsStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:i /><w:sz w:val="15" /><w:szCs w:val="15" /><w:lang w:val="en-US" /></w:rPr><w:t>'
                         for (var c = 0; c < ach.chars.length; c++) {
                             if (c > 0) charsStr += ', ';
@@ -115,4 +122,8 @@ module.exports.getAnket = async function (req, res) {
         res.status(500).send(err)
     }
 
+}
+
+function getDate(d) {
+    return (d.getDate()> 9 ? d.getDate() : '0' + d.getDate())  + "." + ((d.getMonth()+1) > 9 ? (d.getMonth()+1) : '0' + (d.getMonth()+1)) + "." + d.getFullYear();
 }

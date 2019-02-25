@@ -35,7 +35,7 @@ module.exports.dynamic = async function (req, res) {
       if (ach.status === 'Ожидает проверки') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
-          AchTexts.push(ach.achievement)
+        AchTexts.push(ach.achievement)
       }
     }
     if( AchId.length > 0){

@@ -58,24 +58,32 @@ $(document).ready(function () {
 
         })
         addKrit(kritSelector, krit)
+
+        $("#SZ").remove()
+        if ($(this).val() == '6 (9а)' || $(this).val() == '7 (9б)') {
+            $('<div id="SZ"><br/><label for="szBox" class="label_direction">Есть Служебная записка: </label><input type="checkbox" id="szBox"> <br/></div>').insertAfter('#comment')
+            $("#szBox").change(function () {
+                hasSZ = this.checked
+                console.log(this.checked)
+
+                if (hasSZ) {
+                    $('<div id="szForm" style="display: flex; flex-wrap: wrap"></div>').appendTo('#SZ')
+                    $('<br/><div id="dateWr">СЗ от <input style="alignment: right" type="date" id="szDate" required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
+                    $('<div id="numWr">№ <input type="number" id="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
+                    $('<div id="prilWr">прил. <input type="number" id="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
+                    $('<div>п. <input type="number" id="szPunkt" placeholder="Номер пункта"/></div>').insertAfter('#prilWr');
+                } else {
+                    $('#szForm').remove()
+                }
+            })
+        }
+
+        $("#DateWr").remove()
+        if ($(this).val() != '1 (7а)') {
+            $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" placeholder="Дата достижения"/></div>').insertBefore('#comment')
+        }
     });
 
-    $("#szBox").change(function () {
-        hasSZ = this.checked
-        console.log(this.checked)
-
-        if (hasSZ) {
-            $('<br/><input type="number" id="szNum" required placeholder="Номер СЗ"/>').insertAfter('#szBox');
-            $('<input type="date" id="szDate" required placeholder="Дата СЗ">').insertAfter('#szNum');
-            $('<input type="number" id="szPril" placeholder="Номер приложения">').insertAfter('#szDate');
-            $('<input type="number" id="szPunkt" placeholder="Номер пункта">').insertAfter('#szPril');
-        } else {
-            $('#szNum').remove()
-            $('#szDate').remove()
-            $('#szPril').remove()
-            $('#szPunkt').remove()
-        }
-    })
 });
 
 function sendKrit() {
@@ -83,12 +91,14 @@ function sendKrit() {
     res.type = $('#check1').val();
     res.crit = $('#check2').val();
     res.chars = [];
-
-
-     res.szDate = $('#szDate').val();
-    res.szNum = $('#szNum').val();
-    res.szPril = $('#szPril').val();
-    res.szPunkt = $('#szPunkt').val();
+    res.achDate = $("#Date").val();
+    if (hasSZ) {
+        res.SZ = {}
+        res.SZ['Date'] = $('#szDate').val();
+        res.SZ['Num'] = $('#szNum').val();
+        res.SZ['Pril'] = $('#szPril').val();
+        res.SZ['Punkt'] = $('#szPunkt').val();
+    }
 
 
     // получение списка характеристик

@@ -36,6 +36,29 @@ function getAch() {
 
             })
             addKrit(kritSelector, krit)
+
+            $("#SZ").remove()
+            if ($(this).val() == '6 (9а)' || $(this).val() == '7 (9б)') {
+                $('<div id="SZ"><br/><label for="szBox" class="label_direction">Есть Служебная записка:</label><input type="checkbox" id="szBox"> <br/></div>').insertAfter('#comment')
+                $("#szBox").change(function () {
+                    hasSZ = this.checked
+                    console.log(this.checked)
+
+                    if (hasSZ) {
+                        $('<div id="szForm" style="display: flex; flex-wrap: wrap"></div>').appendTo('#SZ')
+                        $('<br/><div id="dateWr">СЗ от <input style="alignment: right" type="date" id="szDate" required placeholder="Дата СЗ"/></div>').appendTo('#szForm');
+                        $('<div id="numWr">№ <input type="number" id="szNum" required placeholder="№ СЗ"/></div>').insertAfter('#dateWr');
+                        $('<div id="prilWr">прил. <input type="number" id="szPril" placeholder="Номер приложения"/></div>').insertAfter('#numWr');
+                        $('<div>п. <input type="number" id="szPunkt" placeholder="Номер пункта"/></div>').insertAfter('#prilWr');
+                    } else {
+                        $('#szForm').remove()
+                    }
+                })
+            }
+            $("#DateWr").remove()
+            if ($(this).val() != '1 (7а)') {
+                $('<div id="DateWr"><br/>Дата достижения: <input type="date" id="Date" placeholder="Дата достижения"/></div>').insertAfter('#comment')
+            }
         });
 
         document.getElementById('comment').value = data.achievement;
@@ -47,6 +70,14 @@ function getAch() {
             k = createdKrits[createdKrits.length - 1]
             k.val(ch).change()
 
+        }
+
+        if (data.SZ) {
+            $("#szBox").attr('checked', true).change();
+            $('#szNum').val(data.SZ['Num'])
+            $('#szDate').val(data.SZ['Date'])
+            $('#szPril').val(data.SZ['Pril'])
+            $('#szPunkt').val(data.SZ['Punkt'])
         }
 
 
