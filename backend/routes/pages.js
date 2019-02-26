@@ -87,13 +87,17 @@ router.get('/upload',auth,(req, res) => {
   res.sendFile(path.join(frontendPath, '/add.html'))
 })
 
+router.get('/prims',auth,(req, res) => {
+    res.sendFile(path.join(frontendPath, '/prim.html'))
+})
+
 router.get('/achievement/:id',
     async (req, res, next) => {
     if (req.user._json && req.user._json.email)
-        id = req.user._json.email
-    else id = req.user.user_id
-    let User = await db.findUserById(id)
-    console.log(req.params.id, User.Achievement)
+        id = req.user._json.email;
+    else id = req.user.user_id;
+    let User = await db.findUserById(id);
+    console.log(req.params.id, User.Achievement);
     if (req.isAuthenticated() &&  (User.Achievement.some(o => o == req.params.id) || User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
         next()
     }

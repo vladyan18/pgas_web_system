@@ -8,7 +8,7 @@ function getAcievement () {
     let data = JSON.parse(xhr.responseText)
     document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic;
     document.getElementById('faculty').innerHTML = data.Faculty
-    let qq = '<table class="table"><thead><th>Критерий</th><th>Достижение</th><th>Статус</th><th>Балл</th><th>Комментарий</th></thead><tbody>'
+    let qq = '<table class="table"><thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
     let k = data.Achs.length;
     if (k > 1)
     data.Achs = data.Achs.sort(function (a, b) {
@@ -27,8 +27,14 @@ function getAcievement () {
       if (!data.Achs[i]) continue
         qq += '<tr id="TR' + i + '" style="cursor: pointer"><td>'+ data.Achs[i].crit+ '</td>';
         qq += '<td>'+data.Achs[i].achievement+'</td>';
-        qq += '<td>'+ data.Achs[i].status +'</td>';
-        qq += '<td>'+ (data.Achs[i].ball ?  data.Achs[i].ball : '-')+ '</td>';
+        if (data.Achs[i].status == 'Изменено')
+            qq += '<td class="table-warning" style="text-align: center">'+ data.Achs[i].status +'</td>';
+        else if (data.Achs[i].status == 'Принято')
+            qq += '<td class="table-success" style="text-align: center">'+ data.Achs[i].status +'</td>';
+        else if (data.Achs[i].status == 'Отказано')
+            qq += '<td class="table-danger" style="text-align: center">'+ data.Achs[i].status +'</td>';
+        else qq += '<td style="text-align: center">'+ data.Achs[i].status +'</td>';
+        qq += '<td style="text-align: center">'+ (data.Achs[i].ball ?  data.Achs[i].ball : '-')+ '</td>';
         qq += '<td>'+ (data.Achs[i].comment ? data.Achs[i].comment : '') +'</td>';
         //qq += '<td>'
 

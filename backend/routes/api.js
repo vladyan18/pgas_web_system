@@ -3,6 +3,7 @@ const router = express.Router()
 const userController = require('../controllers/userController.js')
 const adminController = require('../controllers/adminController.js')
 const docxController = require('../controllers/docxController')
+const facultyController = require('../controllers/facultyController')
 
 router.get('/getUserInfo', userController.dynamic)
 
@@ -27,6 +28,8 @@ router.post('/setUser', adminController.setUser)
 router.post('/setAdmin', adminController.setAdmin)
 
 router.get('/checked', adminController.Checked)
+
+router.get('/getFaculty', facultyController.getFaculty)
 
 router.get('/getRating', adminController.getRating)
 

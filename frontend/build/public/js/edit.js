@@ -32,6 +32,25 @@ function getAch() {
         if (kritSelector.val() != '1 (7а)'){
             $('#Date').val(getDate(data.achDate)).change()
         }
+
+        $.validator.addMethod("unique7aEdit", function(value, element) {
+                r = (value == '1 (7а)' && user.Achs.some(o => o && o.crit == '1 (7а)' && o._id.toString() != achId))
+                if (r) {
+                    $(element).addClass("is-invalid");
+                    return false}
+                else {
+                    $(element).removeClass("is-invalid");
+                    return true}
+            },
+            "<span style='color:#FF0000; vertical-align: center'>Достижение, соответствующее критерию 7а, уже добавлено</span>")
+
+        critValidator = $('#critForm').validate({
+            check2: {
+                firstCourse: {},
+                unique7aEdit: {}
+            }
+        })
+
     }
     xhr.send()
 

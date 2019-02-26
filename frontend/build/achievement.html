@@ -62,46 +62,46 @@
                     <form id="critForm">
                         <label for="check2" class="label_direction">Критерий:</label>
                         <br />
-                        <select id="check2" class="form-control firstCourse" required name="check2">
+                        <select id="check2" class="form-control firstCourse unique7aEdit" required name="check2">
                             <option disabled>Критерий</option>
-                            <option selected value="1 (7а)">
-                                7а
+                            <option selected value="1 (7а)" id="7a">
+                                7а (оценки)
                             </option>
                             <option value="2 (7б)">
-                                7б
+                                7б (проекты)
                             </option>
                             <option value="3 (7в)">
-                                7в
+                                7в (олимпиады)
                             </option>
                             <option value="4 (8а)">
-                                8а
+                                8а (призы за науку, гранты)
                             </option>
                             <option value="5 (8б)">
-                                8б
+                                8б (статьи)
                             </option>
                             <option value="6 (9а)">
-                                9а
+                                9а (обществ. деят. в СПбГУ)
                             </option>
                             <option value="7 (9б)">
-                                9б
+                                9б (информационная деят.)
                             </option>
                             <option value="8 (10а)">
-                                10а
+                                10а (награды за творч. деят.)
                             </option>
                             <option value="9 (10б)">
-                                10б
+                                10б (произв. искусства)
                             </option>
                             <option value="10 (10в)">
-                                10в
+                                10в (обществ. деят.)
                             </option>
                             <option value="11 (11а)">
-                                11а
+                                11а (призы в спорте)
                             </option>
                             <option value="12 (11б)">
-                                11б
+                                11б (участие в спорте)
                             </option>
                             <option value="13 (11в)">
-                                11в
+                                11в (ГТО)
                             </option>
                         </select>
                     </form>
@@ -126,7 +126,7 @@
                             </span>
                         <span class="file-input-label"></span>
                     </div>
-                    <button type="button" onclick="editCrit()" class="btn btn-primary btn-md button_send"
+                    <button type="button" id="SubmitButton" onclick="editCrit()" class="btn btn-primary btn-md button_send"
                             data-target="#exampleModal" value="отправить">
                         Изменить
                     </button>

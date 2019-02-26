@@ -1,5 +1,6 @@
 const UserModel = require('../models/user.js')
 const AchieveModel = require('../models/achieve')
+const FacultyModel = require('../models/faculty')
 
 exports.findUserById= function (id) {
   return UserModel.findOne({ id: id})
@@ -87,6 +88,9 @@ exports.UserSuccesAchs = async function(id){
   return SucAchs
 }
 
+exports.GetFaculty = async function(Name) {
+    return await FacultyModel.findOne({Name: Name});
+}
 
 exports.ChangeRole = function (id, isAdmin) {
   console.log(id)
@@ -101,3 +105,4 @@ exports.ChangeRole = function (id, isAdmin) {
     })
   }
 }
+
