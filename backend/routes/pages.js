@@ -91,6 +91,14 @@ router.get('/prims',auth,(req, res) => {
     res.sendFile(path.join(frontendPath, '/prim.html'))
 })
 
+router.get('/profile',auth,(req, res) => {
+    res.sendFile(path.join(frontendPath, '/myprofile.html'))
+})
+
+router.get('/editProfile',auth,(req, res) => {
+    res.sendFile(path.join(frontendPath, '/edit_myprofile.html'))
+})
+
 router.get('/achievement/:id',
     async (req, res, next) => {
     if (req.user._json && req.user._json.email)

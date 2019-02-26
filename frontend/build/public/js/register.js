@@ -35,7 +35,11 @@ $(document).ready(function() {
         "<span style='color:#FF0000'>Обязательное поле</span>")
 
     $.validator.addMethod("date", function(value, element) {
-            return /\d{2}.\d{2}.\d{4}/.test(value)
+            console.log('TEST')
+            r = /\d{2}.\d{2}.\d{4}/.test(value);
+            if (r) r = r && (makeDate(value) < new Date ('2015-01-01')) && (makeDate(value) > new Date ('1900-01-01'))
+
+            return r
         },
         "<span style='color:#FF0000'>Неправильная дата</span>")
 
@@ -45,6 +49,10 @@ $(document).ready(function() {
         },
         "<span style='color:#FF0000'>Пожалуйста, введите номер курса</span>")
 
+    $('#date').on("keyup", function(e) {
+        if(!(e.which == 8))
+         formatDate( $(e.target) )
+    });
 });
 
 function register() {
@@ -83,3 +91,37 @@ function register() {
 function isInt(value) {
     return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
 }
+
+function makeDate(d) {
+    if (!d) return undefined
+    let date = d.split('.')
+    return new Date(date[2] + '-' + date[1] + '-' + date[0])
+}
+
+function formatDate(el) {
+    var value = el.val()
+    el.val(value)
+
+    var input = value;
+    if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
+    var values = input.split('.').map(function (v) {
+        return v.replace(/\D/g, '')
+    });
+    if (values[0]) values[0] = checkValue(values[0], 31);
+    if (values[1]) values[1] = checkValue(values[1], 12);
+    var output = values.map(function (v, i) {
+        return v.length == 2 && i < 2 ? v + '.' : v;
+    });
+    el.val(output.join('').substr(0, 14))
+
+}
+
+function checkValue(str, max) {
+    if (str.charAt(0) !== '0' || str == '00') {
+        var num = parseInt(str);
+        if (isNaN(num) || num <= 0 || num > max) num = 1;
+        str = num > parseInt(max.toString().charAt(0)) && num.toString().length == 1 ? '0' + num : num.toString();
+    };
+    return str;
+};
+

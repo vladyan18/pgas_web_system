@@ -75,6 +75,10 @@ $(document).ready(function () {
         $("#DateWr").remove()
         if ($(this).val() != '1 (7а)') {
             $('<div id="DateWr" class="form-group" style="display: flex;  margin-top: 1rem"><label for="Date" style="margin-top: auto ; margin-right: 0.5rem" class="control-label col-xs-2">Дата достижения: </label><div style="display: flex; align-items: center; margin-top: auto; margin-bottom: auto"><input type="text" id="Date" name="Date" class="form-control date achDate" required placeholder="дд.мм.гггг"  style="width: 8rem; margin-right: 0.5rem; text-align: center"/></div></div>').appendTo('#textForm')
+            $('#Date').on("keyup", function(e) {
+                if(!(e.which == 8))
+                    formatDate( $(e.target) )
+            });
         }
 
         $("#SZ").remove()
@@ -88,6 +92,10 @@ $(document).ready(function () {
                     $('<div id="szForm" style="display: flex; flex-wrap: wrap"></div>').appendTo('#SZ')
 
                     $('<div id="dateWr"style="display: flex; margin-right: 0.5rem"><p style="margin-top: auto; margin-right: 0.3rem;">СЗ от </p><div><input style="alignment: right; margin-top:auto; width: 6rem; text-align: center" type="text" name="szDate" id="szDate" required placeholder="дд.мм.гггг"/></div></div>').appendTo('#szForm');
+                    $('#szDate').on("keyup", function(e) {
+                        if(!(e.which == 8))
+                            formatDate( $(e.target) )
+                    });
 
                     $('<div id="numWr" style="display: flex"><p style="margin-top: auto; margin-right: 0.3rem;">№</p><div><input type="number" id="szNum" name="szNum" required placeholder="№ СЗ" style="margin-top:auto; margin-right: 0.5rem; width: 4rem; text-align: center"/></div></div>').insertAfter('#dateWr');
 
@@ -326,7 +334,7 @@ function addDescrToCr(el, crit){
     }
     d += '</p></div>'
 
-    $(d).insertAfter(el)
+    $(d).appendTo('#critForm')
 }
 
 function addDescr(el, child, crits, n) {
@@ -366,3 +374,31 @@ function addDescr(el, child, crits, n) {
 
     if(need) $(d).insertBefore(child)
 }
+
+function formatDate(el) {
+    var value = el.val()
+    el.val(value)
+
+    var input = value;
+    if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
+    var values = input.split('.').map(function (v) {
+        return v.replace(/\D/g, '')
+    });
+    if (values[0]) values[0] = checkValue(values[0], 31);
+    if (values[1]) values[1] = checkValue(values[1], 12);
+    var output = values.map(function (v, i) {
+        return v.length == 2 && i < 2 ? v + '.' : v;
+    });
+    el.val(output.join('').substr(0, 14))
+
+}
+
+//for data input formating
+function checkValue(str, max) {
+    if (str.charAt(0) !== '0' || str == '00') {
+        var num = parseInt(str);
+        if (isNaN(num) || num <= 0 || num > max) num = 1;
+        str = num > parseInt(max.toString().charAt(0)) && num.toString().length == 1 ? '0' + num : num.toString();
+    };
+    return str;
+};

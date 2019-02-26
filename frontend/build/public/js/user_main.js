@@ -8,6 +8,7 @@ function getAcievement () {
     let data = JSON.parse(xhr.responseText)
     document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic;
     document.getElementById('faculty').innerHTML = data.Faculty
+    document.getElementById('course').innerHTML = data.Course
 
       let qq =""
       console.log($('#achBlock').width())

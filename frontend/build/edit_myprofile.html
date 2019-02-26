@@ -21,7 +21,7 @@
             <div class="col-12 block_header">
                 <img src="img/gerb.png" class="logo_img">
                 <div class="p_header">Санкт-Петербургский государственный университет <br>
-                    Регистрация </div>
+                    Изменение профиля </div>
 
             </div>
         </div>
@@ -34,9 +34,8 @@
             <div class="col-xl-4 col-lg-3 col-md-2 col-sm-2 col-1"></div>
             <div class="col-xl-4 col-lg-6 col-md-8 col-sm-8 col-10 login">
                 <img src='img/lock.png' , class="pic_lock">
-                <div class="title_text">Регистрация в системе ПГАС</div>
-                <div class="header_logo_text">Для использования системы необходимо пройти регистрацию.<br>
-                    Запрашиваемые данные необходимы для формирования анкеты. Регистрируясь вы разрешаете СПбГУ и Студсовету обрабатывать ваши персональные данные (согласно анкете на ПГАС).</div>
+                <div class="title_text">Изменение профиля в системе ПГАС</div>
+                <div class="header_logo_text">Запрашиваемые данные необходимы для формирования анкеты. Внося их вы разрешаете СПбГУ и Студсовету обрабатывать ваши персональные данные (согласно анкете на ПГАС).</div>
                 <!--- Отправляем данные формы   --->
                 <form id = 'register'>
                     <span style="color:#FF0000">*</span><label>Фамилия</label><br>
@@ -71,10 +70,16 @@
                     <input type='number' id='course' oninput="$(this).validate()" name ='course' class="form-control" required  autocomplete="off"/><br>
 
 
-                    <button type="button" onclick="register()" class="btn btn-primary btn-md button_send"
-                             value="регистрация">
-                        Регистрация
+                    <div style="display: flex; justify-content: space-between;">
+                    <button type="button" onclick="cancel()" class="btn btn-danger btn-md button_send"
+                                value="Отмена">
+                            Отмена
                     </button>
+                    <button type="button" onclick="save()" class="btn btn-success btn-md button_send"
+                             value="Сохранить">
+                        Сохранить
+                    </button>
+                    </div>
                 </form>
             </div>
             <div class="col-xl-4 col-lg-3 col-md-2 col-sm-2 col-1"></div>
@@ -87,6 +92,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 <script src="js/register.js"></script>
+<script src="js/edit_myprofile.js"></script>
 <script src="/jquery-validation/dist/jquery.validate.js"></script>
 </body>
 
