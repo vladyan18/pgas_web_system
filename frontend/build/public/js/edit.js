@@ -57,6 +57,28 @@ function getAch() {
 
 }
 
+function deleteAch() {
+    if (!confirm('Вы уверены? Удаление достижения необратимо.')) return false;
+
+    var form = document.forms.namedItem('fileinfo')
+    var oData = new FormData(form)
+    oData.append('data', JSON.stringify(''))
+    oData.append('achId', achId)
+    var oReq = new XMLHttpRequest()
+    oReq.open('POST', '/delete_achieve', true)
+    oReq.onload = function (oEvent) {
+        if (oReq.status === 200) {
+            $(location).attr('href','/home')
+        }
+        else {
+            console.log(
+                'Error ' + oReq.status + ' occurred when trying to delete achieve.'
+            )
+        }
+    }
+    oReq.send(oData)
+}
+
 function editCrit() {
     a = validator.form()
     b = textValidator.form()

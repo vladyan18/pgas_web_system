@@ -55,9 +55,15 @@
             </div>
             <div class="col-md-9 rightBlock">
                 <div class="block_main_right">
-                    <p class="headline">
-                        Достижение
-                    </p>
+                    <div class="profile" style="display: flex; justify-content: space-between;">
+                        <p class="headline" style="margin-bottom: auto;">
+                            Достижение
+                        </p>
+                        <div style="margin-top: auto; ">
+                            <button id="deleteButton" class="btn btn-danger" onclick="deleteAch()" value="Удалить">Удалить</button>
+                        </div>
+                    </div>
+
                     <hr class="hr_blue">
                     <p class="desc_headline">
                         Изменение загруженного достижения
@@ -129,11 +135,11 @@
                             </span>
                         <span class="file-input-label"></span>
                     </div>
-                    <button type="button" id="SubmitButton" onclick="editCrit()" class="btn btn-primary btn-md button_send"
-                            data-target="#exampleModal" value="отправить">
-                        Изменить
-                    </button>
-                </div>
+
+                        <button type="button" id="SubmitButton" onclick="editCrit()" class="btn btn-success btn-md button_send"
+                                value="Сохранить изменения" style="">
+                            Сохранить изменения
+                        </button>
 
             </div>
 

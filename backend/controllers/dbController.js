@@ -38,6 +38,10 @@ exports.createAchieve = function (achieve) {
   return AchieveModel.create(achieve)
 }
 
+exports.deleteAchieve = function (id) {
+    return AchieveModel.findByIdAndRemove(id)
+}
+
 exports.updateAchieve = function (id, achieve) {
     return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { crit: achieve.crit, chars: achieve.chars, status: achieve.status, achievement: achieve.achievement, ball: achieve.ball, SZ: achieve.SZ, achDate: achieve.achDate } }, function (err, result) {
         console.log('')
