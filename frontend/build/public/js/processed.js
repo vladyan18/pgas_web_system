@@ -1,16 +1,18 @@
 function Success (button) {
   let id = button.value
-  let comment = document.getElementById(id).value
   $.post('/AchSuccess', { Id: id,comment : comment})
 }
 
 function Failed (button) {
   let id = button.value
-  let comment = document.getElementById(id).value
-  $.post('/AchFailed', { Id: id, comment : comment})
+  $.post('/AchFailed', { Id: id})
 }
 
-
+function Comment (button) {
+  let id = button.value
+  let comment = document.getElementById(id).value
+  $.post('/comment', { Id: id, comment:comment})
+}
 
 function getUsers () {
   var xhr = new XMLHttpRequest()
@@ -43,9 +45,10 @@ function getUsers () {
         qq += '<td>'+ (data.Info[i].Comment[j] ? data.Info[i].Comment[j] : '') +'</td>'
         qq += '<td><ul><form action="/achievement/' + data.Info[i].AchId[j] + '" method="get">'
         qq += '<li><textarea cols=50  placeholder="Введите комментарий..."  id="'+ data.Info[i].AchId[j] + '" ></textarea></li>'
-        qq += '<li>&#160;&#160;&#160;&#160;<button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button>&#160;&#160;&#160;&#160;'
-        qq += '<button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button>&#160;&#160;&#160;&#160;'
-        qq += '<button type="submit" value="' + data.Info[i].AchId[j] + '" class="btn btn-warning btn-sm">Изменить</button></li>'
+        qq += '<li>&#160;&#160;&#160;&#160;<button type="button" onclick="Success(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-success btn-sm">Принять</button>&#160;&#160;'
+        qq += '<button type="button" onclick="Failed(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-danger btn-sm">Отклонить</button>&#160;&#160;'
+        qq += '<button type="submit" value="' + data.Info[i].AchId[j] + '" class="btn btn-warning btn-sm">Изменить</button>&#160;&#160;'
+        qq +=  '<button type="button" onclick="Comment(this)" value="' + data.Info[i].AchId[j] + '" class="btn btn-dark btn-sm">Отправить</button></li>'
         qq += '</form></ul></td>'
         qq += '</tr>'
       }

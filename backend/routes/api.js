@@ -6,6 +6,8 @@ const docxController = require('../controllers/docxController')
 
 router.get('/getUserInfo', userController.dynamic)
 
+router.post('/comment', adminController.Comment)
+
 router.post('/add_achieve', userController.addAchieve)
 
 router.post('/update_achieve', userController.updateAchieve)

@@ -46,7 +46,7 @@ module.exports.dynamic = async function (req, res) {
 }
 
 module.exports.AchSuccess = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, true, req.body.comment)
+  await db.ChangeAchieve(req.body.Id, true)
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
@@ -54,7 +54,11 @@ module.exports.AchSuccess = async function (req, res) {
 }
 
 module.exports.AchFailed = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, false, req.body.comment)
+  await db.ChangeAchieve(req.body.Id, false)
+}
+
+module.exports.Comment = async function(req,res){
+  await db.comment(req.body.Id, req.body.comment)
 }
 
 module.exports.Checked = async function (req, res) {

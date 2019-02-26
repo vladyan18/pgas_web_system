@@ -51,26 +51,32 @@ exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 }
 
-exports.ChangeAchieve = async function (id,isGood,comment) {
+exports.ChangeAchieve = async function (id,isGood) {
   if (isGood === true) {
     let Ach = await AchieveModel.findById(id)
     if(Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями'){
-      return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято с изменениями', comment: comment} }, function (err, result) {
+      return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято с изменениями'} }, function (err, result) {
         console.log('')
       })
     }else{
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято' , comment: comment} }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято' } }, function (err, result) {
       console.log('')
     })
   }
   }
   else {
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано' , comment: comment} }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Отказано' } }, function (err, result) {
       console.log('')
     })
   }
 }
 
+
+exports.comment = function(id,comment){
+  return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
+    console.log('')
+  })
+}
 exports.allAchieves = function () {
   return AchieveModel.find({})
 }
