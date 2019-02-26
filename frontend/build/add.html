@@ -39,10 +39,10 @@
                                 <a class="a_element" href="/home">  Мое портфолио</a>
                             </li>
                             <li class=" element element_active">
-                                <a class="" href="/upload">Загрузить в портфолио</a>
+                                <a class="" href="/upload">Добавить достижение</a>
                             </li>
                             <li class=" element">
-                                <a class="" href="/documents">  Документы</a>
+                                <a class="" href="/documents">  Информация</a>
                             </li>
                         </ul>
                     </div>
@@ -50,17 +50,18 @@
                 <div class="col-md-9 rightBlock">
                     <div class="block_main_right">
                         <p class="headline">
-                            Загрузить в портфолио
+                            Добавить достижение
                         </p>
                         <hr class="hr_blue">
                         <p class="desc_headline">
                             Добавление достижений для учета в конкурсе на академическую стипендию в повышенном размере
                         </p>
+                        <form id="critForm">
                         <label for="check2" class="label_direction">Критерий:</label>
                         <br />
-                        <select id="check2" class="form-control " required>
+                        <select id="check2" class="form-control firstCourse" required name="check2">
                             <option disabled>Критерий</option>
-                            <option selected value="1 (7а)">
+                            <option selected value="1 (7а)" id="7a">
                                 7а
                             </option>
                             <option value="2 (7б)">
@@ -100,12 +101,17 @@
                                 11в
                             </option>
                         </select>
-                        <div id="form">
-                        </div>
+                        </form>
+                        <form id="form">
+                        </form>
                         <div class="show_hide_c11">
                         </div>
-                        <textarea class="form-control area_text" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
-                        <div class="input-group">
+                        <form id="textForm">
+                        <textarea class="form-control area_text" name="comment" placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment" required></textarea>
+                        </form>
+                         <br/>
+
+                        <div class="input-group" style="display: none">
                             <span class="input-group-btn">
                                 <form enctype="multipart/form-data" method="post" name="fileinfo">
                                     <label class="btn btn-info btn-file" for="multiple_input_group">
@@ -119,7 +125,7 @@
                             </span>
                             <span class="file-input-label"></span>
                         </div>
-                        <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send" data-toggle="modal"
+                        <button type="button" onclick="sendKrit()" class="btn btn-primary btn-md button_send"
                             data-target="#exampleModal" value="отправить">
                             отправить
                         </button>
@@ -159,6 +165,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="js/add.js"></script>
+    <script src="/jquery-validation/dist/jquery.validate.js"></script>
     <script>
     </script>
 </body>

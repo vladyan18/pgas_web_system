@@ -1,0 +1,5 @@
+FROM node:latest
+COPY . /opt
+WORKDIR /opt/
+EXPOSE 80
+EXPOSE 27017

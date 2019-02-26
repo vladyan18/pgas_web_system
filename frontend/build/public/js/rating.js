@@ -10,9 +10,13 @@ function getUsers () {
       return obj2.Ball-obj1.Ball;
     });
     for (let user of Users) {
-      qq += '<tr><td class="name">' + user.Name + '</td><td class="ball">' + user.Ball + '</td></tr>'
+      qq += '<tr><td style="vertical-align: middle">' + user.Name + '</td><td style="vertical-align: middle">'+ user.Type + '</td><td style="text-align: center; vertical-align: middle">' + user.Course + '</td>'
+        for (crit of Object.keys(user.Crits)) {
+          qq += '<td style="text-align: center; vertical-align: middle">' + user.Crits[crit] + '</td>'
+        }
+      qq +=  '<td style="text-align: center;vertical-align: middle"><b>' + user.Ball + '</b></td></tr>'
     }
-    document.getElementById('users').innerHTML = qq
+    document.getElementById('usersTable').innerHTML = qq
   }
   xhr.send()
 };

@@ -17,12 +17,12 @@ module.exports.dynamic = async function (req, res) {
      let Ach = await db.findAchieveById(i)  
     await Achs.push(Ach)
   }
-  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Faculty: User.Faculty, Achs: Achs })
+  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Faculty: User.Faculty, Achs: Achs, Course: User.Course })
 }
 
 module.exports.getAch = async function (req, res) {
-  id = req.query.achievement.slice(0,24)
-  res.status(200).send( await db.findAchieveById(id))
+  id = req.query.achievement
+    res.status(200).send( await db.findAchieveById(id))
 }
 
 module.exports.registerUser = async function (req, res) {
@@ -32,7 +32,7 @@ module.exports.registerUser = async function (req, res) {
       if (req.user && req.user._json.email)
         id = req.user._json.email
       else id = req.user.user_id
-      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.faculty, data.course, data.type);
+      await db.registerUser(id, data.lastname, data.name, data.patronymic, data.birthdate, data.faculty, data.course, data.type);
       res.sendStatus(200)
   } catch (err) {
       console.log(err)
@@ -58,7 +58,7 @@ module.exports.addAchieve = function (req, res) {
       }
       achieve.status = 'Ожидает проверки'
       achieve.date = new Date().toLocaleString('ru', options)
-      
+
       let arr = []
       for (let file of req.files) {
         arr.push(file.filename)
@@ -67,9 +67,9 @@ module.exports.addAchieve = function (req, res) {
       achieve.comment = ''
       console.log(achieve)
       let createdAchieve = await db.createAchieve(achieve)
-        if (req.user._json && req.user._json.email)
-            id = req.user._json.email
-        else id = req.user.user_id
+      if (req.user._json && req.user._json.email)
+        id = req.user._json.email
+      else id = req.user.user_id
       await db.addAchieveToUser(id, createdAchieve._id)
       res.sendStatus(200)
     }
@@ -90,13 +90,13 @@ module.exports.updateAchieve = function (req, res) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
             let achieve = JSON.parse(req.body.data)
-            let id = req.body.achId.slice(0,24)
+            let id = req.body.achId
             let options = {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
             }
-            achieve.status = 'Ожидает проверки'
+            achieve.status = 'Изменено'
             achieve.date = new Date().toLocaleString('ru', options)
 
             let arr = []

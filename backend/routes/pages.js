@@ -27,7 +27,10 @@ const regAuth = (req, res, next) => {
 }
 
 const adminAuth = async (req, res, next) => {
-  let User = await db.findUserById(req.user.id)
+  if (req.user._json && req.user._json.email)
+    id = req.user._json.email
+  else id = req.user.user_id
+  let User = await db.findUserById(id)
   if (req.isAuthenticated() && User.Role === 'Admin') {
     next()
   }
@@ -37,8 +40,11 @@ const adminAuth = async (req, res, next) => {
 }
 
 const superAdminAuth = async (req, res, next) => {
-  let User = await db.findUserById(req.user.id)
-  if (req.isAuthenticated()) {
+  if (req.user._json && req.user._json.email)
+    id = req.user._json.email
+  else id = req.user.user_id
+  let User = await db.findUserById(id)
+  if (req.isAuthenticated() && User.Role === 'SuperAdmin') {
     next()
   }
   else {
@@ -81,7 +87,20 @@ router.get('/upload',auth,(req, res) => {
   res.sendFile(path.join(frontendPath, '/add.html'))
 })
 
-router.get('/achievement/*',auth,(req, res) => {
+router.get('/achievement/:id',
+    async (req, res, next) => {
+    if (req.user._json && req.user._json.email)
+        id = req.user._json.email
+    else id = req.user.user_id
+    let User = await db.findUserById(id)
+    console.log(req.params.id, User.Achievement)
+    if (req.isAuthenticated() &&  (User.Achievement.some(o => o == req.params.id) || User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
+        next()
+    }
+    else {
+        return res.redirect('/404')
+    }},
+    (req, res) => {
     res.sendFile(path.join(frontendPath, '/achievement.html'))
 })
 
