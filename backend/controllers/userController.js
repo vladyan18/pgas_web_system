@@ -124,13 +124,13 @@ module.exports.deleteAchieve = function (req, res) {
             if (err || !req.files) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
-            let id = req.body.achId
+            let id = req.body.achId;
 
             if (req.user._json.email)
                 User = await db.findUserById(req.user._json.email)
             else  User = await db.findUserById(req.user.user_id)
 
-            if (User.Role != 'Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => o == id))
+            if (User.Role != 'Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
                 return res.sendStatus(404);
 
             let result = await db.deleteAchieve(id)

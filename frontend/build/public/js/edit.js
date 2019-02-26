@@ -3,6 +3,7 @@ var achId
 function getAch() {
     let url = window.location.href
     let ip = url.split('/')[4]
+    achId = ip
     var xhr = new XMLHttpRequest()
     xhr.open('GET', '/getAch/?achievement=' + ip, true)
 
