@@ -8,7 +8,14 @@ function getAcievement () {
     let data = JSON.parse(xhr.responseText)
     document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic;
     document.getElementById('faculty').innerHTML = data.Faculty
-    let qq = '<table class="table"><thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
+
+      let qq =""
+      console.log($('#achBlock').width())
+    if ($('#achBlock').width() < 600)
+         qq = '<table class="table table-sm">'
+    else  qq = '<table class="table">'
+
+    qq += '<thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
     let k = data.Achs.length;
     if (k > 1)
     data.Achs = data.Achs.sort(function (a, b) {
@@ -89,6 +96,7 @@ function getAcievement () {
   })
   xhr.send()
 };
+
 
 
 function editAch(id)
