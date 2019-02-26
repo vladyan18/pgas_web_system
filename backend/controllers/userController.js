@@ -130,7 +130,7 @@ module.exports.deleteAchieve = function (req, res) {
                 User = await db.findUserById(req.user._json.email)
             else  User = await db.findUserById(req.user.user_id)
 
-            if (User.Role!='Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => o == id))
+            if (User.Role != 'Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => o == id))
                 return res.sendStatus(404);
 
             let result = await db.deleteAchieve(id)

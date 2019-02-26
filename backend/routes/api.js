@@ -11,6 +11,8 @@ router.post('/add_achieve', userController.addAchieve)
 
 router.post('/update_achieve', userController.updateAchieve)
 
+router.post('/delete_achieve', userController.deleteAchieve)
+
 router.get('/getAnket', docxController.getAnket)
 
 router.get('/getAch/', userController.getAch)
