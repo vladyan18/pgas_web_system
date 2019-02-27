@@ -221,6 +221,53 @@ $(document).ready(function () {
 
     $("#check2").val('1 (7а)').change()
 
+    $.validator.addMethod("firstCourse", function(value, element) {
+        console.log(user.Course, value)
+            if (value != '1 (7а)' || user.Course.toString() != '1') {
+                $(element).removeClass("is-invalid");
+                return true}
+            else {
+                $(element).addClass("is-invalid");
+                return false}
+        },
+        "<span style='color:#FF0000; vertical-align: center'>Первый курс не может подавать 7(а)</span>")
+
+    $.validator.addMethod("required", function(value, element) {
+            if (value) {
+                $(element).removeClass("is-invalid");
+            return true}
+            else {
+                $(element).addClass("is-invalid");
+                return false}
+        },
+        "<span style='color:#FF0000; vertical-align: center'>Обязательное поле</span>")
+
+    $.validator.addMethod("date", function(value, element) {
+            r = /\d{2}.\d{2}.\d{4}/.test(value)
+            if (r) $(element).removeClass("is-invalid");
+            else $(element).addClass("is-invalid");
+            return r
+        },
+        "<span style='color:#FF0000'>Неправильная дата</span>")
+
+    $.validator.addMethod("number", function(value, element) {
+            r = (!value) || Number.isInteger(parseInt(value))
+            if (r) $(element).removeClass("is-invalid");
+            else $(element).addClass("is-invalid");
+            return r
+        },
+        "<span style='color:#FF0000'>Введите число</span>")
+
+
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', '/getUserInfo', true)
+    xhr.onload = function () {
+        let data = JSON.parse(xhr.responseText)
+        user = data
+            critValidator.form()
+
+    }
+    xhr.send()
 });
 
 function sendKrit() {

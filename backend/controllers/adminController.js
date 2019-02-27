@@ -32,7 +32,7 @@ module.exports.dynamic = async function (req, res) {
 
       let ach = await db.findAchieveById(achievement)
         if (!ach) continue;
-      if (ach.status === 'Ожидает проверки') {
+      if (ach.status === 'Ожидает проверки' || ach.status === 'Изменено') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
         AchTexts.push(ach.achievement)
@@ -46,7 +46,7 @@ module.exports.dynamic = async function (req, res) {
 }
 
 module.exports.AchSuccess = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, req.body.Comm, true)
+  await db.ChangeAchieve(req.body.Id, true)
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
@@ -54,7 +54,11 @@ module.exports.AchSuccess = async function (req, res) {
 }
 
 module.exports.AchFailed = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, req.body.Comm, false)
+  await db.ChangeAchieve(req.body.Id, false)
+}
+
+module.exports.Comment = async function(req,res){
+  await db.comment(req.body.Id, req.body.comment)
 }
 
 module.exports.Checked = async function (req, res) {
@@ -66,16 +70,22 @@ module.exports.Checked = async function (req, res) {
     let AchTexts = []
     let AchId = []
     let Status = []
+    let Ball = []
+    let Comment = []
     for (let achievement of user.Achievement) {
       let ach = await db.findAchieveById(achievement)
       if (ach.status !== 'Ожидает проверки') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
-          AchTexts.push(ach.achievement)
+        AchTexts.push(ach.achievement)
         Status.push(ach.status)
+        Ball.push(ach.ball)
+        Comment.push(ach.comment)
       }
     }
-    info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Status: Status })
+    if( AchId.length > 0){
+      info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Status: Status, Ball: Ball, Comment: Comment })
+    }
   }
   res.status(200).send({ Info: info })
 }

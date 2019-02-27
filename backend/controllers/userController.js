@@ -96,7 +96,7 @@ module.exports.updateAchieve = function (req, res) {
                 month: 'numeric',
                 day: 'numeric'
             }
-            achieve.status = 'Ожидает проверки'
+            achieve.status = 'Изменено'
             achieve.date = new Date().toLocaleString('ru', options)
 
             let arr = []
@@ -114,6 +114,7 @@ module.exports.updateAchieve = function (req, res) {
         }
     })
   }
+
 
 module.exports.deleteAchieve = function (req, res) {
     if (!fs.existsSync(uploadsPath)) {

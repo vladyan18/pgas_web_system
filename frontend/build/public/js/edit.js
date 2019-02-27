@@ -32,6 +32,8 @@ function getAch() {
         if (kritSelector.val() != '1 (7а)'){
             $('#Date').val(getDate(data.achDate)).change()
         }
+    }
+    xhr.send()
 
         $.validator.addMethod("unique7aEdit", function(value, element) {
                 r = (value == '1 (7а)' && user.Achs.some(o => o && o.crit == '1 (7а)' && o._id.toString() != achId))
@@ -50,9 +52,6 @@ function getAch() {
                 unique7aEdit: {}
             }
         })
-
-    }
-    xhr.send()
 
 
 }
