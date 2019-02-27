@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://user:password1@ds127624.mlab.com:27624/portfolio', { useNewUrlParser: true })
+mongoose.connect('mongodb://bekhterev:bekhterev@localhost:27017/pgas?authSource=admin', { useNewUrlParser: true })
 
 const connection = mongoose.connection
 
