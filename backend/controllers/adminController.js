@@ -74,7 +74,7 @@ module.exports.Checked = async function (req, res) {
     let Comment = []
     for (let achievement of user.Achievement) {
       let ach = await db.findAchieveById(achievement)
-      if (ach.status !== 'Ожидает проверки') {
+      if (ach && ach.status !== 'Ожидает проверки') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
         AchTexts.push(ach.achievement)

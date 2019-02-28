@@ -30,17 +30,16 @@ var strategy = new Auth0Strategy(
 
   passport.use(strategy)
 
-  passport.serializeUser(function (user, done) {
-    done(null, user)
-  })
-  
-  passport.deserializeUser(async function (user, done) {
+  passport.serializeUser(async function (user, done) {
       if (user._json && user._json.email) id = user._json.email
       else id = user.user_id
       let u =  await db.findUserById(id)
       user.Registered = u.Registered;
-          done(null, user)
-
+    done(null, user)
+  })
+  
+  passport.deserializeUser(function (user, done) {
+      done(null, user)
   })
 
 module.exports = passport

@@ -4,6 +4,9 @@
   "description": "",
   "main": "backend/server.js",
   "dependencies": {
+    "cluster": "^0.7.7",
+    "connect-mongo": "^2.0.3",
+    "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
@@ -15,11 +18,12 @@
     "now": "^14.0.0",
     "passport": "^0.4.0",
     "passport-auth0": "^1.1.0",
+    "passport-memcached": "^0.2.0",
     "path": "^0.12.7",
     "randomstring": "^1.1.5"
   },
   "scripts": {
-    "start": "node backend/server.js"
+    "start": "node backend/start.js"
   },
   "author": "",
   "engines": {
