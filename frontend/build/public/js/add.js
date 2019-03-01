@@ -191,33 +191,7 @@ $(document).ready(function () {
         "<span style='color:#FF0000'>Введите число</span>")
 
 
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', '/getUserInfo', true)
-    xhr.onload = function () {
-        let data = JSON.parse(xhr.responseText)
-        user = data
-        critValidator.form()
-        console.log(user)
-        var xhr2 = new XMLHttpRequest()
-        xhr2.open('GET', '/getFaculty/?name=' + user.Faculty, true)
-        xhr2.onload = function () {
-            let fac = JSON.parse(xhr2.responseText)
-            console.log(fac)
-            if (fac.AdditionStopped) {
-                $('#SubmitButton').remove()
-                $('#critForm').attr('disabled', true)
-                $("#critForm :input").attr("disabled", true);
-                $('#form').attr('disabled', true)
-                $("#form :input").attr("disabled", true);
-                $('#textForm').attr('disabled', true)
-                $("#textForm :input").attr("disabled", true);
-                $("#textForm").css("margin-bottom", '2rem');
-            }
-        }
-        xhr2.send()
 
-    }
-    xhr.send()
 
     $("#check2").val('1 (7а)').change()
 
@@ -264,7 +238,28 @@ $(document).ready(function () {
     xhr.onload = function () {
         let data = JSON.parse(xhr.responseText)
         user = data
-            critValidator.form()
+        critValidator.form()
+        console.log(user)
+        /*var xhr2 = new XMLHttpRequest()
+        xhr2.open('GET', '/getFaculty/?name=' + user.Faculty, true)
+        xhr2.onload = function () {
+            let fac = JSON.parse(xhr2.responseText)
+            console.log(fac)
+            if (fac.AdditionStopped) {
+                $('#SubmitButton').remove()
+                $('#critForm').attr('disabled', true)
+                $("#critForm :input").attr("disabled", true);
+                $('#form').attr('disabled', true)
+                $("#form :input").attr("disabled", true);
+                $('#textForm').attr('disabled', true)
+                $("#textForm :input").attr("disabled", true);
+                $("#textForm").css("margin-bottom", '2rem');
+            }
+
+        }
+        xhr2.send()*/
+         $('#panel').fadeIn(60);
+        critValidator.form()
 
     }
     xhr.send()

@@ -20,6 +20,14 @@ module.exports.dynamic = async function (req, res) {
   res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Birthdate: User.Birthdate, Faculty: User.Faculty, Achs: Achs, Type: User.Type, Course: User.Course })
 }
 
+module.exports.getProfile = async function (req, res) {
+    if (req.user._json.email)
+        User = await db.findUserById(req.user._json.email)
+    else  User = await db.findUserById(req.user.user_id)
+
+    res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Birthdate: User.Birthdate, Faculty: User.Faculty, Type: User.Type, Course: User.Course })
+}
+
 module.exports.getAch = async function (req, res) {
   id = req.query.achievement
     res.status(200).send( await db.findAchieveById(id))

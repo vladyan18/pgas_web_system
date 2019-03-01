@@ -4,42 +4,81 @@ const userController = require('../controllers/userController.js')
 const adminController = require('../controllers/adminController.js')
 const docxController = require('../controllers/docxController')
 const facultyController = require('../controllers/facultyController')
+const db = require('../controllers/dbController.js')
 
-router.get('/getUserInfo', userController.dynamic)
+const adminAuth = async (req, res, next) => {
+    if (req.user._json && req.user._json.email)
+        id = req.user._json.email
+    else id = req.user.user_id
+    let User = await db.findUserById(id)
+    if (req.isAuthenticated() && User.Role === 'Admin') {
+        next()
+    }
+    else {
+        return res.redirect('/404')
+    }
+}
 
-router.post('/comment', adminController.Comment)
+const regAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        console.log(req.body)
+        next()
+    }
+    else {
+        return res.redirect('/login')
+    }
+}
 
-router.post('/add_achieve', userController.addAchieve)
+const auth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        if (req.user.Registered)
+            next()
+        else return res.redirect('/register')
+    }
+    else {
+        return res.redirect('/login')
+    }
+}
 
-router.post('/update_achieve', userController.updateAchieve)
+router.get('/getUserInfo', auth, userController.dynamic)
 
-router.post('/delete_achieve', userController.deleteAchieve)
+router.get('/getProfile', auth, userController.getProfile)
 
-router.get('/getAnket', docxController.getAnket)
+router.post('/comment', adminAuth, adminController.Comment)
 
-router.get('/getAch/', userController.getAch)
+router.post('/add_achieve', auth, userController.addAchieve)
 
-router.post('/registerUser', userController.registerUser)
+router.post('/update_achieve', auth, userController.updateAchieve)
 
-router.get('/getUsersForAdmin', adminController.dynamic)
+router.post('/delete_achieve', auth, userController.deleteAchieve)
 
-router.post('/AchSuccess', adminController.AchSuccess)
+router.get('/getAnket', auth, docxController.getAnket)
 
-router.post('/AchFailed', adminController.AchFailed)
+router.get('/getAch/', auth, userController.getAch)
 
-router.post('/setUser', adminController.setUser)
+router.post('/registerUser',regAuth, userController.registerUser)
 
-router.post('/setAdmin', adminController.setAdmin)
+router.get('/getUsersForAdmin', adminAuth, adminController.dynamic)
 
-router.get('/checked', adminController.Checked)
+router.post('/AchSuccess', adminAuth, adminController.AchSuccess)
 
-router.get('/getFaculty', facultyController.getFaculty)
+router.post('/AchFailed', adminAuth, adminController.AchFailed)
 
-router.get('/getRating', adminController.getRating)
+router.post('/AddToRating', adminAuth, adminController.AddToRating)
 
-router.get('/getAdmins', adminController.getAdmins)
+router.post('/setUser', adminAuth, adminController.setUser)
 
-router.get('/user=*', adminController.allUsers)
+router.post('/setAdmin', adminAuth, adminController.setAdmin)
+
+router.get('/checked', adminAuth, adminController.Checked)
+
+router.get('/getFaculty', auth, facultyController.getFaculty)
+
+router.get('/getRating', adminAuth, adminController.getRating)
+
+router.get('/getAdmins',adminAuth, adminController.getAdmins)
+
+router.get('/user=*',adminAuth, adminController.allUsers)
 
 
 module.exports = router

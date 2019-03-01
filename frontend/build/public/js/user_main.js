@@ -53,6 +53,7 @@ function getAcievement () {
     }
     qq += '</tbody></table>'
     document.getElementById('row_docs').innerHTML = qq;
+      $('#panel').fadeIn(60);
 
       for (let i = 0; i < k; ++i) {
           if (!data.Achs[i]) continue;

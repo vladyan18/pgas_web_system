@@ -13,7 +13,8 @@ const userSchema = mongoose.Schema({
   Course: Number,
   Type: String,
   Ball: Number,
-  Achievement: [String]
+  Achievement: [String],
+  IsInRating: Boolean
 })
 
 const User = connection.model('User', userSchema)

@@ -28,18 +28,29 @@ module.exports.dynamic = async function (req, res) {
     let Achievements = []
     let AchTexts = []
     let AchId = []
+      let Statuses = []
+      let Chars = []
+      let Comments = []
     for (let achievement of user.Achievement) {
 
       let ach = await db.findAchieveById(achievement)
         if (!ach) continue;
-      if (ach.status === 'Ожидает проверки' || ach.status === 'Изменено') {
         Achievements.push(ach.crit)
         AchId.push(ach._id)
         AchTexts.push(ach.achievement)
-      }
+        Statuses.push(ach.status)
+        Comments.push(ach.comment)
+        chars = ""
+        i = 0;
+        for (ch of ach.chars) {
+          if (i!=0) chars += ', '
+          chars += ch
+          i++
+        }
+        Chars.push(chars)
     }
     if( AchId.length > 0){
-      info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId })
+      info.push({ Id: user._id, user: str, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
     }
   }
   res.status(200).send({ Info: info })
@@ -55,6 +66,10 @@ module.exports.AchSuccess = async function (req, res) {
 
 module.exports.AchFailed = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, false)
+}
+
+module.exports.AddToRating = async function (req, res) {
+    await db.AddToRating(req.body.Id)
 }
 
 module.exports.Comment = async function(req,res){

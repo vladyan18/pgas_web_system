@@ -3,11 +3,11 @@ const AchieveModel = require('../models/achieve')
 const FacultyModel = require('../models/faculty')
 
 exports.findUserById= function (id) {
-  return UserModel.findOne({ id: id})
+  return UserModel.findOne({ id: id}).lean()
 }
 
 exports.findUser = function(id){
-  return UserModel.findById(id)
+  return UserModel.findById(id).lean()
 }
 
 exports.allUsers = function () {
@@ -31,7 +31,7 @@ exports.createUser = function(User){
 }
 
 exports.findAchieveById = function (id) {
-  return AchieveModel.findById(id)
+  return AchieveModel.findById(id).lean()
 }
 
 exports.createAchieve = function (achieve) {
@@ -54,6 +54,11 @@ exports.registerUser = function (userId, lastname, name, patronymic, birthdate, 
 
 exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
+}
+
+exports.AddToRating = function (userId) {
+
+    return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true } })
 }
 
 exports.ChangeAchieve = async function (id,isGood) {
@@ -83,7 +88,7 @@ exports.comment = function(id,comment){
   })
 }
 exports.allAchieves = function () {
-  return AchieveModel.find({})
+  return AchieveModel.find({}).lean()
 }
 
 exports.setBalls = function(id,balls){

@@ -4,6 +4,7 @@ const path = require('path')
 const passport = require('passport')
 const frontendPath = path.join(__dirname, '../../frontend', '/build')
 const db = require('../controllers/dbController.js')
+const fs = require('fs')
 
 const auth = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -72,8 +73,10 @@ router.get('/callback', function (req, res, next) {
         res.redirect(returnTo || '/home')
       });
     })(req, res, next)
-})  
+})
 
+
+var homepage = fs.readFileSync(path.join(frontendPath, '/user_main.html')).toString()
 router.get('/home', auth,  (req, res) => {
   res.sendFile(path.join(frontendPath, '/user_main.html'))
 })

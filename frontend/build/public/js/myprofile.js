@@ -1,6 +1,8 @@
+getInfo()
+
 function getInfo() {
     var xhr = new XMLHttpRequest()
-    xhr.open('GET', '/getUserInfo', true)
+    xhr.open('GET', '/getProfile', true)
     xhr.onload = function () {
         let data = JSON.parse(xhr.responseText)
         user = data;
@@ -19,4 +21,3 @@ function getDate(d) {
     return (d.getDate()> 9 ? d.getDate() : '0' + d.getDate())  + "." + ((d.getMonth()+1) > 9 ? (d.getMonth()+1) : '0' + (d.getMonth()+1)) + "." + d.getFullYear();
 }
 
-getInfo()
