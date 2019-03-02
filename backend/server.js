@@ -3,34 +3,28 @@ const session = require('express-session')
 const morgan = require('morgan')
 const path = require('path')
 const passport = require('./config/passport') // configuring passport here
-const connection = require('./config/db');
+const redisClient = require('./config/redis');
 const frontendPath = path.join(__dirname, '../frontend', '/build')
-const MongoStore  = require('connect-mongo')(session);
 const port = 80
+const http2 = require('http2');
+
 require('dotenv').config();
 const app = express()
 
-
-app.set('views', path.join(__dirname, 'views'));
-app.engine('html', require('ejs').renderFile);
-
-app.set("view engine", "ejs")
 app.set('etag', false)
-app.disable('view cache');
 
 
 const sess = {
   secret: '5c6a5cc5f3fd8718f419ff27',
   cookie: {},
-  resave: true,
+  resave: false,
   saveUninitialized: true,
-  store   : new MongoStore({
-      mongooseConnection: connection
-  })
+    store: new (require('express-sessions'))({
+        storage: 'redis',
+        instance: redisClient
+    })
 }
 
-
-app.use(morgan('dev'))
 
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
@@ -44,6 +38,7 @@ app.use(function (req, res, next) {
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
 app.use(express.static(path.join(frontendPath, '/public')))
 if (process.env.ENV_T == 'production') {
     sess.cookie.secure = true;
@@ -82,11 +77,11 @@ if (process.env.ENV_T == 'production') {
     var credentials = {key: privateKey, cert: certificate};
 
 
-    httpsServer = https.createServer(credentials, app);
+    http2Server = http2.createSecureServer(credentials, app);
 
     http.createServer(app).listen(80)
 
-    httpsServer.listen(443);
+    http2Server.listen(443);
 }
 else
 app.listen(port, () => console.log('Example app listening on port ' + port))

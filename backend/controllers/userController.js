@@ -8,16 +8,18 @@ const fs = require('fs')
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
 
 module.exports.dynamic = async function (req, res) {
-  let Achs = []
     if (req.user._json.email)
-       User = await db.findUserById(req.user._json.email)
-    else  User = await db.findUserById(req.user.user_id)
-  let W = User.Achievement
-  for (let i of W) {
-     let Ach = await db.findAchieveById(i)  
-    await Achs.push(Ach)
-  }
-  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Birthdate: User.Birthdate, Faculty: User.Faculty, Achs: Achs, Type: User.Type, Course: User.Course })
+       var id = req.user._json.email
+    else  var id = req.user.user_id
+
+    achPr = db.findAchieves(id)
+
+    db.findUserById(id).then((User) => {
+        achPr.then((v) => {
+            User.Achs = v;
+            res.status(200).send(User)
+        })
+    })
 }
 
 module.exports.getProfile = async function (req, res) {
@@ -41,6 +43,8 @@ module.exports.registerUser = async function (req, res) {
         id = req.user._json.email
       else id = req.user.user_id
       await db.registerUser(id, data.lastname, data.name, data.patronymic, data.birthdate, data.faculty, data.course, data.type);
+      req.session.passport.user.Registered = true
+      req.session.save(function(err) {console.log(err);})
       res.sendStatus(200)
   } catch (err) {
       console.log(err)

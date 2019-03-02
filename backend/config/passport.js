@@ -17,28 +17,22 @@ var strategy = new Auth0Strategy(
         await db.createUser({Role : "User", id: id, Ball: 0,  Achievement: [], Registered: false})
       }
 
-      user = await db.findUserById(id);
-      if (user.registered)
-      {
-          profile.LastName = user.LastName;
-          profile.Name = user.Name;
-          profile.Patronymic = user.Patronymic;
-      }
+
       return done(null, profile)
     }
   )
 
   passport.use(strategy)
 
-  passport.serializeUser( function (user, done) {
+  passport.serializeUser( async function (user, done) {
+    if (user._json && user._json.email) id = user._json.email
+    else id = user.user_id
+    r = await db.isRegistered(id)
+    user.Registered = r;
     done(null, user)
   })
   
-  passport.deserializeUser(async function (user, done) {
-      if (user._json && user._json.email) id = user._json.email
-      else id = user.user_id
-      let u =  await db.findUserById(id)
-      user.Registered = u.Registered;
+  passport.deserializeUser(function (user, done) {
       done(null, user)
   })
 

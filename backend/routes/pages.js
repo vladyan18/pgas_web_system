@@ -77,6 +77,7 @@ router.get('/callback', function (req, res, next) {
 
 
 var homepage = fs.readFileSync(path.join(frontendPath, '/user_main.html')).toString()
+
 router.get('/home', auth,  (req, res) => {
   res.sendFile(path.join(frontendPath, '/user_main.html'))
 })
