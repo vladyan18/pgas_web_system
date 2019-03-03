@@ -61,7 +61,7 @@ module.exports.getAnket = async function (req, res) {
         f06 = String(f06).replace("&lt;TYPE&gt;", user.Type);
         f06 = String(f06).replace("&lt;COURSE&gt;", user.Course);
         f06 = String(f06).replace("STDIR", studyDirections[user.Faculty]);
-        if (user.Birthdate) datestring = getDate(user.Birthdate)
+        if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate))
         f06 = String(f06).replace("BD", datestring);
 
         crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)']
@@ -80,7 +80,7 @@ module.exports.getAnket = async function (req, res) {
                 for (ach of curAchs) {
                     proof = 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ'
                     if (ach.SZ) {
-                        proof = 'СЗ от ' + getDate(new Date(ach.SZ['Date']))
+                        proof = 'СЗ от ' + getDateFromStr(new Date(ach.SZ['Date']))
                         proof += ' № ' + ach.SZ['Num'] + '-СС-' + user.Faculty
                         if (ach.SZ['Pril']) proof += ', прил. ' + ach.SZ['Pril']
                         if (ach.SZ['Punkt']) proof += ', п. ' + ach.SZ['Punkt']
@@ -89,7 +89,7 @@ module.exports.getAnket = async function (req, res) {
                     if (i == 0) str = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>Да</w:t></w:r></w:p>';
                     else {
                         str += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:lang w:val="en-US" /></w:rPr><w:t>'
-                            + ((num != 1) ? '<w:br />' : '') + num + '. ' + ach.achievement + (ach.achDate ? (' (' + getDate(ach.achDate) + ')' ) : '') + '</w:t></w:r></w:p>';
+                            + ((num != 1) ? '<w:br />' : '') + num + '. ' + ach.achievement + (ach.achDate ? (' (' + getDateFromStr(new Date(ach.achDate)) + ')' ) : '') + '</w:t></w:r></w:p>';
                         charsStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:i /><w:sz w:val="15" /><w:szCs w:val="15" /><w:lang w:val="en-US" /></w:rPr><w:t>'
                         for (var c = 0; c < ach.chars.length; c++) {
                             if (c > 0) charsStr += ', ';
@@ -124,6 +124,7 @@ module.exports.getAnket = async function (req, res) {
 
 }
 
-function getDate(d) {
+function getDateFromStr(d) {
+    console.log(d)
     return (d.getDate()> 9 ? d.getDate() : '0' + d.getDate())  + "." + ((d.getMonth()+1) > 9 ? (d.getMonth()+1) : '0' + (d.getMonth()+1)) + "." + d.getFullYear();
 }

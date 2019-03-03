@@ -108,6 +108,7 @@ exports.updateAchieve = async function (id, achieve) {
 
 exports.registerUser = function (userId, lastname, name, patronymic, birthdate, faculty, course, type) {
     redis.set(id + '_reg', true);
+    redis.del(id + '_user')
     return UserModel.findOneAndUpdate({ id: userId }, { $set: { LastName: lastname, FirstName: name, Patronymic: patronymic, Birthdate: birthdate, Faculty: faculty, Course: course, Type: type, Registered: true } })
 }
 
