@@ -7,12 +7,31 @@ function getAch() {
     var xhr = new XMLHttpRequest()
     xhr.open('GET', '/getAch/?achievement=' + ip, true)
 
+    $.validator.addMethod("unique7aEdit", function(value, element) {
+            r = (value == '1 (7а)' && user.Achs.some(o => o && o.crit == '1 (7а)' && o._id.toString() != achId))
+            if (r) {
+                $(element).addClass("is-invalid");
+                return false}
+            else {
+                $(element).removeClass("is-invalid");
+                return true}
+        },
+        "<span style='color:#FF0000; vertical-align: center'>Достижение, соответствующее критерию 7а, уже добавлено</span>")
+
+    critValidator = $('#critForm').validate({
+        check2: {
+            firstCourse: {},
+            unique7aEdit: {}
+        }
+    })
+
+
     xhr.onload = function () {
         let data = JSON.parse(xhr.responseText)
 
         document.getElementById('comment').value = data.achievement;
 
-        k = kritSelector
+        k = $('#check2')
         k.val(data.crit).change();
 
         for (ch of data.chars) {
@@ -32,26 +51,46 @@ function getAch() {
         if (kritSelector.val() != '1 (7а)'){
             $('#Date').val(getDate(data.achDate)).change()
         }
+
+        console.log(user)
+        if (!user) {
+            userEvent.on('userLoaded', function (e) {
+                if (user.IsInRating) {
+                    $('#SubmitButton').remove()
+                    $('#DeleteButton').remove()
+                    $('#check2').attr("disabled", true);
+                    $(".input").attr("disabled", true);
+                    $('#form').attr('disabled', true)
+                    $("#form :input").attr("disabled", true);
+                    $('#textForm').attr('disabled', true)
+                    $("#textForm :input").attr("disabled", true);
+                    $("#textForm").css("margin-bottom", '2rem');
+                }
+
+                critValidator.form()
+                $('#panel2').fadeIn(60);
+            })
+        }
+        else {
+            if (user.IsInRating) {
+                $('#SubmitButton').remove()
+                $('#DeleteButton').remove()
+                $('#check2').attr("disabled", true);
+                $(".input").attr("disabled", true);
+                $('#form').attr('disabled', true)
+                $("#form :input").attr("disabled", true);
+                $('#textForm').attr('disabled', true)
+                $("#textForm :input").attr("disabled", true);
+                $("#textForm").css("margin-bottom", '2rem');
+            }
+
+            critValidator.form()
+            $('#panel2').fadeIn(60);
+        }
     }
     xhr.send()
 
-        $.validator.addMethod("unique7aEdit", function(value, element) {
-                r = (value == '1 (7а)' && user.Achs.some(o => o && o.crit == '1 (7а)' && o._id.toString() != achId))
-                if (r) {
-                    $(element).addClass("is-invalid");
-                    return false}
-                else {
-                    $(element).removeClass("is-invalid");
-                    return true}
-            },
-            "<span style='color:#FF0000; vertical-align: center'>Достижение, соответствующее критерию 7а, уже добавлено</span>")
 
-        critValidator = $('#critForm').validate({
-            check2: {
-                firstCourse: {},
-                unique7aEdit: {}
-            }
-        })
 
 
 }
@@ -130,4 +169,6 @@ function getDate(d) {
     return (d.getDate()> 9 ? d.getDate() : '0' + d.getDate())  + "." + ((d.getMonth()+1) > 9 ? (d.getMonth()+1) : '0' + (d.getMonth()+1)) + "." + d.getFullYear();
 }
 
-getAch()
+$(document).ready(getAch)
+
+

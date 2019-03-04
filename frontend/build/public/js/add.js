@@ -4,6 +4,7 @@ var validator;
 var textValidator;
 var critValidator;
 var user;
+var userEvent = $({});
 
 function addKrit(self, krit) {
     val = self.val();
@@ -101,7 +102,7 @@ $(document).ready(function () {
 
                     $('<div id="prilWr" style="display: flex"><p style="margin-top: auto; margin-right: 0.3rem;">приложение </p><div><input type="number" id="szPril" name="szPril" placeholder="прил." style="margin-top:auto; margin-right: 0.5rem; width: 3rem; text-align: center"/></div></div>').insertAfter('#numWr');
 
-                    $('<div style="display: flex"><p style="margin-top: auto; margin-right: 0.3rem;">пункт </p><div><input type="number" id="szPunkt" placeholder="пункт" style="margin-top:auto; margin-right: 0.5rem; width: 4rem;text-align: center"/></div></div>').insertAfter('#prilWr');
+                    $('<div style="display: flex"><p style="margin-top: auto; margin-right: 0.3rem;">пункт </p><div><input type="text" id="szPunkt" placeholder="пункт" style="margin-top:auto; margin-right: 0.5rem; width: 4rem;text-align: center"/></div></div>').insertAfter('#prilWr');
                 } else {
                     $('#szForm').remove()
                 }
@@ -238,26 +239,20 @@ $(document).ready(function () {
     xhr.onload = function () {
         let data = JSON.parse(xhr.responseText)
         user = data
+        userEvent.trigger("userLoaded")
         critValidator.form()
-        console.log(user)
-        /*var xhr2 = new XMLHttpRequest()
-        xhr2.open('GET', '/getFaculty/?name=' + user.Faculty, true)
-        xhr2.onload = function () {
-            let fac = JSON.parse(xhr2.responseText)
-            console.log(fac)
-            if (fac.AdditionStopped) {
+            if (user.IsInRating) {
                 $('#SubmitButton').remove()
-                $('#critForm').attr('disabled', true)
-                $("#critForm :input").attr("disabled", true);
+                $('#DeleteButton').remove()
+                $('#check2').attr("disabled", true);
+                $(".input").attr("disabled", true);
                 $('#form').attr('disabled', true)
                 $("#form :input").attr("disabled", true);
                 $('#textForm').attr('disabled', true)
                 $("#textForm :input").attr("disabled", true);
                 $("#textForm").css("margin-bottom", '2rem');
-            }
 
-        }
-        xhr2.send()*/
+            }
          $('#panel').fadeIn(60);
         critValidator.form()
 

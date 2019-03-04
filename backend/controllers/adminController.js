@@ -1,5 +1,9 @@
 const db = require('./dbController')
+const path = require('path')
 const Kri = require(__dirname + "/Kriterii.json")
+const fs = require('fs')
+const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
+const upload = require(path.join(__dirname, '../config/multer'))
 
 module.exports.setUser = async function(req,res){
   db.ChangeRole(req.body.Id,false)
@@ -21,7 +25,7 @@ module.exports.getAdmins = async function (req,res){
 
 module.exports.dynamic = async function (req, res) {
   let info = []
-  let Users = await db.allUsers()
+  let Users = await db.NewUsers()
   for (let user of Users) {
     if (!user) continue;
     let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
@@ -50,26 +54,69 @@ module.exports.dynamic = async function (req, res) {
         Chars.push(chars)
     }
     if( AchId.length > 0){
-      info.push({ Id: user._id, user: str, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
+      info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
     }
   }
   res.status(200).send({ Info: info })
 }
 
+module.exports.updateAchieve = function (req, res) {
+    if (!fs.existsSync(uploadsPath)) {
+        fs.mkdirSync(uploadsPath)
+    }
+    upload(req, res, async function (err) {
+        try {
+            if (err || !req.files) {
+                return res.status(400).send('ERROR: Max file size = 15MB')
+            }
+            let achieve = JSON.parse(req.body.data)
+            let id = req.body.achId
+            let options = {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            }
+            achieve.status = 'Изменено'
+            achieve.date = new Date().toLocaleString('ru', options)
+
+            let arr = []
+            for (let file of req.files) {
+                arr.push(file.filename)
+            }
+            achieve.files = arr
+            console.log(achieve)
+            let createdAchieve = await db.updateAchieve(id, achieve)
+            if (req.user._json.email)
+                id = req.user._json.email
+            else id = req.user.user_id
+            balls(id)
+            res.sendStatus(200)
+        }
+        catch (err) {
+            console.log(err)
+            res.status(500).send(err)
+        }
+    })
+}
+
 module.exports.AchSuccess = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, true)
-    if (req.user._json.email)
-        id = req.user._json.email
-    else id = req.user.user_id
-  balls(id)
+    let u = await db.findUserByAchieve(req.body.Id)
+  balls(u.id)
 }
 
 module.exports.AchFailed = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, false)
+    let u = await db.findUserByAchieve(req.body.Id)
+    balls(u.id)
 }
 
 module.exports.AddToRating = async function (req, res) {
     await db.AddToRating(req.body.Id)
+}
+
+module.exports.RemoveFromRating = async function (req, res) {
+    await db.RemoveFromRating(req.body.Id)
 }
 
 module.exports.Comment = async function(req,res){
@@ -77,32 +124,40 @@ module.exports.Comment = async function(req,res){
 }
 
 module.exports.Checked = async function (req, res) {
-  let info = []
-  let Users = await db.allUsers()
-  for (let user of Users) {
-    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-    let Achievements = []
-    let AchTexts = []
-    let AchId = []
-    let Status = []
-    let Ball = []
-    let Comment = []
-    for (let achievement of user.Achievement) {
-      let ach = await db.findAchieveById(achievement)
-      if (ach && ach.status !== 'Ожидает проверки') {
-        Achievements.push(ach.crit)
-        AchId.push(ach._id)
-        AchTexts.push(ach.achievement)
-        Status.push(ach.status)
-        Ball.push(ach.ball)
-        Comment.push(ach.comment)
-      }
+    let info = []
+    let Users = await db.CurrentUsers()
+    for (let user of Users) {
+        if (!user) continue;
+        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
+        let Achievements = []
+        let AchTexts = []
+        let AchId = []
+        let Statuses = []
+        let Chars = []
+        let Comments = []
+        for (let achievement of user.Achievement) {
+
+            let ach = await db.findAchieveById(achievement)
+            if (!ach) continue;
+            Achievements.push(ach.crit)
+            AchId.push(ach._id)
+            AchTexts.push(ach.achievement)
+            Statuses.push(ach.status)
+            Comments.push(ach.comment)
+            chars = ""
+            i = 0;
+            for (ch of ach.chars) {
+                if (i!=0) chars += ', '
+                chars += ch
+                i++
+            }
+            Chars.push(chars)
+        }
+        if( AchId.length > 0){
+            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
+        }
     }
-    if( AchId.length > 0){
-      info.push({ Id: user._id, user: str, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Status: Status, Ball: Ball, Comment: Comment })
-    }
-  }
-  res.status(200).send({ Info: info })
+    res.status(200).send({ Info: info })
 }
 
 module.exports.allUsers = async function (req, res) {
@@ -130,12 +185,10 @@ module.exports.allUsers = async function (req, res) {
 
 module.exports.getRating = async function (req, res) {
   let kri = JSON.parse(JSON.stringify(Kri))
-
-
-
   let users = []
-  let Users = await db.allUsers()
+  let Users = await db.CurrentUsers()
   for (let user of Users) {
+      let sumBall = 0
       let crits = {}
       for (key of Object.keys(kri)) {
           crits[key] = 0;
@@ -144,28 +197,36 @@ module.exports.getRating = async function (req, res) {
     for(let achID of Achs) {
         ach = await db.findAchieveById(achID);
         if (!ach) continue
-        if (ach.ball) crits[ach.crit] += ach.ball;
+        if (ach.ball) {
+            crits[ach.crit] += ach.ball;
+            sumBall += ach.ball;
+        }
     }
     let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-    users.push({ Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: user.Ball })
+    users.push({ Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall })
   }
   res.status(200).send({ Users: users })
 }
 
 const balls = async function (id) {
   let kri = JSON.parse(JSON.stringify(Kri))
-
+  console.log(id)
   let balls = 0;
-  let Achs = await db.UserSuccesAchs(id)
+  let Achs = await db.findAchieves(id)
+    console.log(Achs)
   let kriteries = {};
 
   for (key of Object.keys(kri)) {
     kriteries[key] = []
   }
 
-
-  for(let achID of Achs) {
-      ach = await db.findAchieveById(achID);
+  for(let ach of Achs) {
+      if (!ach) continue;
+      if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
+          ach.ball = undefined
+          db.updateAchieve(ach._id, ach)
+          continue
+      }
       let curKrit = kri[ach.crit];
       if (Array.isArray(curKrit)) {
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
@@ -181,17 +242,17 @@ const balls = async function (id) {
     for (key of Object.keys(kri)) {
         balls += MatrBalls(kriteries[key])
         for (curAch of kriteries[key]) {
+            if (!curAch) continue
           db.updateAchieve(curAch['ach']._id, curAch['ach'])
         }
     }
-
-  db.setBalls(id,balls)
 }
 
 const MatrBalls = function(M){
   let S = 0;
   let max = 0;
   for(let i = 0; i < M.length; i++){
+      if (!M[i]) continue
       for(let j=0; j < M.length; j++){
         if(M[j]['balls'][i] > max){
           max = M[j]['balls'][i];

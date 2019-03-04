@@ -58,6 +58,8 @@ router.get('/getAch/', auth, userController.getAch)
 
 router.post('/registerUser',regAuth, userController.registerUser)
 
+router.post('/adm_update_achieve', adminAuth, adminController.updateAchieve)
+
 router.get('/getUsersForAdmin', adminAuth, adminController.dynamic)
 
 router.post('/AchSuccess', adminAuth, adminController.AchSuccess)
@@ -65,6 +67,8 @@ router.post('/AchSuccess', adminAuth, adminController.AchSuccess)
 router.post('/AchFailed', adminAuth, adminController.AchFailed)
 
 router.post('/AddToRating', adminAuth, adminController.AddToRating)
+
+router.post('/RemoveFromRating', adminAuth, adminController.RemoveFromRating)
 
 router.post('/setUser', adminAuth, adminController.setUser)
 
@@ -79,6 +83,8 @@ router.get('/getRating', adminAuth, adminController.getRating)
 router.get('/getAdmins',adminAuth, adminController.getAdmins)
 
 router.get('/user=*',adminAuth, adminController.allUsers)
+
+router.get('/getResultTable', adminAuth, docxController.getResultTable)
 
 
 module.exports = router

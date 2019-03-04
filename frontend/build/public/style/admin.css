@@ -73,7 +73,7 @@ body {
 }
 
 h3 {
-  font-size: 16px;
+  font-size: 19px;
   color: white;
   background-color: #2887d4;
   padding: 10px;
@@ -101,6 +101,10 @@ button {
 }
 .pagination {
   margin-top: 30px;
+}
+
+.inRating {
+background-color: #178e3c;
 }
 
 @media (max-width: 768px) {

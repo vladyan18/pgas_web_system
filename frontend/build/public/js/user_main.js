@@ -6,15 +6,14 @@ function getAcievement () {
 
   xhr.onload = function () {
     let data = JSON.parse(xhr.responseText)
-    document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic;
+    document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic + (data.IsInRating ? '<svg style="float: right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="green"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>' : '')
     document.getElementById('faculty').innerHTML = data.Faculty
     document.getElementById('course').innerHTML = data.Course
 
       let qq =""
-      console.log($('#achBlock').width())
-    if ($('#achBlock').width() < 600)
-         qq = '<table class="table table-sm">'
-    else  qq = '<table class="table">'
+    //if ($('#achBlock').width() < 100)
+    //     qq = '<table class="table table-sm">'
+    qq = '<table class="table">'
 
     qq += '<thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
     let k = data.Achs.length;

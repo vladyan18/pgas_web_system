@@ -2,6 +2,7 @@ const UserModel = require('../models/user.js')
 const AchieveModel = require('../models/achieve')
 const FacultyModel = require('../models/faculty')
 const redis = require('../config/redis')
+var ObjectId = require('mongoose').Types.ObjectId;
 
 exports.findUserById = function (id) {
     return redis.getAsync(id + '_user').then(async (res) => {
@@ -19,7 +20,8 @@ exports.findUser = function(id){
 }
 
 exports.findUserByAchieve = function(id){
-    return UserModel.find({Achievement: {$elemMatch: {id}}}).lean()
+
+    return UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()
 }
 
 
@@ -39,7 +41,15 @@ exports.isRegistered = async function(id){
 
 
 exports.allUsers = function () {
-  return UserModel.find({})
+  return UserModel.find({}).lean()
+}
+
+exports.CurrentUsers = function () {
+    return UserModel.find({IsInRating: true}).lean()
+}
+
+exports.NewUsers = function () {
+    return UserModel.find().or([{IsInRating: undefined}, {IsInRating: false}])
 }
 
 exports.isUser = function(token){
@@ -61,10 +71,8 @@ exports.createUser = function(User){
 exports.findAchieves = async function (user_id) {
     return redis.getAsync(user_id + '_achs').then(async (res) => {
         if (!res) {
+            console.log('NOT FOUND')
             User = await UserModel.findOne({ id: user_id}, 'Achievement').lean()
-            var ids = [User.Achievement.length]
-            //for (var i = 0; i < User.Achievement.length; i++)
-                //ids[i] = new ObjectID(User.Achievement[i])
             let b = await AchieveModel.find({_id : {$in: User.Achievement}}).lean()
             redis.setAsync(user_id + '_achs', JSON.stringify(b))
             return(b)
@@ -118,12 +126,23 @@ exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 }
 
-exports.AddToRating = function (userId) {
-
+exports.AddToRating = async function (userId) {
+    let u = await UserModel.findOne({ _id: userId });
+    redis.del(u.id + '_user')
     return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true } })
 }
 
+exports.RemoveFromRating = async function (userId) {
+    let u = await UserModel.findOne({ _id: userId });
+    redis.del(u.id + '_user')
+    return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: false } })
+}
+
 exports.ChangeAchieve = async function (id,isGood) {
+    redis.del(id + '_ach2')
+    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()
+
+    redis.del(u.id + '_achs');
   if (isGood === true) {
     let Ach = await AchieveModel.findById(id)
     if(Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями'){
@@ -144,7 +163,10 @@ exports.ChangeAchieve = async function (id,isGood) {
 }
 
 
-exports.comment = function(id,comment){
+exports.comment = async function(id,comment){
+    redis.del(id + '_ach2')
+    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()
+    redis.del(u.id + '_achs');
   return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
     console.log('')
   })
@@ -154,6 +176,7 @@ exports.allAchieves = function () {
 }
 
 exports.setBalls = function(id,balls){
+    redis.del(id + '_user')
   return UserModel.findOneAndUpdate({ id: id }, { $set: { Ball: balls} }, function (err, result) {
     console.log(result)
   })
@@ -165,7 +188,7 @@ exports.UserSuccesAchs = async function(id){
   let SucAchs = []
   for(let achID of Achs) {
     let ach =  await AchieveModel.findById(achID)
-    if(ach.status === 'Принято' || ach.status === 'Принято с изменениями'){
+    if(ach && (ach.status === 'Принято' || ach.status === 'Принято с изменениями')){
       SucAchs.push(ach)
     }
   }
@@ -177,7 +200,7 @@ exports.GetFaculty = async function(Name) {
 }
 
 exports.ChangeRole = function (id, isAdmin) {
-  console.log(id)
+    redis.del(id + '_user')
   if (isAdmin === true) {
     return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'Admin'} }, function (err, result) {
       console.log(result)

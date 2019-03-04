@@ -19,29 +19,40 @@
             <div class="col-3">
                 <div class="exit"><a href="/logout">Выход из личного кабинета</a></div>
             </div>
-        </div>
-    </header>
-    <main>
-        <div class="row">
-            <div class="col-3">
-                <div class="menu">
-                    <ul class="options">
+            <div style="display:flex;">
+                <div style="margin-left: auto; margin-right: auto">
+                    <ul class="options" style="display: flex">
                         <li class="element"><a href="/admin">Новые заявки</a></li>
-                        <li class="element"><a href="/processed">Обработанные заявки</a></li>
+                        <li class="element"><a href="/processed">Текущие кандидаты</a></li>
                         <li class="element_active"><a href="/rating">Рейтинг студентов</a></li>
                         <li class="element"><a href="/info">Информация</a></li>
                     </ul>
                 </div>
             </div>
+        </div>
+    </header>
+    <main>
+        <div class="row" style="justify-content: center">
 
             <div class="col-9 general">
+                <div class="profile" style="display: flex; justify-content: space-between;">
+                    <div style="margin-top: auto; margin-bottom: auto">
                 <p  class="headline">
                     Рейтинг студентов
                 </p>
+                    </div>
+                    <div style="margin-top: auto; margin-bottom: auto">
+                <form action="/getResultTable" >
+                    <input type="submit" id="download" class="btn btn-primary" value="Скачать" />
+                </form>
+                    </div>
+
+                </div>
                 <hr class="hr_blue" >
                 <table class="table table-bordered" id='users'>
                 <thead>
                 <tr>
+                <th style="text-align: center; width: 0.5rem">№</th>
                 <th>Ф.И.О.</th>
                 <th style="text-align: center">Ступ. обуч.</th>
                 <th style="text-align: center">Курс</th>
@@ -66,19 +77,6 @@
                 </tbody>
                 </table>
 
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </main>

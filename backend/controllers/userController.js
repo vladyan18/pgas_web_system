@@ -108,7 +108,7 @@ module.exports.updateAchieve = function (req, res) {
                 month: 'numeric',
                 day: 'numeric'
             }
-            achieve.status = 'Изменено'
+            achieve.status = 'Ожидает проверки'
             achieve.date = new Date().toLocaleString('ru', options)
 
             let arr = []

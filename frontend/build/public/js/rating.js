@@ -7,10 +7,22 @@ function getUsers () {
     let qq = ''
     let Users = data.Users
     Users.sort(function(obj1, obj2) {
-      return obj2.Ball-obj1.Ball;
+      diff = obj2.Ball-obj1.Ball;
+      if (diff != 0)
+        return obj2.Ball-obj1.Ball;
+      else {
+          for (crit of Object.keys(obj1.Crits)) {
+              diff = obj2.Crits[crit] - obj1.Crits[crit];
+              if (diff != 0) return diff
+          }
+          return 0
+      }
     });
+
+    let i = 0
     for (let user of Users) {
-      qq += '<tr><td style="vertical-align: middle">' + user.Name + '</td><td style="vertical-align: middle">'+ user.Type + '</td><td style="text-align: center; vertical-align: middle">' + user.Course + '</td>'
+      i++
+      qq += '<tr><td style="text-align: center"><b>'+i+'</b></td><td style="vertical-align: middle">' + user.Name + '</td><td style="vertical-align: middle">'+ user.Type + '</td><td style="text-align: center; vertical-align: middle">' + user.Course + '</td>'
         for (crit of Object.keys(user.Crits)) {
           qq += '<td style="text-align: center; vertical-align: middle">' + user.Crits[crit] + '</td>'
         }

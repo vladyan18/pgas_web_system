@@ -28,7 +28,10 @@
     "path": "^0.12.7",
     "randomstring": "^1.1.5",
     "redis": "^2.8.0",
-    "serve-static": "^1.13.2"
+    "serve-static": "^1.13.2",
+    "xlsx": "^0.14.1",
+    "xlsx-populate": "^1.19.1",
+    "xlsx-style": "^0.8.13"
   },
   "scripts": {
     "start": "set NODE_ENV=production && node --nouse-idle-notification backend/start.js"
