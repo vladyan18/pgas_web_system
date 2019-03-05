@@ -62,6 +62,10 @@ body {
   padding: 0;
 }
 
+.commentSended {
+  background-color: #f5f7fa;
+}
+
 .list {
   background-color: white;
   padding: 30px;
@@ -72,12 +76,12 @@ body {
   size: 10px;
 }
 
-h3 {
+.nameHeader {
   font-size: 19px;
   color: white;
   background-color: #2887d4;
-  padding: 10px;
-  border-radius: 2px;
+  border-radius: 0px;
+  vertical-align: center;
 }
 block {
   display: none;

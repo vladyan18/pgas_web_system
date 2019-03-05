@@ -18,16 +18,8 @@ function getAcievement () {
     qq += '<thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
     let k = data.Achs.length;
     if (k > 1)
-    data.Achs = data.Achs.sort(function (a, b) {
-        if(!a || !b) return 0;
-        if (a.crit > b.crit) {
-            return 1;
-        }
-        if (a.crit < b.crit) {
-            return -1;
-        }
-        // a должно быть равным b
-        return 0;
+    data.Achs = data.Achs.sort(function(obj1, obj2) {
+        return Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))
     });
 
     for (let i = 0; i < k; ++i) {
@@ -36,7 +28,7 @@ function getAcievement () {
         qq += '<td>'+data.Achs[i].achievement+'</td>';
         if (data.Achs[i].status == 'Изменено')
             qq += '<td class="table-warning" style="text-align: center">'+ data.Achs[i].status +'</td>';
-        else if (data.Achs[i].status == 'Принято')
+        else if (data.Achs[i].status == 'Принято' || data.Achs[i].status == 'Принято с изменениями')
             qq += '<td class="table-success" style="text-align: center">'+ data.Achs[i].status +'</td>';
         else if (data.Achs[i].status == 'Отказано')
             qq += '<td class="table-danger" style="text-align: center">'+ data.Achs[i].status +'</td>';

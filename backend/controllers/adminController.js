@@ -26,38 +26,38 @@ module.exports.getAdmins = async function (req,res){
 module.exports.dynamic = async function (req, res) {
   let info = []
   let Users = await db.NewUsers()
-  for (let user of Users) {
-    if (!user) continue;
-    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-    let Achievements = []
-    let AchTexts = []
-    let AchId = []
-      let Statuses = []
-      let Chars = []
-      let Comments = []
-    for (let achievement of user.Achievement) {
+    for (let user of Users) {
+        if (!user) continue;
+        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
+        let Achievements = []
 
-      let ach = await db.findAchieveById(achievement)
-        if (!ach) continue;
-        Achievements.push(ach.crit)
-        AchId.push(ach._id)
-        AchTexts.push(ach.achievement)
-        Statuses.push(ach.status)
-        Comments.push(ach.comment)
-        chars = ""
-        i = 0;
-        for (ch of ach.chars) {
-          if (i!=0) chars += ', '
-          chars += ch
-          i++
+        for (let achievement of user.Achievement) {
+
+            let ach = await db.findAchieveById(achievement)
+            if (!ach) continue;
+
+            let charStr = ""
+
+            for (var i = 0; i < ach.chars.length; i++)
+            {
+                if (i != 0) charStr += '; '
+                charStr += ach.chars[i]
+            }
+            ach.chars = charStr
+
+            Achievements.push(ach)
         }
-        Chars.push(chars)
+
+        Achievements.sort(function(obj1, obj2) {
+
+            return Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))
+        });
+
+        if( Achievements.length > 0){
+            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, Achievements: Achievements})
+        }
     }
-    if( AchId.length > 0){
-      info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
-    }
-  }
-  res.status(200).send({ Info: info })
+    res.status(200).send({ Info: info })
 }
 
 module.exports.updateAchieve = function (req, res) {
@@ -130,31 +130,30 @@ module.exports.Checked = async function (req, res) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
         let Achievements = []
-        let AchTexts = []
-        let AchId = []
-        let Statuses = []
-        let Chars = []
-        let Comments = []
+
         for (let achievement of user.Achievement) {
 
             let ach = await db.findAchieveById(achievement)
             if (!ach) continue;
-            Achievements.push(ach.crit)
-            AchId.push(ach._id)
-            AchTexts.push(ach.achievement)
-            Statuses.push(ach.status)
-            Comments.push(ach.comment)
-            chars = ""
-            i = 0;
-            for (ch of ach.chars) {
-                if (i!=0) chars += ', '
-                chars += ch
-                i++
+
+            let charStr = ""
+
+            for (var i = 0; i < ach.chars.length; i++)
+            {
+                if (i != 0) charStr += '; '
+                charStr += ach.chars[i]
             }
-            Chars.push(chars)
+            ach.chars = charStr
+            Achievements.push(ach)
         }
-        if( AchId.length > 0){
-            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, AchTexts: AchTexts, Achievements: Achievements, AchId: AchId, Statuses: Statuses, Chars: Chars, Comments:Comments })
+
+        Achievements.sort(function(obj1, obj2) {
+
+            return Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))
+        });
+
+        if( Achievements.length > 0){
+            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, Achievements: Achievements})
         }
     }
     res.status(200).send({ Info: info })
@@ -251,12 +250,14 @@ const balls = async function (id) {
 const MatrBalls = function(M){
   let S = 0;
   let max = 0;
+
   for(let i = 0; i < M.length; i++){
       if (!M[i]) continue
+      var q = 0;
       for(let j=0; j < M.length; j++){
         if(M[j]['balls'][i] > max){
           max = M[j]['balls'][i];
-          var q = j
+          q = j
         }
       }
       M[q]['ach'].ball = max;
