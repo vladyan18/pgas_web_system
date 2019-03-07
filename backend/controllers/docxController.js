@@ -167,26 +167,30 @@ module.exports.getResultTable = async function (req, res) {
 
         XlsxPopulate.fromFileAsync(anketPath + "/docs/ResultTable.xlsx")
             .then(workbook => {
-                // Modify the workbook.
-                for (var i = 0; i < users.length; i++)
-                {
-                    var r = []
-                    r[0] = i+1
-                    r[1] = users[i].Name
-                    r[2] = users[i].Type
-                    r[3] = users[i].Course
-                    for (var j = 0; j<Object.keys(users[i].Crits).length; j++) {
-                        r.push(users[i].Crits[Object.keys(users[i].Crits)[j]])
+                try {
+                    // Modify the workbook.
+                    for (var i = 0; i < users.length; i++) {
+                        var r = []
+                        r[0] = i + 1
+                        r[1] = users[i].Name
+                        r[2] = users[i].Type
+                        r[3] = users[i].Course
+                        for (var j = 0; j < Object.keys(users[i].Crits).length; j++) {
+                            r.push(users[i].Crits[Object.keys(users[i].Crits)[j]])
+                        }
+                        r.push(users[i].Ball)
+                        workbook.sheet(0).cell("A" + (i + 5)).value([r]);
+                        workbook.sheet(0).row(i + 5).style("horizontalAlignment", "center");
+                        workbook.sheet(0).cell("B" + (i + 5)).style("horizontalAlignment", "left");
                     }
-                    r.push(users[i].Ball)
-                    workbook.sheet(0).cell("A"+(i+5)).value([r]);
-                    workbook.sheet(0).row(i+5).style("horizontalAlignment", "center");
-                    workbook.sheet(0).cell("B"+(i+5)).style("horizontalAlignment", "left");
-                }
 
-                workbook.toFileAsync(anketPath + "/docs/ResultTable2.xlsx").then(() => {
-                    res.download(path.resolve(anketPath + "/docs/ResultTable2.xlsx"));
-                })
+                    workbook.toFileAsync(anketPath + "/docs/ResultTable2.xlsx").then(() => {
+                        res.download(path.resolve(anketPath + "/docs/ResultTable2.xlsx"));
+                    })
+                }
+                catch (e) {
+                    res.status(500).send(e)
+                }
             });
     }
     catch (err) {

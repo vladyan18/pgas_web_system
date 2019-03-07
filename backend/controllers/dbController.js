@@ -81,6 +81,13 @@ exports.findAchieves = async function (user_id) {
 
 exports.findAchieveById = async function (id) {
    return await AchieveModel.findById(id).lean()
+
+    return redis.getAsync(id + '_ach2').then(async (res) => {
+        if (!res) {
+            let b = await AchieveModel.findById(id).lean()
+            redis.setAsync(id + '_ach2', JSON.stringify(b))
+            return(b)
+        } else return JSON.parse(res)})
 }
 
 exports.createAchieve = async function (achieve) {
