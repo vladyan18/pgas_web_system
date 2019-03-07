@@ -29,8 +29,23 @@ function getUsers () {
       qq +=  '<td style="text-align: center;vertical-align: middle"><b>' + user.Ball + '</b></td></tr>'
     }
     document.getElementById('usersTable').innerHTML = qq
+
+      $('#panel').fadeIn(60);
+    registerForUpdate()
   }
   xhr.send()
 };
+
+function registerForUpdate(){
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', '/waitForUpdates', true)
+    xhr.onload = () => {
+        console.log('UPDATE')
+        getUsers()
+    }
+
+    xhr.onerror = () => {xhr.open('GET', '/waitForUpdates', true); setTimeout(()=>{xhr.send()}, 5000)}
+    xhr.send()
+}
 
 getUsers()

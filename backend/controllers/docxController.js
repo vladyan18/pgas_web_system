@@ -168,7 +168,6 @@ module.exports.getResultTable = async function (req, res) {
         XlsxPopulate.fromFileAsync(anketPath + "/docs/ResultTable.xlsx")
             .then(workbook => {
                 // Modify the workbook.
-                console.log(users)
                 for (var i = 0; i < users.length; i++)
                 {
                     var r = []

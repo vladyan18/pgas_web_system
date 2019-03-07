@@ -2,38 +2,132 @@ function ToggleRating (button, i) {
     let id = button.value
     if (!IsInRating[i])
     {
-        $.post('/AddToRating', { Id: id});
-        $('#H' + i).addClass("inRating");
-        IsInRating[i] = true
+        $.post('/AddToRating', { Id: id}).done(function () {
+            $('#H' + i).addClass("inRating");
+            IsInRating[i] = true
+            $('#BL'+i).remove()
+        });
+
     }
     else
     {
-        $.post('/RemoveFromRating', { Id: id});
-        $('#H' + i).removeClass("inRating");
-        IsInRating[i] = false
+        $.post('/RemoveFromRating', { Id: id}).done(function () {
+
+            $('#H' + i).removeClass("inRating");
+            IsInRating[i] = false
+            $('#BL'+i).remove()
+        });
+
     }
 
-    $('#BL'+i).remove()
+
 
 }
 
 function Success (button, i, j) {
   let id = button.value
+    if (usersInfo[i].Achievements[j].crit == '6 (9а)') {
+        if (usersInfo[i].Achievements.filter(o => o.crit == '6 (9а)' && o._id != usersInfo[i].Achievements[j]._id).length < 1) {
+            if (!(usersInfo[i].Achievements[j].chars[0] == 'Проведение (обеспечение проведения) деятельности, направленной на помощь людям (в том числе социального и правозащитного характера) (11)'
+            || usersInfo[i].Achievements[j].chars[0] == 'Проведение (обеспечение проведения) деятельности природоохранного характера (12)')) {
+
+                if (!(usersInfo[i].Achievements[j].chars[1] == 'На международном уровне'
+                || usersInfo[i].Achievements[j].chars[1] == 'На уровне СНГ'
+                || usersInfo[i].Achievements[j].chars[1] == 'На всероссийском уровне'
+                || usersInfo[i].Achievements[j].chars[1] == 'На уровне федерального округа') || (usersInfo[i].Achievements[j].chars[3] == 'Волонтер' || usersInfo[i].Achievements[j].chars[3] == 'Участник' ))
+                {
+                alert('Систематика не может быть выполнена')
+                return false
+                }
+                else {
+                    if (!confirm('Вы уверены, что выполняются условия примечания 5?')) return false;
+                    usersInfo[i].Achievements[j].systematics = 2
+                }
+            }
+        }
+        else if (usersInfo[i].Achievements.filter(o => o.crit == '6 (9а)' && (o.status == 'Принято' || o.status == 'Принято с изменениями')).length < 1) {
+            alert('Не забудьте про требование систематики')
+            usersInfo[i].Achievements[j].systematics = 1
+        } else {
+            if (usersInfo[i].Achievements[j].status == 'Изменено') {
+                $('#Stat_' + i + '_' + j).text('Принято с изменениями')
+                usersInfo[i].Achievements[j].status = 'Принято с изменениями'
+            }
+            usersInfo[i].Achievements[j].systematics = getSystematicsCoeff(usersInfo[i].Achievements[j])
+        }
+    }
+
+    else if (usersInfo[i].Achievements[j].crit == '10 (10в)'
+        || usersInfo[i].Achievements[j].crit == '12 (11б)') {
+        var crit = usersInfo[i].Achievements[j].crit
+        if (usersInfo[i].Achievements.filter(o => o.crit == crit && o._id != usersInfo[i].Achievements[j]._id).length < 1) {
+             alert('Систематика не может быть выполнена')
+                    return false
+        }
+        else if (usersInfo[i].Achievements.filter(o => o.crit == crit && (o.status == 'Принято' || o.status == 'Принято с изменениями')).length < 1) {
+            alert('Не забудьте про требование систематики')
+            usersInfo[i].Achievements[j].systematics = 1
+        } else {
+            if (usersInfo[i].Achievements[j].status == 'Изменено') {
+                $('#Stat_' + i + '_' + j).text('Принято с изменениями')
+                usersInfo[i].Achievements[j].status = 'Принято с изменениями'
+            }
+            usersInfo[i].Achievements[j].systematics = getSystematicsCoeff(usersInfo[i].Achievements[j])
+        }
+    }
   $.post('/AchSuccess', { Id: id})
     $('#TR' + i + '_' + j).removeClass("table-danger");
     $('#TR' + i + '_' + j).removeClass("table-warning");
     $('#TR' + i + '_' + j).addClass("table-success");
-    if (usersInfo[i].Achievements[j].status == 'Изменено')
-      $('#Stat_' + i + '_' + j).text('Принято с изменениями')
-    else $('#Stat_' + i + '_' + j).text('Принято')
+    if (usersInfo[i].Achievements[j].status == 'Изменено') {
+        $('#Stat_' + i + '_' + j).text('Принято с изменениями')
+        usersInfo[i].Achievements[j].status = 'Принято с изменениями'
+    }
+    else {$('#Stat_' + i + '_' + j).text('Принято')
+        usersInfo[i].Achievements[j].status = 'Принято'}
 }
 
 function Failed (button, i, j) {
   let id = button.value
-  $.post('/AchFailed', { Id: id})
-  $('#TR' + i + '_' + j).removeClass("table-success");
-    $('#TR' + i + '_' + j).addClass("table-danger");
-    $('#Stat_' + i + '_' + j).text('Отказано')
+  $.post('/AchFailed', { Id: id}).done(() => {
+      $('#TR' + i + '_' + j).removeClass("table-success");
+      $('#TR' + i + '_' + j).addClass("table-danger");
+      $('#Stat_' + i + '_' + j).text('Отказано')
+      usersInfo[i].Achievements[j].status = 'Отказано'
+
+      if (usersInfo[i].Achievements[j].crit == '6 (9а)' || usersInfo[i].Achievements[j].crit == '10 (10в)'
+          || usersInfo[i].Achievements[j].crit == '12 (11б)') {
+          recalcSyst(i, j, usersInfo[i].Achievements[j].crit)
+      }
+  })
+
+}
+
+function recalcSyst(i, j, crit) {
+    usersInfo[i].Achievements[j].systematics = 0
+    console.log(usersInfo[i].Achievements.filter(o => o.crit == crit))
+    var syst = usersInfo[i].Achievements.filter(o => o.crit == crit).reduce(function (a, b) {
+        console.log(a)
+        return (isFinite(a.systematics)  ? a.systematics : 1) + (isFinite(b.systematics) ? b.systematics : 1)
+    });
+    console.log(syst)
+    if (syst < 2) {
+        for (var k = 0; k < usersInfo[i].Achievements.length; k++)
+        {
+            if (usersInfo[i].Achievements[k].crit == crit)
+            {
+                let l = k
+                $.post('/AchFailed', { Id: usersInfo[i].Achievements[l]._id.toString()}).done(() => {
+                    usersInfo[i].Achievements[l].status = 'Отказано'
+                    $('#TR' + i + '_' + l).removeClass("table-success");
+                    $('#TR' + i + '_' + l).addClass("table-danger");
+                    $('#Stat_' + i + '_' + l).text('Отказано');
+                    usersInfo[i].Achievements[l].systematics = 0;
+                })
+
+            }
+        }
+    }
 }
 
 var editingAchNum;
@@ -72,23 +166,31 @@ function SaveEdition () {
 
     $('#Stat_' + editingUserNum + '_' + editingAchNum).text('Изменено')
     $('#Crit_' + editingUserNum + '_' + editingAchNum).text(crit)
-    usersInfo[editingUserNum].Statuses[editingAchNum] = 'Изменено'
+    usersInfo[editingUserNum].Achievements[editingAchNum].status = 'Изменено'
     $('#Ach_' + editingUserNum + '_' + editingAchNum).text(achievement)
-
+    $('#Chars_' + editingUserNum + '_' + editingAchNum).text(chars)
     str = ''
     for (var k = 0; k < chars.length; k++)
     {
-        if (k != 0) str += ', '
+        if (k != 0) str += '; '
         str += chars[k]
     }
     $('#Chars_' + editingUserNum + '_' + editingAchNum).text(str)
+
+    if (usersInfo[editingUserNum].Achievements[editingAchNum].crit == '6 (9а)' || usersInfo[editingUserNum].Achievements[editingAchNum].crit == '10 (10в)'
+        || usersInfo[editingUserNum].Achievements[editingAchNum].crit == '12 (11б)'  ) {
+        usersInfo[editingUserNum].Achievements[editingAchNum].systematics = getSystematicsCoeff(usersInfo[editingUserNum].Achievements[editingAchNum])
+    }
+
 }
 
 function Comment (button, i, j) {
   let id = button.value
   let comment = document.getElementById(id).value
-  $.post('/comment', { Id: id, comment:comment})
-    $('#' + id).addClass("commentSended");
+  $.post('/comment', { Id: id, comment:comment}).done(() => {
+      $('#' + id).addClass("commentSended");
+  })
+
 }
 
 
@@ -97,28 +199,36 @@ var usersInfo
 
 function getUsers () {
   var xhr = new XMLHttpRequest()
-
-  xhr.open('GET', '/getUsersForAdmin', true)
+  if (isProcessedPage)  xhr.open('GET', '/checked', true)
+  else xhr.open('GET', '/getUsersForAdmin', true)
 
   xhr.onload = function () {
     let data = JSON.parse(xhr.responseText)
+      let infoBuf = usersInfo
+      if (infoBuf) for (user of infoBuf)
+      {
+          for (ach of user.Achievements)
+              ach.systematics = undefined;
+      }
+      console.log(JSON.stringify(data.Info) == JSON.stringify(infoBuf))
+      if (JSON.stringify(data.Info) == JSON.stringify(infoBuf)) {registerForUpdate(); return false}
       usersInfo = data.Info
-    console.log(data)
     let qq = ''
       for (let i = 0; i < data.Info.length; i++) {
           IsInRating[i] = data.Info[i].IsInRating
 
 
 
-          qq += '<div id="BL'+i+'"><div class="name"><div style="width: 100%; margin-bottom: 10px" class="input-group" id="H'+i+'"><h3 class="form-control nameHeader " style="border: 0; box-shadow: none">' + data.Info[i].user + '</h3><div class="input-group-append" ><button type="button" onclick="ToggleRating(this, '+i+')" value="' + data.Info[i].Id + '" class="btn btn-dark btn-xs" style="font-size: x-small; margin-right: 0px; border-radius: 0px">'+(data.Info[i].IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг')+'</button></div></div><block style="display: block;overflow: auto;">'
+          qq += '<div id="BL'+i+'"><div class="name"><div style="width: 100%; margin-bottom: 10px; text-align: center" class="input-group" id="H'+i+'"><h3 class="form-control nameHeader '+(isProcessedPage? 'inRating': '')+'" style="border: 0; box-shadow: none">' + data.Info[i].user + '</h3><div class="input-group-append" ><button type="button" onclick="ToggleRating(this, '+i+')" value="' + data.Info[i].Id + '" class="btn btn-dark btn-xs" style="font-size: x-small; margin-right: 0px; border-radius: 0px">'+(data.Info[i].IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг')+'</button></div></div><block style="display: block;overflow: auto;">'
           qq += '<table class="table"><thead><th class="table-bordered">Крит.</th><th class="table-bordered">Достижение</th><th class="table-bordered">Хар-ки</th><th class="table-bordered">Дата</th><th class="table-bordered">Статус</th><th>Комментарий</th><th></th></thead><tbody>'
           for (let j = 0; j < data.Info[i].Achievements.length; ++j) {
+              if (data.Info[i].Achievements[j].crit == '6 (9а)') data.Info[i].Achievements[j].systematics = getSystematicsCoeff(data.Info[i].Achievements[j])
               qq += '<tr id="TR'+i+'_'+j+'" ' + 'class="' + ((data.Info[i].Achievements[j].status == 'Принято' || data.Info[i].Achievements[j].status == 'Принято с изменениями') ? 'table-success' : '')  +
                   (data.Info[i].Achievements[j].status == 'Отказано' ? 'table-danger' : '')  + (data.Info[i].Achievements[j].status == 'Изменено' ? 'table-warning' : '') +
                   '"><td class="table-bordered" style="vertical-align: middle"width="5%"><span id="Crit_'+i+'_'+j+'">'+ data.Info[i].Achievements[j].crit+ '</span></td>';
               qq += '<td class="table-bordered" style="vertical-align: middle" ><span id="Ach_'+i+'_'+j+'">'+ data.Info[i].Achievements[j].achievement +'</span></td>';
               qq += '<td class="table-bordered" style="vertical-align: middle" width="24%"><span id="Chars_'+i+'_'+j+'">'+ data.Info[i].Achievements[j].chars +'</td>';
-              qq += '<td class="table-bordered" style="vertical-align: middle" width="8%">'+ getDate(data.Info[i].Achievements[j].date) +'</td>'
+              qq += '<td class="table-bordered" style="vertical-align: middle" width="8%">'+ (data.Info[i].Achievements[j].achDate ? getDate(data.Info[i].Achievements[j].achDate) : '') +'</td>'
               qq += '<td class="table-bordered" style="vertical-align: middle" width="9%"><span id="Stat_'+i+'_'+j+'">'+ data.Info[i].Achievements[j].status +'</span></td>';
               qq += '<td width="20%"><div class="input-group" style="min-height: 91px; width: 100%">'
 
@@ -136,8 +246,9 @@ function getUsers () {
           }
           qq += '</tbody></table></block></div></div>'
       }
+      if (qq == "") qq = '<div style="display: flex; justify-content: center"><h4>Заявок нет</h4></div>'
       document.getElementById('users').innerHTML = qq
-
+      $('#panel').fadeIn(60);
       $('.name h3').click(function () {
           console.log($(this).parent().parent().children())
           if (!$(this).parent().parent().find('block').is(':visible')) {
@@ -147,11 +258,24 @@ function getUsers () {
               $(this).parent().parent().find('block').hide(200)
           }
       })
+      registerForUpdate()
   }
 
 
     xhr.send()
 };
+
+function registerForUpdate(){
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', '/waitForUpdates', true)
+    xhr.onload = () => {
+        console.log('UPDATE')
+        getUsers()
+    }
+
+    xhr.onerror = () => {xhr.open('GET', '/waitForUpdates', true); setTimeout(()=>{xhr.send()}, 5000)}
+    xhr.send()
+}
 
 function getDate(d) {
     if (!d) return undefined
@@ -160,3 +284,22 @@ function getDate(d) {
 }
 
 getUsers()
+
+function getSystematicsCoeff(a) {
+    if (a.status == 'Отказано') return 0
+    if (a.crit == '6 (9а)') {
+        if ((a.chars[0] == 'Проведение (обеспечение проведения) деятельности, направленной на помощь людям (в том числе социального и правозащитного характера) (11)'
+            || a == 'Проведение (обеспечение проведения) деятельности природоохранного характера (12)')) {
+            return 2
+        }
+        else if ((a.chars[1] == 'На международном уровне' // Опасно
+            || a.chars[1] == 'На уровне СНГ'
+            || a.chars[1] == 'На всероссийском уровне'
+            || a.chars[1] == 'На уровне федерального округа') && !(a.chars[3] == 'Волонтер'
+            || a.chars[3] == 'Участник')) {
+            return 2
+        }
+        else return 1
+    } else return 1
+
+}

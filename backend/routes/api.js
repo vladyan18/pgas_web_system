@@ -84,7 +84,11 @@ router.get('/getAdmins',adminAuth, adminController.getAdmins)
 
 router.get('/user=*',adminAuth, adminController.allUsers)
 
+router.get('/waitForUpdates', adminAuth, adminController.waitForUpdates)
+
 router.get('/getResultTable', adminAuth, docxController.getResultTable)
+
+
 
 
 module.exports = router

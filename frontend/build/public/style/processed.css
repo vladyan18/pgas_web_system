@@ -19,6 +19,10 @@ body {
     align-self: center;
 }
 
+.table-danger{
+    background-color: firebrick;
+}
+
 @media (max-width: 768px) {
   .logo_img {
     margin-left: 0;

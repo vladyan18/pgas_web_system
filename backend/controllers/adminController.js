@@ -4,13 +4,18 @@ const Kri = require(__dirname + "/Kriterii.json")
 const fs = require('fs')
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
 const upload = require(path.join(__dirname, '../config/multer'))
+const EventEmitter = require('events');
+class UpdateEmitter extends EventEmitter {}
+const AdminEmitter = new UpdateEmitter();
 
 module.exports.setUser = async function(req,res){
-  db.ChangeRole(req.body.Id,false)
+  await db.ChangeRole(req.body.Id,false)
+    res.sendStatus(200)
 }
 
 module.exports.setAdmin = async function(req,res){
-  db.ChangeRole(req.body.Id,true)
+  await db.ChangeRole(req.body.Id,true)
+    res.sendStatus(200)
 }
 
 module.exports.getAdmins = async function (req,res){
@@ -35,15 +40,8 @@ module.exports.dynamic = async function (req, res) {
 
             let ach = await db.findAchieveById(achievement)
             if (!ach) continue;
+            ach.ball = 0;
 
-            let charStr = ""
-
-            for (var i = 0; i < ach.chars.length; i++)
-            {
-                if (i != 0) charStr += '; '
-                charStr += ach.chars[i]
-            }
-            ach.chars = charStr
 
             Achievements.push(ach)
         }
@@ -58,6 +56,13 @@ module.exports.dynamic = async function (req, res) {
         }
     }
     res.status(200).send({ Info: info })
+}
+
+module.exports.waitForUpdates = async function (req, res) {
+    AdminEmitter.once('Update', () => {setImmediate(() => {
+        res.sendStatus(200)
+    })
+    })
 }
 
 module.exports.updateAchieve = function (req, res) {
@@ -91,6 +96,7 @@ module.exports.updateAchieve = function (req, res) {
             else id = req.user.user_id
             balls(id)
             res.sendStatus(200)
+            AdminEmitter.emit('Update')
         }
         catch (err) {
             console.log(err)
@@ -101,26 +107,37 @@ module.exports.updateAchieve = function (req, res) {
 
 module.exports.AchSuccess = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, true)
-    let u = await db.findUserByAchieve(req.body.Id)
+  let u = await db.findUserByAchieve(req.body.Id)
   balls(u.id)
+  res.sendStatus(200)
+  AdminEmitter.emit('Update')
+
 }
 
 module.exports.AchFailed = async function (req, res) {
   await db.ChangeAchieve(req.body.Id, false)
     let u = await db.findUserByAchieve(req.body.Id)
     balls(u.id)
+    AdminEmitter.emit('Update')
+    res.sendStatus(200)
 }
 
 module.exports.AddToRating = async function (req, res) {
     await db.AddToRating(req.body.Id)
+    res.sendStatus(200)
+    AdminEmitter.emit('Update')
 }
 
 module.exports.RemoveFromRating = async function (req, res) {
     await db.RemoveFromRating(req.body.Id)
+    res.sendStatus(200)
+    AdminEmitter.emit('Update')
 }
 
 module.exports.Comment = async function(req,res){
   await db.comment(req.body.Id, req.body.comment)
+    res.sendStatus(200)
+    AdminEmitter.emit('Update')
 }
 
 module.exports.Checked = async function (req, res) {
@@ -136,14 +153,7 @@ module.exports.Checked = async function (req, res) {
             let ach = await db.findAchieveById(achievement)
             if (!ach) continue;
 
-            let charStr = ""
-
-            for (var i = 0; i < ach.chars.length; i++)
-            {
-                if (i != 0) charStr += '; '
-                charStr += ach.chars[i]
-            }
-            ach.chars = charStr
+            ach.ball = 0;
             Achievements.push(ach)
         }
 
@@ -239,12 +249,25 @@ const balls = async function (id) {
   }
 
     for (key of Object.keys(kri)) {
-        balls += MatrBalls(kriteries[key])
+        if (CheckSystem(key, kriteries[key]))
+        {
+            console.log(key, kriteries[key])
+          balls += MatrBalls(kriteries[key])
+        }
+        else for (let ach of kriteries[key]) ach['ach'].ball = undefined
         for (curAch of kriteries[key]) {
             if (!curAch) continue
           db.updateAchieve(curAch['ach']._id, curAch['ach'])
         }
     }
+}
+
+const CheckSystem = function(crit, ach) {
+    if (!ach) return false
+    if (crit == '10 (10в)' || crit == '12 (11б)' ) {
+        return ach.filter(o => o).length >= 2
+    }
+    else return true
 }
 
 const MatrBalls = function(M){
@@ -255,15 +278,17 @@ const MatrBalls = function(M){
       if (!M[i]) continue
       var q = 0;
       for(let j=0; j < M.length; j++){
-        if(M[j]['balls'][i] > max){
+          if (!M[j]['balls']) continue
+        if(M[j]['balls'][i] >= max){
           max = M[j]['balls'][i];
           q = j
         }
       }
       M[q]['ach'].ball = max;
-      M[q]['balls'] = [0,0,0,0,0,0];
+      M[q]['balls'] = undefined;
       S+=max;
       max = 0
   }
+  console.log(M)
   return S
 }

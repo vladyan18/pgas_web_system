@@ -93,6 +93,7 @@ body {
 .document {
   font-size: 16px;
   color: #727272;
+  text-decoration: underline;
 }
 .document:hover {
   font-size: 16px;
