@@ -71,7 +71,6 @@ exports.createUser = function(User){
 exports.findAchieves = async function (user_id) {
     return redis.getAsync(user_id + '_achs').then(async (res) => {
         if (!res) {
-            console.log('NOT FOUND')
             User = await UserModel.findOne({ id: user_id}, 'Achievement').lean()
             let b = await AchieveModel.find({_id : {$in: User.Achievement}}).lean()
             redis.setAsync(user_id + '_achs', JSON.stringify(b))

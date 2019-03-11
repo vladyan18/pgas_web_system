@@ -221,7 +221,7 @@ function getUsers () {
 
           qq += '<div id="BL'+i+'"><div class="name"><div style="width: 100%; margin-bottom: 10px; text-align: center" class="input-group" id="H'+i+'"><h3 class="form-control nameHeader '+(isProcessedPage? 'inRating': '')+'" style="border: 0; box-shadow: none">' + data.Info[i].user + '</h3><div class="input-group-append" ><button type="button" onclick="ToggleRating(this, '+i+')" value="' + data.Info[i].Id + '" class="btn btn-dark btn-xs" style="font-size: x-small; margin-right: 0px; border-radius: 0px">'+(data.Info[i].IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг')+'</button></div></div><block style="display: block;overflow: auto;">'
           qq += '<table class="table"><thead><th class="table-bordered">Крит.</th><th class="table-bordered">Достижение</th><th class="table-bordered">Хар-ки</th><th class="table-bordered">Дата</th><th class="table-bordered">Статус</th><th>Комментарий</th><th></th></thead><tbody>'
-          for (let j = 0; j < data.Info[i].Achievements.length; ++j) {
+          for (var j = 0; j < data.Info[i].Achievements.length; j++) {
               if (data.Info[i].Achievements[j].crit == '6 (9а)') data.Info[i].Achievements[j].systematics = getSystematicsCoeff(data.Info[i].Achievements[j])
               qq += '<tr id="TR'+i+'_'+j+'" ' + 'class="' + ((data.Info[i].Achievements[j].status == 'Принято' || data.Info[i].Achievements[j].status == 'Принято с изменениями') ? 'table-success' : '')  +
                   (data.Info[i].Achievements[j].status == 'Отказано' ? 'table-danger' : '')  + (data.Info[i].Achievements[j].status == 'Изменено' ? 'table-warning' : '') +

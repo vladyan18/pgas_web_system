@@ -146,21 +146,25 @@ module.exports.Checked = async function (req, res) {
     for (let user of Users) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-        let Achievements = []
+        var Achievements = []
 
-        for (let achievement of user.Achievement) {
+        var aches = await db.findAchieves(user.id)
+        for (var i = 0; i < aches.length; i++) {
 
-            let ach = await db.findAchieveById(achievement)
+            var ach = aches[i]
             if (!ach) continue;
 
             ach.ball = 0;
+            ach.systematics = undefined;
             Achievements.push(ach)
         }
 
-        Achievements.sort(function(obj1, obj2) {
-
-            return Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))
+        Achievements.sort((obj1, obj2) => {
+            if (Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))) return 1;
+            else if (Number.parseInt(obj1.crit.substr(0,2)) < Number.parseInt(obj2.crit.substr(0,2))) return -1;
+            else return 0;
         });
+
 
         if( Achievements.length > 0){
             info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, Achievements: Achievements})
@@ -202,9 +206,8 @@ module.exports.getRating = async function (req, res) {
       for (key of Object.keys(kri)) {
           crits[key] = 0;
       }
-    Achs = user.Achievement;
-    for(let achID of Achs) {
-        ach = await db.findAchieveById(achID);
+    Achs = await db.findAchieves(user.id);
+    for(let ach of Achs) {
         if (!ach) continue
         if (ach.ball) {
             crits[ach.crit] += ach.ball;

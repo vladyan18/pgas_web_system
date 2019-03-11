@@ -129,7 +129,7 @@ module.exports.getAnket = async function (req, res) {
 
 module.exports.getResultTable = async function (req, res) {
     try {
-        let kri = JSON.parse(JSON.stringify(Kri))
+        let kri = Kri
         let users = []
         let Users = await db.CurrentUsers()
         for (let user of Users) {
@@ -138,9 +138,8 @@ module.exports.getResultTable = async function (req, res) {
             for (key of Object.keys(kri)) {
                 crits[key] = 0;
             }
-            Achs = user.Achievement;
-            for (let achID of Achs) {
-                ach = await db.findAchieveById(achID);
+            Achs = await db.findAchieves(user.id);
+            for (let ach of Achs) {
                 if (!ach) continue
                 if (ach.ball) {
                     crits[ach.crit] += ach.ball;
@@ -180,9 +179,11 @@ module.exports.getResultTable = async function (req, res) {
                         }
                         r.push(users[i].Ball)
                         workbook.sheet(0).cell("A" + (i + 5)).value([r]);
-                        workbook.sheet(0).row(i + 5).style("horizontalAlignment", "center");
-                        workbook.sheet(0).cell("B" + (i + 5)).style("horizontalAlignment", "left");
                     }
+                    for (var i = 1; i < 19; i++)
+                        workbook.sheet(0).column(i).style("horizontalAlignment", "center");
+                    workbook.sheet(0).column("B").style("horizontalAlignment", "left");
+                    workbook.sheet(0).cell("B1").style("horizontalAlignment", "center");
 
                     workbook.toFileAsync(anketPath + "/docs/ResultTable2.xlsx").then(() => {
                         res.download(path.resolve(anketPath + "/docs/ResultTable2.xlsx"));
@@ -191,7 +192,7 @@ module.exports.getResultTable = async function (req, res) {
                 catch (e) {
                     res.status(500).send(e)
                 }
-            });
+            }).catch((e) => {res.status(500).send(e)});
     }
     catch (err) {
         console.log(err)
