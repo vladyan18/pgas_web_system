@@ -84,6 +84,8 @@ router.get('/getAdmins',adminAuth, adminController.getAdmins)
 
 router.get('/user=*',adminAuth, adminController.allUsers)
 
+router.post('/toggleHide', adminAuth, adminController.toggleHide)
+
 router.get('/waitForUpdates', adminAuth, adminController.waitForUpdates)
 
 router.get('/getResultTable', adminAuth, docxController.getResultTable)

@@ -140,6 +140,11 @@ module.exports.Comment = async function(req,res){
     AdminEmitter.emit('Update')
 }
 
+module.exports.toggleHide = async function (req, res) {
+    await db.toggleHide(req.body.id)
+    res.sendStatus(200)
+}
+
 module.exports.Checked = async function (req, res) {
     let info = []
     let Users = await db.CurrentUsers()
@@ -167,7 +172,14 @@ module.exports.Checked = async function (req, res) {
 
 
         if( Achievements.length > 0){
-            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, Achievements: Achievements})
+            info.push({
+                Id: user._id,
+                user: str,
+                Course: user.Course,
+                IsHiddenInRating: user.IsHiddenInRating,
+                IsInRating: user.IsInRating,
+                Achievements: Achievements
+            })
         }
     }
     res.status(200).send({ Info: info })

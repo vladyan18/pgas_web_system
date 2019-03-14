@@ -14,7 +14,8 @@ const userSchema = mongoose.Schema({
   Type: String,
   Ball: Number,
   Achievement: [String],
-  IsInRating: Boolean
+    IsInRating: Boolean,
+    IsHiddenInRating: Boolean
 })
 
 const User = connection.model('User', userSchema)

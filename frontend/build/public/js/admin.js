@@ -193,6 +193,12 @@ function Comment (button, i, j) {
 
 }
 
+function ToggleHide(id) {
+    $.post('/toggleHide', {id: id}).done(() => {
+    })
+
+}
+
 
 var IsInRating = []
 var usersInfo
@@ -218,8 +224,7 @@ function getUsers () {
           IsInRating[i] = data.Info[i].IsInRating
 
 
-
-          qq += '<div id="BL'+i+'"><div class="name"><div style="width: 100%; margin-bottom: 10px; text-align: center" class="input-group" id="H'+i+'"><h3 class="form-control nameHeader '+(isProcessedPage? 'inRating': '')+'" style="border: 0; box-shadow: none">' + data.Info[i].user + '</h3><div class="input-group-append" ><button type="button" onclick="ToggleRating(this, '+i+')" value="' + data.Info[i].Id + '" class="btn btn-dark btn-xs" style="font-size: x-small; margin-right: 0px; border-radius: 0px">'+(data.Info[i].IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг')+'</button></div></div><block style="display: block;overflow: auto;">'
+          qq += '<div id="BL' + i + '"><div class="name"><div style="width: 100%; text-align: center" class="input-group" id="H' + i + '"><div class ="nameHeader ' + (isProcessedPage ? 'inRating' : '') + '" style="text-align: center;"><i id="IC' + i + '" class="fas fa-chevron-' + (data.Info[i].IsHiddenInRating ? 'right' : 'down') + ' mychevron"></i></div><h3 class="form-control nameHeader ' + (isProcessedPage ? 'inRating' : '') + '" style="border: 0; box-shadow: none">' + data.Info[i].user + '</h3><div class="input-group-append" ><button type="button" onclick="ToggleRating(this, ' + i + ')" value="' + data.Info[i].Id + '" class="btn btn-dark btn-xs" style="font-size: x-small; margin-right: 0px; border-radius: 0px">' + (data.Info[i].IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг') + '</button></div></div><div id="SH' + i + '"></div><div class="cover"></div><block style="display: ' + (data.Info[i].IsHiddenInRating ? 'none' : 'block') + ';overflow: auto;">'
           qq += '<table class="table"><thead><th class="table-bordered">Крит.</th><th class="table-bordered">Достижение</th><th class="table-bordered">Хар-ки</th><th class="table-bordered">Дата</th><th class="table-bordered">Статус</th><th>Комментарий</th><th></th></thead><tbody>'
           for (var j = 0; j < data.Info[i].Achievements.length; j++) {
               if (data.Info[i].Achievements[j].crit == '6 (9а)') data.Info[i].Achievements[j].systematics = getSystematicsCoeff(data.Info[i].Achievements[j])
@@ -246,17 +251,34 @@ function getUsers () {
           }
           qq += '</tbody></table></block></div></div>'
       }
+
+
       if (qq == "") qq = '<div style="display: flex; justify-content: center"><h4>Заявок нет</h4></div>'
       document.getElementById('users').innerHTML = qq
+
       $('#panel').fadeIn(60);
-      $('.name h3').click(function () {
-          console.log($(this).parent().parent().children())
-          if (!$(this).parent().parent().find('block').is(':visible')) {
-              $(this).parent().parent().find('block').show(200)
+      for (let i = 0; i < data.Info.length; i++) {
+          if ($('#BL' + i).height() > 650) {
+              $('#SH' + i).addClass('shadow')
+              $('#H' + i).addClass('sticky')
+          }
+      }
+      $('.mychevron').click(function () {
+          var id = $(this).attr('id').slice(2)
+          id = Number.parseInt(id)
+
+          if (!$(this).parent().parent().parent().find('block').is(':visible')) {
+              $(this).removeClass('fa-chevron-right')
+              $(this).addClass('fa-chevron-down')
+              $(this).parent().parent().parent().find('block').show(200)
           }
           else {
-              $(this).parent().parent().find('block').hide(200)
+              $(this).parent().parent().parent().find('block').hide(200)
+              $(this).removeClass('fa-chevron-down')
+              $(this).addClass('fa-chevron-right')
           }
+          data.Info[id].IsHiddenInRating = !data.Info[id].IsHiddenInRating
+          ToggleHide(data.Info[id].Id)
       })
       registerForUpdate()
   }

@@ -174,9 +174,17 @@ exports.comment = async function(id,comment){
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()
     redis.del(u.id + '_achs');
   return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
-    console.log('')
   })
 }
+
+exports.toggleHide = async function (id) {
+    u = await UserModel.findById(id)
+    redis.del(id + '_user');
+    return UserModel.findOneAndUpdate({_id: id}, {$set: {IsHiddenInRating: (!u.IsHiddenInRating)}}, function (err, result) {
+    })
+}
+
+
 exports.allAchieves = function () {
   return AchieveModel.find({}).lean()
 }
