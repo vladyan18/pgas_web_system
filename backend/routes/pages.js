@@ -146,6 +146,10 @@ router.get('/info',adminAuth, (req, res) => {
   res.sendFile(path.join(frontendPath, '/info.html'))
 })
 
+router.get('/history', adminAuth, (req, res) => {
+    res.sendFile(path.join(frontendPath, '/adminHistory.html'))
+})
+
 
 router.get('/user/*',adminAuth, (req, res) => {
   res.sendFile(path.join(frontendPath, '/profile_admin.html'))

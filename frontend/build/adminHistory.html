@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>История действий</title>
+    <link rel="icon" href="img/icon.png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="style/rating.css">
+</head>
+<body>
+<div class="container-fluid">
+    <header>
+        <div class="row page_top">
+            <div class="col-9 block_header">
+                <img src="img/gerb.png" class="logo_img">
+                <div class="p_header">Санкт-Петербургский государственный университет <br>
+                    История действий
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="exit"><a href="/logout">Выход из личного кабинета</a></div>
+            </div>
+            <div style="display:flex;">
+                <div style="margin-left: auto; margin-right: auto">
+                    <ul class="options" style="display: flex">
+                        <li class="element"><a href="/admin">Новые заявки</a></li>
+                        <li class="element"><a href="/processed">Текущие кандидаты</a></li>
+                        <li class="element"><a href="/rating">Рейтинг студентов</a></li>
+                        <li class="element_active"><a href="/history">История</a></li>
+                        <li class="element"><a href="/info">Информация</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div id="panel" class="row" style="justify-content: center; display: none">
+
+            <div class="col-9 general">
+                <div class="profile" style="display: flex; justify-content: space-between;">
+                    <div style="margin-top: auto; margin-bottom: auto">
+                        <p class="headline">
+                            История действий
+                        </p>
+                    </div>
+
+
+                </div>
+                <div id="HistoryPanel">
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js'></script>
+<script src="js/adminHistory.js"></script>
+</body>
+</html>

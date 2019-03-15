@@ -1,6 +1,7 @@
 const UserModel = require('../models/user.js')
 const AchieveModel = require('../models/achieve')
 const FacultyModel = require('../models/faculty')
+const HistoryNoteModel = require('../models/historyNote')
 const redis = require('../config/redis')
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -227,3 +228,10 @@ exports.ChangeRole = function (id, isAdmin) {
   }
 }
 
+exports.GetHistoryNotes = async function () {
+    return HistoryNoteModel.find({});
+}
+
+exports.createHistoryNote = async function (historyNote) {
+    return HistoryNoteModel.create(historyNote)
+}

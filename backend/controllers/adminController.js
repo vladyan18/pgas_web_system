@@ -1,5 +1,6 @@
 const db = require('./dbController')
 const notify = require('./notificationController')
+const history = require('./historyNotesController')
 const path = require('path')
 const Kri = require(__dirname + "/Kriterii.json")
 const fs = require('fs')
@@ -114,14 +115,21 @@ module.exports.updateAchieve = function (req, res) {
             }
             achieve.files = arr
             console.log(achieve)
+            let oldAchieve = await db.findAchieveById(id)
             let createdAchieve = await db.updateAchieve(id, achieve)
             if (req.user._json.email)
-                id = req.user._json.email
-            else id = req.user.user_id
-            balls(id)
+                uid = req.user._json.email
+            else uid = req.user.user_id
+
+            var args = {}
+            args.from = oldAchieve
+            args.to = createdAchieve
+            history.WriteToHistory(req, id, uid, 'Change', args)
+            balls(uid)
             res.sendStatus(200)
             AdminEmitter.emit('Update')
             notify.emitChange(req, createdAchieve).then()
+
         }
         catch (err) {
             console.log(err)
@@ -137,6 +145,7 @@ module.exports.AchSuccess = async function (req, res) {
   res.sendStatus(200)
   AdminEmitter.emit('Update')
     notify.emitSuccess(req, u).then()
+    history.WriteToHistory(req, req.body.Id, u.id, 'Success')
 }
 
 module.exports.AchFailed = async function (req, res) {
@@ -146,6 +155,7 @@ module.exports.AchFailed = async function (req, res) {
     AdminEmitter.emit('Update')
     res.sendStatus(200)
     notify.emitDecline(req, u).then()
+    history.WriteToHistory(req, req.body.Id, u.id, 'Decline')
 }
 
 module.exports.AddToRating = async function (req, res) {

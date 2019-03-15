@@ -303,15 +303,17 @@ function registerForNotify() {
     xhr.open('GET', '/waitForNotify', true)
     xhr.onload = () => {
         registerForNotify()
-        let data = JSON.parse(xhr.responseText)
-        if (data.Type == 'Success')
-            $().toastmessage('showSuccessToast', data.Message);
-        if (data.Type == 'Decline')
-            $().toastmessage('showErrorToast', data.Message);
-        if (data.Type == 'Change')
-            $().toastmessage('showWarningToast', data.Message);
-        if (data.Type == 'Comment')
-            $().toastmessage('showNoticeToast', data.Message);
+        if (xhr.responseText != 'Request Timeout') {
+            let data = JSON.parse(xhr.responseText)
+            if (data.Type == 'Success')
+                $().toastmessage('showSuccessToast', data.Message);
+            if (data.Type == 'Decline')
+                $().toastmessage('showErrorToast', data.Message);
+            if (data.Type == 'Change')
+                $().toastmessage('showWarningToast', data.Message);
+            if (data.Type == 'Comment')
+                $().toastmessage('showNoticeToast', data.Message);
+        }
     }
 
     xhr.onerror = () => {

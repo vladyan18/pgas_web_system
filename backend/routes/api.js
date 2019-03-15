@@ -5,6 +5,7 @@ const adminController = require('../controllers/adminController.js')
 const docxController = require('../controllers/docxController')
 const facultyController = require('../controllers/facultyController')
 const notifyController = require('../controllers/notificationController')
+const historyController = require('../controllers/historyNotesController')
 const db = require('../controllers/dbController.js')
 
 const adminAuth = async (req, res, next) => {
@@ -93,7 +94,7 @@ router.get('/waitForNotify', adminAuth, notifyController.waitForNotifies)
 
 router.get('/getResultTable', adminAuth, docxController.getResultTable)
 
-
+router.get('/getHistory', adminAuth, historyController.GetHistory)
 
 
 module.exports = router
