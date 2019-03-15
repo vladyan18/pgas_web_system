@@ -4,6 +4,7 @@ const userController = require('../controllers/userController.js')
 const adminController = require('../controllers/adminController.js')
 const docxController = require('../controllers/docxController')
 const facultyController = require('../controllers/facultyController')
+const notifyController = require('../controllers/notificationController')
 const db = require('../controllers/dbController.js')
 
 const adminAuth = async (req, res, next) => {
@@ -87,6 +88,8 @@ router.get('/user=*',adminAuth, adminController.allUsers)
 router.post('/toggleHide', adminAuth, adminController.toggleHide)
 
 router.get('/waitForUpdates', adminAuth, adminController.waitForUpdates)
+
+router.get('/waitForNotify', adminAuth, notifyController.waitForNotifies)
 
 router.get('/getResultTable', adminAuth, docxController.getResultTable)
 

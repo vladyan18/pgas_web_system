@@ -1,4 +1,5 @@
 const db = require('./dbController')
+const notify = require('./notificationController')
 const path = require('path')
 const Kri = require(__dirname + "/Kriterii.json")
 const fs = require('fs')
@@ -52,17 +53,40 @@ module.exports.dynamic = async function (req, res) {
         });
 
         if( Achievements.length > 0){
-            info.push({ Id: user._id, user: str, Course: user.Course, IsInRating:user.IsInRating, Achievements: Achievements})
+            info.push({
+                Id: user._id,
+                user: str,
+                Course: user.Course,
+                IsInRating: user.IsInRating,
+                IsHiddenInRating: user.IsHiddenInRating,
+                Achievements: Achievements
+            })
         }
     }
     res.status(200).send({ Info: info })
 }
 
 module.exports.waitForUpdates = async function (req, res) {
-    AdminEmitter.once('Update', () => {setImmediate(() => {
+    var timer
+    var flag = false
+    var callback = () => {
+        setImmediate(() => {
+            flag = true
         res.sendStatus(200)
-    })
-    })
+            res.end()
+            clearTimeout(timer)
+        })
+    }
+
+    timer = setTimeout(function () {
+        AdminEmitter.removeListener('Update', callback)
+        if (!flag)
+            res.sendStatus(408)
+    }, 300000)
+
+    AdminEmitter.once('Update', callback)
+
+
 }
 
 module.exports.updateAchieve = function (req, res) {
@@ -97,6 +121,7 @@ module.exports.updateAchieve = function (req, res) {
             balls(id)
             res.sendStatus(200)
             AdminEmitter.emit('Update')
+            notify.emitChange(req, createdAchieve).then()
         }
         catch (err) {
             console.log(err)
@@ -111,7 +136,7 @@ module.exports.AchSuccess = async function (req, res) {
   balls(u.id)
   res.sendStatus(200)
   AdminEmitter.emit('Update')
-
+    notify.emitSuccess(req, u).then()
 }
 
 module.exports.AchFailed = async function (req, res) {
@@ -120,24 +145,28 @@ module.exports.AchFailed = async function (req, res) {
     balls(u.id)
     AdminEmitter.emit('Update')
     res.sendStatus(200)
+    notify.emitDecline(req, u).then()
 }
 
 module.exports.AddToRating = async function (req, res) {
     await db.AddToRating(req.body.Id)
     res.sendStatus(200)
     AdminEmitter.emit('Update')
+    notify.AddToRating(req, req.body.Id).then()
 }
 
 module.exports.RemoveFromRating = async function (req, res) {
     await db.RemoveFromRating(req.body.Id)
     res.sendStatus(200)
     AdminEmitter.emit('Update')
+    notify.RemoveFromRating(req, req.body.Id).then()
 }
 
 module.exports.Comment = async function(req,res){
   await db.comment(req.body.Id, req.body.comment)
     res.sendStatus(200)
     AdminEmitter.emit('Update')
+    notify.emitComment(req, req.body.Id).then()
 }
 
 module.exports.toggleHide = async function (req, res) {

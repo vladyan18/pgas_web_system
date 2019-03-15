@@ -266,7 +266,6 @@ function getUsers () {
       $('.mychevron').click(function () {
           var id = $(this).attr('id').slice(2)
           id = Number.parseInt(id)
-
           if (!$(this).parent().parent().parent().find('block').is(':visible')) {
               $(this).removeClass('fa-chevron-right')
               $(this).addClass('fa-chevron-down')
@@ -299,12 +298,38 @@ function registerForUpdate(){
     xhr.send()
 }
 
+function registerForNotify() {
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', '/waitForNotify', true)
+    xhr.onload = () => {
+        registerForNotify()
+        let data = JSON.parse(xhr.responseText)
+        if (data.Type == 'Success')
+            $().toastmessage('showSuccessToast', data.Message);
+        if (data.Type == 'Decline')
+            $().toastmessage('showErrorToast', data.Message);
+        if (data.Type == 'Change')
+            $().toastmessage('showWarningToast', data.Message);
+        if (data.Type == 'Comment')
+            $().toastmessage('showNoticeToast', data.Message);
+    }
+
+    xhr.onerror = () => {
+        xhr.open('GET', '/waitForNotify', true);
+        setTimeout(() => {
+            xhr.send()
+        }, 1000)
+    }
+    xhr.send()
+}
+
 function getDate(d) {
     if (!d) return undefined
     d = new Date(d)
     return (d.getDate()> 9 ? d.getDate() : '0' + d.getDate())  + "." + ((d.getMonth()+1) > 9 ? (d.getMonth()+1) : '0' + (d.getMonth()+1)) + "." + d.getFullYear();
 }
 
+registerForNotify()
 getUsers()
 
 function getSystematicsCoeff(a) {
