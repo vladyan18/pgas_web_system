@@ -84,15 +84,20 @@ module.exports.waitForNotifies = async function (req, res) {
     var flag = false
     var callback = (type, message, id) => {
         setImmediate(() => {
-            flag = true
-            res.status(200).send({Type: type, Message: message, Id: id})
-            clearTimeout(timer)
+            if (!flag) {
+                flag = true
+                res.status(200).send({Type: type, Message: message, Id: id})
+                clearTimeout(timer)
+            }
         })
     }
     NotifyEmitter.once('Update', callback)
 
     timer = setTimeout(function () {
-        NotifyEmitter.removeListener('Update', callback)
-        res.sendStatus(408)
+        if (!flag) {
+            flag = true
+            NotifyEmitter.removeListener('Update', callback)
+            res.sendStatus(408)
+        }
     }, 300000)
 }
