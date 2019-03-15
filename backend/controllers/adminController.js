@@ -1,46 +1,46 @@
-const db = require('./dbController')
-const notify = require('./notificationController')
-const history = require('./historyNotesController')
-const path = require('path')
-const Kri = require(__dirname + "/Kriterii.json")
-const fs = require('fs')
-const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads')
-const upload = require(path.join(__dirname, '../config/multer'))
+const db = require('./dbController');
+const notify = require('./notificationController');
+const history = require('./historyNotesController');
+const path = require('path');
+const Kri = require(__dirname + "/Kriterii.json");
+const fs = require('fs');
+const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
+const upload = require(path.join(__dirname, '../config/multer'));
 const EventEmitter = require('events');
 class UpdateEmitter extends EventEmitter {}
 const AdminEmitter = new UpdateEmitter();
 
 module.exports.setUser = async function(req,res){
-  await db.ChangeRole(req.body.Id,false)
+    await db.ChangeRole(req.body.Id, false);
     res.sendStatus(200)
-}
+};
 
 module.exports.setAdmin = async function(req,res){
-  await db.ChangeRole(req.body.Id,true)
+    await db.ChangeRole(req.body.Id, true);
     res.sendStatus(200)
-}
+};
 
 module.exports.getAdmins = async function (req,res){
-  let users = []
-  let Users = await db.allUsers()
+    let users = [];
+    let Users = await db.allUsers();
   for (let user of Users) {
-    let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
+      let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
     users.push({ Name: str, Role: user.Role, Id: user.id })
   }
   res.status(200).send({ Users: users })
-}
+};
 
 module.exports.dynamic = async function (req, res) {
-  let info = []
-  let Users = await db.NewUsers()
+    let info = [];
+    let Users = await db.NewUsers();
     for (let user of Users) {
         if (!user) continue;
-        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-        let Achievements = []
+        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+        let Achievements = [];
 
         for (let achievement of user.Achievement) {
 
-            let ach = await db.findAchieveById(achievement)
+            let ach = await db.findAchieveById(achievement);
             if (!ach) continue;
             ach.ball = 0;
 
@@ -65,30 +65,30 @@ module.exports.dynamic = async function (req, res) {
         }
     }
     res.status(200).send({ Info: info })
-}
+};
 
 module.exports.waitForUpdates = async function (req, res) {
-    var timer
-    var flag = false
+    var timer;
+    var flag = false;
     var callback = () => {
         setImmediate(() => {
-            flag = true
-        res.sendStatus(200)
-            res.end()
+            flag = true;
+            res.sendStatus(200);
+            res.end();
             clearTimeout(timer)
         })
-    }
+    };
 
     timer = setTimeout(function () {
-        AdminEmitter.removeListener('Update', callback)
+        AdminEmitter.removeListener('Update', callback);
         if (!flag)
             res.sendStatus(408)
-    }, 300000)
+    }, 300000);
 
     AdminEmitter.once('Update', callback)
 
 
-}
+};
 
 module.exports.updateAchieve = function (req, res) {
     if (!fs.existsSync(uploadsPath)) {
@@ -99,103 +99,102 @@ module.exports.updateAchieve = function (req, res) {
             if (err || !req.files) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
-            let achieve = JSON.parse(req.body.data)
-            let id = req.body.achId
+            let achieve = JSON.parse(req.body.data);
+            let id = req.body.achId;
             let options = {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
-            }
-            achieve.status = 'Изменено'
-            achieve.date = new Date().toLocaleString('ru', options)
+            };
+            achieve.status = 'Изменено';
+            achieve.date = new Date().toLocaleString('ru', options);
 
-            let arr = []
+            let arr = [];
             for (let file of req.files) {
                 arr.push(file.filename)
             }
-            achieve.files = arr
-            console.log(achieve)
-            let oldAchieve = await db.findAchieveById(id)
-            let createdAchieve = await db.updateAchieve(id, achieve)
+            achieve.files = arr;
+            let oldAchieve = await db.findAchieveById(id);
+            let createdAchieve = await db.updateAchieve(id, achieve);
             if (req.user._json.email)
-                uid = req.user._json.email
-            else uid = req.user.user_id
+                uid = req.user._json.email;
+            else uid = req.user.user_id;
 
-            var args = {}
-            args.from = oldAchieve
-            args.to = createdAchieve
-            history.WriteToHistory(req, id, uid, 'Change', args)
-            balls(uid)
-            res.sendStatus(200)
-            AdminEmitter.emit('Update')
+            var args = {};
+            args.from = oldAchieve;
+            args.to = createdAchieve;
+            history.WriteToHistory(req, id, uid, 'Change', args);
+            balls(uid);
+            res.sendStatus(200);
+            AdminEmitter.emit('Update');
             notify.emitChange(req, createdAchieve).then()
 
         }
         catch (err) {
-            console.log(err)
+            console.log(err);
             res.status(500).send(err)
         }
     })
-}
+};
 
 module.exports.AchSuccess = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, true)
-  let u = await db.findUserByAchieve(req.body.Id)
-  balls(u.id)
-  res.sendStatus(200)
-  AdminEmitter.emit('Update')
-    notify.emitSuccess(req, u).then()
+    await db.ChangeAchieve(req.body.Id, true);
+    let u = await db.findUserByAchieve(req.body.Id);
+    balls(u.id);
+    res.sendStatus(200);
+    AdminEmitter.emit('Update');
+    notify.emitSuccess(req, u).then();
     history.WriteToHistory(req, req.body.Id, u.id, 'Success')
-}
+};
 
 module.exports.AchFailed = async function (req, res) {
-  await db.ChangeAchieve(req.body.Id, false)
-    let u = await db.findUserByAchieve(req.body.Id)
-    balls(u.id)
-    AdminEmitter.emit('Update')
-    res.sendStatus(200)
-    notify.emitDecline(req, u).then()
+    await db.ChangeAchieve(req.body.Id, false);
+    let u = await db.findUserByAchieve(req.body.Id);
+    balls(u.id);
+    AdminEmitter.emit('Update');
+    res.sendStatus(200);
+    notify.emitDecline(req, u).then();
     history.WriteToHistory(req, req.body.Id, u.id, 'Decline')
-}
+};
 
 module.exports.AddToRating = async function (req, res) {
-    await db.AddToRating(req.body.Id)
-    res.sendStatus(200)
-    AdminEmitter.emit('Update')
+    await db.AddToRating(req.body.Id);
+    res.sendStatus(200);
+    AdminEmitter.emit('Update');
     notify.AddToRating(req, req.body.Id).then()
-}
+};
 
 module.exports.RemoveFromRating = async function (req, res) {
-    await db.RemoveFromRating(req.body.Id)
-    res.sendStatus(200)
-    AdminEmitter.emit('Update')
+    await db.RemoveFromRating(req.body.Id);
+    res.sendStatus(200);
+    AdminEmitter.emit('Update');
     notify.RemoveFromRating(req, req.body.Id).then()
-}
+};
 
 module.exports.Comment = async function(req,res){
-  await db.comment(req.body.Id, req.body.comment)
-    res.sendStatus(200)
-    AdminEmitter.emit('Update')
+    await db.comment(req.body.Id, req.body.comment);
+    res.sendStatus(200);
+    AdminEmitter.emit('Update');
     notify.emitComment(req, req.body.Id).then()
-}
+};
 
 module.exports.toggleHide = async function (req, res) {
-    await db.toggleHide(req.body.id)
+    await db.toggleHide(req.body.id);
     res.sendStatus(200)
-}
+};
 
 module.exports.Checked = async function (req, res) {
-    let info = []
-    let Users = await db.CurrentUsers()
+    let info = [];
+    let Users = await db.CurrentUsers();
     for (let user of Users) {
         if (!user) continue;
-        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-        var Achievements = []
+        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+        var Achievements = [];
 
-        var aches = await db.findAchieves(user.id)
+        var aches = await db.findAchieves(user.id);
         for (var i = 0; i < aches.length; i++) {
 
-            var ach = aches[i]
+            var ach = aches[i];
             if (!ach) continue;
 
             ach.ball = 0;
@@ -223,61 +222,47 @@ module.exports.Checked = async function (req, res) {
         }
     }
     res.status(200).send({ Info: info })
-}
+};
 
-module.exports.allUsers = async function (req, res) {
-  let ip = await req.url.slice(6)
-  let User = await db.findUser(ip)
-  let Achs = []
-  for (let i of User.Achievement) {
-    let Ach = await db.findAchieveById(i)
-    let files = Ach.files
-    let date = Ach.date
-    let crit = Ach.crit
-    let popisal = Ach.comment
-    let status = Ach.status
-    let Achieve = {
-      Files: files,
-      Date: date,
-      Crit: crit,
-      Popisal: popisal,
-      Status: status
-    }
-    Achs.push(Achieve)
-  }
-  res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Achs: Achs })
-}
+module.exports.getUser = async function (req, res) {
+    let ip = await req.url.slice(6);
+
+    db.findUser(ip).then((User) => {
+        db.findAchieves(User.id).then((v) => {
+            User.Achs = v;
+            res.status(200).send(User)
+        })
+    })
+};
 
 module.exports.getRating = async function (req, res) {
-  let kri = JSON.parse(JSON.stringify(Kri))
-  let users = []
-  let Users = await db.CurrentUsers()
+    let kri = JSON.parse(JSON.stringify(Kri));
+    let users = [];
+    let Users = await db.CurrentUsers();
   for (let user of Users) {
-      let sumBall = 0
-      let crits = {}
+      let sumBall = 0;
+      let crits = {};
       for (key of Object.keys(kri)) {
           crits[key] = 0;
       }
     Achs = await db.findAchieves(user.id);
     for(let ach of Achs) {
-        if (!ach) continue
+        if (!ach) continue;
         if (ach.ball) {
             crits[ach.crit] += ach.ball;
             sumBall += ach.ball;
         }
     }
-    let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic
-    users.push({ Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall })
+      let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+      users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall})
   }
   res.status(200).send({ Users: users })
-}
+};
 
 const balls = async function (id) {
-  let kri = JSON.parse(JSON.stringify(Kri))
-  console.log(id)
+    let kri = JSON.parse(JSON.stringify(Kri));
   let balls = 0;
-  let Achs = await db.findAchieves(id)
-    console.log(Achs)
+    let Achs = await db.findAchieves(id);
   let kriteries = {};
 
   for (key of Object.keys(kri)) {
@@ -287,8 +272,8 @@ const balls = async function (id) {
   for(let ach of Achs) {
       if (!ach) continue;
       if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
-          ach.ball = undefined
-          db.updateAchieve(ach._id, ach)
+          ach.ball = undefined;
+          db.updateAchieve(ach._id, ach);
           continue
       }
       let curKrit = kri[ach.crit];
@@ -306,44 +291,44 @@ const balls = async function (id) {
     for (key of Object.keys(kri)) {
         if (CheckSystem(key, kriteries[key]))
         {
-            console.log(key, kriteries[key])
           balls += MatrBalls(kriteries[key])
         }
         else for (let ach of kriteries[key]) ach['ach'].ball = undefined
         for (curAch of kriteries[key]) {
-            if (!curAch) continue
+            if (!curAch) continue;
           db.updateAchieve(curAch['ach']._id, curAch['ach'])
         }
     }
-}
+};
 
 const CheckSystem = function(crit, ach) {
-    if (!ach) return false
+    if (!ach) return false;
     if (crit == '10 (10в)' || crit == '12 (11б)' ) {
         return ach.filter(o => o).length >= 2
     }
     else return true
-}
+};
 
-const MatrBalls = function(M){
-  let S = 0;
+const MatrBalls = function (Crit) {
+    let Summ = 0;
   let max = 0;
 
-  for(let i = 0; i < M.length; i++){
-      if (!M[i]) continue
+    for (let i = 0; i < Crit.length; i++) {
+        if (!Crit[i]) continue;
       var q = 0;
-      for(let j=0; j < M.length; j++){
-          if (!M[j]['balls']) continue
-        if(M[j]['balls'][i] >= max){
-          max = M[j]['balls'][i];
-          q = j
+        for (let ach = 0; ach < Crit.length; ach++) {
+            if (!Crit[ach]['balls']) continue;
+            var shift = i;
+            if (shift >= Crit[ach]['balls'].length) shift = Crit[ach]['balls'].length - 1;
+            if (Crit[ach]['balls'][shift] >= max) {
+                max = Crit[ach]['balls'][shift];
+                maxIndex = ach
         }
       }
-      M[q]['ach'].ball = max;
-      M[q]['balls'] = undefined;
-      S+=max;
+        Crit[maxIndex]['ach'].ball = max;
+        Crit[maxIndex]['balls'] = undefined;
+        Summ += max;
       max = 0
   }
-  console.log(M)
-  return S
-}
+    return Summ
+};

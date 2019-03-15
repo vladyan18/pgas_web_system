@@ -1,21 +1,21 @@
 
 function getAcievement () {
-  var xhr = new XMLHttpRequest()
+    var xhr = new XMLHttpRequest();
 
-  xhr.open('GET', '/getUserInfo', true)
+    xhr.open('GET', '/getUserInfo', true);
 
   xhr.onload = function () {
-    let data = JSON.parse(xhr.responseText)
-    document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic + (data.IsInRating ? '<svg style="float: right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="green"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>' : '')
-    document.getElementById('faculty').innerHTML = data.Faculty
-    document.getElementById('course').innerHTML = data.Course
+      let data = JSON.parse(xhr.responseText);
+      document.getElementById('username').innerHTML = data.LastName + ' ' + data.FirstName + ' ' + data.Patronymic + (data.IsInRating ? '<svg style="float: right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="green"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>' : '');
+      document.getElementById('faculty').innerHTML = data.Faculty;
+      document.getElementById('course').innerHTML = data.Course;
 
-      let qq =""
+      let qq = "";
     //if ($('#achBlock').width() < 100)
     //     qq = '<table class="table table-sm">'
-    qq = '<table class="table">'
+      qq = '<table class="table">';
 
-    qq += '<thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>'
+      qq += '<thead><th>Критерий</th><th>Достижение</th><th style="text-align: center">Статус</th><th style="text-align: center">Балл</th><th>Комментарий</th></thead><tbody>';
     let k = data.Achs.length;
     if (k > 1)
     data.Achs = data.Achs.sort(function(obj1, obj2) {
@@ -23,7 +23,7 @@ function getAcievement () {
     });
 
     for (let i = 0; i < k; ++i) {
-      if (!data.Achs[i]) continue
+        if (!data.Achs[i]) continue;
         qq += '<tr id="TR' + i + '" style="cursor: pointer"><td>'+ data.Achs[i].crit+ '</td>';
         qq += '<td>'+data.Achs[i].achievement+'</td>';
         if (data.Achs[i].status == 'Изменено')
@@ -33,7 +33,7 @@ function getAcievement () {
         else if (data.Achs[i].status == 'Отказано')
             qq += '<td class="table-danger" style="text-align: center">'+ data.Achs[i].status +'</td>';
         else qq += '<td style="text-align: center">'+ data.Achs[i].status +'</td>';
-        qq += '<td style="text-align: center">'+ (data.Achs[i].ball ?  data.Achs[i].ball : '-')+ '</td>';
+        qq += '<td style="text-align: center">' + (data.Achs[i].ball !== null ? data.Achs[i].ball : '-') + '</td>';
         qq += '<td>'+ (data.Achs[i].comment ? data.Achs[i].comment : '') +'</td>';
         //qq += '<td>'
 
@@ -42,7 +42,7 @@ function getAcievement () {
       //}
       qq += '</tr>'
     }
-    qq += '</tbody></table>'
+      qq += '</tbody></table>';
     document.getElementById('row_docs').innerHTML = qq;
       $('#panel').fadeIn(60);
 
@@ -55,13 +55,13 @@ function getAcievement () {
       }
 
 
-    qq = ''
+      qq = '';
     for (let i = 0; i < k; ++i) {
-        if (!data.Achs[i]) continue
+        if (!data.Achs[i]) continue;
       if (data.Achs[i].Status === 'Ожидает проверки') {
         continue
       }
-      qq += '<div class="name"> <h4>' + data.Achs[i].date + '</h4> <block_2>'
+        qq += '<div class="name"> <h4>' + data.Achs[i].date + '</h4> <block_2>';
       for (let j of data.Achs[i].files) {
         qq += '<p><a target="_blank" rel="noopener noreferrer" href="' + '/uploads/' + j + '" class="goto">Подтверждающий документ</a></p>'
       }
@@ -69,7 +69,7 @@ function getAcievement () {
     }
 
 
-    document.getElementById('archive_docs').innerHTML = qq
+      document.getElementById('archive_docs').innerHTML = qq;
     $('.name h4').click(function () {
       if (!$(this).parent().find('block_2').is(':visible')) {
         $(this).parent().find('block_2').show(200)
@@ -78,7 +78,7 @@ function getAcievement () {
         $(this).parent().find('block_2').hide(200)
       }
     })
-  }
+  };
       $('.category h3').click(function () {
     if (!$(this).parent().find('block_1').is(':visible')) {
       $(this).parent().find('block_1').show(200)
@@ -86,14 +86,12 @@ function getAcievement () {
     else {
       $(this).parent().find('block_1').hide(200)
     }
-  })
+      });
   xhr.send()
-};
-
-
-
+}
 function editAch(id)
 {
     $(location).attr('href','/achievement/' + id)
 }
-getAcievement()
+
+getAcievement();
