@@ -214,6 +214,7 @@ module.exports.Checked = async function (req, res) {
             info.push({
                 Id: user._id,
                 user: str,
+                Type: user.Type,
                 Course: user.Course,
                 IsHiddenInRating: user.IsHiddenInRating,
                 IsInRating: user.IsInRating,
