@@ -28,7 +28,7 @@ const adminAuth = async (req, res, next) => {
         id = req.user._json.email;
     else id = req.user.user_id;
     let User = await db.findUserById(id);
-    if (req.isAuthenticated() && User.Role === 'Admin') {
+    if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
         next()
     }
     else {

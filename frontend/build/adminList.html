@@ -19,20 +19,24 @@
             <div class="col-3">
                 <div class="exit"><a href="/logout">Выход из личного кабинета</a></div>
             </div>
-        </div>
-    </header>
-    <main>
-        <div class="row">
-            <div class="col-3">
-                <div class="menu">
-                    <ul class="options">
-                        <li class="element"><a href="/superAdmin">Новые заявки</a></li>
-                        <li class="element"><a href="/superProcessed">Обработанные заявки</a></li>
-                        <li class="element"><a href="/superRating">Рейтинг студентов</a></li>
+            <div style="display:flex;">
+                <div style="margin-left: auto; margin-right: auto">
+                    <ul class="options" style="display: flex">
+                        <li class="element"><a href="/admin">Новые заявки</a></li>
+                        <li class="element"><a href="/processed">Текущие кандидаты</a></li>
+                        <li class="element"><a href="/currentAchieves">Текущие достижения</a></li>
+                        <li class="element"><a href="/rating">Рейтинг студентов</a></li>
+                        <li class="element"><a href="/history">История</a></li>
+                        <li class="element"><a href="/info">Информация</a></li>
                         <li class="element_active"><a href="/admins">Список Администраторов</a></li>
                     </ul>
                 </div>
             </div>
+
+        </div>
+    </header>
+    <main>
+        <div id="panel" class="row" style="justify-content: center">
 
             <div class="col-9 general">
                 <p  class="headline">
