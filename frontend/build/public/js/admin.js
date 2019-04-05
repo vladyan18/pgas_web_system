@@ -37,7 +37,7 @@ function Success (button, i, j) {
                 || usersInfo[i].Achievements[j].chars[1] == 'На уровне федерального округа') || (usersInfo[i].Achievements[j].chars[3] == 'Волонтер' || usersInfo[i].Achievements[j].chars[3] == 'Участник' ))
                 {
                     alert('Систематика не может быть выполнена');
-                return false
+                //return false
                 }
                 else {
                     if (!confirm('Вы уверены, что выполняются условия примечания 5?')) return false;
@@ -62,7 +62,7 @@ function Success (button, i, j) {
         var crit = usersInfo[i].Achievements[j].crit;
         if (usersInfo[i].Achievements.filter(o => o.crit == crit && o._id != usersInfo[i].Achievements[j]._id).length < 1) {
             alert('Систематика не может быть выполнена');
-                    return false
+                    //return false
         }
         else if (usersInfo[i].Achievements.filter(o => o.crit == crit && (o.status == 'Принято' || o.status == 'Принято с изменениями')).length < 1) {
             alert('Не забудьте про требование систематики');
@@ -117,13 +117,13 @@ function recalcSyst(i, j, crit) {
         {
             if (usersInfo[i].Achievements[k].crit == crit)
             {
-                let l = k;
-                $.post('/AchFailed', { Id: usersInfo[i].Achievements[l]._id.toString()}).done(() => {
-                    usersInfo[i].Achievements[l].status = 'Отказано';
-                    $('#TR' + i + '_' + l).removeClass("table-success");
-                    $('#TR' + i + '_' + l).addClass("table-danger");
-                    $('#Stat_' + i + '_' + l).text('Отказано');
-                    usersInfo[i].Achievements[l].systematics = 0;
+               // let l = k;
+               // $.post('/AchFailed', { Id: usersInfo[i].Achievements[l]._id.toString()}).done(() => {
+                   // usersInfo[i].Achievements[l].status = 'Отказано';
+                   // $('#TR' + i + '_' + l).removeClass("table-success");
+                   // $('#TR' + i + '_' + l).addClass("table-danger");
+                  //  $('#Stat_' + i + '_' + l).text('Отказано');
+                  //  usersInfo[i].Achievements[l].systematics = 0;
                 })
 
             }
