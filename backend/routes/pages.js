@@ -121,7 +121,7 @@ router.get('/callback', function (req, res, next) {
             if (err) { return next(err) }
             const returnTo = req.session.returnTo;
             delete req.session.returnTo;
-            res.redirect(returnTo || '/home')
+            res.redirect('http://localhost:3000')
         });
     })(req, res, next)
 });
@@ -306,6 +306,7 @@ router.get('/admins', superAdminAuth, (req, res)=>{
  * @path {GET} /*
  */
 router.get('*', function (req, res) {
+
     res.sendFile(path.join(frontendPath, '/404.html'))
 });
 

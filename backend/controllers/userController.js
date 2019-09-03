@@ -42,6 +42,26 @@ module.exports.getProfile = async function (req, res) {
     res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Birthdate: User.Birthdate, Faculty: User.Faculty, Type: User.Type, Course: User.Course })
 };
 
+module.exports.getRights = async function (req, res) {
+    if (req.user._json.email)
+        User = await db.getUserRole(req.user._json.email);
+    else User = await db.getUserRole(req.user.user_id);
+
+    res.status(200).send({id: User._id, Role: User.Role})
+};
+
+module.exports.isAuth = async function (req, res) {
+    if (req.isAuthenticated())
+        res.json({
+            success: true,
+            message: "user has successfully authenticated ",
+            role: req.user.Role,
+            rights: req.user.Rights,
+            cookies: req.cookies
+        });
+    else res.status(401).send()
+};
+
 /**
  * Get achievement
  * @function getAch
@@ -84,7 +104,7 @@ module.exports.addAchieve = function (req, res) {
     }
     upload(req, res, async function (err) {
         try {
-            if (err || !req.files) {
+            if (err) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
             let achieve = JSON.parse(req.body.data);
@@ -109,8 +129,7 @@ module.exports.addAchieve = function (req, res) {
             else id = req.user.user_id;
             await db.addAchieveToUser(id, createdAchieve._id);
             res.sendStatus(200)
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             res.status(500).send(err)
         }
@@ -147,8 +166,7 @@ module.exports.updateAchieve = function (req, res) {
             achieve.files = arr;
             let createdAchieve = await db.updateAchieve(id, achieve);
             res.sendStatus(200)
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             res.status(500).send(err)
         }
@@ -179,8 +197,7 @@ module.exports.deleteAchieve = function (req, res) {
 
             let result = await db.deleteAchieve(id);
             res.sendStatus(200)
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             res.status(500).send(err)
         }

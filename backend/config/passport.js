@@ -1,6 +1,6 @@
-const passport = require('passport')
-const Auth0Strategy = require('passport-auth0')
-const db = require('../controllers/dbController')
+const passport = require('passport');
+const Auth0Strategy = require('passport-auth0');
+const db = require('../controllers/dbController');
 
 var strategy = new Auth0Strategy(
     {
@@ -11,8 +11,8 @@ var strategy = new Auth0Strategy(
         process.env.AUTH0_CALLBACK_URL || '/callback'
     },
     async function (accessToken, refreshToken, extraParams, profile, done) {
-        if (profile._json && profile._json.email) id = profile._json.email
-        else id = profile.user_id
+        if (profile._json && profile._json.email) id = profile._json.email;
+        else id = profile.user_id;
       if(!await db.isUser(id)){
         await db.createUser({Role : "User", id: id, Ball: 0,  Achievement: [], Registered: false})
       }
@@ -20,20 +20,23 @@ var strategy = new Auth0Strategy(
 
       return done(null, profile)
     }
-  )
+);
 
-  passport.use(strategy)
+passport.use(strategy);
 
   passport.serializeUser( async function (user, done) {
-    if (user._json && user._json.email) id = user._json.email
-    else id = user.user_id
-    r = await db.isRegistered(id)
+      if (user._json && user._json.email) id = user._json.email;
+      else id = user.user_id;
+      r = await db.isRegistered(id);
     user.Registered = r;
+      let role = await db.getUserRights(id);
+      user.Role = role.Role;
+      user.Rights = role.Rights;
     done(null, user)
-  })
+  });
   
   passport.deserializeUser(function (user, done) {
       done(null, user)
-  })
+  });
 
-module.exports = passport
+module.exports = passport;

@@ -1,9 +1,10 @@
-const mongoose = require('mongoose')
-const connection = require('../config/db')
+const mongoose = require('mongoose');
+const connection = require('../config/db');
 
 const userSchema = mongoose.Schema({
   id: String,
   Role: String,
+  Rights: [String],
   Registered: Boolean,
   LastName: String,
   Patronymic: String,
@@ -16,8 +17,8 @@ const userSchema = mongoose.Schema({
   Achievement: [String],
     IsInRating: Boolean,
     IsHiddenInRating: Boolean
-})
+});
 
-const User = connection.model('User', userSchema)
+const User = connection.model('User', userSchema);
 
-module.exports = User
+module.exports = User;

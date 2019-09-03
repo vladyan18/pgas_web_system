@@ -18,6 +18,7 @@ require('dotenv').config();
 const app = express();
 
 app.set('etag', false);
+app.use(morgan('dev'));
 
 
 const sess = {

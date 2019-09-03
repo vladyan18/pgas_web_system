@@ -20,6 +20,10 @@ exports.findUser = function(id){
   return UserModel.findById(id).lean()
 };
 
+exports.getUserRights = function (id) {
+    return UserModel.findOne({id: id}, 'Role Rights').lean();
+};
+
 exports.findUserByAchieve = function(id){
 
     return UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()

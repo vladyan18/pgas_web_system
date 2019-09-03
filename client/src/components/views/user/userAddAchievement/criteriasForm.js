@@ -8,8 +8,30 @@ export default class CriteriasForm extends Component {
     constructor(props) {
         super(props);
         this.handleSelect = this.handleSelect.bind(this);
-        this.state = {selects: [], length: 1, crit: '1 (7а)', values: []};
-        this.props.valuesCallback(['1 (7а)'])
+        if (!this.props.values) {
+            this.state = {selects: [], length: 1, crit: '1 (7а)', values: []};
+            this.props.valuesCallback(['1 (7а)'])
+        } else {
+            let sel = [];
+            for (let i = 1; i < this.props.values.length; i++) {
+                let crit = this.props.crits;
+                let id = '';
+                for (let j = 0; j < i; j++) {
+                    id += this.props.values[j];
+                    crit = crit[this.props.values[j]]
+                }
+
+                sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
+            }
+            this.state = {
+                selects: sel,
+                length: this.props.values.length,
+                crit: this.props.values[0],
+                values: this.props.values
+            };
+            this.props.valuesCallback(this.state.values);
+
+        }
 
         //this.state = {selects: [{value:'', options: []}]}
     }
@@ -64,9 +86,9 @@ export default class CriteriasForm extends Component {
             <label htmlFor="check2" className="label_direction">Критерий:</label>
             <br/>
             <select id='1' className="form-control selectors firstCourse unique7a" required name="check2"
-                    onChange={this.handleSelect}>
+                    onChange={this.handleSelect} defaultValue={this.state.crit}>
                 <option disabled>Критерий</option>
-                <option selected value="1 (7а)" id="7a">
+                <option value="1 (7а)" id="7a">
                     7а (оценки)
                 </option>
                 <option value="2 (7б)">
@@ -111,8 +133,8 @@ export default class CriteriasForm extends Component {
                 <div>
                     <DescriptionToTermin values={item.options}/>
                     <select className="form-control selectors" required key={item.id} id={item.num.toString()}
-                            onChange={this.handleSelect}>
-                        <option selected disabled value="">Выберите характеристику</option>
+                            defaultValue={item.value} f onChange={this.handleSelect}>
+                        <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
                             <option value={option}>
                                 {option}

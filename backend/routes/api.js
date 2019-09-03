@@ -75,6 +75,8 @@ const auth = (req, res, next) => {
  * @auth
  * @see module:userController~dynamic
  */
+router.get('/isAuth', userController.isAuth);
+
 router.get('/getUserInfo', auth, userController.dynamic);
 
 /**
@@ -85,6 +87,8 @@ router.get('/getUserInfo', auth, userController.dynamic);
  * @see module:userController~getProfile
  */
 router.get('/getProfile', auth, userController.getProfile);
+
+router.get('/getRights', auth, userController.getRights);
 
 /**
  * Add comment

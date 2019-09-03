@@ -13,6 +13,10 @@ body {
     background-color: #e9e9e9;
 }
 
+.achieveRow {
+    cursor: pointer;
+}
+
 li {
     list-style-type: none; /* Убираем маркеры */
 }
@@ -148,7 +152,6 @@ h4 {
 }
 
 block_1 {
-    display: none;
     color: black;
     background-color: #f8f8f6;
     border: 1px solid #ededec;
