@@ -1,0 +1,124 @@
+/* .name_doc {
+    color:#;
+    font-size: 16px;
+} */
+/* text-decoration: underline; */
+
+/* .document:hover{
+    font-size: 14px;
+    color:#0087D7;;
+} */
+/*Шапка страницы*/
+.page_top {
+    background-color: white;
+    border-bottom: 1px solid #a5a5a5;
+    color: #4a4a4a;
+    font-size: 14px;
+    align-items: center;
+}
+
+.logo_img {
+    /* float: left; */
+    /* height: 100%; */
+    margin-left: 50px;
+    margin-right: 10px;
+    min-height: 60px;
+    align-self: center;
+}
+
+@media (max-width: 768px) {
+    .logo_img {
+        margin-left: 0;
+    }
+}
+
+.block_header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /* font-family: sans-serif; */
+    color: #4a4a4a;
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+}
+
+.exit {
+    text-align: right;
+    margin-right: 40px;
+}
+
+/**/
+.document {
+    font-size: 16px;
+    color: #727272;
+    text-decoration: underline;
+}
+
+.document:hover {
+    font-size: 16px;
+    color: #727272;
+}
+
+.desc_selectors {
+    border-radius: 5px;
+    margin-top: 1rem;
+    padding: 1rem;
+    font-size: 14px;
+    background-color: #d4e1ec;
+}
+
+.desc_criterion_dspo {
+    color: #727272;
+    font-size: 16px;
+}
+
+.header_info_desc {
+    margin: 1rem 0;
+    font-size: 18px;
+    color: black;
+}
+
+@media (max-width: 768px) {
+    #check1,
+    #check2 {
+        width: 100%;
+    }
+
+    .selectors {
+        /* margin-top: 20px; */
+        width: 100%;
+    }
+
+    .area_text {
+        width: 100%;
+    }
+
+    .button_send {
+        width: 100%;
+    }
+
+    .logo_img {
+        margin-left: 0;
+    }
+
+    .p_header {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .exit {
+        margin-right: 0px;
+    }
+
+    .left_navbar {
+        width: 100%;
+    }
+
+    .ul_nav {
+        padding-bottom: 1rem;
+    }
+
+    .page_top {
+        padding-bottom: 0;
+    }
+}

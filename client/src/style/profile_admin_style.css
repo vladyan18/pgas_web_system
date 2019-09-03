@@ -1,0 +1,188 @@
+body {
+    font-family: "Segoe UI", "Helvetica Neue", "Droid Sans", Arial, Tahoma, Geneva, sans-serif;
+    font-size: 1rem;
+    background-color: #e9e9e9;
+}
+
+/*Шапка страницы*/
+.page_top {
+    background-color: white;
+    border-bottom: 1px solid #a5a5a5;
+    color: #4a4a4a;
+    font-size: 14px;
+    align-items: center;
+}
+
+.logo_img {
+    /* float: left; */
+    /* height: 100%; */
+    margin-left: 50px;
+    margin-right: 10px;
+    min-height: 60px;
+    align-self: center;
+}
+
+@media (max-width: 768px) {
+    .logo_img {
+        margin-left: 0;
+    }
+}
+
+.block_header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /* font-family: sans-serif; */
+    color: #4a4a4a;
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+}
+
+.exit {
+    text-align: right;
+    margin-right: 40px;
+}
+
+main {
+    margin-top: 50px;
+}
+
+/*Навигация*/
+.menu {
+    width: 70%;
+    background-color: white;
+    padding: 10px;
+    margin-left: 50px;
+}
+
+.element a {
+    background-color: white;
+    color: black;
+    padding: 10px;
+    display: block;
+    width: 100%;
+}
+
+.element_active a {
+    background-color: #2887d4;
+    color: white;
+    padding: 10px;
+    display: block;
+    width: 100%;
+}
+
+.options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/*Основной блок*/
+.general {
+    background-color: white;
+    padding: 20px;
+}
+
+.hr_blue {
+    border-top: 1px solid #008CCE;
+}
+
+.headline {
+    margin-top: 0.5rem;
+    font-size: 22px;
+}
+
+.profile {
+    /*background-color: #f8f8f6;*/
+    margin: 15px 0px 15px 0px;
+    font-size: 16px;
+}
+
+h2 {
+    color: white;
+    background-color: #419eea;
+    font-size: 20px;
+    padding: 15px;
+}
+
+.goto {
+    color: #727272;
+    text-decoration: underline;
+    size: 10px;
+}
+
+h3 {
+    font-size: 14px;
+    color: white;
+    background-color: #2887d4;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+block {
+    display: none;
+    color: black;
+    background-color: #f8f8f6;
+    border: 1px solid #ededec;
+    padding: 20px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.info {
+    color: #727272;
+}
+
+button {
+    margin-right: 15px;
+    font-size: 10px;
+}
+
+.pagination {
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    #check1,
+    #check2 {
+        width: 100%;
+    }
+
+    .selectors {
+        /* margin-top: 20px; */
+        width: 100%;
+    }
+
+    .area_text {
+        width: 100%;
+    }
+
+    .button_send {
+        width: 100%;
+    }
+
+    .logo_img {
+        margin-left: 0;
+    }
+
+    .p_header {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .exit {
+        margin-right: 0px;
+    }
+
+    .left_navbar {
+        width: 100%;
+    }
+
+    .ul_nav {
+        padding-bottom: 1rem;
+    }
+
+    .page_top {
+        padding-bottom: 0;
+    }
+}
