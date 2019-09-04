@@ -68,6 +68,24 @@ ul {
     margin-right: 40px;
 }
 
+.general {
+    background-color: white;
+    padding: 20px;
+}
+
+.justify_center {
+    justify-content: center;
+}
+
+.text_middle {
+    vertical-align: middle;
+}
+
+.centered_ver {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 /* левый навбар */
 .left_navbar {
     width: 90%;

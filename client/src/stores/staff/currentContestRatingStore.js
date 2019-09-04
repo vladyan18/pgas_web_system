@@ -1,16 +1,17 @@
 import {decorate, observable} from 'mobx';
 
-class CurrentContestStore {
+class CurrentContestRatingStore {
     users = [];
 
     update() {
-        fetch("/api/checked", {
+        fetch("/api/getRating", {
             method: "GET"
         }).then((resp) => {
             return resp.json()
         })
             .then((data) => {
-                this.users = data.Info
+                this.users = data.Users;
+                console.log('USERS ' + JSON.stringify(data.Users))
             })
             .catch((error) => console.log(error))
     }
@@ -20,8 +21,8 @@ class CurrentContestStore {
     }
 }
 
-decorate(CurrentContestStore, {
+decorate(CurrentContestRatingStore, {
     users: observable
 });
 
-export default new CurrentContestStore();
+export default new CurrentContestRatingStore();

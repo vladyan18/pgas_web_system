@@ -9,6 +9,7 @@ import StaffHeaderContainer from "./containers/staff/staffHeaderContainer";
 import StaffMenu from './views/staff/staffMenu'
 import NewAchievesContainer from "./containers/staff/newAchievesContainer";
 import CurrentContestAchievementsContainer from "./containers/staff/currentContestAchievementsContainer";
+import StaffStudentsRatingContainer from "./containers/staff/staffStudentsRatingContainer";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -59,6 +60,7 @@ class Staff extends Component {
             <Switch>
                 <Route path="/staff/newAchieves" component={NewAchievesContainer}/>
                 <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
+                <Route path="/staff/rating" component={StaffStudentsRatingContainer}/>
                 <Route path="/staff/" component={StaffMenu}/>
             </Switch>
         </div>)

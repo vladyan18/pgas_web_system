@@ -15,16 +15,7 @@ class CurrentContestAchievesContainer extends Component {
     }
 
     getAchieves() {
-        fetch("/api/checked", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((data) => {
-                console.log('DATA: ' + JSON.stringify(data));
-                currentContestStore.users = data.Info
-            })
-            .catch((error) => console.log(error))
+        currentContestStore.update();
     }
 
     render() {

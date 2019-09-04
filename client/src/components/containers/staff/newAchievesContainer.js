@@ -15,16 +15,7 @@ class NewAchievesContainer extends Component {
     }
 
     getAchieves() {
-        fetch("/api/getUsersForAdmin", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((data) => {
-                console.log('DATA: ' + JSON.stringify(data));
-                staffNewAchievementsStore.users = data.Info
-            })
-            .catch((error) => console.log(error))
+        staffNewAchievementsStore.update()
     }
 
     render() {
