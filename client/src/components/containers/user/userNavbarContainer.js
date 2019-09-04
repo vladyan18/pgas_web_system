@@ -1,6 +1,6 @@
 import React from 'react';
-import '../../style/user_main.css';
-import UserNavbar from "../views/user/userNavbar";
+import '../../../style/user_main.css';
+import UserNavbar from "../../views/user/userNavbar";
 
 function UserNavbarContainer(props) {
     return <UserNavbar/>

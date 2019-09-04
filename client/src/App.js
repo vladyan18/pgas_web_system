@@ -3,7 +3,9 @@ import './style/user_main.css';
 import React, {Component} from 'react';
 import User from "./components/user";
 import Auth from "./modules/Auth";
-import Login from "./components/login";
+import Route from "react-router-dom/Route";
+import {Switch} from "react-router-dom";
+import Staff from "./components/staff";
 
 
 class App extends Component {
@@ -15,9 +17,11 @@ class App extends Component {
 
     render() {
         return (
-            Auth.isUserAuthenticated() ?
-                <User/> : <Login/>
-        );
+            <Switch>
+                <Route path="/staff/" component={Staff}/>
+                <Route path="/" component={User}/>
+            </Switch>
+        )
     }
 }
 

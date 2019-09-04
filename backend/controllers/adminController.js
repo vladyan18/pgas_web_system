@@ -64,7 +64,8 @@ module.exports.dynamic = async function (req, res) {
             })
         }
     }
-    res.status(200).send({ Info: info })
+    console.log(info);
+    res.send({Info: info})
 };
 
 module.exports.waitForUpdates = async function (req, res) {
@@ -292,8 +293,7 @@ const balls = async function (id) {
         if (CheckSystem(key, kriteries[key]))
         {
           balls += MatrBalls(kriteries[key])
-        }
-        else for (let ach of kriteries[key]) ach['ach'].ball = undefined
+        } else for (let ach of kriteries[key]) ach['ach'].ball = undefined;
         for (curAch of kriteries[key]) {
             if (!curAch) continue;
           db.updateAchieve(curAch['ach']._id, curAch['ach'])

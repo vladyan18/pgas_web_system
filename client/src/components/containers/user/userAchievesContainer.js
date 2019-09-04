@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import '../../style/user_main.css';
-import UserAchieves from "../views/user/userAchieves/userAchieves";
+import '../../../style/user_main.css';
+import UserAchieves from "../../views/user/userAchieves/userAchieves";
 import {observer} from "mobx-react";
-import userPersonalStore from "../../stores/userPersonalStore";
+import userPersonalStore from "../../../stores/userPersonalStore";
 
 class UserAchievesContainer extends Component {
     constructor(props) {

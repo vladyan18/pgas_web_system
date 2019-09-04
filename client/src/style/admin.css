@@ -1,0 +1,183 @@
+body {
+    font-family: 'Segoe UI', 'Helvetica Neue', 'Droid Sans', Arial, Tahoma, Geneva,
+    sans-serif;
+    font-size: 16px;
+    background-color: #e9e9e9;
+}
+
+.newAchievesGroupButton {
+    font-size: x-small;
+    margin-right: 0px;
+    border-radius: 0px
+}
+
+.page_top {
+    background-color: white;
+    border-bottom: 1px solid #a5a5a5;
+    color: #4a4a4a;
+    font-size: 14px;
+    align-items: center;
+}
+
+.logo_img {
+    /* float: left; */
+    /* height: 100%; */
+    margin-left: 50px;
+    margin-right: 10px;
+    min-height: 60px;
+    align-self: center;
+}
+
+.block_header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /* font-family: sans-serif; */
+    color: #4a4a4a;
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+}
+
+.exit {
+    text-align: right;
+    margin-right: 40px;
+}
+
+.list {
+    margin-top: 50px;
+}
+
+.commentSended {
+    background-color: #f5f7fa;
+}
+
+.list {
+    background-color: white;
+    padding: 30px;
+}
+
+.goto {
+    color: #727272;
+    text-decoration: underline;
+    size: 10px;
+}
+
+.sticky {
+    top: 0;
+    position: sticky;
+    z-index: 99;
+}
+
+.shadow {
+    position: sticky;
+    top: 40.5px;
+    box-shadow: 0px 1.5px 2px 3px rgba(0, 0, 0, 0.50);
+
+    padding: 0px 3px 0px 3px;
+    width: inherit;
+    margin-left: 5px;
+    margin-right: 5px;
+    z-index: 97
+}
+
+.cover {
+    position: relative;
+    background: #f8f8f6;
+    height: 10px;
+    width: 100%;
+    margin-bottom: 0px;
+    z-index: 98;
+}
+
+.mychevron {
+    vertical-align: middle;
+    padding-top: 7px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.nameHeader {
+    font-size: 19px;
+    color: white;
+    background-color: #2887d4;
+    border-radius: 0px;
+    vertical-align: center;
+
+}
+
+.block {
+    color: black;
+    background-color: #f8f8f6;
+    border: 1px solid #ededec;
+    padding: 20px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+criteria {
+    color: #727272;
+}
+
+desc {
+    color: #727272;
+}
+
+button {
+    margin-right: 15px;
+    font-size: 10px;
+}
+
+.pagination {
+    margin-top: 30px;
+}
+
+.inRating {
+    background-color: #178e3c;
+}
+
+@media (max-width: 768px) {
+    #check1,
+    #check2 {
+        width: 100%;
+    }
+
+    .selectors {
+        /* margin-top: 20px; */
+        width: 100%;
+    }
+
+    .area_text {
+        width: 100%;
+    }
+
+    .button_send {
+        width: 100%;
+    }
+
+    .logo_img {
+        margin-left: 0;
+    }
+
+    .p_header {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .exit {
+        text-align: left;
+        margin-right: 0px;
+    }
+
+    .left_navbar {
+        width: 100%;
+    }
+
+    .ul_nav {
+        padding-bottom: 1rem;
+    }
+
+    .page_top {
+        padding-bottom: 0;
+    }
+}

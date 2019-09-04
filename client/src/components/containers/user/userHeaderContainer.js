@@ -1,6 +1,6 @@
 import React from 'react';
-import '../../style/user_main.css';
-import UserHeader from "../views/user/userHeader";
+import '../../../style/user_main.css';
+import UserHeader from "../../views/user/userHeader";
 import {withRouter} from "react-router-dom";
 
 function UserHeaderContainer(props) {

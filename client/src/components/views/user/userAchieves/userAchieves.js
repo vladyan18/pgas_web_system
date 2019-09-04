@@ -8,6 +8,7 @@ class UserAchieves extends Component {
     constructor(props) {
         super(props);
         this.getAchieves();
+
     };
 
     getAchieves() {

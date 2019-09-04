@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import '../../style/user_main.css';
-import UserProfile from "../views/user/userProfile";
+import '../../../style/user_main.css';
+import UserProfile from "../../views/user/userProfile";
 import {observer} from 'mobx-react';
-import userPersonalStore from "../../stores/userPersonalStore";
+import userPersonalStore from "../../../stores/userPersonalStore";
 
 
 class UserProfileContainer extends Component {

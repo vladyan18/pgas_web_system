@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import '../../style/user_main.css';
-import EditAchievement from "../views/user/userEditAchievement/editAchievement";
-import userAchievesStore from "../../stores/userAchievesStore";
+import '../../../style/user_main.css';
+import EditAchievement from "../../views/user/userEditAchievement/editAchievement";
+import userAchievesStore from "../../../stores/userAchievesStore";
 import {observer} from "mobx-react";
 
 class EditAchievementContainer extends Component {
