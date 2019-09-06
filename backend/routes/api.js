@@ -16,7 +16,10 @@ const docxController = require('../controllers/docxController');
 const facultyController = require('../controllers/facultyController');
 const notifyController = require('../controllers/notificationController');
 const historyController = require('../controllers/historyNotesController');
+const criteriasController = require('../controllers/criteriasController');
 const db = require('../controllers/dbController.js');
+const path = require('path');
+const upload = require('../config/multer');
 
 /**
  * If not authenticated, or do not have Admin rigths, redirect to 404
@@ -283,5 +286,6 @@ router.get('/getResultTable', adminAuth, docxController.getResultTable);
  */
 router.get('/getHistory', adminAuth, historyController.GetHistory);
 
+router.post('/uploadCriterias', criteriasController.upload);
 
 module.exports = router;

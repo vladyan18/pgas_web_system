@@ -81,6 +81,26 @@ ul {
     vertical-align: middle;
 }
 
+.dropzone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    border-width: 2px;
+    border-radius: 2px;
+    border-color: #eeeeee;
+    border-style: dashed;
+    background-color: #fafafa;
+    color: #bdbdbd;
+    outline: none;
+    transition: border .24s ease-in-out;
+}
+
+
 .centered_ver {
     margin-top: auto;
     margin-bottom: auto;

@@ -9,6 +9,7 @@ class StaffMenu extends Component {
         this.openNewAchieves = this.openNewAchieves.bind(this);
         this.openCurrentContest = this.openCurrentContest.bind(this);
         this.openCurrentContestRating = this.openCurrentContestRating.bind(this);
+        this.openCriteriasMenu = this.openCriteriasMenu.bind(this);
     };
 
     openNewAchieves() {
@@ -21,6 +22,10 @@ class StaffMenu extends Component {
 
     openCurrentContestRating() {
         this.props.history.push('/staff/rating');
+    }
+
+    openCriteriasMenu() {
+        this.props.history.push('/staff/criteriasMenu');
     }
 
     render() {
@@ -69,7 +74,7 @@ class StaffMenu extends Component {
                                     <div className="centered menuButtonContainer">
                                         <button type="button" id="SubmitButton"
                                                 className="btn btn-success menuButton"
-                                                value="Панель сотрудника">
+                                                value="Панель сотрудника" onClick={this.openCriteriasMenu}>
                                             Критерии
                                         </button>
                                     </div>
