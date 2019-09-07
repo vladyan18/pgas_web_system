@@ -11,7 +11,7 @@ const xlsx = require('xlsx');
 module.exports.upload = function (req, res) {
     console.log(req.isAuthenticated());
 
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated() || req.user.Role != 'SuperAdmin') return res.sendStatus(404);
     if (!fs.existsSync(uploadsPath)) {
         fs.mkdirSync(uploadsPath)
     }
@@ -26,15 +26,8 @@ module.exports.upload = function (req, res) {
         var first_sheet_name = workbook.SheetNames[0];
         console.log(first_sheet_name);
         const worksheet = workbook.Sheets[first_sheet_name];
-        let cr = parseCrits(worksheet);
-        fs.writeFile(path.join(__dirname, '../docs/kr.json'), cr, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-
-            console.log("The file was saved!");
-        });
-        return res.status(200).send()
+        let result = parseCrits(worksheet);
+        return res.status(200).send(result)
         //} catch (e) {
         //    return res.status(500).send()
         // }
@@ -113,9 +106,23 @@ function isCellUndefined(r, c, sheet) {
     return sheet[xlsx.utils.encode_cell({r: r, c: c})] === undefined
 }
 
-function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo) { //добавление ячейки с баллами в словарь
+function addToSchema(categoryList, typesList, schema) {
+    let l = categoryList.length;
+    let i = 0;
+    while (i < (l - 1)) {
+        if (!schema[categoryList[i]]) schema[categoryList[i]] = {};
+        schema["TYPE"] = typesList[i];
+        schema = schema[categoryList[i]];
+        i += 1
+    }
+    if (!schema[categoryList[i]]) schema[categoryList[i]] = {};
+    schema["TYPE"] = typesList[i]
+}
+
+function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo, schema) { //добавление ячейки с баллами в словарь
     let value = listing(cellValue);
     let categoryList = [];
+    let typesList = [];
     let numberOfRowCategories = 0;
     let globalCategoryRowIndex = rowIndex;
 
@@ -126,7 +133,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     if (lastCritInfo) {
         if (lastCritInfo.row != globalCategoryRowIndex) {
             let critName = getCellValue(globalCategoryRowIndex, 1, sheet);
-            if (lastCritInfo.crit != critName) {
+            if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ') != critName.toString().replace(/\s+/g, ' '))) {
                 lastCritInfo.row = globalCategoryRowIndex;
                 lastCritInfo.crit = critName
             } else {
@@ -146,7 +153,9 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
         if (globalCategoryLastIndex < mergedRowIndex)
             globalCategoryLastIndex = mergedRowIndex;
         if (!isCellUndefined(mergedRowIndex, currentColumnIndex, sheet) && !isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
-            categoryList.push(getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' '));
+            let text = getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' ');
+            categoryList.push(text);
+            typesList.push('r');
             numberOfRowCategories += 1
         }
         if (isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
@@ -164,6 +173,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
         }
         if (!isCellUndefined(currentRowIndex, mergedColumnIndex, sheet) && !isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet))) {
             categoryList.splice(numberOfRowCategories, 0, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' '));
+            typesList.push('c');
             lastCategory = true
         }
         if (isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet)) && lastCategory)
@@ -174,7 +184,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     let prevRep = Table;
     let currentRepIndex = 0;
 
-
+    addToSchema(categoryList, typesList, schema);
     while (true) {
         if (!(categoryList[currentRepIndex] in prevRep)) {
 
@@ -190,6 +200,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
 
 function parseCrits(sheet) {
     let Table = {};
+    let Schema = {};
     let rowIndex = 0;
     let lastCritInfo = {};
 
@@ -203,7 +214,7 @@ function parseCrits(sheet) {
             //console.log('CELL VALUE: ' + cellValue)
 
             if (isValue(cellValue))
-                attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo);
+                attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo, Schema);
             columnIndex += 1
         }
         rowIndex += 1
@@ -211,6 +222,6 @@ function parseCrits(sheet) {
 
     const end = new Date().getTime();
     console.log('SecondWay: ' + (end - start).toString() + ' ms');
-    return JSON.stringify(Table)
+    return JSON.stringify({crits: Table, schema: Schema})
 
 }
