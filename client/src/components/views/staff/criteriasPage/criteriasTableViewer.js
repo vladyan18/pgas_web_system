@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import '../../../../style/user_main.css';
+import '../../../../style/critTableViewer.css';
 
 class treeNode {
     ancestor;
@@ -15,6 +16,17 @@ class treeNode {
     }
 }
 
+function cloneObject(obj) {
+    var clone = {};
+    for (var i in obj) {
+        if (obj[i] != null && typeof (obj[i]) == "Object")
+            clone[i] = cloneObject(obj[i]);
+        else
+            clone[i] = obj[i];
+    }
+    return clone;
+}
+
 class CriteriasTableViewer extends Component {
     constructor(props) {
         super(props);
@@ -24,7 +36,9 @@ class CriteriasTableViewer extends Component {
         this.tree = this.tree.bind(this);
         this.incrSpan = this.incrSpan.bind(this);
         this.bodyTree = this.bodyTree.bind(this);
-        this.renderList = this.renderList.bind(this)
+        this.renderList = this.renderList.bind(this);
+        this.getPath = this.getPath.bind(this);
+        this.getSubHeaderRows = this.getSubHeaderRows.bind(this)
     };
 
     tree(tree, curNode, level, headers, spans) {
@@ -54,10 +68,27 @@ class CriteriasTableViewer extends Component {
         }
     }
 
-    makeHead(crits, schema, label) {
+    makeHead(inputCrits, inputSchema, label) {
         let head = {};
         let shift = {val: 0};
-        this.makeHeadRec(crits, schema, label, head, shift);
+        let hasSubTable = {val: false};
+        let crits = inputCrits;
+        let schema = inputSchema;
+        const allCrits = inputCrits;
+        const allSchema = inputSchema;
+        let firstLevelCritsLabels = Object.keys(allCrits[label]);
+        let firstLevelCritsLength = firstLevelCritsLabels.length;
+        let clearSchema = {META: allSchema.META};
+        let clearCrits = {};
+        clearSchema[label] = {META: allSchema[label].META};
+        clearCrits[label] = {};
+        for (let i = 0; i < firstLevelCritsLength; i++) {
+            if (!allSchema[label][firstLevelCritsLabels[i]].META || !allSchema[label][firstLevelCritsLabels[i]].META.isNewSubTable) {
+                clearSchema[label][[firstLevelCritsLabels[i]]] = allSchema[label][firstLevelCritsLabels[i]];
+                clearCrits[label][[firstLevelCritsLabels[i]]] = allCrits[label][firstLevelCritsLabels[i]]
+            } else break
+        }
+        this.makeHeadRec(clearCrits, clearSchema, label, head, shift);
         let headers = [];
         let spans = [];
         let root = new treeNode(undefined, Object.keys(headers), '');
@@ -79,18 +110,17 @@ class CriteriasTableViewer extends Component {
 
     makeHeadRec(crits, schema, label, buildedHeadSchema, shift) {
         if (!(crits instanceof Array)) {
-            if (schema.TYPE == 'c') {
+            if (schema.META.type == 'c' && !schema.META.isNewSubTable) {
                 if (shift.val > 0) {
                     if (!buildedHeadSchema['SHIFT']) buildedHeadSchema['SHIFT'] = shift.val;
                     shift.val = 0
                 }
                 if (!buildedHeadSchema[label]) buildedHeadSchema[label] = {};
-
                 Object.keys(crits[label]).map((node) => {
                     if (buildedHeadSchema[label]) buildedHeadSchema[label] ['SHIFT'] = buildedHeadSchema['SHIFT'];
                     this.makeHeadRec(crits[label], schema[label], node, buildedHeadSchema[label], shift)
                 })
-            } else {
+            } else if (!schema.META.isNewSubTable) {
                 shift.val = shift.val + 1;
                 Object.keys(crits[label]).map((node) => {
                     this.makeHeadRec(crits[label], schema[label], node, buildedHeadSchema, shift)
@@ -100,22 +130,42 @@ class CriteriasTableViewer extends Component {
     }
 
 
-    bodyTree(crits, schema, label, prevNode, nodesWithLists) {
+    bodyTree(crits, schema, label, prevNode, nodesWithLists, deep = 0) {
+        console.log('BT', label, crits instanceof Array, typeof crits, crits);
         if (!(crits instanceof Array)) {
-            if (schema.TYPE == 'r') {
+            if (schema.META && schema.META.type == 'r') {
                 let newNode = new treeNode(prevNode, [], label);
+                if (schema[label].META && schema[label].META.isNewSubTable) {
+                    let headers = [];
+                    let spans = [];
+                    this.renderSubTableHeader(newNode, headers, spans);
+                    newNode.headers = headers;
+                    newNode.spans = spans;
+
+                    for (let i = 0; i < headers.length; i++)
+                        this.incrSpan(prevNode);
+                    newNode.isNewSubTable = schema[label].META.isNewSubTable
+                }
+
                 if (prevNode)
                     prevNode.childs.push(newNode);
-                Object.keys(crits[label]).map((node) => {
-                    this.bodyTree(crits[label], schema[label], node, newNode, nodesWithLists)
-                })
-            } else {
-                if (!(crits[label] instanceof Array))
+                if (!(crits[label] instanceof Array)) {
                     Object.keys(crits[label]).map((node) => {
-                        this.bodyTree(crits[label], schema[label], node, prevNode, nodesWithLists)
+                        this.bodyTree(crits[label], schema[label], node, newNode, nodesWithLists, deep + 1)
+                    })
+                } else this.bodyTree(crits[label], schema[label], 'dummy', newNode, nodesWithLists, deep)
+            } else {
+
+                if (!(crits[label] instanceof Array)) {
+
+                    Object.keys(crits[label]).map((node) => {
+
+                        this.bodyTree(crits[label], schema[label], node, prevNode, nodesWithLists, deep)
                     });
+                }
                 else {
-                    this.bodyTree(crits[label], schema[label], 'dummy', prevNode, nodesWithLists)
+
+                    this.bodyTree(crits[label], schema[label], 'dummy', prevNode, nodesWithLists, deep)
                 }
             }
 
@@ -124,17 +174,59 @@ class CriteriasTableViewer extends Component {
                 this.incrSpan(prevNode);
                 prevNode.isList = true;
                 prevNode.lists = [];
+                prevNode.deep = deep;
                 nodesWithLists.push(prevNode)
             }
+            if (prevNode.label == 'dummy') prevNode.isColumn = false;
             prevNode.lists.push(crits)
         }
     }
 
-    renderList(node, childNode, childMarkup, isNewLine) {
+    getPath(x, headerNodes) {
+        console.log('PATH REQUESTED', x);
+        headerNodes.splice(0, 0, x.label);
+        if (x.ancestor)
+            this.getPath(x.ancestor, headerNodes)
+    }
+
+    getSubHeaderRows(schema, label, level, headers, spans) {
+        if (schema instanceof Array) return null;
+
+        Object.keys(schema).map((node) => {
+            if (node == 'META') return null;
+
+            if (!spans[level]) spans.push({});
+            if (!headers[level]) headers.push([]);
+
+
+            headers[level].push(node);
+            if (level > 0) {
+                if (!spans[level - 1][label]) spans[level - 1][label] = 0;
+                spans[level - 1][label] += 1
+            }
+            this.getSubHeaderRows(schema[node], node, level + 1, headers, spans)
+        })
+    }
+
+    renderSubTableHeader(node, headers, spans) {
+        let schema = this.props.schema;
+        let path = [];
+        this.getPath(node, path);
+        console.log(path, schema);
+        for (let i = 0; i < path.length; i++)
+            schema = schema[path[i]];
+
+        this.getSubHeaderRows(schema, node.label, 0, headers, spans);
+
+        console.log('SBTH', headers)
+
+    }
+
+    renderList(node, childNode, childMarkup, isNewLine, needDeep = 0) {
         if (node.isList) {
+            let th;
             let markup = (
                 <>
-                    <th scope='row'>{node.label}</th>
                     {node.lists.map((child) => {
                         return (
                             <td>{child.toString().replace(/,/g, ' | ')}</td>
@@ -142,13 +234,47 @@ class CriteriasTableViewer extends Component {
                     })}
                 </>
             );
-            return this.renderList(node.ancestor, node, markup, true)
+
+            if (node.isNewSubTable) {
+
+                if (node.deep && needDeep) th = (<th scope='rowgroup' colSpan={needDeep + 1 - node.deep}
+                                                     rowSpan={1 + node.headers.length}>{node.label}</th>);
+                else th = <th scope='rowgroup' rowSpan={1 + node.headers.length}>{node.label}</th>;
+
+                let m = (<>
+                    {this.renderList(node.ancestor, node, (<>{th}{
+                        node.headers[0].map((x) => {
+                            if (node.spans[0][x])
+                                return <td colSpan={node.spans[0][x]}>{x}</td>;
+                            else return <td>{x}</td>
+                        })
+                    }</>), true)}
+                </>);
+
+                for (let i = 1; i < node.headers.length; i++) {
+                    m = (<>
+                        {m}
+                        {this.renderList(node.ancestor, node, (<>{
+                            node.headers[i].map((x) => {
+                                return <td>{x}</td>
+                            })
+                        }</>), false)}
+                    </>)
+                }
+
+                return (<>{m}{markup}</>)
+            }
+
+            if (node.deep && needDeep) th = (<th scope='row' colSpan={needDeep + 1 - node.deep}>{node.label}</th>);
+            else th = <th scope='row'>{node.label}</th>;
+            return this.renderList(node.ancestor, node, (<>{th}{markup}</>), true)
+
         } else {
             let markup = childMarkup;
             let needNewLine = false;
             if (node.childs[0] === childNode && isNewLine) {
-                if (node.label.toString().replace(/\s+/g, ' ') == "2 (7б)")
-                    console.log(childNode.label);
+                //if (node.label.toString().replace(/\s+/g, ' ') == "2 (7б)")
+                //    console.log(childNode.label);
                 markup = (
                     <>
                         <th scope="rowgroup" rowSpan={node.span}>{node.label}</th>
@@ -157,10 +283,13 @@ class CriteriasTableViewer extends Component {
                 );
                 needNewLine = true
             }
-            if (!node.ancestor)
+            if (!node.ancestor) {
+
                 return (<tr>
                     {markup}
                 </tr>);
+            }
+
             return this.renderList(node.ancestor, node, markup, needNewLine)
         }
     }
@@ -170,11 +299,11 @@ class CriteriasTableViewer extends Component {
         console.log('SCHEMA', schema);
         let nodesWithLists = [];
         this.bodyTree(crits, schema, label, undefined, nodesWithLists);
-
-
+        console.log(nodesWithLists);
+        let deep = nodesWithLists[0].deep;
         return (
             nodesWithLists.map((node) => {
-                return this.renderList(node, undefined, undefined)
+                return this.renderList(node, undefined, undefined, true, deep)
             })
         )
     }
@@ -183,7 +312,11 @@ class CriteriasTableViewer extends Component {
         return (
             <div>
                 {Object.keys(this.props.criterias).map((key) => {
-                        //if (key != '2 (7б)') return null
+                    //if (key != '6 (9а)') return null;
+
+                    const crits = this.props.criterias;
+                    const schema = this.props.schema;
+                    console.log(key);
                         return (
                             <>
                                 <h4 style={{
@@ -193,8 +326,11 @@ class CriteriasTableViewer extends Component {
                                 }}>{key}</h4>
                                 <table className="table-bordered table-sm"
                                        style={{"wordWrap": "breakWord", "font-size": "x-small"}}>
+                                    <colgroup>
+                                        <col className="test"></col>
+                                    </colgroup>
                                     <thead>
-                                    {this.makeHead(this.props.criterias, this.props.schema, key)}
+                                    {this.makeHead(crits, schema, key)}
                                     </thead>
                                     <tbody>
                                     {this.makeTable(this.props.criterias, this.props.schema, key)}

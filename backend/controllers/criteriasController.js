@@ -9,7 +9,7 @@ const xlsx = require('xlsx');
 
 
 module.exports.upload = function (req, res) {
-    console.log(req.isAuthenticated());
+
 
     if (!req.isAuthenticated() || req.user.Role != 'SuperAdmin') return res.sendStatus(404);
     if (!fs.existsSync(uploadsPath)) {
@@ -24,14 +24,25 @@ module.exports.upload = function (req, res) {
 
         const workbook = xlsx.readFile(req.file.path);
         var first_sheet_name = workbook.SheetNames[0];
-        console.log(first_sheet_name);
         const worksheet = workbook.Sheets[first_sheet_name];
         let result = parseCrits(worksheet);
-        return res.status(200).send(result)
+        res.status(200).send(result);
+        fs.unlink(req.file.path, (err) => {
+            if (err) console.log(err)
+        })
         //} catch (e) {
         //    return res.status(500).send()
         // }
     })
+};
+
+module.exports.getCriterias = async function (req, res) {
+    try {
+        let criterias, schema = await db.GetCriterias(req.query.facultyId);
+        res.status(200).send({criterias: criterias, schema: schema})
+    } catch (e) {
+        res.status(500).send(err)
+    }
 };
 
 function isValue(str) { //проверка содержатся ли в ячейке баллы
@@ -110,13 +121,18 @@ function addToSchema(categoryList, typesList, schema) {
     let l = categoryList.length;
     let i = 0;
     while (i < (l - 1)) {
-        if (!schema[categoryList[i]]) schema[categoryList[i]] = {};
-        schema["TYPE"] = typesList[i];
+        if (!schema[categoryList[i]])
+            schema[categoryList[i]] = {};
+        if (!schema["META"])
+            schema["META"] = typesList[i];
+
         schema = schema[categoryList[i]];
         i += 1
     }
-    if (!schema[categoryList[i]]) schema[categoryList[i]] = {};
-    schema["TYPE"] = typesList[i]
+    if (!schema[categoryList[i]])
+        schema[categoryList[i]] = {};
+    if (!schema["META"])
+        schema["META"] = typesList[i];
 }
 
 function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo, schema) { //добавление ячейки с баллами в словарь
@@ -135,7 +151,8 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
             let critName = getCellValue(globalCategoryRowIndex, 1, sheet);
             if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ') != critName.toString().replace(/\s+/g, ' '))) {
                 lastCritInfo.row = globalCategoryRowIndex;
-                lastCritInfo.crit = critName
+                lastCritInfo.crit = critName;
+                lastCritInfo.lastHeadRow = undefined
             } else {
                 globalCategoryRowIndex = lastCritInfo.row
             }
@@ -155,7 +172,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
         if (!isCellUndefined(mergedRowIndex, currentColumnIndex, sheet) && !isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
             let text = getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' ');
             categoryList.push(text);
-            typesList.push('r');
+            typesList.push({type: 'r'});
             numberOfRowCategories += 1
         }
         if (isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
@@ -172,18 +189,32 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
             mergedColumnIndex -= 1
         }
         if (!isCellUndefined(currentRowIndex, mergedColumnIndex, sheet) && !isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet))) {
+
+
             categoryList.splice(numberOfRowCategories, 0, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' '));
-            typesList.push('c');
+            if (!lastCritInfo.lastHeadRow) lastCritInfo.lastHeadRow = currentRowIndex;
+            typesList.push({type: 'c'});
+            if (lastCritInfo.lastHeadRow < currentRowIndex) {
+                lastCritInfo.lastHeadRow = currentRowIndex;
+                //typesList.push('nt') //= 'nc' + lastCritInfo.numTables
+                typesList[2].isNewSubTable = true
+            }
+
+            //if (lastCritInfo.crit.toString().replace(/\s+/g, ' ') == '6 (9а)')
+            //    console.log('NT', currentRowIndex, lastCritInfo.lastHeadRow, typesList, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' '))
             lastCategory = true
         }
-        if (isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet)) && lastCategory)
+        if (isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet)) && lastCategory) {
             break;
+        }
         currentRowIndex -= 1
     }
 
     let prevRep = Table;
     let currentRepIndex = 0;
 
+    //if (categoryList[0] == '6 (9а)' && categoryList[1] == 'Безвозмездная педагогическая деятельность (10)')
+    //    console.log('ADD', categoryList, typesList)
     addToSchema(categoryList, typesList, schema);
     while (true) {
         if (!(categoryList[currentRepIndex] in prevRep)) {
@@ -198,26 +229,34 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
 }
 
 
+function isMaxBallsCell(r, c, sheet) {
+    while (c >= 1) {
+        let prevCellValue = getCellValue(r, c - 1, sheet);
+        if (prevCellValue) {
+            if (prevCellValue.toString().toUpperCase().search('Максимальное количество баллов:'.toUpperCase()) != -1)
+                return true;
+            else return false
+        }
+        c--
+    }
+    return false
+}
+
 function parseCrits(sheet) {
     let Table = {};
     let Schema = {};
     let rowIndex = 0;
-    let lastCritInfo = {};
+    let lastCritInfo = {numTables: 0};
 
     var range = xlsx.utils.decode_range(sheet['!ref']);
-    console.log('MIN ', range.s.r);
     const start = new Date().getTime();
     for (let row = range.s.r; row <= range.e.r; row++) {
-        let columnIndex = 0;
         for (let col = range.s.c; col <= range.e.c; col++) {
             let cellValue = getCellValue(row, col, sheet);
-            //console.log('CELL VALUE: ' + cellValue)
 
-            if (isValue(cellValue))
-                attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritInfo, Schema);
-            columnIndex += 1
+            if (isValue(cellValue) && !isMaxBallsCell(row, col, sheet))
+                attendInTable(cellValue, col, row, sheet, Table, lastCritInfo, Schema);
         }
-        rowIndex += 1
     }
 
     const end = new Date().getTime();
@@ -225,3 +264,5 @@ function parseCrits(sheet) {
     return JSON.stringify({crits: Table, schema: Schema})
 
 }
+
+

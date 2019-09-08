@@ -39,7 +39,15 @@ module.exports.getProfile = async function (req, res) {
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
 
-    res.status(200).send({ LastName: User.LastName, FirstName: User.FirstName, Patronymic: User.Patronymic, Birthdate: User.Birthdate, Faculty: User.Faculty, Type: User.Type, Course: User.Course })
+    res.status(200).send({
+        LastName: User.LastName,
+        FirstName: User.FirstName,
+        Patronymic: User.Patronymic,
+        Birthdate: User.Birthdate,
+        Faculty: User.Faculty,
+        Type: User.Type,
+        Course: User.Course
+    })
 };
 
 module.exports.getRights = async function (req, res) {
@@ -117,11 +125,7 @@ module.exports.addAchieve = function (req, res) {
             achieve.status = 'Ожидает проверки';
             achieve.date = new Date().toLocaleString('ru', options);
 
-            let arr = [];
-            for (let file of req.files) {
-                arr.push(file.filename)
-            }
-            achieve.files = arr;
+
             achieve.comment = '';
             let createdAchieve = await db.createAchieve(achieve);
             if (req.user._json && req.user._json.email)

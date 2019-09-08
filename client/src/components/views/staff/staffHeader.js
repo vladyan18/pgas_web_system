@@ -4,6 +4,8 @@ import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore'
 import {observer} from "mobx-react";
 import {withRouter} from "react-router";
+import Dropdown from "react-bootstrap/Dropdown"
+import DropdownButton from "react-bootstrap/DropdownButton"
 
 class StaffHeader extends Component {
     constructor(props) {
@@ -41,19 +43,12 @@ class StaffHeader extends Component {
                                 Меню
                             </button>
                         </div>
-                        <div className="btn-group" style={{"marginRight": "1rem"}}>
-                            <button type="button" className="btn btn-warning dropdown-toggle" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                ПМ-ПУ
-                            </button>
-                            <div className="dropdown-menu">
-                                <a className="dropdown-item" href="#">Action</a>
-                                <a className="dropdown-item" href="#">Another action</a>
-                                <a className="dropdown-item" href="#">Something else here</a>
-                                <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="#">Separated link</a>
-                            </div>
-                        </div>
+                        <DropdownButton variant="warning" title="ПМ-ПУ">
+                            {userPersonalStore.Rights && userPersonalStore.Rights.map((x) => (
+                                <Dropdown.Item key={x}>{x}</Dropdown.Item>
+                            ))
+                            }
+                        </DropdownButton>
 
                         {(userPersonalStore.Role == 'Admin' || userPersonalStore.Role == 'SuperAdmin') &&
                         <div style={{"marginRight": "1rem"}}>

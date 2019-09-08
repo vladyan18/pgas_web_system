@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import '../style/user_main.css';
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
-import userPersonalStore from "../stores/userPersonalStore";
-import CriteriasStore from "../stores/criteriasStore"
 import {Switch} from "react-router";
 import StaffHeaderContainer from "./containers/staff/staffHeaderContainer";
 import StaffMenu from './views/staff/staffMenu'
@@ -11,6 +9,7 @@ import NewAchievesContainer from "./containers/staff/newAchievesContainer";
 import CurrentContestAchievementsContainer from "./containers/staff/currentContestAchievementsContainer";
 import StaffStudentsRatingContainer from "./containers/staff/staffStudentsRatingContainer";
 import CriteriasMenu from "./views/staff/criteriasPage/CriteriasMenu";
+import FacultyCreationContainer from "./containers/staff/superAdmin/facultyCreationContainer";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -29,13 +28,6 @@ class Staff extends Component {
         this.state = {
             authenticated: false
         };
-        CriteriasStore.criterias = krit;
-        fetch("api/getProfile", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((profile) => userPersonalStore.personal = profile);
     };
 
     componentWillMount() {
@@ -63,6 +55,7 @@ class Staff extends Component {
                 <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
                 <Route path="/staff/rating" component={StaffStudentsRatingContainer}/>
                 <Route path="/staff/criteriasMenu" component={CriteriasMenu}/>
+                <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
                 <Route path="/staff/" component={StaffMenu}/>
             </Switch>
         </div>)

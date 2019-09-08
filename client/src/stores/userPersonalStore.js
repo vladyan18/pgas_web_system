@@ -3,6 +3,7 @@ import {computed, decorate, observable} from 'mobx';
 class UserPersonalStore {
     personal;
     Role;
+    Rights;
 
     get fio() {
         return this.LastName + ' ' + this.FirstName + ' ' + this.Patronymic

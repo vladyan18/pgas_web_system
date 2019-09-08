@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import '../../../style/rating.css';
 import {observer} from "mobx-react";
 import {withRouter} from "react-router";
+import userPersonalStore from "../../../stores/userPersonalStore";
 
 class StaffMenu extends Component {
     constructor(props) {
@@ -99,6 +100,19 @@ class StaffMenu extends Component {
                                 </div>
 
                                 <div className="w-100"></div>
+                                {
+                                    userPersonalStore.Role == 'SuperAdmin' &&
+                                    <div className="col">
+                                        <div className="centered menuButtonContainer">
+                                            <button type="button" id="SubmitButton"
+                                                    className="btn btn-warning menuButton"
+                                                    value="Панель сотрудника"
+                                                    onClick={() => this.props.history.push('/staff/facultyCreation')}>
+                                                Создать факультет
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

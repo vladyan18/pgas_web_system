@@ -39,6 +39,19 @@ const adminAuth = async (req, res, next) => {
     }
 };
 
+
+const superAdminAuth = async (req, res, next) => {
+    if (req.user._json && req.user._json.email)
+        id = req.user._json.email;
+    else id = req.user.user_id;
+    let User = await db.findUserById(id);
+    if (req.isAuthenticated() && (User.Role === 'SuperAdmin')) {
+        next()
+    } else {
+        return res.redirect('/404')
+    }
+};
+
 /**
  * If not authenticated, redirect to /login <br/>
  *
@@ -228,6 +241,8 @@ router.get('/checked', adminAuth, adminController.Checked);
 
 router.get('/getFaculty', auth, facultyController.getFaculty);
 
+router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
+
 /**
  * Get current rating for admin
  * @name getRating
@@ -287,5 +302,7 @@ router.get('/getResultTable', adminAuth, docxController.getResultTable);
 router.get('/getHistory', adminAuth, historyController.GetHistory);
 
 router.post('/uploadCriterias', criteriasController.upload);
+
+router.get('/getCriterias', criteriasController.getCriterias);
 
 module.exports = router;

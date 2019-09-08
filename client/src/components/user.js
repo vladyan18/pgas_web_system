@@ -27,9 +27,7 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 class User extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            authenticated: false
-        };
+
         CriteriasStore.criterias = krit;
         fetch("api/getProfile", {
             method: "GET"

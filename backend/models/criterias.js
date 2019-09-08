@@ -1,12 +1,13 @@
-const mongoose = require('mongoose')
-const connection = require('../config/db')
+const mongoose = require('mongoose');
+const connection = require('../config/db');
 
 const criteriasSchema = mongoose.Schema({
-  FacultyName: String,
+    FacultyId: String,
   Date: Date,
-  Crits: String
-})
+    Crits: String,
+    CritsSchema: String
+});
 
-const Criterias = connection.model('Criterias', criteriasSchema)
+const Criterias = connection.model('Criterias', criteriasSchema);
 
-module.exports = Criterias
+module.exports = Criterias;

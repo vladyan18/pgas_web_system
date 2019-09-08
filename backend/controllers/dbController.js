@@ -1,7 +1,10 @@
+
 const UserModel = require('../models/user.js');
 const AchieveModel = require('../models/achieve');
 const FacultyModel = require('../models/faculty');
+const CriteriasModel = require('../models/criterias');
 const HistoryNoteModel = require('../models/historyNote');
+
 const redis = require('../config/redis');
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -217,6 +220,15 @@ exports.UserSuccesAchs = async function(id){
 exports.GetFaculty = async function(Name) {
     return await FacultyModel.findOne({Name: Name});
 };
+
+exports.CreateFaculty = function (Faculty) {
+    return FacultyModel.create(Faculty)
+};
+
+exports.GetCriterias = async function (facultyId) {
+    return await CriteriasModel.findOne({FacultyId: facultyId});
+};
+
 
 exports.ChangeRole = function (id, isAdmin) {
     redis.del(id + '_user');
