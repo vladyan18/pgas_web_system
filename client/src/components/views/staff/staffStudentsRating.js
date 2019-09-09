@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import staffContextStore from "../../../stores/staff/staffContextStore";
+import {withRouter} from "react-router";
 
 class StaffStudentsRating extends Component {
     constructor(props) {
@@ -78,7 +79,12 @@ class StaffStudentsRating extends Component {
                                     Рейтинг студентов
                                 </p>
                             </div>
-                            <div className="centered_ver">
+                            <div className="centered_ver" style={{"display": "flex"}}>
+                                <button id="DeleteButton" className="btn btn-secondary"
+                                        value="Назад" onClick={() => {
+                                    this.props.history.goBack()
+                                }}>Назад
+                                </button>
                                 <form action="/api/getResultTable">
                                     <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
                                 </form>
@@ -106,4 +112,4 @@ class StaffStudentsRating extends Component {
     }
 }
 
-export default StaffStudentsRating
+export default withRouter(StaffStudentsRating)

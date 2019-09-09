@@ -56,15 +56,17 @@ class Staff extends Component {
     render() {
         return (<div className="container-fluid">
             <StaffHeaderContainer/>
-            <Switch>
-                <Route path="/staff/newAchieves" component={NewAchievesContainer}/>
-                <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
-                <Route path="/staff/rating" component={StaffStudentsRatingContainer}/>
-                <Route path="/staff/criteriasMenu" component={CriteriasMenu}/>
-                <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
-                <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
-                <Route path="/staff/" component={StaffMenu}/>
-            </Switch>
+            <div id="mainBody">
+                <Switch>
+                    <Route path="/staff/newAchieves" component={NewAchievesContainer}/>
+                    <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
+                    <Route path="/staff/rating" component={StaffStudentsRatingContainer}/>
+                    <Route path="/staff/criteriasMenu" component={CriteriasMenu}/>
+                    <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
+                    <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
+                    <Route path="/staff/" component={StaffMenu}/>
+                </Switch>
+            </div>
         </div>)
     }
 

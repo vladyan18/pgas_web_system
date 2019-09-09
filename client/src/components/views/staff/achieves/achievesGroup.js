@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../../style/admin.css';
-import NewAchievesTable from "./achievesTable";
+import AchievesTable from "./achievesTable";
 
 class AchievesGroup extends Component {
     constructor(props) {
@@ -62,7 +62,6 @@ class AchievesGroup extends Component {
             <div>
                 {this.state &&
                 <div className="name">
-                    <div>
                         <div style={{"width": "100%", "text-align": "center", "height": "auto",}}
                              className="input-group headerContainer">
                         <div className={"nameHeader" + (this.props.item.IsInRating ? " inRating" : '')}
@@ -80,10 +79,10 @@ class AchievesGroup extends Component {
                                 {this.props.item.IsInRating ? "Убрать из рейтинга" : 'Добавить в рейтинг'}</button>
                         </div>
                     </div>
-                    </div>
                     {!this.state.hidden && <div className="block">
 
-                        <NewAchievesTable data={this.props.item.Achievements} updater={this.props.updater}/>
+                        <AchievesTable data={this.props.item.Achievements} updater={this.props.updater}
+                                       openModal={this.props.openModal}/>
                     </div>}
                 </div>}
             </div>

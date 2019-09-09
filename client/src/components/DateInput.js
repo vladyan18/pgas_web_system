@@ -5,6 +5,8 @@ class DateInput extends Component {
     constructor(props) {
         super(props);
         this.state = {isValid: true, value: ''};
+        if (props.defaultValue) this.state.value = props.defaultValue;
+        console.log(props.defaultValue);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleDateKeyUp = this.handleDateKeyUp.bind(this)
     };
@@ -30,8 +32,8 @@ class DateInput extends Component {
             } else st.value = value
         } else st.value = value;
 
+        this.props.updater(st.value);
         this.setState(st);
-        this.props.updater(st.value)
     }
 
     render() {

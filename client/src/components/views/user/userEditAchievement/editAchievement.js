@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
-import CriteriasStore from '../../../../stores/criteriasStore'
+import CriteriasStore, {fetchSendWithoutRes} from '../../../../stores/criteriasStore'
 import CriteriasForm from "../userAddAchievement/criteriasForm";
 import {withRouter} from "react-router";
+import AchievementDateInput from "../../../AchievementDateInput";
 
 
 class EditAchievement extends Component {
@@ -13,9 +14,15 @@ class EditAchievement extends Component {
         this.updateDescr = this.updateDescr.bind(this);
         this.editKrit = this.editKrit.bind(this);
         this.deleteAch = this.deleteAch.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
         this.crits = CriteriasStore.criterias;
         if (this.props.achieves)
-            this.state = {ach: this.props.achieves.filter((x) => x._id == this.props.achId)[0].achievement}
+            this.state = {
+                ach: this.props.achieves.filter((x) => x._id == this.props.achId)[0].achievement,
+                isDateValid: false,
+                dateValidationResult: true,
+                achDate: getDate(this.props.achieves.filter((x) => x._id == this.props.achId)[0].achDate)
+            }
     }
 
     updateChars = (value) => {
@@ -36,6 +43,14 @@ class EditAchievement extends Component {
         else return false
     }
 
+    handleDateChange(isValid, value) {
+        let st = this.state;
+        st.isDateValid = isValid;
+        st.dateValidationResult = isValid;
+        st.achDate = value;
+        this.setState(st);
+    }
+
     editKrit() {
         let res = {};
         res.crit = this.state.chars[0];
@@ -44,43 +59,20 @@ class EditAchievement extends Component {
 
         res.achievement = this.state.ach;
 
-        let form = document.forms.namedItem('fileinfo');
-        let oData = new FormData(form);
-        oData.append('data', JSON.stringify(res));
-        oData.append('achId', this.props.achId);
-        fetch('/api/update_achieve', {
-            method: 'post',
-            body: oData
-        }).then((oRes) => {
-            if (oRes.status === 200) {
-                this.props.history.push('/home');
-            } else {
-                console.log(
-                    'Error ' + oRes.status + ' occurred when trying to upload your file.'
-                )
-            }
+        if (this.state.achDate) res.achDate = makeDate(this.state.achDate);
+
+        let obj = {data: res, achId: this.props.achId};
+
+        fetchSendWithoutRes('/api/update_achieve', obj).then((response) => {
+            if (response) this.props.history.push('/home')
         })
     }
 
     deleteAch() {
         if (!window.confirm('Вы уверены? Удаление достижения необратимо.')) return false;
 
-        var form = document.forms.namedItem('fileinfo');
-        var oData = new FormData(form);
-        oData.append('data', JSON.stringify(''));
-        oData.append('achId', this.props.achId);
-
-        fetch('/api/delete_achieve', {
-            method: 'post',
-            body: oData
-        }).then((oRes) => {
-            if (oRes.status === 200) {
-                this.props.history.push('/home');
-            } else {
-                console.log(
-                    'Error ' + oRes.status + ' occurred when trying to upload your file.'
-                )
-            }
+        fetchSendWithoutRes('/api/delete_achieve', {achId: this.props.achId}).then((response) => {
+            if (response) this.props.history.push('/home');
         })
     }
 
@@ -93,6 +85,11 @@ class EditAchievement extends Component {
                         Достижение
                     </p>
                     <div style={{'margin-top': 'auto'}}>
+                        <button id="DeleteButton" className="btn btn-secondary"
+                                value="Назад" onClick={() => {
+                            this.props.history.goBack()
+                        }}>Назад
+                        </button>
                         <button id="DeleteButton" className="btn btn-danger"
                                 value="Удалить" onClick={this.deleteAch}>Удалить
                         </button>
@@ -111,11 +108,28 @@ class EditAchievement extends Component {
                 </form>
                 <div className="show_hide_c11">
                 </div>
-                <form id="textForm">
+                {(this.state.chars && this.state.chars[0] != '1 (7а)') && <form id="textForm">
                     <textarea className="form-control area_text" name="comment"
                               placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
-                              required onChange={this.updateDescr} value={this.state.ach}></textarea>
-                </form>
+                              required onChange={this.updateDescr} value={this.state.ach}/>
+
+
+                    <div className="form-group" style={{"display": "flex", "marginTop": "1rem"}}>
+                        <label
+                            htmlFor="Date" style={{"marginTop": "auto", "marginRight": "0.5rem"}}
+                            className="control-label col-xs-2">Дата достижения: </label>
+                        <div id="Date" style={{
+                            "display": "flex",
+                            "align-items": "center",
+                            "marginTop": "auto",
+                            "margin-bottom": "auto"
+                        }}>
+                            <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
+                                                  updater={this.handleDateChange} defaultValue={this.state.achDate}/>
+                        </div>
+                    </div>
+
+                </form>}
                 <br/>
 
                 <div className="input-group" style={{'display': 'none'}}>
@@ -140,6 +154,18 @@ class EditAchievement extends Component {
             </div>
         </div>)
     }
+}
+
+function getDate(d) {
+    if (!d) return undefined;
+    d = new Date(d);
+    return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + "." + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + "." + d.getFullYear();
+}
+
+function makeDate(d) {
+    if (!d) return undefined;
+    let date = d.split('.');
+    return new Date(date[2] + '-' + date[1] + '-' + date[0])
 }
 
 export default withRouter(EditAchievement)

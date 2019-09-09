@@ -63,6 +63,13 @@ class CriteriasMenu extends Component {
                                     Управление критериями
                                 </p>
                             </div>
+                            <div className="centered_ver">
+                                <button id="DeleteButton" className="btn btn-secondary"
+                                        value="Назад" onClick={() => {
+                                    this.props.history.goBack()
+                                }}>Назад
+                                </button>
+                            </div>
                         </div>
                         <hr className="hr_blue"/>
                         <div style={{"display": "flex"}}>

@@ -143,16 +143,9 @@ module.exports.addAchieve = function (req, res) {
  * Change achieve
  * @function updateAchieve
  * */
-module.exports.updateAchieve = function (req, res) {
-    if (!fs.existsSync(uploadsPath)) {
-        fs.mkdirSync(uploadsPath)
-    }
-    upload(req, res, async function (err) {
-        try {
-            if (err || !req.files) {
-                return res.status(400).send('ERROR: Max file size = 15MB')
-            }
-            let achieve = JSON.parse(req.body.data);
+module.exports.updateAchieve = async function (req, res) {
+    try {
+        let achieve = req.body.data;
             let id = req.body.achId;
             let options = {
                 year: 'numeric',
@@ -162,33 +155,21 @@ module.exports.updateAchieve = function (req, res) {
             achieve.status = 'Ожидает проверки';
             achieve.date = new Date().toLocaleString('ru', options);
 
-            let arr = [];
-            for (let file of req.files) {
-                arr.push(file.filename)
-            }
-            achieve.files = arr;
             let createdAchieve = await db.updateAchieve(id, achieve);
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
             res.status(500).send(err)
         }
-    })
 };
 
 /**
  * Delete achieve
  * @function deleteAchieve
  * */
-module.exports.deleteAchieve = function (req, res) {
-    if (!fs.existsSync(uploadsPath)) {
-        fs.mkdirSync(uploadsPath)
-    }
-    upload(req, res, async function (err) {
+module.exports.deleteAchieve = async function (req, res) {
+
         try {
-            if (err || !req.files) {
-                return res.status(400).send('ERROR: Max file size = 15MB')
-            }
             let id = req.body.achId;
 
             if (req.user._json.email)
@@ -204,5 +185,4 @@ module.exports.deleteAchieve = function (req, res) {
             console.log(err);
             res.status(500).send(err)
         }
-    })
 };

@@ -129,12 +129,12 @@ export default class CriteriasForm extends Component {
                     11в (ГТО)
                 </option>
             </select>
-            <DescriptionToCriteria crit={this.state.crit}/>
+            {!this.props.supressDescription && <DescriptionToCriteria crit={this.state.crit}/>}
             {this.state.selects.map((item) => (
                 <div>
                     <DescriptionToTermin values={item.options}/>
                     <select className="form-control selectors" required key={item.id} id={item.num.toString()}
-                            defaultValue={item.value} onChange={this.handleSelect}>
+                            defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}>
                         <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
                             <option value={option}>

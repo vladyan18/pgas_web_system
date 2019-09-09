@@ -13,6 +13,7 @@ class AchievementDateInput extends Component {
         let st = this.state;
         let r = /\d{2}.\d{2}.\d{4}/.test(value);
         st.isValid = r;
+        st.value = value;
         if (!r) {
             st.validMessage = 'Неверная дата';
             st.isValid = false
@@ -31,7 +32,8 @@ class AchievementDateInput extends Component {
 
     render() {
         return (<>
-            <DateInput isValid={this.state.isValid && this.props.isValid} updater={this.handleChange}/>
+            <DateInput isValid={this.state.isValid && this.props.isValid} updater={this.handleChange}
+                       defaultValue={this.props.defaultValue}/>
             {(!this.state.isValid || !this.props.isValid) &&
             <span className="redText">{this.state.validMessage}</span>}</>)
     }

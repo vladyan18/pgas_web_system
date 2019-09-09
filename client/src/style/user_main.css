@@ -34,10 +34,29 @@ body {
     cursor: pointer;
 }
 
+.Modal {
+    margin-top: 40px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: auto;
+    width: max-content;
+    position: relative;
+}
+
+.Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(39, 39, 39, 0.75);
+}
+
 .adminAchievesTableContainer {
     /*box-shadow: 0 3px 5px rgba(0,0,0,0.2);*/
     background-color: white;
 }
+
 
 .commentContainer {
     margin: 0px !important;

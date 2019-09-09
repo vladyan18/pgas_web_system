@@ -14,6 +14,19 @@ class AchievesTable extends Component {
         this.handleCommentChange = this.handleCommentChange.bind(this)
     };
 
+    charsFormatter = (cell, row) =>
+        (
+            <div style={{"display": "flex", 'flex-wrap': "wrap", "max-width": "20rem"}}>
+                {row.chars.map((x) => {
+                    let str = x;
+                    if (str.length > 35) {
+                        str = x.substr(0, 15) + '...' + x.substr(x.length - 15, 15)
+                    }
+                    return (<div className="charsItem">{str}</div>)
+                })}
+            </div>
+        );
+
     newComments = {};
     commentsFormatter = (cell, row) =>
         (
@@ -61,10 +74,15 @@ class AchievesTable extends Component {
         text: 'Достижение'
     }, {
         dataField: 'chars',
-        text: 'Хар-ки'
+        isDummyField: true,
+        text: 'Хар-ки',
+        formatter: this.charsFormatter,
     }, {
         dataField: 'achDate',
-        text: 'Дата'
+        text: 'Дата',
+        formatter: (cell, row) => (<>
+            {row.achDate && <>{getDate(row.achDate)}</>}
+        </>),
     }, {
         dataField: 'status',
         text: 'Статус'
@@ -125,7 +143,8 @@ class AchievesTable extends Component {
 
 
     edit(e, id) {
-
+        this.props.openModal(id);
+        e.stopPropagation()
     }
 
     handleCommentChange(e, id) {
@@ -141,10 +160,16 @@ class AchievesTable extends Component {
         return (
             <div className="adminAchievesTableContainer">
                 <BootstrapTable keyField='_id' data={this.props.data} columns={this.columns}
-                                rowClasses={this.rowClasses}></BootstrapTable>
+                                rowClasses={this.rowClasses}/>
             </div>
         )
     }
+}
+
+function getDate(d) {
+    if (!d) return undefined;
+    d = new Date(d);
+    return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + "." + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + "." + d.getFullYear();
 }
 
 export default withRouter(AchievesTable)

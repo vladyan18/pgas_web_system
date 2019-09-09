@@ -53,6 +53,9 @@ class UserAddAchievement extends Component {
         res.crit = this.state.chars[0];
 
         res.chars = this.state.chars;
+        console.log(this.state.dateValue);
+        if (this.state.dateValue && this.state.dateValue != '')
+            res.achDate = makeDate(this.state.dateValue);
 
         res.achievement = this.state.ach;
 
@@ -140,6 +143,12 @@ class UserAddAchievement extends Component {
                 </div>
             </div>)
     }
+}
+
+function makeDate(d) {
+    if (!d) return undefined;
+    let date = d.split('.');
+    return new Date(date[2] + '-' + date[1] + '-' + date[0])
 }
 
 export default withRouter(UserAddAchievement)
