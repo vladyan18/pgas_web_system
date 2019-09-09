@@ -17,7 +17,13 @@ module.exports.setUser = async function(req,res){
 
 module.exports.setAdmin = async function(req,res){
     await db.ChangeRole(req.body.Id, true);
-    res.sendStatus(200)
+    res.status(200).send({})
+};
+
+module.exports.createAdmin = async function (req, res) {
+    let User = req.body;
+    await db.createUser(User);
+    res.status(200).send({ok: true})
 };
 
 module.exports.getAdmins = async function (req,res){
@@ -32,7 +38,7 @@ module.exports.getAdmins = async function (req,res){
 
 module.exports.dynamic = async function (req, res) {
     let info = [];
-    let Users = await db.NewUsers();
+    let Users = await db.NewUsers(req.query.faculty);
     for (let user of Users) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
@@ -186,7 +192,7 @@ module.exports.toggleHide = async function (req, res) {
 
 module.exports.Checked = async function (req, res) {
     let info = [];
-    let Users = await db.CurrentUsers();
+    let Users = await db.CurrentUsers(req.query.faculty);
     for (let user of Users) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
@@ -239,7 +245,7 @@ module.exports.getUser = async function (req, res) {
 module.exports.getRating = async function (req, res) {
     let kri = JSON.parse(JSON.stringify(Kri));
     let users = [];
-    let Users = await db.CurrentUsers();
+    let Users = await db.CurrentUsers(req.query.faculty);
   for (let user of Users) {
       let sumBall = 0;
       let crits = {};

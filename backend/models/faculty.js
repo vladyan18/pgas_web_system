@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const connection = require('../config/db');
 
 const facultySchema = mongoose.Schema({
-  id: String,
   Name: String,
     OfficialName: String,
     DirName: String,

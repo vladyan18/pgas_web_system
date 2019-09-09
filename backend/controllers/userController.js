@@ -35,11 +35,13 @@ module.exports.dynamic = async function (req, res) {
  * @function getProfile
  * */
 module.exports.getProfile = async function (req, res) {
+    let User;
     if (req.user._json.email)
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
 
     res.status(200).send({
+        id: User.id,
         LastName: User.LastName,
         FirstName: User.FirstName,
         Patronymic: User.Patronymic,
@@ -51,11 +53,8 @@ module.exports.getProfile = async function (req, res) {
 };
 
 module.exports.getRights = async function (req, res) {
-    if (req.user._json.email)
-        User = await db.getUserRole(req.user._json.email);
-    else User = await db.getUserRole(req.user.user_id);
-
-    res.status(200).send({id: User._id, Role: User.Role})
+    let User = await db.getUserRights(req.query.id);
+    res.status(200).send({Role: User.Role, Rights: User.Rights})
 };
 
 module.exports.isAuth = async function (req, res) {

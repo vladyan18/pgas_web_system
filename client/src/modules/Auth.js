@@ -17,7 +17,6 @@ class Auth {
         });
         resp.json().then((x) => {
             userPersonalStore.Role = x.role;
-            userPersonalStore.Rights = x.rights;
             console.log('CUR ROLE: ' + userPersonalStore.Role, x)
         });
         localStorage.setItem('auth', (resp.status === 200).toString());

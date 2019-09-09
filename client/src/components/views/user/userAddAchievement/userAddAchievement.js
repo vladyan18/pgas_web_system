@@ -3,18 +3,21 @@ import '../../../../style/add_portfolio.css';
 import CriteriasForm from './criteriasForm';
 import CriteriasStore from '../../../../stores/criteriasStore'
 import {withRouter} from "react-router";
+import AchievementDateInput from "../../../AchievementDateInput";
 
 
 class UserAddAchievement extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {isDateValid: false, dateValidationResult: true};
         this.updateDescr = this.updateDescr.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
         this.sendKrit = this.sendKrit.bind(this);
-        this.state = {}
+        this.updateChars = this.updateChars.bind(this)
     }
 
-    updateChars = (value) => {
+    updateChars(value) {
         let st = this.state;
         st.chars = value;
         this.setState(st);
@@ -27,12 +30,25 @@ class UserAddAchievement extends Component {
     }
 
     isValid() {
-        if (this.state)
-            return this.state.chars;
-        else return false
+        return (this.state && this.state.chars)
+    }
+
+    handleDateChange(isValid, value) {
+        let st = this.state;
+        st.isDateValid = isValid;
+        st.dateValidationResult = isValid;
+        st.dateValue = value;
+        this.setState(st);
     }
 
     sendKrit() {
+        if (!this.state.isDateValid && this.state.chars[0] != '1 (7а)') {
+            let st = this.state;
+            st.dateValidationResult = false;
+            this.setState(st);
+            return
+        }
+        if (!this.state.ach && this.state.chars[0] != '1 (7а)') return;
         let res = {};
         res.crit = this.state.chars[0];
 
@@ -76,11 +92,30 @@ class UserAddAchievement extends Component {
                     </form>
                     <div className="show_hide_c11">
                     </div>
-                    <form id="textForm">
+                    {(this.state.chars && this.state.chars[0] != '1 (7а)') && <form id="textForm">
                     <textarea className="form-control area_text" name="comment"
                               placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
-                              required onChange={this.updateDescr}></textarea>
-                    </form>
+                              required onChange={this.updateDescr}/>
+
+
+                        <div className="form-group" style={{"display": "flex", "marginTop": "1rem"}}>
+                            <label
+                                htmlFor="Date" style={{"marginTop": "auto", "marginRight": "0.5rem"}}
+                                className="control-label col-xs-2">Дата достижения: </label>
+                            <div id="Date" style={{
+                                "display": "flex",
+                                "align-items": "center",
+                                "marginTop": "auto",
+                                "margin-bottom": "auto"
+                            }}>
+                                <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
+                                                      updater={this.handleDateChange}/>
+                            </div>
+                        </div>
+
+                    </form>}
+
+
                     <br/>
 
                     <div className="input-group" style={{'display': 'none'}}>

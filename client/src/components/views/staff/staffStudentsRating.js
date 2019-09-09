@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
-import criteriasStore from "../../../stores/criteriasStore";
+import staffContextStore from "../../../stores/staff/staffContextStore";
 
 class StaffStudentsRating extends Component {
     constructor(props) {
         super(props);
 
         let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '10в', '11а', '11б', '11в'];
-        let crits = Object.keys(criteriasStore.criterias);
+        let crits = Object.keys(staffContextStore.criterias);
         for (let i = 0; i < crits.length; i++) {
             this.columns.push({
                 dataField: "Crits." + crits[i] + "",

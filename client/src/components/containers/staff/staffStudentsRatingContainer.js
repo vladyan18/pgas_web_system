@@ -3,6 +3,7 @@ import '../../../style/user_main.css';
 import {observer} from "mobx-react";
 import StaffStudentsRating from "../../views/staff/staffStudentsRating";
 import CurrentContestRatingStore from "../../../stores/staff/currentContestRatingStore";
+import staffContextStore from "../../../stores/staff/staffContextStore";
 
 class StaffStudentsContainer extends Component {
     constructor(props) {
@@ -15,7 +16,7 @@ class StaffStudentsContainer extends Component {
     }
 
     getUsers() {
-        CurrentContestRatingStore.update()
+        CurrentContestRatingStore.update(staffContextStore.faculty).then()
     }
 
     render() {

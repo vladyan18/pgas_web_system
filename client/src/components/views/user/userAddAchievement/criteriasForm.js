@@ -8,6 +8,7 @@ export default class CriteriasForm extends Component {
     constructor(props) {
         super(props);
         this.handleSelect = this.handleSelect.bind(this);
+
         if (!this.props.values) {
             this.state = {selects: [], length: 1, crit: '1 (7а)', values: []};
             this.props.valuesCallback(['1 (7а)'])
@@ -70,7 +71,7 @@ export default class CriteriasForm extends Component {
         let keys = Object.keys(crit);
         console.log('S: ' + state.values);
         if (isNaN(Number(crit[keys[0]]))) {
-            this.props.valuesCallback(null);
+            this.props.valuesCallback(state.values);
             state.selects.push({id: id, num: state.length + 1, value: '', options: Object.keys(crit)});
             state.length += 1
 
@@ -133,7 +134,7 @@ export default class CriteriasForm extends Component {
                 <div>
                     <DescriptionToTermin values={item.options}/>
                     <select className="form-control selectors" required key={item.id} id={item.num.toString()}
-                            defaultValue={item.value} f onChange={this.handleSelect}>
+                            defaultValue={item.value} onChange={this.handleSelect}>
                         <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
                             <option value={option}>

@@ -1,19 +1,12 @@
 import {decorate, observable} from 'mobx';
+import {fetchGet} from "../../services/fetchService";
 
 class CurrentContestRatingStore {
     users = [];
 
-    update() {
-        fetch("/api/getRating", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((data) => {
-                this.users = data.Users;
-                console.log('USERS ' + JSON.stringify(data.Users))
-            })
-            .catch((error) => console.log(error))
+    async update(facultyName) {
+        let result = await fetchGet("/api/getRating", {faculty: facultyName});
+        this.users = result.Users
     }
 
     constructor() {

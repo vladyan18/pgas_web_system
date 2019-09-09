@@ -231,6 +231,8 @@ router.post('/setUser', adminAuth, adminController.setUser);
  */
 router.post('/setAdmin', adminAuth, adminController.setAdmin);
 
+router.post('/createAdmin', superAdminAuth, adminController.createAdmin);
+
 /**
  * Get current candidates for admin
  * @name checked
@@ -238,6 +240,8 @@ router.post('/setAdmin', adminAuth, adminController.setAdmin);
  * @auth adminAuth required
  */
 router.get('/checked', adminAuth, adminController.Checked);
+
+router.get('/getFacultiesList', auth, facultyController.getFacultiesList);
 
 router.get('/getFaculty', auth, facultyController.getFaculty);
 
@@ -302,6 +306,8 @@ router.get('/getResultTable', adminAuth, docxController.getResultTable);
 router.get('/getHistory', adminAuth, historyController.GetHistory);
 
 router.post('/uploadCriterias', criteriasController.upload);
+
+router.post('/saveCriterias', superAdminAuth, criteriasController.saveCriteriasForFaculty);
 
 router.get('/getCriterias', criteriasController.getCriterias);
 

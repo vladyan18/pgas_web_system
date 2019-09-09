@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router";
+import {fetchSendWithoutRes} from "../../../../services/fetchService";
 
 class AchievesTable extends Component {
 
@@ -10,7 +11,27 @@ class AchievesTable extends Component {
         this.accept = this.accept.bind(this);
         this.decline = this.decline.bind(this);
         this.edit = this.edit.bind(this);
+        this.handleCommentChange = this.handleCommentChange.bind(this)
     };
+
+    newComments = {};
+    commentsFormatter = (cell, row) =>
+        (
+            <div className="input-group commentContainer" onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget))
+                    document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
+            }}>
+            <textarea id={row._id} className={"form-control" + (row.comment ? " commentSended" : "")}
+                      defaultValue={row.comment}
+                      onChange={(e) => this.newComments[row._id] = e.target.value}></textarea>
+                <div className="input-group-append" style={{"marginRight": "0px"}}>
+                    <button class="btn btn-info" style={{"font-size": "x-small", "margin": "0px"}} onClick={(e) => {
+                        this.handleCommentChange(e, row._id)
+                    }}>Ок
+                    </button>
+                </div>
+            </div>
+        );
 
     actionsFormatter = (cell, row) => (
         <div style={{"display": "block"}}>
@@ -48,8 +69,11 @@ class AchievesTable extends Component {
         dataField: 'status',
         text: 'Статус'
     }, {
-        dataField: 'comment',
-        text: 'Комментарий'
+        dataField: 'comments',
+        text: 'Комментарий',
+        isDummyField: true,
+        csvExport: false,
+        formatter: this.commentsFormatter,
     }, {
         dataField: 'actions',
         text: '',
@@ -60,7 +84,11 @@ class AchievesTable extends Component {
     ];
 
     rowClasses = (row, rowIndex) => {
-        return '';
+        if (row.status == 'Отказано')
+            return 'declined-row';
+        if (row.status == 'Принято')
+            return 'accepted-row';
+        else return ''
     };
 
     accept(e, id) {
@@ -100,11 +128,21 @@ class AchievesTable extends Component {
 
     }
 
+    handleCommentChange(e, id) {
+        document.getElementById(id).defaultValue = this.newComments[id];
+        console.log(this.newComments[id]);
+        fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then(
+            this.props.updater()
+        );
+        e.preventDefault()
+    }
+
     render() {
         return (
-            <BootstrapTable keyField='_id' data={this.props.data} columns={this.columns}
-                            rowClasses={this.rowClasses}></BootstrapTable>
-
+            <div className="adminAchievesTableContainer">
+                <BootstrapTable keyField='_id' data={this.props.data} columns={this.columns}
+                                rowClasses={this.rowClasses}></BootstrapTable>
+            </div>
         )
     }
 }

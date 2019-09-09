@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import Dropzone from 'react-dropzone';
 import CriteriasTableViewer from "./criteriasTableViewer";
+import {fetchSendObj} from "../../../../services/fetchService";
+import staffContextStore from "../../../../stores/staff/staffContextStore";
 
 class CriteriasMenu extends Component {
     constructor(props) {
@@ -12,12 +14,14 @@ class CriteriasMenu extends Component {
             st.file = file[0];
             this.setState(st)
         };
-        this.uploadCrits = this.uploadCrits.bind(this)
+        this.uploadCrits = this.uploadCrits.bind(this);
+        this.saveCrits = this.saveCrits.bind(this)
     };
 
     uploadCrits() {
         let data = new FormData();
         data.append('file', this.state.file, this.state.file.name);
+        data.append('faculty', 'ПМ-ПУ');
 
         fetch('/api/uploadCriterias', {
             method: 'POST',
@@ -30,6 +34,17 @@ class CriteriasMenu extends Component {
                 st.criterias = success;
                 console.log(st.criterias.schema);
                 this.setState(st)
+                // Do something with the successful response
+
+            })
+            .catch(error => console.log(error)
+            );
+    }
+
+    saveCrits() {
+        fetchSendObj('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
+            .then(success => {
+                console.log('SAVE CR', success);
                 // Do something with the successful response
 
             })
@@ -65,8 +80,18 @@ class CriteriasMenu extends Component {
                                             {this.state.file.name} - {this.state.file.size} bytes
                                         </li>}
                                         </ul>
-                                        <button className="btn btn-warning" onClick={this.uploadCrits}>загрузить
-                                        </button>
+                                        <div style={{
+                                            "display": "flex",
+                                            "justifyContent": "space-between",
+                                            "width": "100%"
+                                        }}>
+                                            <button className="btn btn-warning" onClick={this.uploadCrits}>загрузить
+                                            </button>
+                                            {this.state.criterias &&
+                                            <button className="btn btn-success"
+                                                    onClick={this.saveCrits}>сохранить</button>}
+                                        </div>
+
                                     </aside>
                                 </section>
 

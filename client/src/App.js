@@ -8,6 +8,7 @@ import {Switch} from "react-router-dom";
 import Staff from "./components/staff";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
+import "./setupProxy"
 
 
 class App extends Component {

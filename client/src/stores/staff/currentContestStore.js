@@ -1,18 +1,12 @@
 import {decorate, observable} from 'mobx';
+import {fetchGet} from "../../services/fetchService";
 
 class CurrentContestStore {
     users = [];
 
-    update() {
-        fetch("/api/checked", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((data) => {
-                this.users = data.Info
-            })
-            .catch((error) => console.log(error))
+    async update(facultyName) {
+        let result = await fetchGet("/api/checked", {faculty: facultyName});
+        this.users = result.Info
     }
 
     constructor() {

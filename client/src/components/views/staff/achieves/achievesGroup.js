@@ -62,7 +62,9 @@ class AchievesGroup extends Component {
             <div>
                 {this.state &&
                 <div className="name">
-                    <div style={{"width": "100%", "text-align": "center"}} className="input-group">
+                    <div>
+                        <div style={{"width": "100%", "text-align": "center", "height": "auto",}}
+                             className="input-group headerContainer">
                         <div className={"nameHeader" + (this.props.item.IsInRating ? " inRating" : '')}
                              style={{"text-align": "center"}}>
                             <i className={"fas fa-chevron-" + (this.state.hidden ? "right" : "down") + " mychevron"}
@@ -78,8 +80,7 @@ class AchievesGroup extends Component {
                                 {this.props.item.IsInRating ? "Убрать из рейтинга" : 'Добавить в рейтинг'}</button>
                         </div>
                     </div>
-                    <div></div>
-                    <div className="cover"></div>
+                    </div>
                     {!this.state.hidden && <div className="block">
 
                         <NewAchievesTable data={this.props.item.Achievements} updater={this.props.updater}/>

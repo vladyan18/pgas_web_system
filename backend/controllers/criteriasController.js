@@ -8,7 +8,7 @@ const anketPath = path.join(__dirname, '..');
 const xlsx = require('xlsx');
 
 
-module.exports.upload = function (req, res) {
+module.exports.upload = async function (req, res) {
 
 
     if (!req.isAuthenticated() || req.user.Role != 'SuperAdmin') return res.sendStatus(404);
@@ -16,7 +16,7 @@ module.exports.upload = function (req, res) {
         fs.mkdirSync(uploadsPath)
     }
 
-    upload(req, res, function (err) {
+    upload(req, res, async function (err) {
         //try {
         if (err) {
             return res.status(400).send('ERROR: Max file size = 15MB')
@@ -36,12 +36,19 @@ module.exports.upload = function (req, res) {
     })
 };
 
+module.exports.saveCriteriasForFaculty = async function (req, res) {
+    await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
+    return res.sendStatus(200)
+};
+
 module.exports.getCriterias = async function (req, res) {
     try {
-        let criterias, schema = await db.GetCriterias(req.query.facultyId);
-        res.status(200).send({criterias: criterias, schema: schema})
+        let criterias = await db.GetCriterias(req.query.faculty);
+        if (criterias)
+            res.status(200).send(criterias.Crits);
+        else res.status(404).send({})
     } catch (e) {
-        res.status(500).send(err)
+        res.status(500).send(e)
     }
 };
 
@@ -160,15 +167,22 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     } else lastCritInfo = {row: globalCategoryRowIndex, crit: getCellValue(globalCategoryRowIndex, 1, sheet)};
 
     let currentColumnIndex = 1;
-    let globalCategoryLastIndex = 1;
+    let globalCategoryLastIndex = lastCritInfo.row;
+    let globalCategoryLastName = lastCritInfo.crit.toString().replace(/\s+/g, ' ');
     let leftColumnIndex = columnIndex;
     while (currentColumnIndex < (columnIndex - 1)) { //поиск критериев горизонтали
         let mergedRowIndex = rowIndex;
         while (mergedRowIndex > globalCategoryLastIndex && isCellUndefined(mergedRowIndex, currentColumnIndex, sheet)) {
             mergedRowIndex -= 1
         }
-        if (globalCategoryLastIndex < mergedRowIndex)
+        let critName = getCellValue(mergedRowIndex, currentColumnIndex, sheet);
+
+        if (globalCategoryLastIndex < mergedRowIndex && (globalCategoryLastName != critName.toString().replace(/\s+/g, ' '))) {
+            if (mergedRowIndex > globalCategoryLastIndex && mergedRowIndex > 247 && mergedRowIndex < 259)
+                globalCategoryLastName = critName;
             globalCategoryLastIndex = mergedRowIndex;
+        } else if (globalCategoryLastIndex > mergedRowIndex) mergedRowIndex = globalCategoryLastIndex;
+
         if (!isCellUndefined(mergedRowIndex, currentColumnIndex, sheet) && !isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
             let text = getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' ');
             categoryList.push(text);
@@ -261,7 +275,7 @@ function parseCrits(sheet) {
 
     const end = new Date().getTime();
     console.log('SecondWay: ' + (end - start).toString() + ' ms');
-    return JSON.stringify({crits: Table, schema: Schema})
+    return {crits: Table, schema: Schema}
 
 }
 

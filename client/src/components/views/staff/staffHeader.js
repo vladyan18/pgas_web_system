@@ -6,16 +6,30 @@ import {observer} from "mobx-react";
 import {withRouter} from "react-router";
 import Dropdown from "react-bootstrap/Dropdown"
 import DropdownButton from "react-bootstrap/DropdownButton"
+import staffContextStore from "../../../stores/staff/staffContextStore";
+import staffNewAchievementsStore from "../../../stores/staff/staffNewAchievementsStore";
+import currentContestStore from "../../../stores/staff/currentContestStore";
+import currentContestRatingStore from "../../../stores/staff/currentContestRatingStore";
 
 class StaffHeader extends Component {
     constructor(props) {
         super(props);
         this.switchToUser = this.switchToUser.bind(this);
         this.goToMenu = this.goToMenu.bind(this);
+        this.switchFaculty = this.switchFaculty.bind(this)
     };
 
     switchToUser() {
         this.props.history.push('/home');
+    }
+
+    switchFaculty(faculty, event) {
+        event.preventDefault();
+        staffContextStore.changeFaculty(faculty).then();
+        staffNewAchievementsStore.update(faculty).then();
+        currentContestStore.update(faculty).then();
+        currentContestRatingStore.update(faculty).then()
+
     }
 
     goToMenu() {
@@ -43,9 +57,9 @@ class StaffHeader extends Component {
                                 Меню
                             </button>
                         </div>
-                        <DropdownButton variant="warning" title="ПМ-ПУ">
+                        <DropdownButton variant="warning" title={staffContextStore.faculty}>
                             {userPersonalStore.Rights && userPersonalStore.Rights.map((x) => (
-                                <Dropdown.Item key={x}>{x}</Dropdown.Item>
+                                <Dropdown.Item key={x} onClick={e => this.switchFaculty(x, e)}>{x}</Dropdown.Item>
                             ))
                             }
                         </DropdownButton>

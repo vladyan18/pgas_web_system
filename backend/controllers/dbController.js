@@ -1,4 +1,5 @@
 
+
 const UserModel = require('../models/user.js');
 const AchieveModel = require('../models/achieve');
 const FacultyModel = require('../models/faculty');
@@ -52,12 +53,12 @@ exports.allUsers = function () {
   return UserModel.find({}).lean()
 };
 
-exports.CurrentUsers = function () {
-    return UserModel.find({IsInRating: true}).lean()
+exports.CurrentUsers = function (faculty) {
+    return UserModel.find({Faculty: faculty, IsInRating: true}).lean()
 };
 
-exports.NewUsers = function () {
-    return UserModel.find().or([{IsInRating: undefined}, {IsInRating: false}])
+exports.NewUsers = function (faculty) {
+    return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
 };
 
 exports.isUser = function(token){
@@ -221,12 +222,28 @@ exports.GetFaculty = async function(Name) {
     return await FacultyModel.findOne({Name: Name});
 };
 
-exports.CreateFaculty = function (Faculty) {
-    return FacultyModel.create(Faculty)
+exports.GetAllFaculties = async function () {
+    return await FacultyModel.find().lean();
 };
 
-exports.GetCriterias = async function (facultyId) {
-    return await CriteriasModel.findOne({FacultyId: facultyId});
+
+exports.CreateFaculty = async function (Faculty) {
+    let superAdmins = await UserModel.find({Role: 'SuperAdmin'});
+    let faculty = await FacultyModel.create(Faculty);
+    for (let superAdmin of superAdmins) {
+        if (!superAdmin.Rights) superAdmin.Rights = [];
+        superAdmin.Rights.push(Faculty.Name);
+        await UserModel.findOneAndUpdate({'_id': superAdmin._id}, {$set: {Rights: superAdmin.Rights}});
+        redis.del(superAdmin.Id + '_user');
+    }
+    return faculty
+};
+
+exports.GetCriterias = async function (facultyName) {
+    let facObject = await FacultyModel.findOne({Name: facultyName});
+    if (facObject.CritsId)
+        return await CriteriasModel.findById(facObject.CritsId, 'Crits');
+    else return undefined
 };
 
 
@@ -250,4 +267,18 @@ exports.GetHistoryNotes = async function () {
 
 exports.createHistoryNote = async function (historyNote) {
     return HistoryNoteModel.create(historyNote)
+};
+
+exports.UploadCriteriasToFaculty = async function (crits, faculty) {
+    console.log('FIND', faculty);
+    let facultyObject = await FacultyModel.findOne({Name: faculty});
+    console.log('FOUND', facultyObject);
+    let critsObject = {};
+    critsObject.Date = Date.now();
+    critsObject.Crits = JSON.stringify(crits.crits);
+    critsObject.CritsSchema = JSON.stringify(crits.schema);
+    critsObject.FacultyId = facultyObject._id.toString();
+
+    critsObject = await CriteriasModel.create(critsObject);
+    await FacultyModel.findOneAndUpdate({Name: faculty}, {$set: {CritsId: critsObject._id.toString()}})
 };

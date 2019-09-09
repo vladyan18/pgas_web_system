@@ -3,6 +3,7 @@ import '../../../style/user_main.css';
 import AchievesUserGroups from "../../views/staff/achieves/achievesUserGroups";
 import staffNewAchievementsStore from "../../../stores/staff/staffNewAchievementsStore";
 import {observer} from "mobx-react";
+import staffContextStore from "../../../stores/staff/staffContextStore";
 
 class NewAchievesContainer extends Component {
     constructor(props) {
@@ -15,7 +16,7 @@ class NewAchievesContainer extends Component {
     }
 
     getAchieves() {
-        staffNewAchievementsStore.update()
+        staffNewAchievementsStore.update(staffContextStore.faculty).then()
     }
 
     render() {

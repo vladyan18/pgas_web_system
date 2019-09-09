@@ -3,6 +3,7 @@ import '../../../style/rating.css';
 import {observer} from "mobx-react";
 import {withRouter} from "react-router";
 import userPersonalStore from "../../../stores/userPersonalStore";
+import staffContextStore from "../../../stores/staff/staffContextStore";
 
 class StaffMenu extends Component {
     constructor(props) {
@@ -74,7 +75,7 @@ class StaffMenu extends Component {
                                 <div className="col ">
                                     <div className="centered menuButtonContainer">
                                         <button type="button" id="SubmitButton"
-                                                className="btn btn-success menuButton"
+                                                className={"btn btn-" + (staffContextStore.criterias ? "success" : "danger") + " menuButton"}
                                                 value="Панель сотрудника" onClick={this.openCriteriasMenu}>
                                             Критерии
                                         </button>
@@ -102,16 +103,28 @@ class StaffMenu extends Component {
                                 <div className="w-100"></div>
                                 {
                                     userPersonalStore.Role == 'SuperAdmin' &&
-                                    <div className="col">
-                                        <div className="centered menuButtonContainer">
-                                            <button type="button" id="SubmitButton"
-                                                    className="btn btn-warning menuButton"
-                                                    value="Панель сотрудника"
-                                                    onClick={() => this.props.history.push('/staff/facultyCreation')}>
-                                                Создать факультет
-                                            </button>
+                                    <>
+                                        <div className="col">
+                                            <div className="centered menuButtonContainer">
+                                                <button type="button" id="SubmitButton"
+                                                        className="btn btn-warning menuButton"
+                                                        value="Панель сотрудника"
+                                                        onClick={() => this.props.history.push('/staff/facultyCreation')}>
+                                                    Создать факультет
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div className="col">
+                                            <div className="centered menuButtonContainer">
+                                                <button type="button" id="SubmitButton"
+                                                        className="btn btn-warning menuButton"
+                                                        value="Панель сотрудника"
+                                                        onClick={() => this.props.history.push('/staff/adminCreation')}>
+                                                    Создать администратора
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
                                 }
                             </div>
                         </div>

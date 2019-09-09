@@ -3,7 +3,7 @@ const connection = require('../config/db');
 
 const criteriasSchema = mongoose.Schema({
     FacultyId: String,
-  Date: Date,
+    Date: Date,
     Crits: String,
     CritsSchema: String
 });

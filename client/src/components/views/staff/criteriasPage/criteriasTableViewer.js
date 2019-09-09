@@ -131,7 +131,6 @@ class CriteriasTableViewer extends Component {
 
 
     bodyTree(crits, schema, label, prevNode, nodesWithLists, deep = 0) {
-        console.log('BT', label, crits instanceof Array, typeof crits, crits);
         if (!(crits instanceof Array)) {
             if (schema.META && schema.META.type == 'r') {
                 let newNode = new treeNode(prevNode, [], label);
@@ -183,7 +182,6 @@ class CriteriasTableViewer extends Component {
     }
 
     getPath(x, headerNodes) {
-        console.log('PATH REQUESTED', x);
         headerNodes.splice(0, 0, x.label);
         if (x.ancestor)
             this.getPath(x.ancestor, headerNodes)
@@ -212,13 +210,10 @@ class CriteriasTableViewer extends Component {
         let schema = this.props.schema;
         let path = [];
         this.getPath(node, path);
-        console.log(path, schema);
         for (let i = 0; i < path.length; i++)
             schema = schema[path[i]];
 
         this.getSubHeaderRows(schema, node.label, 0, headers, spans);
-
-        console.log('SBTH', headers)
 
     }
 
@@ -296,10 +291,8 @@ class CriteriasTableViewer extends Component {
 
     makeTable(crits, schema, label) {
         let root = new treeNode(undefined, [], label);
-        console.log('SCHEMA', schema);
         let nodesWithLists = [];
         this.bodyTree(crits, schema, label, undefined, nodesWithLists);
-        console.log(nodesWithLists);
         let deep = nodesWithLists[0].deep;
         return (
             nodesWithLists.map((node) => {
@@ -316,7 +309,6 @@ class CriteriasTableViewer extends Component {
 
                     const crits = this.props.criterias;
                     const schema = this.props.schema;
-                    console.log(key);
                         return (
                             <>
                                 <h4 style={{
