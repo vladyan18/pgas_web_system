@@ -1,9 +1,11 @@
 
 
+
 const UserModel = require('../models/user.js');
 const AchieveModel = require('../models/achieve');
 const FacultyModel = require('../models/faculty');
 const CriteriasModel = require('../models/criterias');
+const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 
 const redis = require('../config/redis');
@@ -281,4 +283,12 @@ exports.UploadCriteriasToFaculty = async function (crits, faculty) {
 
     critsObject = await CriteriasModel.create(critsObject);
     await FacultyModel.findOneAndUpdate({Name: faculty}, {$set: {CritsId: critsObject._id.toString()}})
+};
+
+exports.createConfirmation = async function (confirmation) {
+    return ConfirmationModel.create(confirmation)
+};
+
+exports.getConfirmByIdForUser = async function (confirmation) {
+    return ConfirmationModel.findById(confirmation)
 };

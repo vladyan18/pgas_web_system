@@ -123,6 +123,10 @@ router.post('/comment', adminAuth, adminController.Comment);
  */
 router.post('/add_achieve', auth, userController.addAchieve);
 
+router.post('/add_file_for_confirmation', auth, userController.addFileForConfirmation);
+
+router.post('/add_confirmation', auth, userController.addConfirmation);
+
 /**
  * Change achievement
  * @name update_achieve
@@ -310,5 +314,7 @@ router.post('/uploadCriterias', criteriasController.upload);
 router.post('/saveCriterias', superAdminAuth, criteriasController.saveCriteriasForFaculty);
 
 router.get('/getCriterias', criteriasController.getCriterias);
+
+router.get('/getConfirm/*', auth, userController.getConfirmation);
 
 module.exports = router;

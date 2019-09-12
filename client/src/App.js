@@ -40,6 +40,11 @@ class App extends Component {
             Auth.isUserAuthenticated() ?
                 <Switch>
                     <Route path="/staff/" component={Staff}/>
+                    <Route path="/api/getConfirm/:id" component={(props) => {
+                        let id = props.match.params.id;
+                        window.location.href = 'http://localhost/getConfirm/' + id;
+                        return null;
+                    }}/>
                     <Route path="/" component={User}/>
                 </Switch>
                 :

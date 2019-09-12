@@ -4,6 +4,7 @@ import CriteriasForm from './criteriasForm';
 import CriteriasStore from '../../../../stores/criteriasStore'
 import {withRouter} from "react-router";
 import AchievementDateInput from "../../../AchievementDateInput";
+import ConfirmationForm from "../userConfirmation/ConfirmationForm";
 
 
 class UserAddAchievement extends Component {
@@ -14,7 +15,8 @@ class UserAddAchievement extends Component {
         this.updateDescr = this.updateDescr.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.sendKrit = this.sendKrit.bind(this);
-        this.updateChars = this.updateChars.bind(this)
+        this.updateChars = this.updateChars.bind(this);
+        this.updateConfirmations = this.updateConfirmations.bind(this);
     }
 
     updateChars(value) {
@@ -22,6 +24,12 @@ class UserAddAchievement extends Component {
         st.chars = value;
         this.setState(st);
     };
+
+    updateConfirmations(confirms) {
+        let st = this.state;
+        st.confirmations = confirms;
+        this.setState(st);
+    }
 
     updateDescr(e) {
         let st = this.state;
@@ -58,6 +66,11 @@ class UserAddAchievement extends Component {
             res.achDate = makeDate(this.state.dateValue);
 
         res.achievement = this.state.ach;
+
+        res.confirmations = [];
+        for (let i = 0; i < this.state.confirmations.length; i++) {
+            res.confirmations.push(this.state.confirmations[i]._id)
+        }
 
         let form = document.forms.namedItem('fileinfo');
         let oData = new FormData(form);
@@ -120,6 +133,7 @@ class UserAddAchievement extends Component {
 
 
                     <br/>
+                    <ConfirmationForm updateForm={this.updateConfirmations}/>
 
                     <div className="input-group" style={{'display': 'none'}}>
                             <span className="input-group-btn">

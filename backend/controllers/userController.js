@@ -5,11 +5,13 @@
 const path = require('path');
 const passport = require(path.join(__dirname, '../config/passport'));
 const upload = require(path.join(__dirname, '../config/multer'));
+const uploadConfirmation = require(path.join(__dirname, '../config/confirmationMulter'));
 const db = require('./dbController');
 const fs = require('fs');
 
 
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
+const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
 
 /**
  * Get all new canditates
@@ -22,8 +24,23 @@ module.exports.dynamic = async function (req, res) {
 
     achPr = db.findAchieves(id);
 
-    db.findUserById(id).then((User) => {
-        achPr.then((v) => {
+    db.findUserById(id).then((User) => { // TODO OPTIMIZE
+        achPr.then(async (v) => {
+
+
+            for (let i = 0; i < v.length; i++) {
+                let confirms = [];
+                console.log('1', confirms);
+                if (v[i].confirmations)
+                    for (let j = 0; j < v[i].confirmations.length; j++) {
+
+                        let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j]);
+                        confirms.push(confirm)
+                    }
+                console.log('2', confirms);
+                v[i].confirmations = confirms
+            }
+
             User.Achs = v;
             res.status(200).send(User)
         })
@@ -75,7 +92,15 @@ module.exports.isAuth = async function (req, res) {
  * */
 module.exports.getAch = async function (req, res) {
     id = req.query.achievement;
-    res.status(200).send( await db.findAchieveById(id))
+    let ach = await db.findAchieveById(id);
+    let confirms = [];
+
+    for (let i = 0; i < ach.confirmations.length; i++) {
+        let confirm = await db.getConfirmByIdForUser(ach.confirmations[i]);
+        confirms.push(confirm)
+    }
+    ach.confirmations = confirms;
+    res.status(200).send(ach)
 };
 
 /**
@@ -99,6 +124,48 @@ module.exports.registerUser = async function (req, res) {
         console.log(err);
         res.status(500).send(err)
     }
+};
+
+module.exports.addConfirmation = function (req, res) {
+    let data = req.body;
+    data.Date = Date.now();
+    db.createConfirmation(data).then(
+        (result) => {
+            res.status(200).send(result)
+        }
+    )
+};
+
+module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
+    let filename = await req.url.slice(12);
+    let filePath = path.join(__dirname, '../static/confirmations/' + filename);
+    res.sendFile(filePath)
+};
+
+module.exports.addFileForConfirmation = function (req, res) {
+
+    if (!fs.existsSync(uploadsConfirmationsPath)) {
+        fs.mkdirSync(uploadsConfirmationsPath)
+    }
+
+    uploadConfirmation(req, res, async function (err) {
+
+        if (err) {
+            return res.status(400).send('ERROR: Max file size = 15MB')
+        }
+
+        let confirmation = JSON.parse(req.body.data);
+        console.log(req.file);
+        confirmation.FilePath = req.file.path;
+        confirmation.Data = 'http://localhost:3000/api/getConfirm/' + req.file.filename;
+        confirmation.Date = Date.now();
+        db.createConfirmation(confirmation).then(
+            (result) => {
+                result.FilePath = undefined;
+                res.status(200).send(result)
+            }
+        )
+    })
 };
 
 /**

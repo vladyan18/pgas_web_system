@@ -47,6 +47,8 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({extended: false}));
 
 app.use(express.static(path.join(frontendPath, '/public')));
+app.use(express.static(path.join(__dirname, '/static/confirmations')));
+
 if (process.env.ENV_T == 'production') {
     sess.cookie.secure = true;
 }

@@ -4,6 +4,7 @@ import CriteriasStore, {fetchSendWithoutRes} from '../../../../stores/criteriasS
 import CriteriasForm from "../userAddAchievement/criteriasForm";
 import {withRouter} from "react-router";
 import AchievementDateInput from "../../../AchievementDateInput";
+import ConfirmationForm from "../userConfirmation/ConfirmationForm";
 
 
 class EditAchievement extends Component {
@@ -21,7 +22,8 @@ class EditAchievement extends Component {
                 ach: this.props.achieves.filter((x) => x._id == this.props.achId)[0].achievement,
                 isDateValid: false,
                 dateValidationResult: true,
-                achDate: getDate(this.props.achieves.filter((x) => x._id == this.props.achId)[0].achDate)
+                achDate: getDate(this.props.achieves.filter((x) => x._id == this.props.achId)[0].achDate),
+                confirmations: this.props.achieves.filter((x) => x._id == this.props.achId)[0].confirmations
             }
     }
 
@@ -126,10 +128,14 @@ class EditAchievement extends Component {
                         }}>
                             <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
                                                   updater={this.handleDateChange} defaultValue={this.state.achDate}/>
+
                         </div>
                     </div>
 
                 </form>}
+
+                <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations}/>
+
                 <br/>
 
                 <div className="input-group" style={{'display': 'none'}}>
