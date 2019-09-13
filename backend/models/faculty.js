@@ -6,7 +6,8 @@ const facultySchema = mongoose.Schema({
     OfficialName: String,
     DirName: String,
   AdditionStopped: Boolean,
-  CritsId: String
+    CritsId: String,
+    AnnotationsToCritsId: String
 });
 
 const Faculty = connection.model('Faculty', facultySchema);

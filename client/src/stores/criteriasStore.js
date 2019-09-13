@@ -5,6 +5,13 @@ export * from '../services/fetchService'
 
 class CriteriasStore {
     criterias;
+    annotations;
+    schema;
+
+    async getAnnotations(facultyName) {
+        let result = await fetchGet('/api/getAnnotations', {faculty: facultyName});
+        this.annotations = result
+    }
 
     getCriteriasForFaculty(facultyName) {
         fetchGet('/api/getCriterias', {faculty: facultyName}).then((result) => {
@@ -19,7 +26,9 @@ class CriteriasStore {
 }
 
 decorate(CriteriasStore, {
-    criterias: observable
+    criterias: observable,
+    annotations: observable,
+    schema: observable
 });
 
 export default new CriteriasStore();

@@ -7,18 +7,19 @@ const FacultyModel = require('../models/faculty');
 const CriteriasModel = require('../models/criterias');
 const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
+const AnnotationsModel = require('../models/annotation');
 
 const redis = require('../config/redis');
 var ObjectId = require('mongoose').Types.ObjectId;
 
-exports.findUserById = function (id) {
-    return redis.getAsync(id + '_user').then(async (res) => {
-        if (!res) {
+exports.findUserById = async function (id) {
+    //return redis.getAsync(id + '_user').then(async (res) => {
+    // if (!res) {
             res = await UserModel.findOne({id: id}).lean();
-            if (res) redis.setAsync(id + '_user', JSON.stringify(res))
-        } else res = JSON.parse(res);
+    // if (res) redis.setAsync(id + '_user', JSON.stringify(res))
+    // } else res = JSON.parse(res);
         return res
-    })
+    //})
 
 };
 
@@ -246,6 +247,28 @@ exports.GetCriterias = async function (facultyName) {
     if (facObject.CritsId)
         return await CriteriasModel.findById(facObject.CritsId, 'Crits');
     else return undefined
+};
+
+exports.GetCriteriasAndSchema = async function (facultyName) {
+    let facObject = await FacultyModel.findOne({Name: facultyName});
+    if (facObject.CritsId)
+        return await CriteriasModel.findById(facObject.CritsId, 'Crits CritsSchema');
+    else return undefined
+};
+
+exports.UploadAnnotationsToFaculty = async function (annotations, facultyName) {
+    let facObject = await FacultyModel.findOne({Name: facultyName});
+    let annObj = {Date: Date.now(), AnnotationsToCrits: annotations, FacultyId: facObject._id};
+    annObj = await AnnotationsModel.create(annObj);
+    await FacultyModel.findByIdAndUpdate(facObject._id, {$set: {AnnotationsToCritsId: annObj._id.toString()}});
+    return annObj
+};
+
+exports.GetAnnotationsForFaculty = async function (facultyName) {
+    let facObject = await FacultyModel.findOne({Name: facultyName});
+    console.log('FACULTY NAME', facultyName);
+    annObj = await AnnotationsModel.findById(facObject.AnnotationsToCritsId);
+    return annObj
 };
 
 

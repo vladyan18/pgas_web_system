@@ -75,8 +75,10 @@ class StaffMenu extends Component {
                                 <div className="col ">
                                     <div className="centered menuButtonContainer">
                                         <button type="button" id="SubmitButton"
-                                                className={"btn btn-" + (staffContextStore.criterias ? "success" : "danger") + " menuButton"}
-                                                value="Панель сотрудника" onClick={this.openCriteriasMenu}>
+                                                className={"btn btn-success menuButton"}
+                                                value="Панель сотрудника" onClick={() => {
+                                            this.props.history.push('/staff/criteriasPage')
+                                        }}>
                                             Критерии
                                         </button>
                                     </div>
@@ -121,6 +123,15 @@ class StaffMenu extends Component {
                                                         value="Панель сотрудника"
                                                         onClick={() => this.props.history.push('/staff/adminCreation')}>
                                                     Создать администратора
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="col ">
+                                            <div className="centered menuButtonContainer">
+                                                <button type="button" id="SubmitButton"
+                                                        className={"btn btn-" + (staffContextStore.criterias ? "warning" : "danger") + " menuButton"}
+                                                        value="Панель сотрудника" onClick={this.openCriteriasMenu}>
+                                                    Загрузка критериев
                                                 </button>
                                             </div>
                                         </div>

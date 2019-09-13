@@ -36,6 +36,18 @@ module.exports.upload = async function (req, res) {
     })
 };
 
+module.exports.UploadAnnotationsToFaculty = async function (req, res) {
+    let annotations = await db.UploadAnnotationsToFaculty(req.body.annotations, req.body.faculty);
+    return res.sendStatus(200)
+};
+
+module.exports.GetAnnotationsForFaculty = async function (req, res) {
+    let annotations = await db.GetAnnotationsForFaculty(req.query.faculty);
+    if (annotations)
+        return res.status(200).send(annotations.AnnotationsToCrits);
+    else return res.sendStatus(404)
+};
+
 module.exports.saveCriteriasForFaculty = async function (req, res) {
     await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
     return res.sendStatus(200)
@@ -46,6 +58,17 @@ module.exports.getCriterias = async function (req, res) {
         let criterias = await db.GetCriterias(req.query.faculty);
         if (criterias)
             res.status(200).send(criterias.Crits);
+        else res.status(404).send({})
+    } catch (e) {
+        res.status(500).send(e)
+    }
+};
+
+module.exports.getCriteriasAndSchema = async function (req, res) {
+    try {
+        let criterias = await db.GetCriteriasAndSchema(req.query.faculty);
+        if (criterias)
+            res.status(200).send(criterias);
         else res.status(404).send({})
     } catch (e) {
         res.status(500).send(e)

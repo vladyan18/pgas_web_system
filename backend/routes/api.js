@@ -44,7 +44,9 @@ const superAdminAuth = async (req, res, next) => {
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
+    console.log(id);
     let User = await db.findUserById(id);
+    console.log(User);
     if (req.isAuthenticated() && (User.Role === 'SuperAdmin')) {
         next()
     } else {
@@ -313,7 +315,12 @@ router.post('/uploadCriterias', criteriasController.upload);
 
 router.post('/saveCriterias', superAdminAuth, criteriasController.saveCriteriasForFaculty);
 
-router.get('/getCriterias', criteriasController.getCriterias);
+router.post('/updateAnnotations', adminAuth, criteriasController.UploadAnnotationsToFaculty);
+router.get('/getAnnotations', auth, criteriasController.GetAnnotationsForFaculty);
+
+router.get('/getCriterias', auth, criteriasController.getCriterias);
+
+router.get('/getCriteriasAndSchema', auth, criteriasController.getCriteriasAndSchema);
 
 router.get('/getConfirm/*', auth, userController.getConfirmation);
 

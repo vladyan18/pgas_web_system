@@ -13,6 +13,9 @@ import FacultyCreationContainer from "./containers/staff/superAdmin/facultyCreat
 import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
 import AdminCreationContainer from "./containers/staff/superAdmin/adminCreationContainer";
+import StaffCriteriasPage from "./views/staff/staffCriteriasPage";
+import StaffAnnotationsPage from "./views/staff/staffAnnotationsPage";
+
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -62,6 +65,8 @@ class Staff extends Component {
                     <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
                     <Route path="/staff/rating" component={StaffStudentsRatingContainer}/>
                     <Route path="/staff/criteriasMenu" component={CriteriasMenu}/>
+                    <Route path="/staff/criteriasPage" component={StaffCriteriasPage}/>
+                    <Route path="/staff/manageAnnotations" component={StaffAnnotationsPage}/>
                     <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
                     <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
                     <Route path="/staff/" component={StaffMenu}/>

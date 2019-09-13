@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
-import DescriptionToCriteria from "./DescriptionToCriteria";
 import DescriptionToTermin from "./DescriptionToTermin";
+import ReactMarkdown from "react-markdown";
+import criteriasStore from "../../../../stores/criteriasStore";
 
 export default class CriteriasForm extends Component {
 
@@ -129,7 +130,12 @@ export default class CriteriasForm extends Component {
                     11в (ГТО)
                 </option>
             </select>
-            {!this.props.supressDescription && <DescriptionToCriteria crit={this.state.crit}/>}
+            {(!this.props.supressDescription && criteriasStore.annotations && criteriasStore.annotations[this.state.crit])
+            && <div id="critDescr" className="blue_bg">
+                <p className="desc_selectors" id="desc_criterion_first">
+                    <ReactMarkdown source={criteriasStore.annotations[this.state.crit]}/>
+                </p>
+            </div>}
             {this.state.selects.map((item) => (
                 <div>
                     <DescriptionToTermin values={item.options}/>

@@ -31,7 +31,8 @@ class User extends Component {
         userPersonalStore.update().then(
             (profile) => {
 
-                CriteriasStore.getCriteriasForFaculty(profile.Faculty)
+                CriteriasStore.getCriteriasForFaculty(profile.Faculty);
+                CriteriasStore.getAnnotations(profile.Faculty).then()
             }
         )
     };
