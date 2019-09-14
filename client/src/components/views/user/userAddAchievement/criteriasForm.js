@@ -118,7 +118,7 @@ export default class CriteriasForm extends Component {
                     10б (произв. искусства)
                 </option>
                 <option value="10 (10в)">
-                    10в (обществ. деят.)
+                    10в (обществ. деят. не в СПбГУ)
                 </option>
                 <option value="11 (11а)">
                     11а (призы в спорте)

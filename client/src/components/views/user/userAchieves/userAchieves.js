@@ -17,7 +17,12 @@ class UserAchieves extends Component {
         }).then((resp) => {
             return resp.json()
         })
-            .then((data) => userAchievesStore.achieves = data.Achs);
+            .then((data) => {
+                data.Achs = data.Achs.sort(function (obj1, obj2) {
+                    return Number.parseInt(obj1.crit.substr(0, 2)) > Number.parseInt(obj2.crit.substr(0, 2))
+                });
+                userAchievesStore.achieves = data.Achs
+            });
     }
 
     render() {

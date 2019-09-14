@@ -131,10 +131,9 @@ class EditAchievement extends Component {
 
                         </div>
                     </div>
-
+                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations}/>
                 </form>}
 
-                <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations}/>
 
                 <br/>
 

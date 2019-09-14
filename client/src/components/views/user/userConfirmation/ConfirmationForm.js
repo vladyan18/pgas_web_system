@@ -121,8 +121,8 @@ class ConfirmationForm extends Component {
             <div>
                 <div style={this.headerContainerStyle}>
                     <p>Подтверждения: </p>
-                    <button className="btn btn-xs btn-success" onClick={this.openModal}><b>+</b></button>
                 </div>
+                <button className="btn btn-xs btn-success" onClick={this.openModal}><b>+</b></button>
                 <div>
                     {this.state.confirmations.length > 0 &&
                     <BootstrapTable keyField='_id' data={this.state.confirmations} columns={this.columns}/>
@@ -188,7 +188,8 @@ class ConfirmationForm extends Component {
                                         {({getRootProps, getInputProps}) => (
                                             <section className="container">
                                                 {!this.state.file &&
-                                                <div {...getRootProps({className: 'dropzone'})}>
+                                                <div {...getRootProps({className: 'dropzone'})}
+                                                     style={{"backgroundColor": "white"}}>
                                                     <input {...getInputProps()} />
                                                     <p>Нажмите, либо перетащите файл</p>
                                                 </div>}

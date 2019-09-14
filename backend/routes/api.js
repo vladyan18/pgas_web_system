@@ -77,9 +77,7 @@ const regAuth = (req, res, next) => {
  * */
 const auth = (req, res, next) => {
     if (req.isAuthenticated()) {
-        if (req.user.Registered)
             next();
-        else return res.redirect('/register')
     }
     else {
         return res.redirect('/login')

@@ -8,7 +8,7 @@ import StaffMenu from './views/staff/staffMenu'
 import NewAchievesContainer from "./containers/staff/newAchievesContainer";
 import CurrentContestAchievementsContainer from "./containers/staff/currentContestAchievementsContainer";
 import StaffStudentsRatingContainer from "./containers/staff/staffStudentsRatingContainer";
-import CriteriasMenu from "./views/staff/criteriasPage/CriteriasMenu";
+import CriteriasMenu from "./views/staff/criteriasManagePage/CriteriasMenu";
 import FacultyCreationContainer from "./containers/staff/superAdmin/facultyCreationContainer";
 import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";

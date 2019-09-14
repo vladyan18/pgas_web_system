@@ -9,18 +9,23 @@ import Staff from "./components/staff";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
 import "./setupProxy"
+import UserRegistrationContainer from "./components/containers/user/UserRegistrationContainer";
+import UserEditProfileContainer from "./components/containers/user/UserEditProfileContainer";
 
 
 class App extends Component {
     constructor(props) {
         super(props);
+        this.state = {isRegistered: 'unknown'};
 
         fetch("api/getProfile", {
             method: "GET"
         }).then((resp) => {
             return resp.json()
         })
-            .then((profile) => userPersonalStore.personal = profile);
+            .then((profile) => {
+                userPersonalStore.personal = profile
+            });
     }
 
     componentWillMount(nextProps, nextState, nextContext) {
@@ -39,6 +44,8 @@ class App extends Component {
         return (
             Auth.isUserAuthenticated() ?
                 <Switch>
+                    <Route path="/register" component={UserRegistrationContainer}/>
+                    <Route path="/edit_profile" component={UserEditProfileContainer}/>
                     <Route path="/staff/" component={Staff}/>
                     <Route path="/api/getConfirm/:id" component={(props) => {
                         let id = props.match.params.id;

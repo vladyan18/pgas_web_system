@@ -10,10 +10,11 @@ class UserPersonalStore {
         let result = await fetchGet('/api/getProfile', {});
         console.log('GET PROFILE', result);
         this.personal = result;
-        await fetchGet('/api/getRights', {id: result.id}).then((res2) => {
-            this.Role = res2.Role;
-            this.Rights = res2.Rights
-        });
+        if (result)
+            await fetchGet('/api/getRights', {id: result.id}).then((res2) => {
+                this.Role = res2.Role;
+                this.Rights = res2.Rights
+            });
         return result
     }
 
@@ -23,6 +24,11 @@ class UserPersonalStore {
 
     get LastName() {
         if (this.personal) return this.personal.LastName;
+        else return ''
+    }
+
+    get SpbuId() {
+        if (this.personal) return this.personal.SpbuId;
         else return ''
     }
 

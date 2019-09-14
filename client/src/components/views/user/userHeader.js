@@ -37,10 +37,12 @@ class UserHeader extends Component {
                         </div>
                         }
                         <div>
-                            <button type="button" id="logoutButton"
-                                    className="btn btn-outline-danger">
+                            <form action="/api/logout">
+                                <button type="submit" id="logoutButton"
+                                        className="btn btn-outline-danger" action="/api/logout">
                                 Выход
                             </button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -133,10 +133,22 @@ exports.updateAchieve = async function (id, achieve) {
     })
 };
 
-exports.registerUser = function (userId, lastname, name, patronymic, birthdate, faculty, course, type) {
+exports.registerUser = function (userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type) {
     redis.set(id + '_reg', true);
     redis.del(id + '_user');
-    return UserModel.findOneAndUpdate({ id: userId }, { $set: { LastName: lastname, FirstName: name, Patronymic: patronymic, Birthdate: birthdate, Faculty: faculty, Course: course, Type: type, Registered: true } })
+    return UserModel.findOneAndUpdate({id: userId}, {
+        $set: {
+            LastName: lastname,
+            FirstName: name,
+            Patronymic: patronymic,
+            Birthdate: birthdate,
+            SpbuId: spbuId,
+            Faculty: faculty,
+            Course: course,
+            Type: type,
+            Registered: true
+        }
+    })
 };
 
 exports.addAchieveToUser = function (userId, achieveId) {

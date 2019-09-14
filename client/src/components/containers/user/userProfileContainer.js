@@ -13,7 +13,8 @@ class UserProfileContainer extends Component {
     render() {
         return <UserProfile fio={userPersonalStore.fio} Birthdate={userPersonalStore.Birthdate}
                             Faculty={userPersonalStore.Faculty}
-                            Course={userPersonalStore.Course} Type={userPersonalStore.Type}/>
+                            Course={userPersonalStore.Course} Type={userPersonalStore.Type}
+                            SpbuId={userPersonalStore.SpbuId}/>
     }
 }
 

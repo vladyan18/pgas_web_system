@@ -57,16 +57,19 @@ module.exports.getProfile = async function (req, res) {
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
 
-    res.status(200).send({
-        id: User.id,
-        LastName: User.LastName,
-        FirstName: User.FirstName,
-        Patronymic: User.Patronymic,
-        Birthdate: User.Birthdate,
-        Faculty: User.Faculty,
-        Type: User.Type,
-        Course: User.Course
-    })
+    if (User.Registered)
+        res.status(200).send({
+            id: User.id,
+            LastName: User.LastName,
+            FirstName: User.FirstName,
+            Patronymic: User.Patronymic,
+            Birthdate: User.Birthdate,
+            SpbuId: User.SpbuId,
+            Faculty: User.Faculty,
+            Type: User.Type,
+            Course: User.Course
+        });
+    else res.status(404).send()
 };
 
 module.exports.getRights = async function (req, res) {
@@ -114,7 +117,7 @@ module.exports.registerUser = async function (req, res) {
         if (req.user && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;
-        await db.registerUser(id, data.lastname, data.name, data.patronymic, data.birthdate, data.faculty, data.course, data.type);
+        await db.registerUser(id, data.lastname, data.name, data.patronymic, data.birthdate, data.spbuId, data.faculty, data.course, data.type);
         req.session.passport.user.Registered = true;
         req.session.save(function (err) {
             console.log(err);

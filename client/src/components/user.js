@@ -11,7 +11,8 @@ import Auth from "../modules/Auth";
 import userPersonalStore from "../stores/userPersonalStore";
 import EditAchievementContainer from "./containers/user/editAchievementContainer";
 import CriteriasStore from "../stores/criteriasStore"
-import {Switch} from "react-router";
+import {Switch, withRouter} from "react-router";
+import {observer} from "mobx-react";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -27,15 +28,23 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 class User extends Component {
     constructor(props) {
         super(props);
-
-        userPersonalStore.update().then(
-            (profile) => {
-
-                CriteriasStore.getCriteriasForFaculty(profile.Faculty);
-                CriteriasStore.getAnnotations(profile.Faculty).then()
-            }
-        )
+        this.state = {}
     };
+
+    async componentDidMount() {
+
+
+        let profile = await userPersonalStore.update();
+        if (profile) {
+            CriteriasStore.getCriteriasForFaculty(profile.Faculty);
+            await CriteriasStore.getAnnotations(profile.Faculty);
+            this.setState({ready: true})
+        } else {
+            this.props.history.push('/register')
+        }
+
+
+    }
 
     async toggleAuthenticateStatus() {
         // check authenticated status and toggle state based on that
@@ -45,7 +54,7 @@ class User extends Component {
     }
 
     render() {
-        return (<div className="container-fluid">
+        return (<>{(this.state.ready) && <div className="container-fluid">
         <UserHeaderContainer/>
         <div className="container main_block">
             <div className="row">
@@ -60,9 +69,9 @@ class User extends Component {
                 </Switch>
             </div>
         </div>
-        </div>)
+        </div>}</>)
     }
 
 }
 
-export default User
+export default withRouter(observer(User))

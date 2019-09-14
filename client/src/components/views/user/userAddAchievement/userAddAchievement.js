@@ -68,9 +68,10 @@ class UserAddAchievement extends Component {
         res.achievement = this.state.ach;
 
         res.confirmations = [];
-        for (let i = 0; i < this.state.confirmations.length; i++) {
-            res.confirmations.push(this.state.confirmations[i]._id)
-        }
+        if (this.state.confirmations)
+            for (let i = 0; i < this.state.confirmations.length; i++) {
+                res.confirmations.push(this.state.confirmations[i]._id)
+            }
 
         let form = document.forms.namedItem('fileinfo');
         let oData = new FormData(form);
@@ -128,12 +129,12 @@ class UserAddAchievement extends Component {
                                                       updater={this.handleDateChange}/>
                             </div>
                         </div>
-
+                        <ConfirmationForm updateForm={this.updateConfirmations}/>
                     </form>}
 
 
                     <br/>
-                    <ConfirmationForm updateForm={this.updateConfirmations}/>
+
 
                     <div className="input-group" style={{'display': 'none'}}>
                             <span className="input-group-btn">
