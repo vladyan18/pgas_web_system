@@ -129,7 +129,14 @@ exports.updateAchieve = async function (id, achieve) {
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
     redis.del(u.id + '_achs');
     redis.del(u.id + '_user');
-    return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { crit: achieve.crit, chars: achieve.chars, status: achieve.status, achievement: achieve.achievement, ball: achieve.ball, SZ: achieve.SZ, achDate: achieve.achDate } }, function (err, result) {
+    return AchieveModel.findOneAndUpdate({_id: id}, {
+        $set: {
+            crit: achieve.crit,
+            chars: achieve.chars, status: achieve.status,
+            achievement: achieve.achievement, ball: achieve.ball, SZ: achieve.SZ,
+            achDate: achieve.achDate, comment: achieve.comment
+        }
+    }, function (err, result) {
     })
 };
 

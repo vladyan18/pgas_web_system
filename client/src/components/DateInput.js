@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import '../style/user_main.css';
+import MaskedInput from "react-text-mask";
 
 class DateInput extends Component {
     constructor(props) {
@@ -8,29 +9,19 @@ class DateInput extends Component {
         if (props.defaultValue) this.state.value = props.defaultValue;
         console.log(props.defaultValue);
         this.handleDateChange = this.handleDateChange.bind(this);
-        this.handleDateKeyUp = this.handleDateKeyUp.bind(this)
     };
 
-    handleDateChange(e) {
+    handleDateChangeLeg(e) {
         let st = this.state;
         st.value = e.target.value;
         this.setState(st)
     }
 
-    handleDateKeyUp(e) {
+    handleDateChange(e) {
         let value = e.target.value ? e.target.value : '';
-        if (/\d/.test(e.key))
-            value += e.key;
-        if (e.keyCode == 8 && value.length > 0) value = value.substr(0, value.length - 1);
+
         let st = this.state;
-
-        if (e.keyCode != 8) {
-
-            let formattedData = formatDate(value);
-            if (formattedData != value) {
-                st.value = formattedData
-            } else st.value = value
-        } else st.value = value;
+        st.value = value;
 
         this.props.updater(st.value);
         this.setState(st);
@@ -38,15 +29,16 @@ class DateInput extends Component {
 
     render() {
         return (
-            <input style={{
+            <MaskedInput style={{
                 "width": "8rem",
                 "margin-right": "0.5rem",
                 "text-align": "center",
                 "marginTop": "auto",
                 "marginBottom": "auto"
-            }}
-                   className={"form-control date achDate" + (!this.props.isValid ? " is-invalid" : "")} type="text"
-                   placeholder='дд.мм.гггг' onKeyDown={this.handleDateKeyUp} value={this.state.value}/>
+            }} guide={true} keepCharPositions={true}
+                         mask={[/[0-3]/, /\d/, '.', /[0-1]/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
+                         className={"form-control date achDate" + (!this.props.isValid ? " is-invalid" : "")} type="text"
+                         placeholder='дд.мм.гггг' onChange={this.handleDateChange} value={this.state.value}/>
 
         )
     }

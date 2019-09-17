@@ -104,6 +104,15 @@ ul {
     }
 }
 
+.block {
+    color: black;
+    background-color: #f8f8f6;
+    border: 1px solid #ededec;
+    padding: 30px 20px 20px;
+    margin-top: 0px;
+    width: 100%;
+}
+
 .block_header {
     margin-top: 5px;
     margin-bottom: 5px;

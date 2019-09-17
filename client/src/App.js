@@ -1,17 +1,17 @@
 import './style/bootstrap.min.css';
 import './style/user_main.css';
-import React, {Component} from 'react';
+import React, {Component, Suspense} from 'react';
 import User from "./components/user";
 import Auth from "./modules/Auth";
 import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
-import Staff from "./components/staff";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
 import "./setupProxy"
 import UserRegistrationContainer from "./components/containers/user/UserRegistrationContainer";
 import UserEditProfileContainer from "./components/containers/user/UserEditProfileContainer";
 
+const Staff = React.lazy(() => import('./components/staff'));
 
 class App extends Component {
     constructor(props) {
@@ -43,17 +43,21 @@ class App extends Component {
     render() {
         return (
             Auth.isUserAuthenticated() ?
-                <Switch>
-                    <Route path="/register" component={UserRegistrationContainer}/>
-                    <Route path="/edit_profile" component={UserEditProfileContainer}/>
-                    <Route path="/staff/" component={Staff}/>
-                    <Route path="/api/getConfirm/:id" component={(props) => {
-                        let id = props.match.params.id;
-                        window.location.href = 'http://localhost/getConfirm/' + id;
-                        return null;
-                    }}/>
-                    <Route path="/" component={User}/>
-                </Switch>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <Switch>
+                        <Route path="/register" component={UserRegistrationContainer}/>
+                        <Route path="/edit_profile" component={UserEditProfileContainer}/>
+
+                        <Route path="/staff/" component={Staff}/>
+
+                        <Route path="/api/getConfirm/:id" component={(props) => {
+                            let id = props.match.params.id;
+                            window.location.href = 'http://localhost/getConfirm/' + id;
+                            return null;
+                        }}/>
+                        <Route path="/" component={User}/>
+                    </Switch>
+                </Suspense>
                 :
                 <Login/>
         )

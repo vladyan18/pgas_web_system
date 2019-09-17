@@ -5,6 +5,8 @@ import CriteriasStore from '../../../../stores/criteriasStore'
 import {withRouter} from "react-router";
 import AchievementDateInput from "../../../AchievementDateInput";
 import ConfirmationForm from "../userConfirmation/ConfirmationForm";
+import userAchievesStore from "../../../../stores/userAchievesStore";
+import userPersonalStore from "../../../../stores/userPersonalStore";
 
 
 class UserAddAchievement extends Component {
@@ -19,9 +21,22 @@ class UserAddAchievement extends Component {
         this.updateConfirmations = this.updateConfirmations.bind(this);
     }
 
-    updateChars(value) {
+    updateChars(value, isValid) {
         let st = this.state;
+        if (value[0] == '1 (7а)') {
+            if (userAchievesStore.achieves.some((x) => x.chars[0] == '1 (7а)')) {
+                st.critError = true;
+                st.critErrorMessage = "Достижение за критерий 7а уже добавлено"
+            } else if (userPersonalStore.Course == 1) {
+                st.critError = true;
+                st.critErrorMessage = "Первый курс не может получать баллы за 7а"
+            } else st.critError = false
+        } else st.critError = false;
+
         st.chars = value;
+        if (isValid)
+            st.charsInvalid = !isValid;
+        else st.charsInvalid = undefined;
         this.setState(st);
     };
 
@@ -50,13 +65,19 @@ class UserAddAchievement extends Component {
     }
 
     sendKrit() {
-        if (!this.state.isDateValid && this.state.chars[0] != '1 (7а)') {
-            let st = this.state;
-            st.dateValidationResult = false;
-            this.setState(st);
-            return
-        }
-        if (!this.state.ach && this.state.chars[0] != '1 (7а)') return;
+        if (this.state.chars[0] != '1 (7а)') {
+            if (this.state.charsInvalid === undefined) {
+                this.setState({charsInvalid: true});
+                return null;
+            } else if (this.state.charsInvalid) return null;
+            if (!this.state.isDateValid) {
+                let st = this.state;
+                st.dateValidationResult = false;
+                this.setState(st);
+                return
+            }
+            if (!this.state.ach) return;
+        } else if (this.state.critError) return null;
         let res = {};
         res.crit = this.state.chars[0];
 
@@ -103,7 +124,9 @@ class UserAddAchievement extends Component {
                         Добавление достижений для учета в конкурсе на академическую стипендию в повышенном размере
                     </p>
 
-                    <CriteriasForm crits={CriteriasStore.criterias} valuesCallback={this.updateChars}/>
+                    <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
+                                   critErrorMessage={this.state.critErrorMessage}
+                                   isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}/>
 
                     <form id="form">
                     </form>

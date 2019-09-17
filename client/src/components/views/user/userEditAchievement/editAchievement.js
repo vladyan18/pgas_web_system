@@ -5,6 +5,8 @@ import CriteriasForm from "../userAddAchievement/criteriasForm";
 import {withRouter} from "react-router";
 import AchievementDateInput from "../../../AchievementDateInput";
 import ConfirmationForm from "../userConfirmation/ConfirmationForm";
+import userAchievesStore from "../../../../stores/userAchievesStore";
+import userPersonalStore from "../../../../stores/userPersonalStore";
 
 
 class EditAchievement extends Component {
@@ -27,9 +29,22 @@ class EditAchievement extends Component {
             }
     }
 
-    updateChars = (value) => {
+    updateChars = (value, isValid) => {
         let st = this.state;
+        if (value[0] == '1 (7а)') {
+            if (userAchievesStore.achieves.some((x) => (x.chars[0] == '1 (7а)' && x._id != this.props.achId))) {
+                st.critError = true;
+                st.critErrorMessage = "Достижение за критерий 7а уже добавлено"
+            } else if (userPersonalStore.Course == 1) {
+                st.critError = true;
+                st.critErrorMessage = "Первый курс не может получать баллы за 7а"
+            } else st.critError = false
+        } else st.critError = false;
+
         st.chars = value;
+        if (isValid)
+            st.charsInvalid = !isValid;
+        else st.charsInvalid = undefined;
         this.setState(st);
     };
 
@@ -54,6 +69,19 @@ class EditAchievement extends Component {
     }
 
     editKrit() {
+        if (this.state.chars[0] != '1 (7а)') {
+            if (this.state.charsInvalid === undefined) {
+                this.setState({charsInvalid: true});
+                return null;
+            } else if (this.state.charsInvalid) return null;
+            if (!this.state.isDateValid) {
+                let st = this.state;
+                st.dateValidationResult = false;
+                this.setState(st);
+                return
+            }
+            if (!this.state.ach) return;
+        } else if (this.state.critError) return null;
         let res = {};
         res.crit = this.state.chars[0];
 
@@ -103,7 +131,9 @@ class EditAchievement extends Component {
                     Изменение достижения
                 </p>
 
-                <CriteriasForm crits={this.crits} valuesCallback={this.updateChars}
+                <CriteriasForm crits={this.crits} valuesCallback={this.updateChars} isInvalid={this.state.charsInvalid}
+                               critError={this.state.critError}
+                               critErrorMessage={this.state.critErrorMessage}
                                values={this.props.achieves.filter((x) => x._id == this.props.achId)[0].chars}/>
 
                 <form id="form">

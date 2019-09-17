@@ -29,7 +29,7 @@ export default class CriteriasForm extends Component {
                 selects: sel,
                 length: this.props.values.length,
                 crit: this.props.values[0],
-                values: this.props.values
+                values: this.props.values.slice()
             };
             this.props.valuesCallback(this.state.values);
 
@@ -39,6 +39,8 @@ export default class CriteriasForm extends Component {
     }
 
     handleSelect(e) {
+        e.preventDefault();
+        e.stopPropagation();
         let state = this.state;
         let key = Number(e.target.id);
         console.log(key, state.length, state.values.length);
@@ -72,12 +74,12 @@ export default class CriteriasForm extends Component {
         let keys = Object.keys(crit);
         console.log('S: ' + state.values);
         if (isNaN(Number(crit[keys[0]]))) {
-            this.props.valuesCallback(state.values);
+            this.props.valuesCallback(state.values, false);
             state.selects.push({id: id, num: state.length + 1, value: '', options: Object.keys(crit)});
             state.length += 1
 
         } else
-            this.props.valuesCallback(state.values);
+            this.props.valuesCallback(state.values, true);
 
 
         this.setState(state)
@@ -87,7 +89,9 @@ export default class CriteriasForm extends Component {
         return (<form id="critForm">
             <label htmlFor="check2" className="label_direction">Критерий:</label>
             <br/>
-            <select id='1' className="form-control selectors firstCourse unique7a" required name="check2"
+            <select id='1'
+                    className={"form-control selectors firstCourse unique7a" + +(this.props.critError ? " is-invalid" : '')}
+                    required name="check2"
                     onChange={this.handleSelect} defaultValue={this.state.crit}>
                 <option disabled>Критерий</option>
                 <option value="1 (7а)" id="7a">
@@ -130,6 +134,8 @@ export default class CriteriasForm extends Component {
                     11в (ГТО)
                 </option>
             </select>
+            {(this.props.critError && this.props.critErrorMessage) &&
+            <span className="redText">{this.props.critErrorMessage}</span>}
             {(!this.props.supressDescription && criteriasStore.annotations && criteriasStore.annotations[this.state.crit])
             && <div id="critDescr" className="blue_bg">
                 <p className="desc_selectors" id="desc_criterion_first">
@@ -139,11 +145,12 @@ export default class CriteriasForm extends Component {
             {this.state.selects.map((item) => (
                 <div>
                     <DescriptionToTermin values={item.options}/>
-                    <select className="form-control selectors" required key={item.id} id={item.num.toString()}
+                    <select className={"form-control selectors" + (this.props.isInvalid ? " is-invalid" : '')} required
+                            key={item.id} id={item.num.toString()}
                             defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}>
                         <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
-                            <option value={option}>
+                            <option value={option} style={{wordWrap: "break-word"}}>
                                 {option}
                             </option>
                         ))}

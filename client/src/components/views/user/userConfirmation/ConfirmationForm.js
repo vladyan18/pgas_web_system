@@ -24,12 +24,16 @@ class ConfirmationForm extends Component {
         };
 
         this.handleNameChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             let st = this.state;
             st.Name = e.target.value;
             this.setState(st)
         };
 
         this.handleLinkChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             let st = this.state;
             st.URL = e.target.value;
             this.setState(st)
@@ -38,14 +42,12 @@ class ConfirmationForm extends Component {
 
     columns = [{
         dataField: 'Type',
-        text: 'Тип'
-    }, {
-        dataField: 'Name',
-        text: 'Название'
+        text: 'Тип',
+        style: {width: "10%"}
     }, {
         dataField: 'Data',
-        text: '',
-        formatter: (cell, row) => (<a href={row.Data} target="_blank">Ссылка</a>)
+        text: 'Подтверждение',
+        formatter: (cell, row) => (<a href={row.Data} target="_blank">{row.Name}</a>)
     }];
 
     headerContainerStyle = {
@@ -54,6 +56,8 @@ class ConfirmationForm extends Component {
     };
 
     openModal(e) {
+        e.preventDefault();
+        e.stopPropagation();
         let st = this.state;
         st.modalIsOpen = true;
         this.setState(st)
@@ -71,6 +75,7 @@ class ConfirmationForm extends Component {
 
     addConfirmation(e) {
         e.preventDefault();
+        e.stopPropagation();
 
         if (this.state.Type == 'doc') {
             let newConf = {Name: this.state.Name, Type: this.state.Type};
@@ -158,7 +163,7 @@ class ConfirmationForm extends Component {
 
                             {!this.state.Type && <div>
                                 <p>Выберите тип подтверждения:</p>
-                                <button id="DocButton" className="btn btn-success"
+                                <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ
                                 </button>
                                 <button id="LinkButton" className="btn btn-success"

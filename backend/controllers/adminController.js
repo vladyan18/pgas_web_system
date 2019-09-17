@@ -97,17 +97,10 @@ module.exports.waitForUpdates = async function (req, res) {
 
 };
 
-module.exports.updateAchieve = function (req, res) {
-    if (!fs.existsSync(uploadsPath)) {
-        fs.mkdirSync(uploadsPath)
-    }
-    upload(req, res, async function (err) {
-        try {
-            if (err || !req.files) {
-                return res.status(400).send('ERROR: Max file size = 15MB')
-            }
-            let achieve = JSON.parse(req.body.data);
-            let id = req.body.achId;
+module.exports.updateAchieve = async function (req, res) {
+
+    let achieve = req.body;
+    let id = req.body._id;
             let options = {
                 year: 'numeric',
                 month: 'numeric',
@@ -116,11 +109,6 @@ module.exports.updateAchieve = function (req, res) {
             achieve.status = 'Изменено';
             achieve.date = new Date().toLocaleString('ru', options);
 
-            let arr = [];
-            for (let file of req.files) {
-                arr.push(file.filename)
-            }
-            achieve.files = arr;
             let oldAchieve = await db.findAchieveById(id);
             let createdAchieve = await db.updateAchieve(id, achieve);
             if (req.user._json.email)
@@ -135,19 +123,12 @@ module.exports.updateAchieve = function (req, res) {
             res.sendStatus(200);
             AdminEmitter.emit('Update');
             notify.emitChange(req, createdAchieve).then()
-
-        }
-        catch (err) {
-            console.log(err);
-            res.status(500).send(err)
-        }
-    })
 };
 
 module.exports.AchSuccess = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, true);
     let u = await db.findUserByAchieve(req.body.Id);
-    balls(u.id);
+    balls(u.id, u.Faculty);
     res.sendStatus(200);
     AdminEmitter.emit('Update');
     notify.emitSuccess(req, u).then();
@@ -157,7 +138,7 @@ module.exports.AchSuccess = async function (req, res) {
 module.exports.AchFailed = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, false);
     let u = await db.findUserByAchieve(req.body.Id);
-    balls(u.id);
+    balls(u.id, u.Faculty);
     AdminEmitter.emit('Update');
     res.sendStatus(200);
     notify.emitDecline(req, u).then();
@@ -266,9 +247,12 @@ module.exports.getRating = async function (req, res) {
   res.status(200).send({ Users: users })
 };
 
-const balls = async function (id) {
-    let kri = JSON.parse(JSON.stringify(Kri));
-  let balls = 0;
+const balls = async function (id, faculty) {
+    let criterias = await db.GetCriterias(faculty);
+    if (!criterias) return null;
+
+    let kri = JSON.parse(criterias.Crits);
+    let balls = 0;
     let Achs = await db.findAchieves(id);
   let kriteries = {};
 
@@ -280,16 +264,19 @@ const balls = async function (id) {
       if (!ach) continue;
       if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
           ach.ball = undefined;
-          db.updateAchieve(ach._id, ach);
+          db.updateAchieve(ach._id, ach).then();
           continue
       }
-      let curKrit = kri[ach.crit];
+      let curKrit = kri;
       if (Array.isArray(curKrit)) {
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
       else {
           for (let ch of ach.chars) {
               curKrit = curKrit[ch]
+          }
+          while (!Array.isArray(curKrit)) {
+              curKrit = curKrit[Object.keys(curKrit)[0]]
           }
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
       }
@@ -302,7 +289,7 @@ const balls = async function (id) {
         } else for (let ach of kriteries[key]) ach['ach'].ball = undefined;
         for (curAch of kriteries[key]) {
             if (!curAch) continue;
-          db.updateAchieve(curAch['ach']._id, curAch['ach'])
+            db.updateAchieve(curAch['ach']._id, curAch['ach']).then()
         }
     }
 };

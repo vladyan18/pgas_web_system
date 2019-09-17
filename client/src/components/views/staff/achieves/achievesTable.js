@@ -104,7 +104,7 @@ class AchievesTable extends Component {
     rowClasses = (row, rowIndex) => {
         if (row.status == 'Отказано')
             return 'declined-row';
-        if (row.status == 'Принято')
+        if (row.status == 'Принято' || row.status == 'Принято с изменениями')
             return 'accepted-row';
         else return ''
     };

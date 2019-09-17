@@ -132,6 +132,8 @@ module.exports.registerUser = async function (req, res) {
 module.exports.addConfirmation = function (req, res) {
     let data = req.body;
     data.Date = Date.now();
+    if (!(data.Data.startsWith('http://') || data.Data.startsWith('https://')))
+        data.Data = '//' + data.Data;
     db.createConfirmation(data).then(
         (result) => {
             res.status(200).send(result)
