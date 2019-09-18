@@ -12,7 +12,6 @@ const passport = require('./config/passport'); // configuring passport here
 const redisClient = require('./config/redis');
 const frontendPath = path.join(__dirname, '../frontend', '/build');
 const port = 80;
-const http2 = require('http2');
 
 require('dotenv').config();
 const app = express();
@@ -86,11 +85,11 @@ if (process.env.ENV_T == 'production') {
     var credentials = {key: privateKey, cert: certificate};
 
 
-    http2Server = http2.createSecureServer(credentials, app);
+    httpsServer = https.createSecureServer(credentials, app);
 
     http.createServer(app).listen(80);
 
-    http2Server.listen(443);
+    httpsServer.listen(443);
 }
 else
-    app.listen(port, () => console.log('Example app listening on port ' + port));
+    app.listen(port, () => console.log('Server listening on port ' + port + ', good luck'));

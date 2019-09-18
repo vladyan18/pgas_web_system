@@ -8,7 +8,7 @@ class UserNavItem extends Component {
         const {location} = this.props;
         const {index, to, children, ...props} = this.props;
 
-        let isActive = location.pathname == to;
+        let isActive = location.pathname == to || (location.pathname == '/' && to == '/home');
         const LinkComponent = index ? Link : Link;
 
         return (

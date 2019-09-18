@@ -5,19 +5,48 @@ import logo from '../../../img/gerb.png';
 import DateInput from "../../DateInput";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
 import {withRouter} from "react-router";
+import '../../../style/checkbox.css'
+import {OverlayTrigger, Popover} from "react-bootstrap";
 
 class UserRegistrationPage extends Component {
+    reqFields = ['LastName', 'Name', 'SpbuId', 'Birthdate', 'Faculty', 'Type', 'Course'];
     constructor(props) {
         super(props);
-        this.state = {isDateValid: false, dateValidationResult: true, Type: "Бакалавриат"};
+        this.state = {isDateValid: false, Type: "Бакалавриат"};
 
         this.handleChange = (e, field) => {
             let st = this.state;
             st[field] = e.target.value;
+            st[field + 'Invalid'] = false;
             this.setState(st)
         };
 
+        this.checkValidity = (x) => {
+            if (!this.state[x]) {
+                return false
+            }
+            return true
+        };
+
+        this.isValid = (x) => {
+            if (!this.state[x + 'Invalid']) return '';
+            else return ' is-invalid'
+        };
+
         this.register = (e) => {
+            e.preventDefault();
+
+            let valid = true;
+            let st = {};
+
+            for (let field of this.reqFields) {
+                let fieldValid = this.checkValidity(field);
+                st[field + 'Invalid'] = !fieldValid;
+                valid = valid && fieldValid
+            }
+            this.setState(st);
+            if (!valid) return;
+
             let user = {};
             user.lastname = this.state.LastName;
             user.name = this.state.Name;
@@ -28,6 +57,9 @@ class UserRegistrationPage extends Component {
             user.type = this.state.Type;
             user.course = this.state.Course;
 
+            if (this.state.AccessAllowed)
+                user.settings = {AccessAllowed: true};
+
             fetchSendWithoutRes('/api/registerUser', user).then((result) => {
                 if (result) this.props.history.push('/');
             })
@@ -37,6 +69,7 @@ class UserRegistrationPage extends Component {
         this.handleDateChange = (value) => {
             let st = this.state;
             st.Birthdate = value;
+            st.BirthdateInvalid = false;
             this.setState(st)
         }
 
@@ -44,6 +77,26 @@ class UserRegistrationPage extends Component {
 
 
     render() {
+
+        const allowAccessPopover = (
+            <Popover id="popover-basic" style={{width: "40rem"}}>
+                <Popover.Title as="h3">Согласие на открытие доступа</Popover.Title>
+                <Popover.Content>
+                    Ставя эту галочку, вы разрешаете участникам конкурса с вашего факультета, <b>также поставившим эту
+                    галочку</b>,
+                    просматривать ваши достижения в рейтинге на ПГАС. Такая возможность предоставляется в целях
+                    повышения открытости процесса и формирования доверия между всеми участниками назначения ПГАС.
+                    <br/>
+                    <i style={{fontSize: "small", color: "#5d5d5d"}}>Таким образом, ставя данную галочку, вы
+                        дополнительно даете согласие на публикацию информации,
+                        относящейся к вашим персональным данным в соответствии со статьей 9 Федерального закона
+                        от 27.07.2006 №152-ФЗ «О персональных данных», в целях повышения открытости процесса назначения
+                        ПГАС. Отзыв данного согласия
+                        возможен путем изменения настроек в профиле.</i>
+                </Popover.Content>
+            </Popover>
+        );
+
         return (
             <div className="container-fluid">
                 <header>
@@ -66,43 +119,51 @@ class UserRegistrationPage extends Component {
                             <div className="title_text">Регистрация в системе ПГАС</div>
                             <div className="header_logo_text">Для использования системы необходимо пройти
                                 регистрацию.<br/>
-                                Запрашиваемые данные необходимы для формирования анкеты. Регистрируясь вы разрешаете
-                                СПбГУ и Студсовету обрабатывать ваши персональные данные (согласно анкете на ПГАС).
+                                Запрашиваемые данные необходимы для формирования анкеты. Регистрируясь, вы разрешаете
+                                СПбГУ обработку, в том числе автоматизированную, указанной вами в настоящей форме
+                                информации,
+                                относящейся к вашим персональным данным в соответствии со статьей 9 Федерального закона
+                                от 27.07.2006 №152-ФЗ «О персональных данных», а также передачу членам комиссий по
+                                проверке заявлений-анкет.
                             </div>
                             <form id='register'>
                                 <span className="redText">*</span><label>Фамилия</label><br/>
                                 <input type='text' style={{margin: "0"}} id='lastname' name='lastname'
-                                       onChange={(e) => this.handleChange(e, 'LastName')} className="form-control"
+                                       onChange={(e) => this.handleChange(e, 'LastName')}
+                                       className={"form-control" + this.isValid('LastName')}
                                        required autocomplete="off"/><br/>
                                 <span className="redText">*</span><label>Имя</label><br/>
                                 <input type='text' style={{margin: "0"}} id='name' name='name'
-                                       onChange={(e) => this.handleChange(e, 'Name')} className="form-control" required
+                                       onChange={(e) => this.handleChange(e, 'Name')}
+                                       className={"form-control" + this.isValid('Name')} required
                                        autocomplete="off"/><br/>
                                 <label>Отчество</label><br/>
                                 <input type='text' style={{margin: "0"}} id='patronymic' name='patronymic'
-                                       onChange={(e) => this.handleChange(e, 'Patronymic')} oninput="$(this).validate()"
+                                       onChange={(e) => this.handleChange(e, 'Patronymic')}
                                        className="form-control" autocomplete="off"/><br/>
 
                                 <span className="redText">*</span><label>Дата рождения</label><br/>
                                 <DateInput style={{width: "100%"}} updater={this.handleDateChange}
-                                           isValid={this.state.dateValidationResult}/><br/>
+                                           isValid={!this.state.BirthdateInvalid}/><br/>
 
                                 <span className="redText" style={{"margin-top": "2rem"}}>*</span><label>Почта
                                 СПбГУ</label><br/>
                                 <input type='text' style={{margin: "0"}} id='name' name='name'
                                        onChange={(e) => this.handleChange(e, 'SpbuId')}
-                                       className="form-control" required autoComplete="off"
+                                       className={"form-control" + this.isValid('SpbuId')} required autoComplete="off"
                                        placeholder="st******@student.spbu.ru"/><br/>
                                 <span className="redText">*</span><label>Факультет</label><br/>
-                                <select id="faculty" className="form-control "
-                                        onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue="">
-                                    <option disabled value="">Факультет</option>
+                                <select id="faculty" className={"form-control" + this.isValid('Faculty')}
+                                        onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue=""
+                                        style={{cursor: "pointer"}}>
+                                    <option disabled value="">Выберите факультет/институт</option>
                                     {this.props.faculties.map((fac) => {
                                         return (<option value={fac}>{fac}</option>)
                                     })}
                                 </select><br/>
                                 <span className="redText">*</span><label>Ступень обучения</label><br/>
-                                <select id="type" name="type" style={{margin: "0"}} className="form-control "
+                                <select id="type" name="type" style={{margin: "0", cursor: "pointer"}}
+                                        className={"form-control" + this.isValid('Type')}
                                         onChange={(e) => this.handleChange(e, 'Type')} required>
                                     <option disabled>Ступень</option>
                                     <option selected value="Бакалавриат">
@@ -116,10 +177,29 @@ class UserRegistrationPage extends Component {
                                     </option>
                                 </select><br/>
                                 <span className="redText">*</span><label>Курс</label><br/>
-                                <input type='number' style={{margin: "0"}} id='course'
-                                       onChange={(e) => this.handleChange(e, 'Course')} name='course'
-                                       className="form-control" required autocomplete="off"/><br/>
+                                <select style={{margin: "0", cursor: "pointer"}} id='course'
+                                        onChange={(e) => this.handleChange(e, 'Course')} name='course'
+                                        className={"form-control" + this.isValid('Course')} required>
+                                    <option disabled selected>Выберите курс</option>
+                                    {this.state.Type == 'Бакалавриат' && [...Array(4).keys()].map((x) => {
+                                        return <option value={x + 1}>{x + 1}</option>
+                                    })}
+                                    {this.state.Type == 'Магистратура' && [...Array(2).keys()].map((x) => {
+                                        return <option value={x + 1}>{x + 1}</option>
+                                    })}
+                                    {this.state.Type == 'Специалитет' && [...Array(6).keys()].map((x) => {
+                                        return <option value={x + 1}>{x + 1}</option>
+                                    })}
+                                </select><br/>
 
+                                <OverlayTrigger trigger={['hover']} placement="top"
+                                                overlay={allowAccessPopover}>
+                                    <div className="checkbox" style={{color: "green"}}>
+                                        <input type="checkbox" id="checkbox_1"
+                                               onChange={() => this.setState({AccessAllowed: !this.state.AccessAllowed})}/>
+                                        <label htmlFor="checkbox_1">Открыть участникам доступ к моим достижениям</label>
+                                    </div>
+                                </OverlayTrigger>
 
                                 <button type="button" onClick={this.register}
                                         className="btn btn-primary btn-md button_send"

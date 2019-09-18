@@ -2,6 +2,7 @@ import {decorate, observable} from 'mobx';
 
 class UserAchievesStore {
     achieves;
+    confirmations;
 
     getAchieves() {
         fetch("/api/getUserInfo", {
@@ -15,13 +16,15 @@ class UserAchievesStore {
                 data.Achs = data.Achs.sort(function (obj1, obj2) {
                     return Number.parseInt(obj1.crit.substr(0, 2)) > Number.parseInt(obj2.crit.substr(0, 2))
                 });
-                this.achieves = data.Achs
+                this.achieves = data.Achs;
+                this.confirmations = data.Confirmations
             }).catch((err) => console.log(err));
     }
 }
 
 decorate(UserAchievesStore, {
-    achieves: observable
+    achieves: observable,
+    confirmations: observable
 });
 
 export default new UserAchievesStore();

@@ -322,4 +322,6 @@ router.get('/getCriteriasAndSchema', auth, criteriasController.getCriteriasAndSc
 
 router.get('/getConfirm/*', auth, userController.getConfirmation);
 
+router.get('/getConfirmations', auth, userController.getConfirmations);
+
 module.exports = router;

@@ -83,7 +83,8 @@ class StaffAnnotationsPage extends Component {
                                                       value={this.state.annotations[crit]} style={{margin: "0"}}/>
                                                 <div className="desc_selectors"
                                                      style={{whiteSpace: "pre-line", margin: "0", width: "50%"}}>
-                                                    <ReactMarkdown source={this.state.annotations[crit]}/>
+                                                    <ReactMarkdown className="markdown_view" linkTarget={() => '_blank'}
+                                                                   source={this.state.annotations[crit]}/>
                                                 </div>
                                             </div>
                                             <br/>

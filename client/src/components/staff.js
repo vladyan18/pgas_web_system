@@ -12,6 +12,7 @@ import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
 import StaffCriteriasPage from "./views/staff/staffCriteriasPage";
 import StaffAnnotationsPage from "./views/staff/staffAnnotationsPage";
+import {observer} from "mobx-react";
 
 const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage/CriteriasMenu'));
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
@@ -34,10 +35,14 @@ class Staff extends Component {
         this.state = {
             authenticated: false
         };
+
+    };
+
+    componentDidMount() {
         userPersonalStore.update().then((result) => {
             staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then()
         })
-    };
+    }
 
     componentWillMount() {
         if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
@@ -60,6 +65,7 @@ class Staff extends Component {
         return (<div className="container-fluid">
             <StaffHeaderContainer/>
             <div id="mainBody">
+                {staffContextStore.faculty &&
                 <Suspense fallback={<div>Loading...</div>}>
                     <Switch>
                         <Route path="/staff/newAchieves" component={NewAchievesContainer}/>
@@ -73,10 +79,11 @@ class Staff extends Component {
                         <Route path="/staff/" component={StaffMenu}/>
                     </Switch>
                 </Suspense>
+                }
             </div>
         </div>)
     }
 
 }
 
-export default Staff
+export default observer(Staff)

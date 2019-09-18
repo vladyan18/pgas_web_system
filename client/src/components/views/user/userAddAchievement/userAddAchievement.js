@@ -143,10 +143,14 @@ class UserAddAchievement extends Component {
 
         res.achievement = this.state.ach;
 
+
         res.confirmations = [];
         if (this.state.confirmations)
             for (let i = 0; i < this.state.confirmations.length; i++) {
-                res.confirmations.push(this.state.confirmations[i]._id)
+                res.confirmations.push({
+                    id: this.state.confirmations[i]._id,
+                    additionalInfo: this.state.confirmations[i].additionalInfo
+                })
             }
 
         let form = document.forms.namedItem('fileinfo');

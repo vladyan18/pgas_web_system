@@ -13,15 +13,23 @@ function UserCommonInfo(props) {
                     Документы ПГАС
                 </p>
                 <p className="desc_selectors desc_criterion_dspo ">
-                    <a className="document" target="_blank" href="/doc/Kriterii_PGAS_PM-PU.pdf">
+                    <a className="document" target="_blank"
+                       href="https://students.spbu.ru/mmen-stipendii/stipendii/povyshennaya-akademicheskaya-stipendiya">
                                         <span className="name_doc">
-                                            Критерии ПГАС ПМ-ПУ
+                                            Раздел ПГАС на сайте УРМ СПбГУ
                                         </span>
                     </a>
                     <br/>
-                    <a className="document" target="_blank" href="/doc/rasporyazhenie_vesna_2019.pdf">
+                    <a className="document" target="_blank" href="https://students.spbu.ru/files/20190911_2616.pdf">
                                             <span className="name_doc">
                                                 Распоряжение об организации работы по назначению ПГАС
+                                            </span>
+                    </a>
+                    <br/>
+                    <a className="document" target="_blank"
+                       href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf">
+                                            <span className="name_doc">
+                                                Постановление УС об определении размера ПГАС
                                             </span>
                     </a>
                 </p>
@@ -33,7 +41,7 @@ function UserCommonInfo(props) {
                 <p className="desc_selectors desc_criterion_dspo ">
                     Уважаемые студенты!
                     <br/>
-                    Сотрудники учебных отделов по направлениям в срок до 17:45 5 марта 2019 года принимают от
+                    Сотрудники учебных отделов по направлениям в срок до 17:45 2 октября 2019 года принимают от
                     студентов Университета, получающих академическую стипендию, заявления-анкеты на повышенную
                     государственную академическую стипендию, заполненные только в электронном виде и распечатанные в
                     соответствии с установленной формой.
@@ -41,19 +49,13 @@ function UserCommonInfo(props) {
             </div>
             <div className="blue_bg">
                 <p className="header_info_desc">
-                    Списки студентов, представленных к назначению повышенной академической стипендии в весеннем семестре
-                    2017-2018 учебного года
+                    Обнаружили ошибку или неточность? Есть вопросы по работе системы?
                 </p>
                 <p className="desc_selectors desc_criterion_dspo ">
-                    Ниже публикуем списки студентов (с баллами по анкетам), которые представлены к назначению
-                    государственной академической стипендии в повышенном размере в весеннем семестре 2017-2018 учебного
-                    года.
-                    <br/>
-                    Биология
-                    <br/>
-                    Востоковедение
-                    <br/>
-                    География и геоэкология.
+                    По всем вопросам можно обращаться к <a target="_blank"
+                                                           href="https://vk.com/vladvolosnikov">разработчику</a> системы. <br/>
+                    Либо в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu">паблика Стипкома
+                    Студсовета ПМ-ПУ.</a>
                 </p>
             </div>
         </div>

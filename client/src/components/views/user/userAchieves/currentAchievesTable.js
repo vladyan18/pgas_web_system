@@ -12,7 +12,7 @@ const columns = [{
 }, {
     dataField: 'achievement',
     text: 'Достижение',
-    style: {width: "40%", textAlign: "left"},
+    style: {width: "40%", textAlign: "left", verticalAlign: "middle"},
     headerStyle: {verticalAlign: "middle", textAlign: "center"}
 }, {
     dataField: 'status',

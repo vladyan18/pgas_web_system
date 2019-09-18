@@ -160,6 +160,14 @@ class EditAchievement extends Component {
         res.chars = this.state.chars;
 
         res.achievement = this.state.ach;
+        res.confirmations = [];
+        if (this.state.confirmations)
+            for (let i = 0; i < this.state.confirmations.length; i++) {
+                res.confirmations.push({
+                    id: this.state.confirmations[i]._id,
+                    additionalInfo: this.state.confirmations[i].additionalInfo
+                })
+            }
 
         if (this.state.dateValue) res.achDate = makeDate(this.state.dateValue);
 

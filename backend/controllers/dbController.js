@@ -81,13 +81,13 @@ exports.createUser = function(User){
 };
 
 exports.findAchieves = async function (user_id) {
-    return redis.getAsync(user_id + '_achs').then(async (res) => {
-        if (!res) {
+    //return redis.getAsync(user_id + '_achs').then(async (res) => {
+    //   if (!res) {
             User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
             let b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
             redis.setAsync(user_id + '_achs', JSON.stringify(b));
             return(b)
-        } else return JSON.parse(res)})
+    // } else return JSON.parse(res)})
 };
 
 exports.findAchieveById = async function (id) {
@@ -135,13 +135,14 @@ exports.updateAchieve = async function (id, achieve) {
             chars: achieve.chars, status: achieve.status,
             achievement: achieve.achievement, ball: achieve.ball,
             achDate: achieve.achDate, comment: achieve.comment,
-            endingDate: achieve.endingDate
+            endingDate: achieve.endingDate,
+            confirmations: achieve.confirmations
         }
     }, function (err, result) {
     })
 };
 
-exports.registerUser = function (userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type) {
+exports.registerUser = function (userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type, settings) {
     redis.set(id + '_reg', true);
     redis.del(id + '_user');
     return UserModel.findOneAndUpdate({id: userId}, {
@@ -154,10 +155,12 @@ exports.registerUser = function (userId, lastname, name, patronymic, birthdate, 
             Faculty: faculty,
             Course: course,
             Type: type,
-            Registered: true
+            Registered: true,
+            Settings: settings
         }
     })
 };
+
 
 exports.addAchieveToUser = function (userId, achieveId) {
     redis.del(userId + '_achs');
@@ -333,5 +336,18 @@ exports.createConfirmation = async function (confirmation) {
 };
 
 exports.getConfirmByIdForUser = async function (confirmation) {
-    return ConfirmationModel.findById(confirmation)
+    return ConfirmationModel.findById(confirmation).lean()
+};
+
+exports.getConfirmations = async function (confIds) {
+
+    return ConfirmationModel.find({_id: {$in: confIds}}).lean()
+};
+
+exports.addConfirmationToUser = async function (userId, confId) {
+    return UserModel.findByIdAndUpdate(userId, {$push: {Confirmations: confId}})
+};
+
+exports.updateConfirmCrawlResult = async function (confirmId, crawlResult) {
+    return ConfirmationModel.findByIdAndUpdate(confirmId, {$set: {CrawlResult: crawlResult, IsCrawled: true}})
 };

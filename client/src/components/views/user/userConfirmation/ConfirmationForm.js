@@ -3,7 +3,7 @@ import '../../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
-import {fetchSendObj} from "../../../../services/fetchService";
+import {fetchGet, fetchSendObj} from "../../../../services/fetchService";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 
 class ConfirmationForm extends Component {
@@ -13,10 +13,12 @@ class ConfirmationForm extends Component {
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.addConfirmation = this.addConfirmation.bind(this);
+        this.addExistingConfirmation = this.addExistingConfirmation.bind(this);
 
         if (props.value) {
             this.state.confirmations = props.value
         }
+
 
         this.onDrop = (file) => {
             let st = this.state;
@@ -38,26 +40,112 @@ class ConfirmationForm extends Component {
             let st = this.state;
             st.URL = e.target.value;
             this.setState(st)
+        };
+
+        this.handleSZNameChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({Name: e.target.value})
+        };
+
+        this.handleSZAppendixChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({SZAppendix: e.target.value})
+        };
+
+        this.handleSZParagraphChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({SZParagraph: e.target.value})
+        };
+
+        this.handleAdditionalInfoChange = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({additionalInfo: e.target.value})
+        };
+
+        this.openExisting = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState({existingOpened: true})
         }
     };
 
-    types = {'link': 'Ссылка', 'doc': 'Документ', 'sz': 'Служ. записка'};
+    async componentDidMount() {
+        let commonConfirms = await fetchGet('/api/getConfirmations', {});
+
+        console.log(commonConfirms);
+        for (let conf of commonConfirms) {
+            if (conf.Type == 'SZ') {
+                commonConfirms.remove(conf)
+            }
+        }
+        this.setState({commonConfirms: commonConfirms})
+    }
+
+    types = {'link': 'Ссылка', 'doc': 'Документ', 'SZ': 'Служ. записка'};
     columns = [{
         dataField: 'Type',
         text: 'Тип',
         style: {width: "10%"},
-        formatter: (cell, row) => this.types[row.Type]
+        formatter: (cell, row) => {
+            if (row.Type == 'link') {
+                if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
+                    return 'e-library'
+                }
+            }
+            return this.types[row.Type]
+        }
     }, {
         dataField: 'Data',
         text: 'Подтверждение',
-        formatter: (cell, row) => (<a href={row.Data} target="_blank">{row.Name}</a>)
+        style: {width: "40%"},
+        formatter: (cell, row) => {
+            if (row.Type == 'SZ') {
+                return (<>{row.Name}
+                    {row.SZ ? (row.SZ.Appendix ? ', прил. ' + row.SZ.Appendix : '') : ''}
+                    {row.SZ ? (row.SZ.Paragraph ? ', п. ' + row.SZ.Paragraph : '') : ''}
+                </>)
+            } else return (<><a href={row.Data} onClick={(e) => e.stopPropagation()} target="_blank">{row.Name}</a>
+                <br/>{row.additionalInfo}</>)
+        }
     }, {
         isDummyField: true,
         formatter: (cell, row) => {
             if (row.Type == 'doc')
                 return <span>{(row.Size / 1024 / 1024).toFixed(2)} Мб</span>;
             if (row.Type == 'link') {
+                if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
+                    if (row.CrawlResult) {
+                        return (
+                            <div style={{display: "flex", justifyContent: "space-between", fontSize: "x-small"}}>
+                                {row.CrawlResult.title ? <div style={{maxWidth: "10rem", fontSize: "xx-small"}}>
+                                    <div>"{row.CrawlResult.title.toLowerCase()}"</div>
+                                    <div><i>{row.CrawlResult.magazine ? row.CrawlResult.magazine.toLowerCase() : ''}</i>
+                                    </div>
+                                </div> : ''}
+                                <div style={{width: "100%", marginLeft: "0.5rem"}}>
+                                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                                        {row.CrawlResult.inRINC ?
+                                            <div className="greenText">В РИНЦе <i className="fa fa-check"/></div> :
+                                            <div className="redText">Не в РИНЦе<i className="fa fa-times"/></div>}
+                                        {row.CrawlResult.isAuthor ?
+                                            <div className="greenText">Указан в авторах <i className="fa fa-check"/>
+                                            </div> :
+                                            <div className="redText">Не указан в авторах<i className="fa fa-times"/>
+                                            </div>}
+                                    </div>
+                                    {row.CrawlResult.year ? <div style={{fontSize: 'small', merginTop: '0.5rem'}}>
+                                        <b>Год: {row.CrawlResult.year}</b></div> : ''}
+                                </div>
+                            </div>
 
+
+                        )
+                    } else return (<div style={{color: "#505050"}}>Нет информации из e-library</div>)
+                }
             }
             return ''
         }
@@ -79,11 +167,31 @@ class ConfirmationForm extends Component {
     closeModal(e) {
         let st = this.state;
         st.modalIsOpen = false;
+        st.existingOpened = false;
+        st.existingConfirm = false;
+        st.existingSelected = false;
+        st.additionalInfo = undefined;
         st.Type = undefined;
         st.file = undefined;
         st.Name = undefined;
         st.URL = undefined;
+        st.isLoading = false;
         this.setState(st)
+    }
+
+    addExistingConfirmation(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let ex = this.state.existingConfirm;
+        let st = this.state;
+        ex.additionalInfo = this.state.additionalInfo;
+        st.confirmations.push(ex);
+        this.setState(st, () => {
+            this.props.updateForm(this.state.confirmations);
+        });
+        this.closeModal(null)
+
     }
 
     addConfirmation(e) {
@@ -99,15 +207,23 @@ class ConfirmationForm extends Component {
             let oData = new FormData();
             oData.append('file', this.state.file, this.state.file.name);
             oData.append('data', JSON.stringify(newConf));
-            fetch('/api/add_file_for_confirmation', {
+            let prom = fetch('/api/add_file_for_confirmation', {
                 method: 'post',
                 body: oData
-            }).then((oRes) => {
+            });
+            this.setState({isLoading: true});
+
+            prom.then((oRes) => {
                 if (oRes.status === 200) {
                     oRes.json().then((res) => {
+                        this.setState({isLoading: false});
                             let st = this.state;
+                        res.additionalInfo = this.state.additionalInfo;
                             st.confirmations.push(res);
+
+                        this.setState(st, () => {
                             this.props.updateForm(this.state.confirmations);
+                        });
                             this.closeModal(null)
                         }
                     )
@@ -124,6 +240,24 @@ class ConfirmationForm extends Component {
             }
 
             let newConf = {Name: this.state.Name, Type: this.state.Type, Data: this.state.URL};
+            fetchSendObj('/api/add_confirmation', newConf).then(((result => {
+                let st = this.state;
+                result.additionalInfo = this.state.additionalInfo;
+                st.confirmations.push(result);
+                this.setState(st, () => {
+                    this.props.updateForm(this.state.confirmations);
+                });
+
+                this.closeModal(null)
+            })))
+        } else if (this.state.Type == 'SZ') {
+
+            if (!this.state.Name) {
+                return
+            }
+
+            let newConf = {Name: this.state.Name, Type: this.state.Type};
+            newConf.SZ = {Appendix: this.state.SZAppendix, Paragraph: this.state.SZParagraph};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
                 st.confirmations.push(result);
@@ -165,6 +299,33 @@ class ConfirmationForm extends Component {
                 </Popover.Content>
             </Popover>
         );
+
+        const AddInfoPopover = (
+            <Popover id="popover-basic">
+                <Popover.Content style={{backgroundColor: "rgb(243, 243, 255)"}}>
+                    В этом поле стоит указать информацию, которая поможет проверяющим понять, на что смотреть в
+                    подтверждении, если это необходимо.
+                    Если у проверяющих возникнут проблемы, вам придется идти на апелляцию.<br/>
+                    <span style={{color: "#4d4d4d"}}>
+                    Примеры:<br/>
+                    <i>- п. 6</i><br/>
+                    <i>- пункты 1-2</i><br/>
+                    <i>- п.п 1.а</i><br/>
+                    </span>
+                </Popover.Content>
+            </Popover>
+        );
+
+        const AddInfoHelp = (
+            <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
+                            overlay={AddInfoPopover}>
+                <i className={"fas fa-question-circle"}
+                   style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
+                   onClick={(e) => {
+                       e.preventDefault()
+                   }}/>
+            </OverlayTrigger>);
+
         return (
             <div>
                 <div style={this.headerContainerStyle}>
@@ -187,10 +348,25 @@ class ConfirmationForm extends Component {
                        shouldCloseOnOverlayClick={true}
                        contentLabel="Example Modal"
                        overlayClassName="Overlay">
-                    {this.state.modalIsOpen &&
-                    <div className="modalContentWrapper">
+                    <>
+                        {this.state.isLoading &&
+                        <div style={{backGroundColor: "#e2e2e2", padding: "3rem"}}>
+                            <div id="floatingCirclesG">
+                                <div className="f_circleG" id="frotateG_01"></div>
+                                <div className="f_circleG" id="frotateG_02"></div>
+                                <div className="f_circleG" id="frotateG_03"></div>
+                                <div className="f_circleG" id="frotateG_04"></div>
+                                <div className="f_circleG" id="frotateG_05"></div>
+                                <div className="f_circleG" id="frotateG_06"></div>
+                                <div className="f_circleG" id="frotateG_07"></div>
+                                <div className="f_circleG" id="frotateG_08"></div>
+                            </div>
+                        </div>}
+                        {(this.state.modalIsOpen && !this.state.isLoading) &&
+                        <div className="modalContentWrapper" style={{maxHeight: "40rem"}}>
 
-                        <div className="block">
+                            <div className="block"
+                                 style={{maxHeight: "inherit", maxWidth: "inherit", overflow: "auto"}}>
                             <div className="profile"
                                  style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
                                 <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
@@ -208,8 +384,16 @@ class ConfirmationForm extends Component {
                                 Не забудьте также приложить его к бумажной анкете
                             </p>
 
-                            {!this.state.Type && <div>
-                                <p>Выберите тип подтверждения:</p>
+                                {(!this.state.Type && !this.state.existingOpened) && <div>
+                                    <p>Выберите существующее подтверждение:</p>
+                                    <div style={{display: "flex", justifyContent: "center"}}>
+                                        <button id="DocButton" className="btn btn-primary"
+                                                style={{margin: "0", width: "50%"}}
+                                                value="Назад" onClick={this.openExisting}>Открыть
+                                        </button>
+                                    </div>
+                                    <p style={{marginTop: "1rem"}}>Или создайте новое:</p>
+                                    <div style={{display: "flex", justifyContent: "center"}}>
                                 <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ
                                 </button>
@@ -217,8 +401,9 @@ class ConfirmationForm extends Component {
                                         value="Назад" onClick={() => this.chooseType('link')}>Ссылка
                                 </button>
                                 <button id="LinkButton" className="btn btn-success"
-                                        value="Назад" onClick={() => this.chooseType('sz')}>Служ. записка
+                                        value="Назад" onClick={() => this.chooseType('SZ')}>Служ. записка
                                 </button>
+                                    </div>
                             </div>}
                             {
                                 this.state.Type == 'link' && <form>
@@ -231,18 +416,29 @@ class ConfirmationForm extends Component {
                                                    e.preventDefault()
                                                }}/>
                                         </OverlayTrigger></label>
-                                    <input id="Name" className="form-control" type="text" required
+                                    <input id="Name" className="form-control" type="text" required autoComplete={'off'}
                                            onChange={this.handleNameChange} autoFocus={true}/>
                                     <label htmlFor="Link"><span className="redText">*</span>Ссылка:</label>
                                     <input id="Link" className="form-control" type="text" required
-                                           onChange={this.handleLinkChange}/>
+                                           onChange={this.handleLinkChange} autoComplete={'off'}/>
+                                    <label htmlFor="AddInfo">Дополнительная информация:
+                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
+                                                        overlay={AddInfoPopover}>
+                                            <i className={"fas fa-question-circle"}
+                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
+                                               onClick={(e) => {
+                                                   e.preventDefault()
+                                               }}/>
+                                        </OverlayTrigger></label>
+                                    <input id="AddInfo" className="form-control" type="text" required
+                                           onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
                                            onClick={this.addConfirmation}
                                            disabled={!(this.state.URL && this.state.Name)}/>
                                 </form>
                             }
                             {
-                                this.state.Type == 'sz' && <form>
+                                this.state.Type == 'SZ' && <form>
                                     <label htmlFor="Name"><span className="redText">*</span>Название служебной записки:
                                         <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
                                                         overlay={SZNamePopover}>
@@ -252,17 +448,17 @@ class ConfirmationForm extends Component {
                                                    e.preventDefault()
                                                }}/>
                                         </OverlayTrigger></label>
-                                    <input id="Name" className="form-control" type="text" required
+                                    <input id="SZName" name="SZname" className="form-control" type="text" required
                                            onChange={this.handleSZNameChange} autoFocus={true}/>
                                     <label htmlFor="Link">Приложение:</label>
-                                    <input id="Link" className="form-control" type="text" required
+                                    <input id="SZApp" className="form-control" type="text" required
                                            onChange={this.handleSZAppendixChange}/>
                                     <label htmlFor="Link">Пункт:</label>
-                                    <input id="Link" className="form-control" type="text" required
+                                    <input id="SZPar" className="form-control" type="text" required
                                            onChange={this.handleSZParagraphChange}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
                                            onClick={this.addConfirmation}
-                                           disabled={!(this.state.URL && this.state.Name)}/>
+                                           disabled={!(this.state.Name)}/>
                                 </form>
                             }
                             {
@@ -271,7 +467,11 @@ class ConfirmationForm extends Component {
                                 }}>
                                     <label htmlFor="Name"><span className="redText">*</span>Название:</label>
                                     <input id="Name" className="form-control" type="text" required autoFocus={true}
-                                           onChange={this.handleNameChange}/>
+                                           onChange={this.handleNameChange} autoComplete={'off'}/>
+                                    <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}
+                                    </label>
+                                    <input id="AddInfo" className="form-control" type="text" required
+                                           onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
                                     <label htmlFor="Link"><span className="redText">*</span>Документ:</label>
                                     <Dropzone onDrop={this.onDrop} multiple={false}>
                                         {({getRootProps, getInputProps}) => (
@@ -318,16 +518,44 @@ class ConfirmationForm extends Component {
                                     </button>
                                 </form>
                             }
+                                {(this.state.existingOpened && !this.state.existingSelected) && <div>
+                                    <label htmlFor="Name">Выберите подтверждение:</label>
+                                    <BootstrapTable keyField='_id' data={this.state.commonConfirms}
+                                                    columns={this.columns}
+                                                    rowEvents={this.commonConfRowEvents}
+                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
+                                                    bordered={false}/>
+                                </div>}
+                                {(this.state.existingSelected) &&
+                                <form>
+                                    <label htmlFor="Name">Выбрано подтверждение:</label>
+                                    <div>{this.state.existingConfirm.Name}</div>
+                                    <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}</label>
+                                    <input id="AddInfo" className="form-control" type="text" required
+                                           onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
+                                    <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
+                                           onClick={this.addExistingConfirmation}/>
+                                </form>
+
+                                }
                         </div>
 
                     </div>
                     }
+                    </>
                 </Modal>
 
             </div>
 
         )
     }
+
+    commonConfRowEvents = {
+        onClick: (e, row, rowIndex) => {
+            this.setState({existingConfirm: row, existingSelected: true})
+            //window.location.assign('/achievement/'+row._id.toString())
+        }
+    };
 }
 
 export default ConfirmationForm

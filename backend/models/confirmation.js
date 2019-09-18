@@ -5,9 +5,12 @@ const confirmationSchema = mongoose.Schema({
     Name: String,
     Type: String,
     Data: String,
+    SZ: {},
     CreationDate: Date,
     FilePath: String,
-    Size: Number
+    Size: Number,
+    IsCrawled: Boolean,
+    CrawlResult: {}
 });
 
 const Confirmation = connection.model('Confirmation', confirmationSchema);
