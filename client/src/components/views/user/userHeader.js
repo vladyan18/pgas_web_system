@@ -26,7 +26,7 @@ class UserHeader extends Component {
                     </div>
                 </div>
 
-                <div className="col-4">
+                <div className="col-4 buttons_header">
                     <div style={{"display": "flex", "justify-content": "flex-end"}}>
                         {(userPersonalStore.Role == 'Admin' || userPersonalStore.Role == 'SuperAdmin') &&
                         <div style={{"marginRight": "1rem"}}>

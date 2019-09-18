@@ -13,15 +13,6 @@ body {
     align-items: center;
 }
 
-.logo_img {
-    /* float: left; */
-    /* height: 100%; */
-    margin-left: 50px;
-    margin-right: 10px;
-    min-height: 60px;
-    align-self: center;
-}
-
 @media (max-width: 768px) {
     .logo_img {
         margin-left: 0;

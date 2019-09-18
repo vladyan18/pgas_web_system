@@ -30,15 +30,6 @@ ul {
     align-items: center;
 }
 
-.logo_img {
-    /* float: left; */
-    /* height: 100%; */
-    margin-left: 50px;
-    margin-right: 10px;
-    min-height: 60px;
-    align-self: center;
-}
-
 .block_header {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -55,9 +46,6 @@ ul {
 }
 
 /**/
-.main_block {
-    margin-top: 50px;
-}
 
 /* левый навбар */
 .left_navbar {
@@ -107,11 +95,6 @@ ul {
 
 .hr_blue {
     border-top: 1px solid #008cce;
-}
-
-.headline {
-    margin-top: 1rem;
-    font-size: 22px;
 }
 
 .block_main_right {

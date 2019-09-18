@@ -5,9 +5,10 @@ const facultySchema = mongoose.Schema({
   Name: String,
     OfficialName: String,
     DirName: String,
-  AdditionStopped: Boolean,
+    AdditionStopped: Boolean,
     CritsId: String,
-    AnnotationsToCritsId: String
+    AnnotationsToCritsId: String,
+    LearningProfile: String
 });
 
 const Faculty = connection.model('Faculty', facultySchema);

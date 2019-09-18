@@ -7,12 +7,16 @@ import {observer} from "mobx-react";
 class UserAchieves extends Component {
     constructor(props) {
         super(props);
-        this.getAchieves();
+
 
     };
 
+    componentDidMount() {
+        this.getAchieves();
+    }
+
     getAchieves() {
-        fetch("api/getUserInfo", {
+        fetch("/api/getUserInfo", {
             method: "GET"
         }).then((resp) => {
             return resp.json()
@@ -37,7 +41,7 @@ class UserAchieves extends Component {
                     <course id="course" className="info">{this.props.course}</course>
                 </div>
                 <form action="/api/getAnket">
-                    <input type="submit" id="download" className="btn btn-primary" value="Скачать анкету"/>
+                    <input type="submit" id="download" className="btn btn-primary anket_button" value="Скачать анкету"/>
                 </form>
             </div>
 

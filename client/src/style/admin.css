@@ -26,15 +26,6 @@ body {
     align-items: center;
 }
 
-.logo_img {
-    /* float: left; */
-    /* height: 100%; */
-    margin-left: 50px;
-    margin-right: 10px;
-    min-height: 60px;
-    align-self: center;
-}
-
 .block_header {
     margin-top: 5px;
     margin-bottom: 5px;

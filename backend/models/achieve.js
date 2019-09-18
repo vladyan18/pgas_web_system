@@ -8,10 +8,11 @@ const achieveSchema = mongoose.Schema({
   confirmations: [String],
   status: String,
   achDate: Date,
+    endingDate: Date,
   achievement: String,
   comment: String,
   ball: Number,
-  SZ: {}
+    isArchived: Boolean,
 });
 
 const Achieve = connection.model('Achieve', achieveSchema);

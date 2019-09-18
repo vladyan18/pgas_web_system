@@ -5,16 +5,21 @@ import userAchievesStore from "../../../stores/userAchievesStore";
 import {observer} from "mobx-react";
 
 class EditAchievementContainer extends Component {
-    achId;
-
     constructor(props) {
         super(props);
-        this.achId = this.props.match.params.id
+        this.state = {achId: props.match.params.id}
+
     };
 
+    componentDidMount() {
+        if (!userAchievesStore.achieves) userAchievesStore.getAchieves()
+
+    }
 
     render() {
-        return <EditAchievement achieves={userAchievesStore.achieves} achId={this.achId}/>
+        console.log(userAchievesStore.achieves);
+        return (<>{(userAchievesStore.achieves) &&
+        <EditAchievement achieves={userAchievesStore.achieves} achId={this.state.achId}/>}</>)
     }
 }
 

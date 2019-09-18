@@ -6,7 +6,8 @@ const confirmationSchema = mongoose.Schema({
     Type: String,
     Data: String,
     CreationDate: Date,
-    FilePath: String
+    FilePath: String,
+    Size: Number
 });
 
 const Confirmation = connection.model('Confirmation', confirmationSchema);

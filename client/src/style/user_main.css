@@ -13,6 +13,16 @@ body {
     background-color: #e9e9e9;
 }
 
+.form_elem_with_left_border {
+    margin-top: 2rem;
+    border-left: solid #8c8c8c;
+    padding-left: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
 .redText {
     color: red;
 }
@@ -30,6 +40,14 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.main_block {
+    margin-top: 50px;
+}
+
+.admin_header_buttons_group {
+    display: flex;
+    justify-content: flex-end;
+}
 .achieveRow {
     cursor: pointer;
 }
@@ -123,9 +141,7 @@ ul {
     align-items: center;
 }
 
-.main_block {
-    margin-top: 50px;
-}
+
 
 .exit {
     text-align: right;
@@ -152,19 +168,23 @@ ul {
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
-    padding-right: 20px;
+    padding-right: 0;
     padding-bottom: 20px;
-    padding-left: 20px;
+    padding-left: 0;
     border-width: 2px;
     border-radius: 2px;
-    border-color: #eeeeee;
+    border-color: #eed000;
     border-style: dashed;
     background-color: #fafafa;
-    color: #bdbdbd;
+    color: #000000;
     outline: none;
+    cursor: pointer;
     transition: border .24s ease-in-out;
 }
 
+.dropzone p {
+    margin: 0;
+}
 
 .centered_ver {
     margin-top: auto;
@@ -347,9 +367,20 @@ block_2 {
         margin-left: 0;
     }
 
-    .p_header {
-        margin-top: 0.1rem;
-        margin-bottom: 0.1rem;
+    @media screen and (max-width: 700px) {
+        .p_header {
+            display: none;
+        }
+
+        .hideInMobile {
+            display: none
+        }
+    }
+    @media screen and (min-width: 700px) {
+        .p_header {
+            margin-top: 0.1rem;
+            margin-bottom: 0.1rem;
+        }
     }
 
     .exit {
@@ -367,4 +398,79 @@ block_2 {
     .page_top {
         padding-bottom: 0;
     }
+
+    .headline {
+        font-size: larger;
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+    .main_block {
+        margin-top: 15px;
+    }
+
+    .table td {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        font-size: small;
+    }
+
+    .table th {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        font-size: x-small;
+    }
+
+    .achieveRow {
+        font-size: small;
+    }
+
+    .modalContentWrapper {
+        max-width: 80%;
+    }
+
+    .logo_img {
+        min-height: 30px;
+        width: 30px;
+    }
+
+    .page_top button {
+        font-size: x-small;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .block_header {
+        width: auto;
+        flex: none;
+        max-width: none;
+        -webkit-flex: none;
+    }
+
+    .buttons_header {
+        width: 80%;
+        flex: none;
+        max-width: none;
+        -webkit-flex: none;
+
+    }
+
+    .admin_header_buttons_group {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .page_top button {
+        padding: 5px;
+    }
+
+    .anket_button {
+        font-size: x-small;
+    }
+
+    .profile div button {
+        font-size: x-small;
+    }
+
 }

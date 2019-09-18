@@ -31,7 +31,7 @@ export default class CriteriasForm extends Component {
                 crit: this.props.values[0],
                 values: this.props.values.slice()
             };
-            this.props.valuesCallback(this.state.values);
+            this.props.valuesCallback(this.state.values, true);
 
         }
 
@@ -87,11 +87,9 @@ export default class CriteriasForm extends Component {
 
     render() {
         return (<form id="critForm">
-            <label htmlFor="check2" className="label_direction">Критерий:</label>
-            <br/>
             <select id='1'
                     className={"form-control selectors firstCourse unique7a" + +(this.props.critError ? " is-invalid" : '')}
-                    required name="check2"
+                    required name="check2" style={{marginTop: "0", cursor: "pointer"}}
                     onChange={this.handleSelect} defaultValue={this.state.crit}>
                 <option disabled>Критерий</option>
                 <option value="1 (7а)" id="7a">
@@ -147,7 +145,8 @@ export default class CriteriasForm extends Component {
                     <DescriptionToTermin values={item.options}/>
                     <select className={"form-control selectors" + (this.props.isInvalid ? " is-invalid" : '')} required
                             key={item.id} id={item.num.toString()}
-                            defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}>
+                            defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}
+                            style={{cursor: "pointer"}}>
                         <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
                             <option value={option} style={{wordWrap: "break-word"}}>

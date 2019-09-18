@@ -2,7 +2,7 @@ import React from 'react';
 import '../../../style/commonInfo.css'
 
 function UserCommonInfo(props) {
-    return (<div className="col-9 rightBlock">
+    return (<div className="col-md-9 rightBlock">
         <div className="block_main_right">
             <p className="headline">
                 Информация

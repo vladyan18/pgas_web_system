@@ -133,8 +133,9 @@ exports.updateAchieve = async function (id, achieve) {
         $set: {
             crit: achieve.crit,
             chars: achieve.chars, status: achieve.status,
-            achievement: achieve.achievement, ball: achieve.ball, SZ: achieve.SZ,
-            achDate: achieve.achDate, comment: achieve.comment
+            achievement: achieve.achievement, ball: achieve.ball,
+            achDate: achieve.achDate, comment: achieve.comment,
+            endingDate: achieve.endingDate
         }
     }, function (err, result) {
     })

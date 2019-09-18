@@ -4,6 +4,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import {fetchSendObj} from "../../../../services/fetchService";
+import {OverlayTrigger, Popover} from "react-bootstrap";
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -40,14 +41,26 @@ class ConfirmationForm extends Component {
         }
     };
 
+    types = {'link': 'Ссылка', 'doc': 'Документ', 'sz': 'Служ. записка'};
     columns = [{
         dataField: 'Type',
         text: 'Тип',
-        style: {width: "10%"}
+        style: {width: "10%"},
+        formatter: (cell, row) => this.types[row.Type]
     }, {
         dataField: 'Data',
         text: 'Подтверждение',
         formatter: (cell, row) => (<a href={row.Data} target="_blank">{row.Name}</a>)
+    }, {
+        isDummyField: true,
+        formatter: (cell, row) => {
+            if (row.Type == 'doc')
+                return <span>{(row.Size / 1024 / 1024).toFixed(2)} Мб</span>;
+            if (row.Type == 'link') {
+
+            }
+            return ''
+        }
     }];
 
     headerContainerStyle = {
@@ -78,6 +91,9 @@ class ConfirmationForm extends Component {
         e.stopPropagation();
 
         if (this.state.Type == 'doc') {
+            if (!this.state.file || !this.state.Name) {
+                return
+            }
             let newConf = {Name: this.state.Name, Type: this.state.Type};
 
             let oData = new FormData();
@@ -103,6 +119,10 @@ class ConfirmationForm extends Component {
             })
 
         } else if (this.state.Type == 'link') {
+            if (!this.state.URL || !this.state.Name) {
+                return
+            }
+
             let newConf = {Name: this.state.Name, Type: this.state.Type, Data: this.state.URL};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
@@ -122,15 +142,42 @@ class ConfirmationForm extends Component {
     }
 
     render() {
+        const SZNamePopover = (
+            <Popover id="popover-basic">
+                <Popover.Content style={{backgroundColor: "rgb(243, 243, 255)"}}>
+                    Нужно указать полное название служебной записки. <br/>
+                    <span style={{color: "#4d4d4d"}}>
+                    Пример:<br/>
+                    <i>СЗ от 22.02.2022 №21-СС-ПМ-ПУ</i> <br/>
+                    </span>
+                </Popover.Content>
+            </Popover>
+        );
+
+        const LinkNamePopover = (
+            <Popover id="popover-basic">
+                <Popover.Content style={{backgroundColor: "rgb(243, 243, 255)"}}>
+                    По названию ссылки должно быть понятно, что по ней можно увидеть. <br/>
+                    <span style={{color: "#4d4d4d"}}>
+                    Пример:<br/>
+                    <i>Статья *Название* в e-library</i> <br/>
+                    </span>
+                </Popover.Content>
+            </Popover>
+        );
         return (
             <div>
                 <div style={this.headerContainerStyle}>
                     <p>Подтверждения: </p>
+                    <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal}>
+                        добавить
+                    </b>
                 </div>
-                <button className="btn btn-xs btn-success" onClick={this.openModal}><b>+</b></button>
+
                 <div>
                     {this.state.confirmations.length > 0 &&
-                    <BootstrapTable keyField='_id' data={this.state.confirmations} columns={this.columns}/>
+                    <BootstrapTable keyField='_id' data={this.state.confirmations} columns={this.columns}
+                                    headerClasses={["hidden"]} bordered={false}/>
                     }
                 </div>
 
@@ -141,7 +188,7 @@ class ConfirmationForm extends Component {
                        contentLabel="Example Modal"
                        overlayClassName="Overlay">
                     {this.state.modalIsOpen &&
-                    <div>
+                    <div className="modalContentWrapper">
 
                         <div className="block">
                             <div className="profile"
@@ -166,43 +213,98 @@ class ConfirmationForm extends Component {
                                 <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ
                                 </button>
-                                <button id="LinkButton" className="btn btn-success"
+                                <button id="LinkButton" className="btn btn-success" style={{marginRight: "1rem"}}
                                         value="Назад" onClick={() => this.chooseType('link')}>Ссылка
+                                </button>
+                                <button id="LinkButton" className="btn btn-success"
+                                        value="Назад" onClick={() => this.chooseType('sz')}>Служ. записка
                                 </button>
                             </div>}
                             {
                                 this.state.Type == 'link' && <form>
-                                    <label htmlFor="Name">Название:</label>
+                                    <label htmlFor="Name"><span className="redText">*</span>Название:
+                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
+                                                        overlay={LinkNamePopover}>
+                                            <i className={"fas fa-question-circle"}
+                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
+                                               onClick={(e) => {
+                                                   e.preventDefault()
+                                               }}/>
+                                        </OverlayTrigger></label>
                                     <input id="Name" className="form-control" type="text" required
-                                           onChange={this.handleNameChange}/>
-                                    <label htmlFor="Link">Ссылка:</label>
+                                           onChange={this.handleNameChange} autoFocus={true}/>
+                                    <label htmlFor="Link"><span className="redText">*</span>Ссылка:</label>
                                     <input id="Link" className="form-control" type="text" required
                                            onChange={this.handleLinkChange}/>
-                                    <button id="SaveButton" className="btn btn-success"
-                                            value="Назад" onClick={this.addConfirmation}>Сохранить
-                                    </button>
+                                    <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
+                                           onClick={this.addConfirmation}
+                                           disabled={!(this.state.URL && this.state.Name)}/>
                                 </form>
                             }
                             {
-                                this.state.Type == 'doc' && <form>
-                                    <label htmlFor="Name">Название:</label>
+                                this.state.Type == 'sz' && <form>
+                                    <label htmlFor="Name"><span className="redText">*</span>Название служебной записки:
+                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
+                                                        overlay={SZNamePopover}>
+                                            <i className={"fas fa-question-circle"}
+                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
+                                               onClick={(e) => {
+                                                   e.preventDefault()
+                                               }}/>
+                                        </OverlayTrigger></label>
                                     <input id="Name" className="form-control" type="text" required
+                                           onChange={this.handleSZNameChange} autoFocus={true}/>
+                                    <label htmlFor="Link">Приложение:</label>
+                                    <input id="Link" className="form-control" type="text" required
+                                           onChange={this.handleSZAppendixChange}/>
+                                    <label htmlFor="Link">Пункт:</label>
+                                    <input id="Link" className="form-control" type="text" required
+                                           onChange={this.handleSZParagraphChange}/>
+                                    <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
+                                           onClick={this.addConfirmation}
+                                           disabled={!(this.state.URL && this.state.Name)}/>
+                                </form>
+                            }
+                            {
+                                this.state.Type == 'doc' && <form onSubmit={e => {
+                                    e.preventDefault();
+                                }}>
+                                    <label htmlFor="Name"><span className="redText">*</span>Название:</label>
+                                    <input id="Name" className="form-control" type="text" required autoFocus={true}
                                            onChange={this.handleNameChange}/>
-                                    <label htmlFor="Link">Документ:</label>
+                                    <label htmlFor="Link"><span className="redText">*</span>Документ:</label>
                                     <Dropzone onDrop={this.onDrop} multiple={false}>
                                         {({getRootProps, getInputProps}) => (
-                                            <section className="container">
+                                            <section>
                                                 {!this.state.file &&
                                                 <div {...getRootProps({className: 'dropzone'})}
                                                      style={{"backgroundColor": "white"}}>
                                                     <input {...getInputProps()} />
                                                     <p>Нажмите, либо перетащите файл</p>
+                                                    <p style={{fontSize: "small", color: "#4f4f4f"}}>Максимальный
+                                                        размер: 50 Мб</p>
                                                 </div>}
                                                 <aside>
-                                                    <ul>{this.state.file &&
-                                                    <li key={this.state.file.name}>
-                                                        {this.state.file.name} - {this.state.file.size / 1024 / 1024} Мб
-                                                    </li>}
+                                                    <ul>{this.state.file && <div>
+                                                        <table className="table-borderless">
+                                                            <tr>
+                                                                <td>
+                                                                    <div style={{
+                                                                        marginRight: "2rem",
+                                                                        maxWidth: "300px",
+                                                                        wordWrap: "break-word"
+                                                                    }}>
+                                                                        {this.state.file.name}
+                                                                    </div>
+                                                                </td>
+                                                                <td style={{color: "#434343"}}>
+                                                                    {(this.state.file.size / 1024 / 1024).toFixed(2)} Мб
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        {Math.ceil(this.state.file.size / 1024 / 1024) > 50 &&
+                                                        <span className="redText">Размер файла превышает 50 Мб</span>}
+                                                    </div>}
                                                     </ul>
                                                 </aside>
                                             </section>
@@ -210,6 +312,8 @@ class ConfirmationForm extends Component {
                                         )}
                                     </Dropzone>
                                     <button id="SaveButton" className="btn btn-success"
+                                            disabled={!(this.state.Name && this.state.file) ||
+                                            Math.ceil(this.state.file.size / 1024 / 1024) > 50}
                                             value="Назад" onClick={this.addConfirmation}>Сохранить
                                     </button>
                                 </form>

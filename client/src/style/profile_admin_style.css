@@ -13,14 +13,6 @@ body {
     align-items: center;
 }
 
-.logo_img {
-    /* float: left; */
-    /* height: 100%; */
-    margin-left: 50px;
-    margin-right: 10px;
-    min-height: 60px;
-    align-self: center;
-}
 
 @media (max-width: 768px) {
     .logo_img {
@@ -87,10 +79,6 @@ main {
     border-top: 1px solid #008CCE;
 }
 
-.headline {
-    margin-top: 0.5rem;
-    font-size: 22px;
-}
 
 .profile {
     /*background-color: #f8f8f6;*/

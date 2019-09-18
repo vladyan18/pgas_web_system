@@ -48,9 +48,9 @@ class StaffHeader extends Component {
                 </div>
 
 
-                <div className="col-3">
+                <div className="col-3 buttons_header ">
 
-                    <div style={{"display": "flex", "justify-content": "flex-end"}}>
+                    <div className="admin_header_buttons_group">
                         <div>
                             <button type="button"
                                     className="btn btn-outline-primary" onClick={this.goToMenu}>

@@ -6,6 +6,7 @@
   "dependencies": {
     "bluebird": "^3.5.3",
     "chai": "^4.2.0",
+    "cheerio": "^1.0.0-rc.3",
     "cluster": "^0.7.7",
     "compression": "^1.7.3",
     "connect-mongo": "^2.0.3",
@@ -33,7 +34,9 @@
     "path": "^0.12.7",
     "randomstring": "^1.1.5",
     "redis": "^2.8.0",
+    "request": "^2.88.0",
     "serve-static": "^1.13.2",
+    "website-scraper": "^4.2.0",
     "xlsx": "^0.14.5",
     "xlsx-populate": "^1.19.1",
     "xlsx-style": "^0.8.13"

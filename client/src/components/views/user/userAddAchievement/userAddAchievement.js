@@ -7,15 +7,18 @@ import AchievementDateInput from "../../../AchievementDateInput";
 import ConfirmationForm from "../userConfirmation/ConfirmationForm";
 import userAchievesStore from "../../../../stores/userAchievesStore";
 import userPersonalStore from "../../../../stores/userPersonalStore";
+import {FormGroup, OverlayTrigger, Popover} from "react-bootstrap";
 
 
 class UserAddAchievement extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {isDateValid: false, dateValidationResult: true};
+        this.state = {isDateValid: false, dateValidationResult: true, endDateValidationResult: true};
         this.updateDescr = this.updateDescr.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
+        this.handleStartDateChange = this.handleStartDateChange.bind(this);
+        this.handleEndDateChange = this.handleEndDateChange.bind(this);
         this.sendKrit = this.sendKrit.bind(this);
         this.updateChars = this.updateChars.bind(this);
         this.updateConfirmations = this.updateConfirmations.bind(this);
@@ -64,27 +67,79 @@ class UserAddAchievement extends Component {
         this.setState(st);
     }
 
-    sendKrit() {
+    handleStartDateChange(isValid, value) {
+        let st = this.state;
+        st.isDateValid = isValid;
+        st.dateValidationResult = isValid;
+        st.dateValue = value;
+        if (isValid && st.isEndDateValid) {
+            if (makeDate(value) > makeDate(st.endDateValue)) {
+                st.dateValidationResult = false;
+                st.dateDiapErrorMess = "Начальная дата не может быть после конечной"
+            } else {
+                st.dateDiapErrorMess = undefined;
+                st.endDateValidationResult = true
+            }
+        }
+        this.setState(st);
+    }
+
+    handleEndDateChange(isValid, value) {
+        let st = this.state;
+        st.isEndDateValid = isValid;
+        st.endDateValidationResult = isValid;
+        st.endDateValue = value;
+        if (isValid && st.isDateValid) {
+            if (makeDate(value) < makeDate(st.dateValue)) {
+                st.endDateValidationResult = false;
+                st.dateDiapErrorMess = "Начальная дата не может быть после конечной"
+            } else {
+                st.dateDiapErrorMess = undefined;
+                st.dateValidationResult = true
+            }
+        }
+        this.setState(st);
+    }
+
+    checkValidityBeforeSend() {
+
         if (this.state.chars[0] != '1 (7а)') {
             if (this.state.charsInvalid === undefined) {
                 this.setState({charsInvalid: true});
-                return null;
-            } else if (this.state.charsInvalid) return null;
+                return false;
+            } else if (this.state.charsInvalid) return false;
             if (!this.state.isDateValid) {
                 let st = this.state;
                 st.dateValidationResult = false;
                 this.setState(st);
-                return
+                return false
             }
-            if (!this.state.ach) return;
-        } else if (this.state.critError) return null;
+            if (this.state.hasDateDiapasone && !this.state.isEndDateValid) {
+                this.setState({endDateValidationResult: false});
+                return false
+            }
+            if (this.state.hasDateDiapasone && (!this.state.endDateValidationResult || !this.state.dateValidationResult)) {
+                return false
+            }
+            if (!this.state.ach) return false;
+        } else if (this.state.critError) return false;
+
+        return true
+    }
+
+    sendKrit() {
+        if (!this.checkValidityBeforeSend()) return;
+
         let res = {};
         res.crit = this.state.chars[0];
 
         res.chars = this.state.chars;
         console.log(this.state.dateValue);
+
         if (this.state.dateValue && this.state.dateValue != '')
             res.achDate = makeDate(this.state.dateValue);
+        if (this.state.endDateValue && this.state.endDateValue != '')
+            res.endingDate = makeDate(this.state.endDateValue);
 
         res.achievement = this.state.ach;
 
@@ -113,6 +168,19 @@ class UserAddAchievement extends Component {
     }
 
     render() {
+        const achievementPopover = (
+            <Popover id="popover-basic">
+                <Popover.Content style={{backgroundColor: "rgb(243, 243, 255)"}}>
+                    Название достижения должно позволить однозначно понять, что это за достижение. <br/>
+                    <span style={{color: "#4d4d4d"}}>
+                    Примеры:<br/>
+                    <i>- Статья *название* с докладом на конференции *название*</i> <br/>
+                    <i>- Победа в олимпиаде *название*</i>
+                    </span>
+                </Popover.Content>
+            </Popover>
+        );
+
         return (
             <div className="col-md-9 rightBlock" id="panel">
                 <div className="block_main_right">
@@ -124,36 +192,84 @@ class UserAddAchievement extends Component {
                         Добавление достижений для учета в конкурсе на академическую стипендию в повышенном размере
                     </p>
 
-                    <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
+                    <div className="form_elem_with_left_border">
+                        <label htmlFor="check2" className="label">Характеристики: </label>
+                        <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
                                    critErrorMessage={this.state.critErrorMessage}
                                    isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}/>
+                    </div>
 
-                    <form id="form">
-                    </form>
                     <div className="show_hide_c11">
                     </div>
-                    {(this.state.chars && this.state.chars[0] != '1 (7а)') && <form id="textForm">
+                    {(this.state.chars && this.state.chars[0] != '1 (7а)') && <FormGroup id="textForm">
+                        <div className="form_elem_with_left_border" style={{marginTop: "20px"}}>
+                            <label className="control-label" htmlFor="comment">Название достижения:
+                                <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
+                                                overlay={achievementPopover}>
+                                    <i className={"fas fa-question-circle"}
+                                       style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
+                                       onClick={(e) => {
+                                           e.preventDefault()
+                                       }}/>
+                                </OverlayTrigger>
+                            </label>
                     <textarea className="form-control area_text" name="comment"
-                              placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
-                              required onChange={this.updateDescr}/>
+                              placeholder={'Введите название достижения (однозначно определяющее его среди других)'}
+                              id="comment"
+                              required onChange={this.updateDescr} value={this.state.ach} style={{marginTop: "0"}}/>
+                        </div>
 
 
-                        <div className="form-group" style={{"display": "flex", "marginTop": "1rem"}}>
+                        <div className="form-group form_elem_with_left_border" style={{"marginTop": "1rem"}}>
+                            <div style={{display: "flex"}}>
+                                <div>
                             <label
-                                htmlFor="Date" style={{"marginTop": "auto", "marginRight": "0.5rem"}}
-                                className="control-label col-xs-2">Дата достижения: </label>
+                                style={{"marginTop": "auto"}}
+                                className="form-check-label">Дата достижения: </label>
+                                </div>
+                                <div style={{marginLeft: "3rem"}}>
+                                    <label className="checkbox-inline" style={{cursor: "pointer", color: "#595959"}}>
+                                        <input type="checkbox" id="defaultCheck1" onChange={(e) =>
+                                            this.setState({hasDateDiapasone: !this.state.hasDateDiapasone})}
+                                               style={{cursor: "pointer", color: "#595959"}}/>
+                                        <span style={{marginLeft: "0.5rem", color: "#595959"}}>диапазон дат</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {(this.state.hasDateDiapasone && this.state.dateDiapErrorMess) &&
+                            <span className="redText">{this.state.dateDiapErrorMess}</span>}
                             <div id="Date" style={{
                                 "display": "flex",
                                 "align-items": "center",
                                 "marginTop": "auto",
                                 "margin-bottom": "auto"
                             }}>
+
+
+                                {!this.state.hasDateDiapasone &&
                                 <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
-                                                      updater={this.handleDateChange}/>
+                                                      updater={this.handleDateChange}/>}
+                                {this.state.hasDateDiapasone && <table>
+                                    <tbody>
+                                    <tr>
+                                        <td>С:</td>
+                                        <td><AchievementDateInput className="form-control"
+                                                                  isValid={this.state.dateValidationResult}
+                                                                  updater={this.handleStartDateChange}/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>По:</td>
+                                        <td><AchievementDateInput className="form-control"
+                                                                  isValid={this.state.endDateValidationResult}
+                                                                  updater={this.handleEndDateChange}/></td>
+                                    </tr>
+                                    </tbody>
+                                </table>}
                             </div>
                         </div>
                         <ConfirmationForm updateForm={this.updateConfirmations}/>
-                    </form>}
+                    </FormGroup>}
 
 
                     <br/>
