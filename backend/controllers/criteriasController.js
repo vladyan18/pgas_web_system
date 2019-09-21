@@ -46,7 +46,7 @@ module.exports.GetAnnotationsForFaculty = async function (req, res) {
     if (annotations) {
         let result = {}
         result.annotations = annotations.AnnotationsToCrits;
-        result.learningProfile = annotations.LearningProfile
+        result.learningProfile = annotations.LearningProfile;
         return res.status(200).send(result);
     }
     else return res.sendStatus(404)

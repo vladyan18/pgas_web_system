@@ -26,11 +26,7 @@ class StaffContextStore {
         if (result) {
             this.annotations = result.annotations
             this.learningProfile = result.learningProfile
-        }
-        else {
-            this.annotations = undefined
-            this.learningProfile = undefined
-        }
+        } else console.log('ANN NOT FOUND', this.faculty)
     }
 
     async getCritsAndSchema() {
@@ -38,11 +34,6 @@ class StaffContextStore {
         if (result) {
             this.criterias = JSON.parse(result.Crits);
             this.schema = JSON.parse(result.CritsSchema)
-        }
-        else
-        {
-            this.criterias = undefined
-            this.schema = undefined
         }
     }
 }

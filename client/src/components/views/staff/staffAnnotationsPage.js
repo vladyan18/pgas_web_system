@@ -19,10 +19,7 @@ class StaffAnnotationsPage extends Component {
 
         await staffContextStore.getAnnotations();
         if (staffContextStore.annotations) {
-            this.setState({annotations: staffContextStore.annotations})
-        }
-        if (staffContextStore.learningProfile) {
-            this.setState({learningProfile: staffContextStore.learningProfile})
+            this.setState({annotations: staffContextStore.annotations, learningProfile: staffContextStore.learningProfile})
         }
     }
 
