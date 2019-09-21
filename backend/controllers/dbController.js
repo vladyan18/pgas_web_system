@@ -9,7 +9,7 @@ const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
 
-const redis = require('../config/redis');
+//const redis = require('../config/redis');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 exports.findUserById = async function (id) {
@@ -38,15 +38,15 @@ exports.findUserByAchieve = function(id){
 
 
 exports.isRegistered = async function(id){
-    r = (await redis.get(id + '_reg')) == 'true';
-    if (!r) {
+    //r = (await redis.get(id + '_reg')) == 'true';
+    //if (!r) {
         u = await UserModel.findOne({id: id}, 'Registered').lean();
         r = u.Registered;
 
-        if (r) {
-            redis.set(id + '_reg', 'true')
-        }
-    }
+       // if (r) {
+       //     redis.set(id + '_reg', 'true')
+      //  }
+    //}
 
     return r
 };
@@ -85,7 +85,7 @@ exports.findAchieves = async function (user_id) {
     //   if (!res) {
             User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
             let b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
-            redis.setAsync(user_id + '_achs', JSON.stringify(b));
+            //redis.setAsync(user_id + '_achs', JSON.stringify(b));
             return(b)
     // } else return JSON.parse(res)})
 };
@@ -93,22 +93,22 @@ exports.findAchieves = async function (user_id) {
 exports.findAchieveById = async function (id) {
     return await AchieveModel.findById(id).lean();
 
-    return redis.getAsync(id + '_ach2').then(async (res) => {
-        if (!res) {
+   // return redis.getAsync(id + '_ach2').then(async (res) => {
+      //  if (!res) {
             let b = await AchieveModel.findById(id).lean();
-            redis.setAsync(id + '_ach2', JSON.stringify(b));
+         //   redis.setAsync(id + '_ach2', JSON.stringify(b));
             return(b)
-        } else return JSON.parse(res)})
+      //  } else return JSON.parse(res)})
 };
 
 exports.createAchieve = async function (achieve) {
     let a = await AchieveModel.create(achieve);
-    redis.setAsync(a._id + '_ach2', JSON.stringify(a));
+   // redis.setAsync(a._id + '_ach2', JSON.stringify(a));
   return a
 };
 
 exports.deleteAchieve = async function (id) {
-    redis.del(id + '_ach2');
+   // redis.del(id + '_ach2');
     AchieveModel.findByIdAndRemove(id).then((x) => {
     });
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
@@ -119,16 +119,16 @@ exports.deleteAchieve = async function (id) {
         }
     }
     await UserModel.findOneAndUpdate({id: u.id}, {Achievement: u.Achievement});
-    redis.del(u.id + '_achs');
-    redis.del(u.id + '_user');
+    //redis.del(u.id + '_achs');
+    //redis.del(u.id + '_user');
     return true
 };
 
 exports.updateAchieve = async function (id, achieve) {
-    redis.del(id + '_ach2');
+    //redis.del(id + '_ach2');
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-    redis.del(u.id + '_achs');
-    redis.del(u.id + '_user');
+    //redis.del(u.id + '_achs');
+    //redis.del(u.id + '_user');
     return AchieveModel.findOneAndUpdate({_id: id}, {
         $set: {
             crit: achieve.crit,
@@ -143,8 +143,8 @@ exports.updateAchieve = async function (id, achieve) {
 };
 
 exports.registerUser = function (userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type, settings) {
-    redis.set(id + '_reg', true);
-    redis.del(id + '_user');
+    //redis.set(id + '_reg', true);
+    //redis.del(id + '_user');
     return UserModel.findOneAndUpdate({id: userId}, {
         $set: {
             LastName: lastname,
@@ -163,28 +163,28 @@ exports.registerUser = function (userId, lastname, name, patronymic, birthdate, 
 
 
 exports.addAchieveToUser = function (userId, achieveId) {
-    redis.del(userId + '_achs');
-    redis.del(userId + '_user');
+    //redis.del(userId + '_achs');
+    //redis.del(userId + '_user');
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 };
 
 exports.AddToRating = async function (userId) {
     let u = await UserModel.findOne({ _id: userId });
-    redis.del(u.id + '_user');
+    //redis.del(u.id + '_user');
     return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true } })
 };
 
 exports.RemoveFromRating = async function (userId) {
     let u = await UserModel.findOne({ _id: userId });
-    redis.del(u.id + '_user');
+    //redis.del(u.id + '_user');
     return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: false } })
 };
 
 exports.ChangeAchieve = async function (id,isGood) {
-    redis.del(id + '_ach2');
+    //redis.del(id + '_ach2');
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
 
-    redis.del(u.id + '_achs');
+    //redis.del(u.id + '_achs');
   if (isGood === true) {
       let Ach = await AchieveModel.findById(id);
     if(Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями'){
@@ -206,16 +206,16 @@ exports.ChangeAchieve = async function (id,isGood) {
 
 
 exports.comment = async function(id,comment){
-    redis.del(id + '_ach2');
+    //redis.del(id + '_ach2');
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-    redis.del(u.id + '_achs');
+    //redis.del(u.id + '_achs');
   return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
   })
 };
 
 exports.toggleHide = async function (id) {
     u = await UserModel.findById(id);
-    redis.del(id + '_user');
+    //redis.del(id + '_user');
     return UserModel.findOneAndUpdate({_id: id}, {$set: {IsHiddenInRating: (!u.IsHiddenInRating)}}, function (err, result) {
     })
 };
@@ -226,7 +226,7 @@ exports.allAchieves = function () {
 };
 
 exports.setBalls = function(id,balls){
-    redis.del(id + '_user');
+    //redis.del(id + '_user');
   return UserModel.findOneAndUpdate({ id: id }, { $set: { Ball: balls} }, function (err, result) {
   })
 };
@@ -260,7 +260,7 @@ exports.CreateFaculty = async function (Faculty) {
         if (!superAdmin.Rights) superAdmin.Rights = [];
         superAdmin.Rights.push(Faculty.Name);
         await UserModel.findOneAndUpdate({'_id': superAdmin._id}, {$set: {Rights: superAdmin.Rights}});
-        redis.del(superAdmin.Id + '_user');
+        //redis.del(superAdmin.Id + '_user');
     }
     return faculty
 };
@@ -296,7 +296,7 @@ exports.GetAnnotationsForFaculty = async function (facultyName) {
 
 
 exports.ChangeRole = function (id, isAdmin) {
-    redis.del(id + '_user');
+    //redis.del(id + '_user');
   if (isAdmin === true) {
     return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'Admin'} }, function (err, result) {
       console.log(result)

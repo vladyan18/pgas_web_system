@@ -6,10 +6,11 @@
 
 const express = require('express');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const morgan = require('morgan');
 const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
-const redisClient = require('./config/redis');
+//const redisClient = require('./config/redis');
 const frontendPath = path.join(__dirname, '../frontend', '/build');
 const port = 80;
 
@@ -25,9 +26,8 @@ const sess = {
   cookie: {},
   resave: false,
   saveUninitialized: true,
-    store: new (require('express-sessions'))({
-        storage: 'redis',
-        instance: redisClient
+    store: new MongoStore({
+        url: 'mongodb://bekhterev:bekhterev@localhost:27017/bekhterev?authSource=admin'
     })
 };
 
