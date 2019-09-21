@@ -12,7 +12,7 @@ class StaffAnnotationsPage extends Component {
         this.state = {annotations: {}}
     };
 
-    async componentWillMount() {
+    async componentDidMount() {
         if (!staffContextStore.criterias || !staffContextStore.schema) {
             staffContextStore.getCritsAndSchema().then()
         }
@@ -21,13 +21,17 @@ class StaffAnnotationsPage extends Component {
         if (staffContextStore.annotations) {
             this.setState({annotations: staffContextStore.annotations})
         }
+        if (staffContextStore.learningProfile) {
+            this.setState({learningProfile: staffContextStore.learningProfile})
+        }
     }
 
 
     saveAnnotations() {
         fetchSendWithoutRes('/api/updateAnnotations', {
             faculty: staffContextStore.faculty,
-            annotations: this.state.annotations
+            annotations: this.state.annotations,
+            learningProfile: this.state.learningProfile
         }).then((res) => {
             if (res) {
                 staffContextStore.getAnnotations().then();
@@ -65,6 +69,16 @@ class StaffAnnotationsPage extends Component {
                             </div>
                         </div>
                         <hr className="hr_blue"/>
+                        <h5>Какой у вас профиль обучения (что является ДСПО):</h5>
+                                            <textarea className="form-control area_text"
+                                                      placeholder="Введите примечания к критерию..." onChange={(e) => {
+
+                                                let st = this.state;
+                                                st.learningProfile = e.target.value;
+                                                this.setState(st)
+                                            }}
+                                                      value={this.state.learningProfile} style={{margin: "0"}}/>
+
                         {
                             staffContextStore.criterias &&
                             <div>

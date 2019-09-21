@@ -4,7 +4,8 @@ const connection = require('../config/db');
 const annotationSchema = mongoose.Schema({
     FacultyId: String,
     Date: Date,
-    AnnotationsToCrits: {}
+    AnnotationsToCrits: {},
+    LearningProfile: String
 });
 
 const Annotation = connection.model('Annotation', annotationSchema);

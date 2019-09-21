@@ -37,14 +37,18 @@ module.exports.upload = async function (req, res) {
 };
 
 module.exports.UploadAnnotationsToFaculty = async function (req, res) {
-    let annotations = await db.UploadAnnotationsToFaculty(req.body.annotations, req.body.faculty);
+    let annotations = await db.UploadAnnotationsToFaculty(req.body.annotations, req.body.learningProfile, req.body.faculty);
     return res.sendStatus(200)
 };
 
 module.exports.GetAnnotationsForFaculty = async function (req, res) {
     let annotations = await db.GetAnnotationsForFaculty(req.query.faculty);
-    if (annotations)
-        return res.status(200).send(annotations.AnnotationsToCrits);
+    if (annotations) {
+        let result = {}
+        result.annotations = annotations.AnnotationsToCrits;
+        result.learningProfile = annotations.LearningProfile
+        return res.status(200).send(result);
+    }
     else return res.sendStatus(404)
 };
 
@@ -291,8 +295,9 @@ function parseCrits(sheet) {
         for (let col = range.s.c; col <= range.e.c; col++) {
             let cellValue = getCellValue(row, col, sheet);
 
-            if (isValue(cellValue) && !isMaxBallsCell(row, col, sheet))
-                attendInTable(cellValue, col, row, sheet, Table, lastCritInfo, Schema);
+            if (isValue(cellValue) && !isMaxBallsCell(row, col, sheet)) {
+                    attendInTable(cellValue, col, row, sheet, Table, lastCritInfo, Schema);
+            }
         }
     }
 

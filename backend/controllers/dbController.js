@@ -279,9 +279,9 @@ exports.GetCriteriasAndSchema = async function (facultyName) {
     else return undefined
 };
 
-exports.UploadAnnotationsToFaculty = async function (annotations, facultyName) {
+exports.UploadAnnotationsToFaculty = async function (annotations, learningProfile, facultyName) {
     let facObject = await FacultyModel.findOne({Name: facultyName});
-    let annObj = {Date: Date.now(), AnnotationsToCrits: annotations, FacultyId: facObject._id};
+    let annObj = {Date: Date.now(), AnnotationsToCrits: annotations, LearningProfile: learningProfile, FacultyId: facObject._id};
     annObj = await AnnotationsModel.create(annObj);
     await FacultyModel.findByIdAndUpdate(facObject._id, {$set: {AnnotationsToCritsId: annObj._id.toString()}});
     return annObj

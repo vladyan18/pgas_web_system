@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
+import criteriasStore from "../../../../stores/criteriasStore";
 
 export default class DescriptionToTermin extends Component {
 
@@ -33,8 +34,7 @@ export default class DescriptionToTermin extends Component {
             </p></div>)
         } else if (values.some(o => o == 'ДСПО')) {
             return (<div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
-                <b>ДСПО</b> – Достижение Соответствующее Профилю Обучения (<b>математика, физика, информатика и
-                программирование</b>) <br/>
+                <b>ДСПО</b> – Достижение Соответствующее Профилю Обучения (<b>{criteriasStore.learningProfile}</b>) <br/>
                 <b>ДнСПО</b> – Достижение <b>не</b> Соответствующее Профилю Обучения<br/>
             </p></div>)
         } else if (values.some(o => o.search('Q1') > -1)) {
