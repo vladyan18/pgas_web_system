@@ -43,7 +43,7 @@ module.exports.UploadAnnotationsToFaculty = async function (req, res) {
 
 module.exports.GetAnnotationsForFaculty = async function (req, res) {
     let annotations = await db.GetAnnotationsForFaculty(req.query.faculty);
-    if (annotations) {
+    if (annotations && (annotations.AnnotationsToCrits || annotations.LearningProfile) ) {
         let result = {}
         result.annotations = annotations.AnnotationsToCrits;
         result.learningProfile = annotations.LearningProfile;
