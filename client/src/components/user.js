@@ -69,7 +69,9 @@ class User extends Component {
                 </Switch>
             </div>
         </div>
-        </div>}</>)
+
+        </div>}
+            </>)
     }
 
 }

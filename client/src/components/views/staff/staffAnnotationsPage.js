@@ -9,16 +9,18 @@ import {fetchSendWithoutRes} from "../../../services/fetchService";
 class StaffAnnotationsPage extends Component {
     constructor(props) {
         super(props);
-        this.state = {annotations: {}}
+        this.state = {annotations: {}, criterias: {}}
+        if (staffContextStore.annotations) this.state.annotation = staffContextStore.annotations
+        if (staffContextStore.learningProfile) this.state.learningProfile = staffContextStore.learningProfile
     };
 
-    async componentDidMount() {
+    async componentWillMount() {
         if (!staffContextStore.criterias || !staffContextStore.schema) {
             staffContextStore.getCritsAndSchema().then()
         }
 
         await staffContextStore.getAnnotations();
-        if (staffContextStore.annotations) {
+        if (staffContextStore.annotations || staffContextStore.learningProfile) {
             this.setState({annotations: staffContextStore.annotations, learningProfile: staffContextStore.learningProfile})
         }
     }
