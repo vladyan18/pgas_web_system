@@ -137,7 +137,7 @@ export default class CriteriasForm extends Component {
             {(!this.props.supressDescription && criteriasStore.annotations && criteriasStore.annotations[this.state.crit])
             && <div id="critDescr" className="blue_bg">
                 <p className="desc_selectors" id="desc_criterion_first">
-                    <ReactMarkdown source={criteriasStore.annotations[this.state.crit]}/>
+                    <ReactMarkdown source={criteriasStore.annotations[this.state.crit]} linkTarget={() => '_blank'}/>
                 </p>
             </div>}
             {this.state.selects.map((item) => (
