@@ -71,7 +71,7 @@ module.exports.getProfile = async function (req, res) {
             Type: User.Type,
             Course: User.Course
         });
-    else res.status(404).send()
+    else res.status(404).send({})
 };
 
 module.exports.getRights = async function (req, res) {

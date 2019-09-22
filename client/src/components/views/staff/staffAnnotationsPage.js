@@ -14,15 +14,16 @@ class StaffAnnotationsPage extends Component {
         if (staffContextStore.learningProfile) this.state.learningProfile = staffContextStore.learningProfile
     };
 
-    async componentWillMount() {
+    async componentDidMount() {
         if (!staffContextStore.criterias || !staffContextStore.schema) {
             staffContextStore.getCritsAndSchema().then()
         }
 
         await staffContextStore.getAnnotations();
-        if (staffContextStore.annotations || staffContextStore.learningProfile) {
-            this.setState({annotations: staffContextStore.annotations, learningProfile: staffContextStore.learningProfile})
-        }
+        let st = this.state;
+        if (staffContextStore.annotations) st.annotations = staffContextStore.annotations
+        if (staffContextStore.learningProfile) st.learningProfile = staffContextStore.learningProfile
+        this.setState(st)
     }
 
 
