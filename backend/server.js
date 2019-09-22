@@ -5,6 +5,7 @@
  */
 
 const express = require('express');
+var compress = require('compression');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const morgan = require('morgan');
@@ -45,6 +46,7 @@ app.use(function (req, res, next) {
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({extended: false}));
 
+app.use(compress());
 app.use(express.static(path.join(frontendPath, '/public')));
 app.use(express.static(path.join(__dirname, '/static/confirmations')));
 

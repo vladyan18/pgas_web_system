@@ -6,13 +6,14 @@ import UserAchievesContainer from "./containers/user/userAchievesContainer";
 import {Route} from "react-router-dom";
 import UserCommonInfoContainer from "./containers/user/UserCommonInfoContainer";
 import UserProfileContainer from "./containers/user/userProfileContainer";
-import UserAddAchievementContainer from "./containers/user/userAddAchievementContainer";
 import Auth from "../modules/Auth";
 import userPersonalStore from "../stores/userPersonalStore";
-import EditAchievementContainer from "./containers/user/editAchievementContainer";
 import CriteriasStore from "../stores/criteriasStore"
 import {Switch, withRouter} from "react-router";
 import {observer} from "mobx-react";
+
+import EditAchievementContainer from "./containers/user/editAchievementContainer";
+import UserAddAchievementContainer from "./containers/user/userAddAchievementContainer";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (

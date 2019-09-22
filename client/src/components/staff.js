@@ -5,15 +5,15 @@ import Auth from "../modules/Auth";
 import {Switch} from "react-router";
 import StaffHeaderContainer from "./containers/staff/staffHeaderContainer";
 import StaffMenu from './views/staff/staffMenu'
-import NewAchievesContainer from "./containers/staff/newAchievesContainer";
-import CurrentContestAchievementsContainer from "./containers/staff/currentContestAchievementsContainer";
-import StaffStudentsRatingContainer from "./containers/staff/staffStudentsRatingContainer";
 import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
-import StaffCriteriasPage from "./views/staff/staffCriteriasPage";
-import StaffAnnotationsPage from "./views/staff/staffAnnotationsPage";
 import {observer} from "mobx-react";
 
+const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"))
+const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"))
+const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"))
+const StaffCriteriasPage = React.lazy(() => import("./views/staff/staffCriteriasPage"))
+const StaffAnnotationsPage = React.lazy(() => import("./views/staff/staffAnnotationsPage"))
 const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage/CriteriasMenu'));
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
@@ -66,7 +66,18 @@ class Staff extends Component {
             <StaffHeaderContainer/>
             <div id="mainBody">
                 {staffContextStore.faculty &&
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div style={{backGroundColor: "#e2e2e2", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
+                    <div id="floatingCirclesG">
+                        <div className="f_circleG" id="frotateG_01"/>
+                        <div className="f_circleG" id="frotateG_02"/>
+                        <div className="f_circleG" id="frotateG_03"/>
+                        <div className="f_circleG" id="frotateG_04"/>
+                        <div className="f_circleG" id="frotateG_05"/>
+                        <div className="f_circleG" id="frotateG_06"/>
+                        <div className="f_circleG" id="frotateG_07"/>
+                        <div className="f_circleG" id="frotateG_08"/>
+                    </div>
+                </div>}>
                     <Switch>
                         <Route path="/staff/newAchieves" component={NewAchievesContainer}/>
                         <Route path="/staff/current" component={CurrentContestAchievementsContainer}/>
