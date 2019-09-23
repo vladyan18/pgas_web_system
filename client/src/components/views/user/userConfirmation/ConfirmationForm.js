@@ -518,7 +518,7 @@ class ConfirmationForm extends Component {
                                     </button>
                                 </form>
                             }
-                                {(this.state.existingOpened && !this.state.existingSelected) && <div>
+                                {(this.state.existingOpened && !this.state.existingSelected && this.state.commonConfirms) && <div>
                                     <label htmlFor="Name">Выберите подтверждение:</label>
                                     <BootstrapTable keyField='_id' data={this.state.commonConfirms}
                                                     columns={this.columns}
