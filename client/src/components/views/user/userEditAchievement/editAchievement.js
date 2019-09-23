@@ -22,7 +22,6 @@ class EditAchievement extends Component {
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
         this.updateConfirmations = this.updateConfirmations.bind(this);
-        this.crits = CriteriasStore.criterias;
         if (this.props.achieves) {
             let ach = this.props.achieves.filter((x) => x._id == this.props.achId)[0];
             this.state = {
@@ -203,6 +202,9 @@ class EditAchievement extends Component {
                 </Popover.Content>
             </Popover>
         );
+
+        if (!CriteriasStore.criterias) return null
+
         return (<div className="col-md-9 rightBlock" id="panel">
             <div className="block_main_right">
                 <div className="profile" style={{"display: flex; justify-content": "space-between"}}>

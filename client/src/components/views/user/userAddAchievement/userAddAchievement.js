@@ -185,6 +185,8 @@ class UserAddAchievement extends Component {
             </Popover>
         );
 
+        if (!CriteriasStore.criterias) return null
+
         return (
             <div className="col-md-9 rightBlock" id="panel">
                 <div className="block_main_right">

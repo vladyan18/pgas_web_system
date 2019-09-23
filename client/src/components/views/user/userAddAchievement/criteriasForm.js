@@ -25,6 +25,7 @@ export default class CriteriasForm extends Component {
 
                 sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
             }
+
             this.state = {
                 selects: sel,
                 length: this.props.values.length,
@@ -49,12 +50,13 @@ export default class CriteriasForm extends Component {
         }
 
         if (key < state.length) {
-            let d = state.length - key + 1;
+            let d = state.length - key;
             for (let i = 0; i < d; i++) {
                 state.values.pop();
                 state.selects.pop();
                 state.length -= 1;
             }
+            state.values.pop()
 
         }
 
@@ -64,6 +66,7 @@ export default class CriteriasForm extends Component {
         }
 
         state.values.push(e.target.value);
+        //state.length += 1;
 
         let crit = this.props.crits;
         let id = '';
@@ -72,10 +75,10 @@ export default class CriteriasForm extends Component {
             crit = crit[state.values[i]]
         }
         let keys = Object.keys(crit);
-        console.log('S: ' + state.values);
-        if (isNaN(Number(crit[keys[0]]))) {
+        console.log('S: ' + keys);
+        if (isNaN(Number(keys[0]))) {
             this.props.valuesCallback(state.values, false);
-            state.selects.push({id: id, num: state.length + 1, value: '', options: Object.keys(crit)});
+            state.selects.push({id: id, num: state.length + 1, value: "", options: keys});
             state.length += 1
 
         } else
@@ -143,7 +146,7 @@ export default class CriteriasForm extends Component {
             {this.state.selects.map((item) => (
                 <div>
                     <DescriptionToTermin values={item.options}/>
-                    <select className={"form-control selectors" + (this.props.isInvalid ? " is-invalid" : '')} required
+                    <select className={"form-control selectors" + (this.props.isInvalid && (item.num == this.state.length) ? " is-invalid" : '')} required
                             key={item.id} id={item.num.toString()}
                             defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}
                             style={{cursor: "pointer"}}>
