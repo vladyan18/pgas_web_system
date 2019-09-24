@@ -165,6 +165,7 @@ module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
     else id = req.user.user_id;
     user = await db.findUserById(id);
     let confirms = await db.getConfirmations(user.Confirmations);
+    console.log('Trying to get confirms,', user.LastName, confirms)
     res.status(200).send(confirms)
 };
 
