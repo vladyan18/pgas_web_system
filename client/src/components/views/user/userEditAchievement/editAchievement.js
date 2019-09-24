@@ -8,6 +8,7 @@ import ConfirmationForm from "../userConfirmation/ConfirmationForm";
 import userAchievesStore from "../../../../stores/userAchievesStore";
 import userPersonalStore from "../../../../stores/userPersonalStore";
 import {OverlayTrigger, Popover} from "react-bootstrap";
+import HelpButton from "../helpButton";
 
 
 class EditAchievement extends Component {
@@ -244,13 +245,7 @@ class EditAchievement extends Component {
                 {(this.state.chars && this.state.chars[0] != '1 (7а)') && <form id="textForm">
                     <div className="form_elem_with_left_border" style={{marginTop: "20px"}}>
                         <label className="control-label" htmlFor="comment">Название достижения:
-                            <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
-                                            overlay={achievementPopover}>
-                                <i className={"fas fa-question-circle"}
-                                   style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}} onClick={(e) => {
-                                    e.preventDefault()
-                                }}/>
-                            </OverlayTrigger>
+                            <HelpButton  overlay={achievementPopover} placement={"top"} />
                         </label>
                         <textarea className="form-control area_text" name="comment"
                                   placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
