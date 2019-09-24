@@ -8,7 +8,7 @@ import {Switch} from "react-router-dom";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
 import "./setupProxy"
-
+import {Helmet} from "react-helmet";
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));

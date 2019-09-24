@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import {fetchGet, fetchSendObj} from "../../../../services/fetchService";
 import {OverlayTrigger, Popover} from "react-bootstrap";
+import HelpButton from "../helpButton";
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -88,7 +89,7 @@ class ConfirmationForm extends Component {
     columns = [{
         dataField: 'Type',
         text: 'Тип',
-        style: {width: "10%"},
+        style: {width: "10%", fontSize: "small"},
         formatter: (cell, row) => {
             if (row.Type == 'link') {
                 if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
@@ -100,15 +101,16 @@ class ConfirmationForm extends Component {
     }, {
         dataField: 'Data',
         text: 'Подтверждение',
-        style: {width: "40%"},
+        style: {width: "40%", overflow:"hidden"},
         formatter: (cell, row) => {
             if (row.Type == 'SZ') {
-                return (<>{row.Name}
+                return (<div style={{fontSize: "small"}}>{row.Name}
                     {row.SZ ? (row.SZ.Appendix ? ', прил. ' + row.SZ.Appendix : '') : ''}
                     {row.SZ ? (row.SZ.Paragraph ? ', п. ' + row.SZ.Paragraph : '') : ''}
-                </>)
-            } else return (<><a href={row.Data} onClick={(e) => e.stopPropagation()} target="_blank">{row.Name}</a>
-                <br/>{row.additionalInfo}</>)
+                </div>)
+            } else return (<div style={{overflow:"hidden", textOverflow: "ellipsis", maxWidth:"18rem", fontSize: "small"}}>
+                <a href={row.Data} onClick={(e) => e.stopPropagation()} target="_blank">{row.Name}</a>
+                <br/>{row.additionalInfo}</div>)
         }
     }, {
         isDummyField: true,
@@ -316,14 +318,33 @@ class ConfirmationForm extends Component {
         );
 
         const AddInfoHelp = (
-            <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
-                            overlay={AddInfoPopover}>
-                <i className={"fas fa-question-circle"}
-                   style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
-                   onClick={(e) => {
-                       e.preventDefault()
-                   }}/>
-            </OverlayTrigger>);
+            <HelpButton  overlay={AddInfoPopover} placement={"top"} />);
+
+        const deleteConfirmation = (e, confirmation) => {
+            let confirmations = this.state.confirmations
+            confirmations.splice(confirmations.indexOf(confirmation), 1)
+            this.props.updateForm(confirmations);
+            //this.setState({confirmations: confirmations})
+        }
+
+        let columns = this.columns.concat([
+            {
+                isDummyField: true,
+                style: {textAlign: "right"},
+                formatter: (cell, row) => <button onClick={(e) => deleteConfirmation(e, row)}
+                                                  style={
+                                                      {
+                                                          cursor: "pointer",
+                                                          marginLeft: "0.3rem",
+                                                          marginTop: "0px",
+                                                          border:'none',
+                                                          padding: 0,
+                                                          backgroundColor: 'transparent',
+                                                          outline: 'none',
+                                                          color: "red",
+                                                      }}><i className="fa fa-trash-alt"/></button>
+            }
+        ])
 
         return (
             <div>
@@ -336,7 +357,7 @@ class ConfirmationForm extends Component {
 
                 <div>
                     {this.state.confirmations.length > 0 &&
-                    <BootstrapTable keyField='_id' data={this.state.confirmations} columns={this.columns}
+                    <BootstrapTable keyField='_id' data={this.state.confirmations} columns={columns}
                                     headerClasses={["hidden"]} bordered={false}/>
                     }
                 </div>
@@ -407,28 +428,16 @@ class ConfirmationForm extends Component {
                             {
                                 this.state.Type == 'link' && <form>
                                     <label htmlFor="Name"><span className="redText">*</span>Название:
-                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
-                                                        overlay={LinkNamePopover}>
-                                            <i className={"fas fa-question-circle"}
-                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
-                                               onClick={(e) => {
-                                                   e.preventDefault()
-                                               }}/>
-                                        </OverlayTrigger></label>
+                                        <HelpButton  overlay={LinkNamePopover} placement={"top"} />
+                                    </label>
                                     <input id="Name" className="form-control" type="text" required autoComplete={'off'}
                                            onChange={this.handleNameChange} autoFocus={true}/>
                                     <label htmlFor="Link"><span className="redText">*</span>Ссылка:</label>
                                     <input id="Link" className="form-control" type="text" required
                                            onChange={this.handleLinkChange} autoComplete={'off'}/>
                                     <label htmlFor="AddInfo">Дополнительная информация:
-                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
-                                                        overlay={AddInfoPopover}>
-                                            <i className={"fas fa-question-circle"}
-                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
-                                               onClick={(e) => {
-                                                   e.preventDefault()
-                                               }}/>
-                                        </OverlayTrigger></label>
+                                        <HelpButton  overlay={AddInfoPopover} placement={"top"} />
+                                    </label>
                                     <input id="AddInfo" className="form-control" type="text" required
                                            onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
@@ -439,14 +448,8 @@ class ConfirmationForm extends Component {
                             {
                                 this.state.Type == 'SZ' && <form>
                                     <label htmlFor="Name"><span className="redText">*</span>Название служебной записки:
-                                        <OverlayTrigger trigger={['click', 'focus']} placement="bottom"
-                                                        overlay={SZNamePopover}>
-                                            <i className={"fas fa-question-circle"}
-                                               style={{cursor: "pointer", marginLeft: "0.3rem", marginTop: "0px"}}
-                                               onClick={(e) => {
-                                                   e.preventDefault()
-                                               }}/>
-                                        </OverlayTrigger></label>
+                                        <HelpButton  overlay={SZNamePopover} placement={"top"} />
+                                    </label>
                                     <input id="SZName" name="SZname" className="form-control" type="text" required
                                            onChange={this.handleSZNameChange} autoFocus={true}/>
                                     <label htmlFor="Link">Приложение:</label>

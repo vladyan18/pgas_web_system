@@ -235,12 +235,14 @@ module.exports.addFileForConfirmation = function (req, res) {
  * @function addAchieve
  * */
 
+
+let browser
+puppeteer.launch().then((newBrowser) => browser = newBrowser)
+
 crawlLink = async function (confirmation, user) {
     let userName = (user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic).trim();
     if (confirmation.Data.startsWith('https://elibrary.ru/item.asp?id=') || confirmation.Data.startsWith('elibrary.ru/item.asp?id=')) {
-        let html = await puppeteer
-            .launch()
-            .then(browser => browser.newPage())
+        let html = await browser.newPage()
             .then(page => {
                 return page.goto(confirmation.Data).then(function () {
                     return page.content();
