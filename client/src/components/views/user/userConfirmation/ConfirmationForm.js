@@ -76,10 +76,9 @@ class ConfirmationForm extends Component {
     async componentDidMount() {
         let commonConfirms = await fetchGet('/api/getConfirmations', {});
 
-        console.log(commonConfirms);
         for (let conf of commonConfirms) {
             if (conf.Type == 'SZ') {
-                commonConfirms.remove(conf)
+                commonConfirms.splice(commonConfirms.indexOf(conf), 1)
             }
         }
         this.setState({commonConfirms: commonConfirms})
