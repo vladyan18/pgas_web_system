@@ -42,47 +42,59 @@ export default class CriteriasForm extends Component {
     handleSelect(e) {
         e.preventDefault();
         e.stopPropagation();
-        let state = this.state;
+        let state = {...this.state};
         let key = Number(e.target.id);
-        console.log(key, state.length, state.values.length);
-        if (key == state.length && key == state.values.length) {
+        if (key == state.length && key == (state.values.length)) {
+            console.log('POP1', state.values[state.values.length-1])
             state.values.pop();
+            state.length -= 1;
         }
+
 
         if (key < state.length) {
             let d = state.length - key;
+            console.log('D', d, state.length, key)
             for (let i = 0; i < d; i++) {
+                console.log('POP', state.values[state.values.length-1])
                 state.values.pop();
                 state.selects.pop();
                 state.length -= 1;
             }
-            state.values.pop()
+            console.log('POP', state.values[state.values.length-1])
 
+            state.values.pop();
+            state.length -= 1;
         }
 
         if (key == 1) {
             state.crit = e.target.value;
             state.length = 1
-        }
+        } else state.length += 1
+        //this.setState(state)
 
+        console.log('PUSH', e.target.value)
         state.values.push(e.target.value);
+        if (state.selects.length >= state.values.length)
+            state.selects.pop()
+
         //state.length += 1;
 
         let crit = this.props.crits;
         let id = '';
+        let val = {...state.values}
+        console.log(state.length, val)
         for (let i = 0; i < state.length; i++) {
             id += state.values[i];
             crit = crit[state.values[i]]
         }
         let keys = Object.keys(crit);
-        console.log('S: ' + keys);
         if (isNaN(Number(keys[0]))) {
-            this.props.valuesCallback(state.values, false);
-            state.selects.push({id: id, num: state.length + 1, value: "", options: keys});
-            state.length += 1
+            //this.props.valuesCallback(state.values, false);
+            state.selects.push({id: id + e.target.value, num: state.length + 1, value: "", options: keys});
 
-        } else
-            this.props.valuesCallback(state.values, true);
+
+        }
+            //this.props.valuesCallback(state.values, true);
 
 
         this.setState(state)
@@ -143,22 +155,23 @@ export default class CriteriasForm extends Component {
                     <ReactMarkdown source={criteriasStore.annotations[this.state.crit]} linkTarget={() => '_blank'}/>
                 </p>
             </div>}
-            {this.state.selects.map((item) => (
-                <div>
+            {this.state.selects.map((item) => {
+                return(
+                <div key={item.id}>
                     <DescriptionToTermin values={item.options}/>
                     <select className={"form-control selectors" + (this.props.isInvalid && (item.num == this.state.length) ? " is-invalid" : '')} required
-                            key={item.id} id={item.num.toString()}
+                            id={item.num.toString()}
                             defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}
                             style={{cursor: "pointer"}}>
                         <option disabled value="">Выберите характеристику</option>
                         {item.options.map((option) => (
-                            <option value={option} style={{wordWrap: "break-word"}}>
+                            <option key={option + item.id} value={option} style={{wordWrap: "break-word"}}>
                                 {option}
                             </option>
                         ))}
                     </select>
                 </div>
-            ))}
+            )})}
         </form>)
     }
 }
