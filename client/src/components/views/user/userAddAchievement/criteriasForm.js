@@ -89,12 +89,12 @@ export default class CriteriasForm extends Component {
         }
         let keys = Object.keys(crit);
         if (isNaN(Number(keys[0]))) {
-            //this.props.valuesCallback(state.values, false);
+            this.props.valuesCallback(state.values, false);
             state.selects.push({id: id + e.target.value, num: state.length + 1, value: "", options: keys});
 
 
         }
-            //this.props.valuesCallback(state.values, true);
+            this.props.valuesCallback(state.values, true);
 
 
         this.setState(state)
