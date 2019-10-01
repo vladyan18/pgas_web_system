@@ -10,7 +10,8 @@ const storage = multer.diskStorage({
         cb(null, uploadsConfirmationsPath)
     },
     filename: (req, file, cb) => {
-        let filename = translitter().transform(file.originalname, '_');
+        let filename = translitter().transform(file.originalname, '_').replace(/&/g, 'amp').replace(/\\/g, 'slash').replace(/%/g, 'perc')
+            .replace(/\?/g, 'q').replace(/[%№!;\[\]{}()=+,#]/g, 's');
         cb(null, 'conf-' + randomstring.generate(16) + '-' + filename)
     }
 });

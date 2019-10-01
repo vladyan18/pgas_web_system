@@ -33,8 +33,9 @@ exports.getUserRights = function (id) {
 
 exports.findUserByAchieve = async function(id){
 
-    console.log('GET ID', id)
-    let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}})
+    console.log('GET ID', id, typeof id)
+    let ach = await AchieveModel.findById(id.toString())
+    let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
     console.log('USER', user)
     return user
 };
@@ -157,7 +158,8 @@ exports.deleteAchieve = async function (id) {
 
 exports.updateAchieve = async function (id, achieve) {
     //redis.del(id + '_ach2');
-    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
+    u = this.findUserByAchieve(id)
+    //u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
     //redis.del(u.id + '_achs');
     //redis.del(u.id + '_user');
     let newAch = {
@@ -169,7 +171,7 @@ exports.updateAchieve = async function (id, achieve) {
     }
 
     if (achieve.confirmations && achieve.confirmations.length > 0) {
-        //newAch.confirmations = achieve.confirmations
+        newAch.confirmations = achieve.confirmations
 
         //for (let conf of achieve.confirmations) {
         //    let id = await ConfirmationModel.findById(conf)

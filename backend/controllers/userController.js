@@ -166,7 +166,6 @@ module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
     else id = req.user.user_id;
     user = await db.findUserById(id);
     let confirms = await db.getConfirmations(user.Confirmations);
-    console.log('Trying to get confirms,', user.LastName, confirms)
     res.status(200).send(confirms)
 };
 
@@ -211,7 +210,6 @@ module.exports.addFileForConfirmation = function (req, res) {
         }
 
         let confirmation = JSON.parse(req.body.data);
-        console.log(req.file);
         confirmation.FilePath = req.file.path;
         confirmation.Data = 'http://localhost:3000/api/getConfirm/' + req.file.filename;
         confirmation.Date = Date.now();
