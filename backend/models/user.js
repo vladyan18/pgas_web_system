@@ -15,7 +15,10 @@ const userSchema = mongoose.Schema({
   Course: Number,
   Type: String,
   Ball: Number,
-  Achievement: [String],
+  Achievement: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Achieve'
+  }],
     IsInRating: Boolean,
     IsHiddenInRating: Boolean,
     Confirmations: [String],

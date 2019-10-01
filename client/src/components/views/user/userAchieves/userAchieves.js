@@ -52,7 +52,7 @@ class UserAchieves extends Component {
 
             <div className="category">
                 <h3 className="achGroup">Архив достижений</h3>
-                <block_1>
+                <block_1 style={{border:"none"}}>
                     <div id="archive_docs"></div>
                 </block_1>
             </div>

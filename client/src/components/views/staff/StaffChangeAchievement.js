@@ -4,6 +4,8 @@ import AchievementDateInput from "../../AchievementDateInput";
 import {fetchSendWithoutRes} from "../../../stores/criteriasStore";
 import CriteriasForm from "../user/userAddAchievement/criteriasForm";
 import staffContextStore from "../../../stores/staff/staffContextStore";
+import BootstrapTable from "react-bootstrap-table-next";
+import {ConfirmationColumns} from "../user/userConfirmation/ConfirmationColumns";
 
 class StaffChangeAchievement extends Component {
     constructor(props) {
@@ -11,6 +13,7 @@ class StaffChangeAchievement extends Component {
         let user = this.props.users.find((x) => x.Achievements.find((ach) => ach._id.toString() == this.props.achId));
         let achieve = user.Achievements.find((ach) => ach._id.toString() == this.props.achId);
 
+        console.log(achieve.confirmations)
         this.state = {
             user: user.user,
             achId: achieve._id,
@@ -20,6 +23,7 @@ class StaffChangeAchievement extends Component {
             ach: achieve.achievement,
             comment: achieve.comment,
             achDate: achieve.achDate,
+            confirmations: achieve.confirmations,
             isDateValid: true
         };
         this.updateDescr = this.updateDescr.bind(this);
@@ -83,7 +87,22 @@ class StaffChangeAchievement extends Component {
 
     render() {
         return (<div style={{display: "flex", maxHeight: "42rem"}}>
-            <div className="block">
+                { !this.state.confirmsOpened &&
+            <div className="block" style={{overflow: "auto", width: "50rem", maxHeight: "100%", maxWidth: "30rem"}}>
+                <div className="profile" style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
+                    <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
+                        Подтверждения
+                    </p>
+                </div>
+                <div>
+                    <BootstrapTable keyField='_id' data={this.state.confirmations}
+                                    columns={ConfirmationColumns}
+                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
+                                    bordered={false}/>
+                </div>
+            </div>}
+
+            <div className="block" style={{maxWidth:"30rem", overflow: "auto"}}>
                 <div className="profile" style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
                     <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
                         Изменение достижения
@@ -166,7 +185,7 @@ class StaffChangeAchievement extends Component {
 
             </div>
                 {this.state.changeChars &&
-                <div className="block" style={{overflow: "scroll", width: "50rem", maxHeight: "100%"}}>
+                <div className="block" style={{overflow: "scroll", width: "50rem", maxHeight: "100%", maxWidth: "30rem"}}>
                     <div className="profile" style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
                         <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
                             Изменение характеристик
@@ -174,7 +193,7 @@ class StaffChangeAchievement extends Component {
                     </div>
                     <div>
                         <CriteriasForm crits={staffContextStore.criterias} values={this.state.chars}
-                                       valuesCallback={this.updateNewChars}/>
+                                       valuesCallback={this.updateNewChars} supressDescription={true}/>
                     </div>
                     <button className="btn btn-success" onClick={this.updateChars}>Сохранить характеристики</button>
                 </div>}

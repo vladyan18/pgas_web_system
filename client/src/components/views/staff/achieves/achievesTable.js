@@ -4,7 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router";
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
 
-class AchievesTable extends Component {
+class AchievesTable extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -35,10 +35,10 @@ class AchievesTable extends Component {
                     document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
             }}>
             <textarea id={row._id} className={"form-control" + (row.comment ? " commentSended" : "")}
-                      defaultValue={row.comment}
-                      onChange={(e) => this.newComments[row._id] = e.target.value}></textarea>
+    defaultValue={row.comment}
+    onChange={(e) => this.newComments[row._id] = e.target.value} style={{height: "8.2rem"}}/>
                 <div className="input-group-append" style={{"marginRight": "0px"}}>
-                    <button class="btn btn-info" style={{"font-size": "x-small", "margin": "0px"}} onClick={(e) => {
+                    <button class="btn btn-info" style={{"font-size": "x-small", "margin": "0px", backgroundColor: "#3d5c61"}} onClick={(e) => {
                         this.handleCommentChange(e, row._id)
                     }}>Ок
                     </button>
@@ -48,19 +48,20 @@ class AchievesTable extends Component {
 
     actionsFormatter = (cell, row) => (
         <div style={{"display": "block"}}>
-            <div style={{"width": "6rem"}}>
-                <button style={{"width": "100%"}} type="button" className="btn btn-warning btn-sm" data-toggle="modal"
-                        data-target="#exampleModal" onClick={(e) => this.edit(e, row._id)}>Изменить
+            <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem", padding: "0.1rem"}}>
+                <button type="button" className="custom_button centered_hor" data-toggle="modal"
+                        data-target="#exampleModal" onClick={(e) => this.edit(e, row._id)}><i style={{paddingLeft: "0.5rem"}}
+                                                                                              className="fa fa-edit editText custom_icon_button"/>
                 </button>
             </div>
-            <div style={{"width": "6rem"}}>
-                <button style={{"width": "100%"}} type="button" className="btn btn-danger btn-sm"
-                        onClick={(e) => this.decline(e, row._id)}>Отклонить
+            <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem"}}>
+                <button type="button" className="custom_button centered_hor"
+                        onClick={(e) => this.decline(e, row._id)}><i className="fa  fa-times redText custom_icon_button"/>
                 </button>
             </div>
-            <div style={{"width": "6rem"}}>
-                <button style={{"width": "100%"}} type="button" className="btn btn-success btn-sm"
-                        onClick={(e) => this.accept(e, row._id)}>Принять
+            <div style={{"width": "100%", display: "flex", justifyContent: "center"}}>
+                <button type="button" className="custom_button centered_hor"
+                        onClick={(e) => this.accept(e, row._id)}><i style={{paddingLeft: "0.2rem"}} className="fa fa-check greenText custom_icon_button"/>
                 </button>
             </div>
         </div>
@@ -68,23 +69,28 @@ class AchievesTable extends Component {
 
     columns = [{
         dataField: 'crit',
+        style: {width: "5%", textAlign: "center", verticalAlign: "middle"},
         text: 'Крит.'
     }, {
         dataField: 'achievement',
-        text: 'Достижение'
+        text: 'Достижение',
+        style: {width: "30%", verticalAlign: "middle"},
     }, {
         dataField: 'chars',
         isDummyField: true,
         text: 'Хар-ки',
+        style: {verticalAlign: "middle", width: "20%"},
         formatter: this.charsFormatter,
     }, {
         dataField: 'achDate',
         text: 'Дата',
+        style: {width: "5%", textAlign: "center", verticalAlign: "middle"},
         formatter: (cell, row) => (<>
             {row.achDate && <>{getDate(row.achDate)}</>}
         </>),
     }, {
         dataField: 'status',
+        style: {width: "5%", textAlign: "center", fontSize: "small", verticalAlign: "middle"},
         text: 'Статус'
     }, {
         dataField: 'comments',
@@ -96,6 +102,7 @@ class AchievesTable extends Component {
         dataField: 'actions',
         text: '',
         isDummyField: true,
+        style: { width: "1rem", backgroundColor: "white" },
         csvExport: false,
         formatter: this.actionsFormatter,
     },
@@ -104,6 +111,8 @@ class AchievesTable extends Component {
     rowClasses = (row, rowIndex) => {
         if (row.status == 'Отказано')
             return 'declined-row';
+        if (row.status == 'Изменено')
+            return 'edited-row';
         if (row.status == 'Принято' || row.status == 'Принято с изменениями')
             return 'accepted-row';
         else return ''
@@ -116,7 +125,7 @@ class AchievesTable extends Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({Id: id})
+            body: JSON.stringify({Id: id, UserId: this.props.userId})
         }).then((resp) => {
             if (resp.status === 200) {
                 this.props.updater()
@@ -132,7 +141,7 @@ class AchievesTable extends Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({Id: id})
+            body: JSON.stringify({Id: id, UserId: this.props.userId})
         }).then((resp) => {
             if (resp.status === 200) {
                 this.props.updater()

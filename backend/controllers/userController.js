@@ -37,6 +37,7 @@ module.exports.dynamic = async function (req, res) {
                     for (let j = 0; j < v[i].confirmations.length; j++) {
 
                         let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
+                        if (!confirm) continue
                         confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
                         confirms.push(confirm)
                     }

@@ -48,6 +48,8 @@ class CurrentAchievesTable extends Component {
     rowClasses = (row, rowIndex) => {
         if (row.status == 'Отказано')
             return 'achieveRow declined-row';
+        if (row.status == 'Изменено')
+            return 'achieveRow edited-row';
         if (row.status == 'Принято' || row.status == 'Принято с изменениями')
             return 'achieveRow accepted-row';
         else return 'achieveRow'

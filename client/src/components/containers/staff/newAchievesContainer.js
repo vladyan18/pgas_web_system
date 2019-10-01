@@ -11,11 +11,11 @@ class NewAchievesContainer extends Component {
         this.getAchieves = this.getAchieves.bind(this);
     };
 
-    componentWillMount() {
-        this.getAchieves()
+    componentDidMount() {
+        this.getAchieves().then()
     }
 
-    getAchieves() {
+    async getAchieves() {
         staffNewAchievementsStore.update(staffContextStore.faculty).then()
     }
 

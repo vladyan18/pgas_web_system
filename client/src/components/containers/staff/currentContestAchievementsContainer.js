@@ -11,7 +11,7 @@ class CurrentContestAchievesContainer extends Component {
         this.getAchieves = this.getAchieves.bind(this);
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this.getAchieves()
     }
 

@@ -3,8 +3,9 @@ import '../../../../style/admin.css';
 import AchievesGroup from "./achievesGroup";
 import Modal from "react-modal";
 import StaffChangeAchievement from "../StaffChangeAchievement";
+import staffContextStore from "../../../../stores/staff/staffContextStore";
 
-class AchievesUserGroups extends Component {
+class AchievesUserGroups extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {modalIsOpen: false, modalAchId: ''};
@@ -30,9 +31,16 @@ class AchievesUserGroups extends Component {
         return (
             <main id="main">{this.props.users &&
             <div id="panel" className="col list" style={{"width": "100%"}}>
+                <h2 style={{fontSize: "2rem"}}>
+                    <b>Факультет: {staffContextStore.faculty}</b>
+                    <br/>
+                    <span style={{fontSize: "1.5rem"}}>Количество студентов: {this.props.users.length}</span>
+                </h2>
 
                 {this.props.users.map((item) => (
-                    <AchievesGroup item={item} updater={this.props.updater} openModal={this.openEditModal}/>
+                    <div key={item._id}>
+                    <AchievesGroup  item={item} updater={this.props.updater} openModal={this.openEditModal}/>
+                    </div>
                 ))}
             </div>}
                 <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}

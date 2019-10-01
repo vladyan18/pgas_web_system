@@ -5,7 +5,14 @@ const achieveSchema = mongoose.Schema({
   date: String,
   crit: String,
   chars: [String],
-    confirmations: [{}],
+    confirmations: [
+        {
+      id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Confirmation'
+        },
+            additionalInfo: String
+        }],
   status: String,
   achDate: Date,
     endingDate: Date,

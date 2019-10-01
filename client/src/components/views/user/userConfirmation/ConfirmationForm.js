@@ -342,6 +342,7 @@ class ConfirmationForm extends Component {
                                                           backgroundColor: 'transparent',
                                                           outline: 'none',
                                                           color: "red",
+                                                          fontSize: "1rem"
                                                       }}><i className="fa fa-trash-alt"/></button>
             }
         ])

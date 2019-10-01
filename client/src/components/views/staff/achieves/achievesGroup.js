@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../../style/admin.css';
 import AchievesTable from "./achievesTable";
 
-class AchievesGroup extends Component {
+class AchievesGroup extends React.PureComponent {
     constructor(props) {
         super(props);
         this.toggleHide = this.toggleHide.bind(this);
@@ -81,7 +81,7 @@ class AchievesGroup extends Component {
                     </div>
                     {!this.state.hidden && <div className="block">
 
-                        <AchievesTable data={this.props.item.Achievements} updater={this.props.updater}
+                        <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} updater={this.props.updater}
                                        openModal={this.props.openModal}/>
                     </div>}
                 </div>}

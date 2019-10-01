@@ -38,39 +38,33 @@ module.exports.getAdmins = async function (req,res){
 
 module.exports.dynamic = async function (req, res) {
     let info = [];
-    let Users = await db.NewUsers(req.query.faculty);
+    let Users = await db.GetUsersWithAllInfo(req.query.faculty)
+
     for (let user of Users) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
-        let Achievements = [];
 
-        for (let achievement of user.Achievement) {
+        for (let i = 0; i < user.Achievement.length; i++) {
+            for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
+                if (!user.Achievement[i].confirmations[j].id) continue
 
-            let ach = await db.findAchieveById(achievement);
-            if (!ach) continue;
-            ach.ball = 0;
-
-
-            Achievements.push(ach)
+                let expandedConfirm = user.Achievement[i].confirmations[j].id
+                expandedConfirm.additionalInfo = user.Achievement[i].confirmations[j].additionalInfo
+                user.Achievement[i].confirmations[j] = expandedConfirm
+            }
         }
 
-        Achievements.sort(function(obj1, obj2) {
-
-            return Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))
-        });
-
-        if( Achievements.length > 0){
+        if( user.Achievement.length > 0){
             info.push({
                 Id: user._id,
                 user: str,
                 Course: user.Course,
                 IsInRating: user.IsInRating,
                 IsHiddenInRating: user.IsHiddenInRating,
-                Achievements: Achievements
+                Achievements: user.Achievement
             })
         }
     }
-    console.log(info);
     res.send({Info: info})
 };
 
@@ -127,7 +121,8 @@ module.exports.updateAchieve = async function (req, res) {
 
 module.exports.AchSuccess = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, true);
-    let u = await db.findUserByAchieve(req.body.Id);
+    let u = await db.findUser(req.body.UserId);
+    console.log('IDSucess', req.body, u)
     balls(u.id, u.Faculty);
     res.sendStatus(200);
     AdminEmitter.emit('Update');
@@ -137,7 +132,8 @@ module.exports.AchSuccess = async function (req, res) {
 
 module.exports.AchFailed = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, false);
-    let u = await db.findUserByAchieve(req.body.Id);
+    console.log('ID', req.body.Id)
+    let u = await db.findUser(req.body.UserId);
     balls(u.id, u.Faculty);
     AdminEmitter.emit('Update');
     res.sendStatus(200);
@@ -173,43 +169,34 @@ module.exports.toggleHide = async function (req, res) {
 
 module.exports.Checked = async function (req, res) {
     let info = [];
-    let Users = await db.CurrentUsers(req.query.faculty);
+    let Users = await db.GetUsersWithAllInfo(req.query.faculty, true)
+
     for (let user of Users) {
         if (!user) continue;
         let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
-        var Achievements = [];
 
-        var aches = await db.findAchieves(user.id);
-        for (var i = 0; i < aches.length; i++) {
+        for (let i = 0; i < user.Achievement.length; i++) {
+            for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
+                if (!user.Achievement[i].confirmations[j].id) continue
 
-            var ach = aches[i];
-            if (!ach) continue;
-
-            ach.ball = 0;
-            ach.systematics = undefined;
-            Achievements.push(ach)
+                let expandedConfirm = user.Achievement[i].confirmations[j].id
+                expandedConfirm.additionalInfo = user.Achievement[i].confirmations[j].additionalInfo
+                user.Achievement[i].confirmations[j] = expandedConfirm
+            }
         }
 
-        Achievements.sort((obj1, obj2) => {
-            if (Number.parseInt(obj1.crit.substr(0,2)) > Number.parseInt(obj2.crit.substr(0,2))) return 1;
-            else if (Number.parseInt(obj1.crit.substr(0,2)) < Number.parseInt(obj2.crit.substr(0,2))) return -1;
-            else return 0;
-        });
-
-
-        if( Achievements.length > 0){
+        if( user.Achievement.length > 0){
             info.push({
                 Id: user._id,
                 user: str,
-                Type: user.Type,
                 Course: user.Course,
-                IsHiddenInRating: user.IsHiddenInRating,
                 IsInRating: user.IsInRating,
-                Achievements: Achievements
+                IsHiddenInRating: user.IsHiddenInRating,
+                Achievements: user.Achievement
             })
         }
     }
-    res.status(200).send({ Info: info })
+    res.send({Info: info})
 };
 
 module.exports.getUser = async function (req, res) {

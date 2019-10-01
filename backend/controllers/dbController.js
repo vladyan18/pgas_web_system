@@ -31,9 +31,12 @@ exports.getUserRights = function (id) {
     return UserModel.findOne({id: id}, 'Role Rights').lean();
 };
 
-exports.findUserByAchieve = function(id){
+exports.findUserByAchieve = async function(id){
 
-    return UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean()
+    console.log('GET ID', id)
+    let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}})
+    console.log('USER', user)
+    return user
 };
 
 
@@ -63,6 +66,34 @@ exports.CurrentUsers = function (faculty) {
 exports.NewUsers = function (faculty) {
     return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
 };
+
+exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
+    let error, users
+    if (!checked) {
+    error, users = await UserModel.find()
+        .or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
+        .populate(
+            {
+                path: 'Achievement',
+                populate : {
+                    path : 'confirmations.id'
+                }
+            }
+        ).exec()
+    }
+    else {
+        error, users = await UserModel.find({Faculty: faculty, IsInRating: true})
+            .populate(
+                {
+                    path: 'Achievement',
+                    populate: {
+                        path: 'confirmations.id'
+                    }
+                }
+            ).exec()
+    }
+    return users
+}
 
 exports.isUser = function(token){
     return UserModel.findOne({id: token},function(err, user){
@@ -129,15 +160,25 @@ exports.updateAchieve = async function (id, achieve) {
     u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
     //redis.del(u.id + '_achs');
     //redis.del(u.id + '_user');
+    let newAch = {
+        crit: achieve.crit,
+        chars: achieve.chars, status: achieve.status,
+        achievement: achieve.achievement, ball: achieve.ball,
+        achDate: achieve.achDate, comment: achieve.comment,
+        endingDate: achieve.endingDate,
+    }
+
+    if (achieve.confirmations && achieve.confirmations.length > 0) {
+        //newAch.confirmations = achieve.confirmations
+
+        //for (let conf of achieve.confirmations) {
+        //    let id = await ConfirmationModel.findById(conf)
+        //    console.log('CONF', id, conf)
+        //}
+    }
+
     return AchieveModel.findOneAndUpdate({_id: id}, {
-        $set: {
-            crit: achieve.crit,
-            chars: achieve.chars, status: achieve.status,
-            achievement: achieve.achievement, ball: achieve.ball,
-            achDate: achieve.achDate, comment: achieve.comment,
-            endingDate: achieve.endingDate,
-            confirmations: achieve.confirmations
-        }
+        $set: newAch
     }, function (err, result) {
     })
 };
