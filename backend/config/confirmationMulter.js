@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         let filename = translitter().transform(file.originalname, '_').replace(/&/g, 'amp').replace(/\\/g, 'slash').replace(/%/g, 'perc')
             .replace(/\?/g, 'q').replace(/[%№!;\[\]{}()=+,#]/g, 's');
-        cb(null, 'conf-' + randomstring.generate(16) + '-' + filename)
+        cb(null, 'conf-' + randomstring.generate(16))
     }
 });
 
