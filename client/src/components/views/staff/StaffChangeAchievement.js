@@ -77,7 +77,7 @@ class StaffChangeAchievement extends Component {
         res.confirmations = [];
         if (this.state.confirmations)
             for (let i = 0; i < this.state.confirmations.length; i++) {
-                res.confirmations.push(this.state.confirmations[i]._id)
+                res.confirmations.push({id: this.state.confirmations[i]._id, additionalInfo: this.state.confirmations[i].additionalInfo})
             }
         res._id = this.props.achId;
         fetchSendWithoutRes('/api/adm_update_achieve', res).then((result) => {

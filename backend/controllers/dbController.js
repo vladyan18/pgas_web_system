@@ -35,6 +35,7 @@ exports.findUserByAchieve = async function(id){
 
     console.log('GET ID', id, typeof id)
     let ach = await AchieveModel.findById(id.toString())
+    console.log('ACH', ach)
     let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
     console.log('USER', user)
     return user
@@ -80,7 +81,7 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
                     path : 'confirmations.id'
                 }
             }
-        ).exec()
+        ).lean().exec()
     }
     else {
         error, users = await UserModel.find({Faculty: faculty, IsInRating: true})
@@ -91,7 +92,7 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
                         path: 'confirmations.id'
                     }
                 }
-            ).exec()
+            ).lean().exec()
     }
     return users
 }
@@ -158,7 +159,7 @@ exports.deleteAchieve = async function (id) {
 
 exports.updateAchieve = async function (id, achieve) {
     //redis.del(id + '_ach2');
-    u = this.findUserByAchieve(id)
+    //u = this.findUserByAchieve(id)
     //u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
     //redis.del(u.id + '_achs');
     //redis.del(u.id + '_user');
@@ -173,10 +174,11 @@ exports.updateAchieve = async function (id, achieve) {
     if (achieve.confirmations && achieve.confirmations.length > 0) {
         newAch.confirmations = achieve.confirmations
 
-        //for (let conf of achieve.confirmations) {
-        //    let id = await ConfirmationModel.findById(conf)
-        //    console.log('CONF', id, conf)
-        //}
+
+        for (let i = 0; i < achieve.confirmations.length; i++) {
+            console.log(achieve.confirmations[i])
+            newAch.confirmations[i] = achieve.confirmations[i]
+        }
     }
 
     return AchieveModel.findOneAndUpdate({_id: id}, {
@@ -225,7 +227,7 @@ exports.RemoveFromRating = async function (userId) {
 
 exports.ChangeAchieve = async function (id,isGood) {
     //redis.del(id + '_ach2');
-    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
+    let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
 
     //redis.del(u.id + '_achs');
   if (isGood === true) {
