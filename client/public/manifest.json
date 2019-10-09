@@ -1,10 +1,10 @@
 {
-  "short_name": "ПГАС СПбГУ",
-  "name": "Система ПГАС СПбГУ",
+  "short_name": "ПГАС БСС",
+  "name": "Система ПГАС БСС",
   "icons": [
     {
-      "src": "gerb.ico",
-      "sizes": "64x64 32x32 16x16",
+      "src": "logo_bss2_KRe_icon.ico",
+      "sizes": "128x128 96x96 64x64 48x48 32x32 24x24 16x16",
       "type": "image/x-icon"
     }
   ],

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import logo from '../../../img/gerb.png';
+import logoBss from '../../../img/logo_bss2.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore'
 import {observer} from "mobx-react";
@@ -19,9 +20,9 @@ class UserHeader extends Component {
         return <header>
             <div className="row page_top">
                 <div className="col-8 block_header">
-                    <img src={logo} className="logo_img"/>
+                    <img src={logoBss} className="logo_img" style={{ height: "45px"}}/>
                     <div className="p_header">
-                        Санкт-Петербургский государственный университет <br/>
+                        Студенческий совет СПбГУ <br/>
                         {this.props.pageName}
                     </div>
                 </div>
