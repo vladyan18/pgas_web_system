@@ -69,7 +69,7 @@ class StaffChangeAchievement extends Component {
 
         res.chars = this.state.chars;
         if (this.state.achDate && this.state.achDate != '')
-            res.achDate = makeDate(this.state.achDate);
+            res.achDate = this.state.achDate;
 
         res.achievement = this.state.ach;
         res.comment = this.state.comment;

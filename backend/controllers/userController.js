@@ -352,7 +352,7 @@ module.exports.updateAchieve = async function (req, res) {
             achieve.date = new Date().toLocaleString('ru', options);
 
             let createdAchieve = await db.updateAchieve(id, achieve);
-        autoCheckConfirms(createdAchieve).then();
+            autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
