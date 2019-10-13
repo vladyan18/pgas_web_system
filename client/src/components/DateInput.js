@@ -38,7 +38,8 @@ class DateInput extends Component {
             }} guide={true} keepCharPositions={true}
                          mask={[/[0-3]/, /\d/, '.', /[0-1]/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
                          className={"form-control date achDate" + (!this.props.isValid ? " is-invalid" : "")} type="text"
-                         placeholder='дд.мм.гггг' onChange={this.handleDateChange} value={this.state.value}/>
+                         placeholder='дд.мм.гггг' onChange={this.handleDateChange} value={this.state.value}
+                         disabled={this.props.disabled}/>
 
         )
     }

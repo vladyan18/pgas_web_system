@@ -4,7 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router";
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
 
-class AchievesTable extends React.PureComponent {
+class AchievesTable extends Component {
 
     constructor(props) {
         super(props);
@@ -13,6 +13,10 @@ class AchievesTable extends React.PureComponent {
         this.edit = this.edit.bind(this);
         this.handleCommentChange = this.handleCommentChange.bind(this)
     };
+
+    statusFormatter = (cell, row) => (
+        row.status + (row.ball ? '('+row.ball+')': '')
+    )
 
     charsFormatter = (cell, row) =>
         (
@@ -91,7 +95,8 @@ class AchievesTable extends React.PureComponent {
     }, {
         dataField: 'status',
         style: {width: "5%", textAlign: "center", fontSize: "small", verticalAlign: "middle"},
-        text: 'Статус'
+        text: 'Статус',
+        formatter: this.statusFormatter,
     }, {
         dataField: 'comments',
         text: 'Комментарий',
@@ -166,9 +171,15 @@ class AchievesTable extends React.PureComponent {
     }
 
     render() {
+        let filteredAchieves
+        if (this.props.filters.hideCheckedAchieves)
+        {
+            filteredAchieves = this.props.data.filter(x => (x.status != 'Принято' && x.status != 'Принято с изменениями'))
+        }
+        else filteredAchieves = this.props.data
         return (
             <div className="adminAchievesTableContainer">
-                <BootstrapTable keyField='_id' data={this.props.data} columns={this.columns}
+                <BootstrapTable keyField='_id' data={filteredAchieves} columns={this.columns}
                                 rowClasses={this.rowClasses}/>
             </div>
         )

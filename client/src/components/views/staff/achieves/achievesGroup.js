@@ -1,17 +1,52 @@
 import React, {Component} from 'react';
 import '../../../../style/admin.css';
 import AchievesTable from "./achievesTable";
+import StaffChangeAchievement from "../StaffChangeAchievement";
+import Modal from "react-modal";
+import staffContextStore from "../../../../stores/staff/staffContextStore";
 
-class AchievesGroup extends React.PureComponent {
+class AchievesGroup extends Component {
     constructor(props) {
         super(props);
+        this.state = {}
         this.toggleHide = this.toggleHide.bind(this);
         this.toggleRating = this.toggleRating.bind(this);
+        this.toggleModal = this.toggleModal.bind(this);
     };
 
-    toggleRating() {
+    toggleModal() {
+        if (this.state.modalIsOpen)
+            this.setState({choosedDirection: false, modalIsOpen: !this.state.modalIsOpen})
+        else
+            this.setState({modalIsOpen: !this.state.modalIsOpen})
+    }
+
+    async toggleRating() {
         let id = this.props.item.Id;
-        console.log('ID: ' + id);
+        let direction
+        if (!this.props.item.IsInRating && staffContextStore.faculty == 'ВШЖиМК')
+        {
+            this.toggleModal();
+            const waitForAnswer = (resolve, reject) => {
+                if (this.state.choosedDirection)
+                    resolve(this.state.choosedDirection)
+                else if (this.state.choosedDirection === false)
+                {
+                    console.log('NULL')
+                    reject('null')
+                }
+                else
+                    setTimeout(() => waitForAnswer(resolve, reject), 30)
+            }
+            try {
+                direction = await new Promise(waitForAnswer)
+                this.setState({choosedDirection: undefined})
+            } catch (e) {
+                this.setState({choosedDirection: undefined})
+                return null
+            }
+        }
+
         if (!this.props.item.IsInRating) {
 
             fetch("/api/AddToRating", {
@@ -20,7 +55,7 @@ class AchievesGroup extends React.PureComponent {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({Id: id})
+                body: direction ? JSON.stringify({Id: id, Direction: direction}) : JSON.stringify({Id: id})
             }).then((resp) => {
                 if (resp.status === 200) {
                     this.props.updater()
@@ -47,6 +82,27 @@ class AchievesGroup extends React.PureComponent {
 
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.filters.hideCheckedAchieves)
+        {
+            let needHide = true
+            for (let ach of this.props.item.Achievements)
+            {
+                if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
+                    needHide = false
+                    if (this.state.hidden !== false) {
+                        this.setState({hidden: false})
+                    }
+                    break
+                }
+            }
+            if (needHide && !this.state.hidden)
+            this.setState({hidden: true})
+        }
+        else
+            if (this.state.hidden) this.setState({hidden: false})
+    }
+
     componentDidMount() {
         this.setState({hidden: false})
     }
@@ -58,6 +114,7 @@ class AchievesGroup extends React.PureComponent {
     }
 
     render() {
+        if (this.state) console.log('STATE', this.props.item.user, this.state.hidden)
         return (
             <div>
                 {this.state &&
@@ -82,9 +139,33 @@ class AchievesGroup extends React.PureComponent {
                     {!this.state.hidden && <div className="block">
 
                         <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} updater={this.props.updater}
-                                       openModal={this.props.openModal}/>
+                                       openModal={this.props.openModal} filters={this.props.filters}/>
                     </div>}
                 </div>}
+                <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+                       isOpen={this.state.modalIsOpen}
+                       onRequestClose={this.toggleModal}
+                       shouldCloseOnOverlayClick={true}
+                       contentLabel="Example Modal"
+                       overlayClassName="Overlay"
+                >
+                    {this.state.modalIsOpen &&
+                    <div style={{width: '400px', height: '250px', backgroundColor: 'white', padding: '15px'}}>
+                        <h2>Выберите направление:</h2>
+                        <p style={{marginBottom: '40px'}}>{this.props.item.user}</p>
+                        <div style={{display: 'flex', flexDirection:'column', justifyContent: 'center'}}>
+                        {staffContextStore.directions.map((dir) =>
+                        <button className='btn btn-warning'
+                                style={{marginBottom: '15px'}}
+                            onClick={() => {
+                                this.setState({choosedDirection: dir, modalIsOpen: false})
+                            }}>
+                            {dir}
+                        </button>)}
+                        </div>
+                    </div>
+                    }
+                </Modal>
             </div>
         )
     }

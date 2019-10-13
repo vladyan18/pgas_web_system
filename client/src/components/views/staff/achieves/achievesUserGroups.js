@@ -12,6 +12,8 @@ class AchievesUserGroups extends React.PureComponent {
         Modal.setAppElement('#root');
         this.openEditModal = this.openEditModal.bind(this);
         this.closeEditModal = this.closeEditModal.bind(this)
+        this.toggleCheckedAchieve = this.toggleCheckedAchieve.bind(this)
+        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
     };
 
     openEditModal(achId) {
@@ -26,20 +28,73 @@ class AchievesUserGroups extends React.PureComponent {
 
     }
 
+    toggleCheckedAchieve() {
+        this.setState({hideCheckedAchieves: !this.state.hideCheckedAchieves})
+    }
+
+    handleDirectionSelect(e) {
+        this.setState({currentDirection: e.target.value})
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (!this.props.isNewList && staffContextStore.directions && staffContextStore.directions.length > 0)
+            if (!this.state.currentDirection)
+                this.setState({currentDirection: staffContextStore.directions[0]})
+    }
 
     render() {
-        return (
-            <main id="main">{this.props.users &&
-            <div id="panel" className="col list" style={{"width": "100%"}}>
-                <h2 style={{fontSize: "2rem"}}>
-                    <b>Факультет: {staffContextStore.faculty}</b>
-                    <br/>
-                    <span style={{fontSize: "1.5rem"}}>Количество студентов: {this.props.users.length}</span>
-                </h2>
+        let totalAchCount = 0
+        let checkedAchCount = 0
 
-                {this.props.users.map((item) => (
+        let filteredUsers = this.props.users
+        if (staffContextStore.faculty == 'ВШЖиМК' && this.state.currentDirection) {
+            filteredUsers = filteredUsers.filter(x => x.Direction == this.state.currentDirection)
+        }
+
+        for (let user of filteredUsers) {
+            for (let ach of user.Achievements)
+            {
+                if (ach.status != 'Ожидает проверки' && ach.status != 'Изменено' )
+                    checkedAchCount += 1
+                totalAchCount += 1
+            }
+        }
+
+        return (
+            <main id="main">{filteredUsers &&
+            <div id="panel" className="col list" style={{"width": "100%"}}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                    <h2 style={{fontSize: "2rem"}}>
+                        <b>Факультет: {staffContextStore.faculty}</b>
+                        <br/>
+                        <span style={{fontSize: "1.5rem"}}>Количество студентов: {filteredUsers.length}</span>
+                        {!this.props.isNewList && staffContextStore.directions && staffContextStore.directions.length > 0 && <select id='1'
+                                className="form-control selectors"
+                                onChange={this.handleDirectionSelect}>
+                            {staffContextStore.directions.map(dir =>
+                                <option value={dir}>{dir}</option> )}
+                        </select>}
+                    </h2>
+                    <div>
+                        <p style={
+                            {
+                                fontSize: "1.28rem",
+                            marginBottom: "0.8rem",
+                            marginLeft: "-1px",
+                            marginTop: "-0.1rem"
+                            }
+                        }>Проверено достижений: {checkedAchCount}/{totalAchCount}</p>
+                    <button
+                        className={`btn btn-${this.state.hideCheckedAchieves ? 'success':'outline-info'}`}
+                        onClick={this.toggleCheckedAchieve} >{this.state.hideCheckedAchieves ? 'Показать ' : 'Скрыть '}
+                        проверенные достижения
+                    </button>
+                    </div>
+                </div>
+
+                {filteredUsers.map((item) => (
                     <div key={item._id}>
-                    <AchievesGroup  item={item} updater={this.props.updater} openModal={this.openEditModal}/>
+                    <AchievesGroup  item={item} updater={this.props.updater} openModal={this.openEditModal} filters={{hideCheckedAchieves: this.state.hideCheckedAchieves}}/>
                     </div>
                 ))}
             </div>}
@@ -51,7 +106,7 @@ class AchievesUserGroups extends React.PureComponent {
                        overlayClassName="Overlay"
                 >
                     {this.state.modalIsOpen &&
-                    <StaffChangeAchievement users={this.props.users} achId={this.state.modalAchId}
+                    <StaffChangeAchievement users={filteredUsers} achId={this.state.modalAchId}
                                             closeModal={() => {
                                                 this.setState({modalIsOpen: false, modalAchId: ''});
                                                 this.props.updater()

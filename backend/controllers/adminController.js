@@ -42,7 +42,7 @@ module.exports.dynamic = async function (req, res) {
 
     for (let user of Users) {
         if (!user) continue;
-        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+        let str = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
 
         for (let i = 0; i < user.Achievement.length; i++) {
             for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
@@ -122,7 +122,6 @@ module.exports.updateAchieve = async function (req, res) {
 module.exports.AchSuccess = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, true);
     let u = await db.findUser(req.body.UserId);
-    console.log('IDSucess', req.body, u)
     balls(u.id, u.Faculty);
     res.sendStatus(200);
     AdminEmitter.emit('Update');
@@ -132,7 +131,6 @@ module.exports.AchSuccess = async function (req, res) {
 
 module.exports.AchFailed = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, false);
-    console.log('ID', req.body.Id)
     let u = await db.findUser(req.body.UserId);
     balls(u.id, u.Faculty);
     AdminEmitter.emit('Update');
@@ -142,7 +140,9 @@ module.exports.AchFailed = async function (req, res) {
 };
 
 module.exports.AddToRating = async function (req, res) {
-    await db.AddToRating(req.body.Id);
+    if (req.body.Direction)
+        await db.AddToRating(req.body.Id, req.body.Direction);
+    else await db.AddToRating(req.body.Id)
     res.sendStatus(200);
     AdminEmitter.emit('Update');
     notify.AddToRating(req, req.body.Id).then()
@@ -173,7 +173,7 @@ module.exports.Checked = async function (req, res) {
 
     for (let user of Users) {
         if (!user) continue;
-        let str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+        let str = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
 
         for (let i = 0; i < user.Achievement.length; i++) {
             for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
@@ -192,7 +192,8 @@ module.exports.Checked = async function (req, res) {
                 Course: user.Course,
                 IsInRating: user.IsInRating,
                 IsHiddenInRating: user.IsHiddenInRating,
-                Achievements: user.Achievement
+                Achievements: user.Achievement,
+                Direction: user.Direction
             })
         }
     }
@@ -228,8 +229,8 @@ module.exports.getRating = async function (req, res) {
             sumBall += ach.ball;
         }
     }
-      let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
-      users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall})
+      let fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+      users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction})
   }
   res.status(200).send({ Users: users })
 };
@@ -255,8 +256,9 @@ const balls = async function (id, faculty) {
           continue
       }
       let curKrit = kri;
+      console.log(ach.chars)
       if (Array.isArray(curKrit)) {
-          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit, 'chars': ach.chars})
       }
       else {
           for (let ch of ach.chars) {
@@ -265,16 +267,21 @@ const balls = async function (id, faculty) {
           while (!Array.isArray(curKrit)) {
               curKrit = curKrit[Object.keys(curKrit)[0]]
           }
-          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit})
+          kriteries[ach.crit].push({'ach': ach, 'balls':curKrit, 'chars': ach.chars})
       }
   }
 
     for (key of Object.keys(kri)) {
-        if (CheckSystem(key, kriteries[key]))
+        if (true) // (CheckSystem(key, kriteries[key]))
         {
-          balls += MatrBalls(kriteries[key])
+            if (faculty === 'ВШЖиМК' || faculty === 'Соцфак') {
+                balls += MatrBallsLegacy(kriteries[key], faculty)
+            }
+            else {
+                balls += MatrBalls(kriteries[key])
+            }
         } else for (let ach of kriteries[key]) ach['ach'].ball = undefined;
-        for (curAch of kriteries[key]) {
+        for (let curAch of kriteries[key]) {
             if (!curAch) continue;
             db.updateAchieve(curAch['ach']._id, curAch['ach']).then()
         }
@@ -283,9 +290,9 @@ const balls = async function (id, faculty) {
 
 const CheckSystem = function(crit, ach) {
     if (!ach) return false;
-    if (crit == '10 (10в)' || crit == '12 (11б)' ) {
-        return ach.filter(o => o).length >= 2
-    }
+    //if (crit == '10 (10в)' || crit == '12 (11б)' ) {
+    //    return ach.filter(o => o).length >= 2
+    //}
     else return true
 };
 
@@ -310,5 +317,51 @@ const MatrBalls = function (Crit) {
         Summ += max;
       max = 0
   }
+    return Summ
+};
+
+const MatrBallsLegacy = function (Crit, faculty) {
+    let Summ = 0;
+    let subrows = {}
+    for (let ach = 0; ach < Crit.length; ach++) {
+        let chars = [...Crit[ach].chars]
+        if (faculty == 'Соцфак' && chars[0] == '6 (9а)') {
+            if (
+                chars[1] != 'Членство в жюри предметной олимпиады (9)' &&
+                chars[1] != 'Безвозмездная педагогическая деятельность (10)' &&
+                chars[1] != 'Проведение (обеспечение проведения) деятельности, направленной на помощь людям (в том числе социального и правозащитного характера) (11)' &&
+                chars[1] != 'Проведение (обеспечение проведения) деятельности природоохранного характера (12)'
+            )
+                chars[1] = 'Организация мероприятий'
+        }
+            //console.log('CHARS', Crit[ach].chars)
+            if (!subrows[chars])
+                subrows[chars] = [Crit[ach]]
+            else
+                subrows[chars].push(Crit[ach])
+    }
+
+    for (let subrowKey of Object.keys(subrows)) {
+
+        let subrow = subrows[subrowKey]
+        if (!subrow) continue;
+        for (let i = 0; i < subrow.length; i++) {
+            let max = 0;
+            let maxIndex
+            for (let ach = 0; ach < subrow.length; ach++) {
+                if (!subrow[ach]['balls']) continue;
+                var shift = i;
+                if (shift >= subrow[ach]['balls'].length) shift = subrow[ach]['balls'].length - 1;
+                if (subrow[ach]['balls'][shift] >= max) {
+                    max = subrow[ach]['balls'][shift];
+                    maxIndex = ach
+                }
+            }
+            subrow[maxIndex]['ach'].ball = max;
+            subrow[maxIndex]['balls'] = undefined;
+            Summ += max;
+            max = 0
+        }
+    }
     return Summ
 };

@@ -331,7 +331,8 @@ class ConfirmationForm extends Component {
             {
                 isDummyField: true,
                 style: {textAlign: "right"},
-                formatter: (cell, row) => <button onClick={(e) => deleteConfirmation(e, row)}
+                formatter: (cell, row) => (<>{!this.props.disabled && <button
+                    onClick={(e) => deleteConfirmation(e, row)}
                                                   style={
                                                       {
                                                           cursor: "pointer",
@@ -343,7 +344,7 @@ class ConfirmationForm extends Component {
                                                           outline: 'none',
                                                           color: "red",
                                                           fontSize: "1rem"
-                                                      }}><i className="fa fa-trash-alt"/></button>
+                                                      }}><i className="fa fa-trash-alt"/></button>}</>)
             }
         ])
 
@@ -351,9 +352,9 @@ class ConfirmationForm extends Component {
             <div>
                 <div style={this.headerContainerStyle}>
                     <p>Подтверждения: </p>
-                    <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal}>
+                    {!this.props.disabled && <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
                         добавить
-                    </b>
+                    </b>}
                 </div>
 
                 <div>

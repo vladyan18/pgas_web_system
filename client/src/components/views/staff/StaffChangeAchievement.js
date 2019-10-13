@@ -26,6 +26,7 @@ class StaffChangeAchievement extends Component {
             confirmations: achieve.confirmations,
             isDateValid: true
         };
+        console.log(achieve.confirmations)
         this.updateDescr = this.updateDescr.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.updateNewChars = this.updateNewChars.bind(this);
@@ -68,8 +69,10 @@ class StaffChangeAchievement extends Component {
         res.crit = this.state.chars[0];
 
         res.chars = this.state.chars;
-        if (this.state.achDate && this.state.achDate != '')
-            res.achDate = this.state.achDate;
+        if (this.state.achDate && this.state.achDate != '') {
+            if (this.state.achDate.indexOf('-') > 0 ) res.achDate = this.state.achDate
+            else res.achDate = makeDate(this.state.achDate);
+        }
 
         res.achievement = this.state.ach;
         res.comment = this.state.comment;
@@ -166,15 +169,6 @@ class StaffChangeAchievement extends Component {
                             }}>{str}</div>)
                         })}
                     </div>
-
-                    <label
-                        htmlFor="staffComment" style={{"marginTop": "auto", "marginRight": "0.5rem"}}
-                        className="control-label col-xs-2">Комментарий: </label>
-                    <textarea className="form-control area_text" name="staffComment"
-                              placeholder="Комментарий..." id="staffComment"
-                              required onChange={this.updateComment} value={this.state.comment}
-                              style={{width: "100%", margin: "0"}}/>
-
 
                 </div>
 

@@ -3,6 +3,7 @@ const db = require('./dbController');
 const path = require('path');
 const fs = require('fs');
 const XlsxPopulate = require('xlsx-populate');
+const translitter = require('cyrillic-to-translit-js');
 
 const anketPath = path.join(__dirname, '..');
 
@@ -167,9 +168,12 @@ getProofString = function (confirm, confirmNum) {
 
 module.exports.getResultTable = async function (req, res) {
     try {
-        let kri = Kri;
+        console.log('QUERY', req.query)
+        let faculty = await db.GetFaculty(req.query.faculty)
+        console.log(faculty)
+        let kri = JSON.parse((await db.GetCriterias(req.query.faculty)).Crits)
         let users = [];
-        let Users = await db.CurrentUsers();
+        let Users = await db.CurrentUsers(req.query.faculty);
         for (let user of Users) {
             let sumBall = 0;
             let crits = {};
@@ -184,7 +188,7 @@ module.exports.getResultTable = async function (req, res) {
                     sumBall += ach.ball;
                 }
             }
-            let fio = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
+            let fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
             users.push({Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall})
         }
 
@@ -205,6 +209,7 @@ module.exports.getResultTable = async function (req, res) {
         XlsxPopulate.fromFileAsync(anketPath + "/docs/ResultTable.xlsx")
             .then(workbook => {
                 try {
+                    workbook.sheet(0).cell("A4").value(faculty.OfficialName);
                     // Modify the workbook.
                     for (var i = 0; i < users.length; i++) {
                         var r = [];
@@ -224,7 +229,7 @@ module.exports.getResultTable = async function (req, res) {
                     workbook.sheet(0).cell("B1").style("horizontalAlignment", "center");
 
                     workbook.toFileAsync(anketPath + "/docs/ResultTable2.xlsx").then(() => {
-                        res.download(path.resolve(anketPath + "/docs/ResultTable2.xlsx"));
+                        res.download(path.resolve(anketPath + "/docs/ResultTable2.xlsx"), "PGAS_" + translitter().transform(faculty.Name, '_') + "_" + (new Date()).getFullYear() + ".xlsx");
                     })
                 }
                 catch (e) {

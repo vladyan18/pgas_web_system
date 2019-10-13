@@ -20,7 +20,7 @@ class NewAchievesContainer extends Component {
     }
 
     render() {
-        return <AchievesUserGroups users={staffNewAchievementsStore.users} updater={this.getAchieves}/>
+        return <AchievesUserGroups users={staffNewAchievementsStore.users} updater={this.getAchieves} isNewList={true}/>
     }
 }
 

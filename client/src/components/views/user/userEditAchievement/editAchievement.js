@@ -36,7 +36,8 @@ class EditAchievement extends Component {
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
                 hasDateDiapasone: !!ach.endingDate,
                 confirmations: ach.confirmations,
-                charsInvalid: false
+                charsInvalid: false,
+                status: ach.status
             }
         }
     }
@@ -219,7 +220,7 @@ class EditAchievement extends Component {
                         }}>Назад
                         </button>
                         <button id="DeleteButton" className="btn btn-danger"
-                                value="Удалить" onClick={this.deleteAch}>Удалить
+                                value="Удалить" onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'}>Удалить
                         </button>
                     </div>
                 </div>
@@ -231,7 +232,7 @@ class EditAchievement extends Component {
 
                 <div className="form_elem_with_left_border">
                     <label htmlFor="check2" className="label">Характеристики: </label>
-                    <CriteriasForm crits={this.state.crits} valuesCallback={this.updateChars}
+                    <CriteriasForm crits={this.state.crits} valuesCallback={this.updateChars} disabled={this.state.status != 'Ожидает проверки'}
                                    isInvalid={this.state.charsInvalid}
                                critError={this.state.critError}
                                critErrorMessage={this.state.critErrorMessage}
@@ -247,7 +248,7 @@ class EditAchievement extends Component {
                         <label className="control-label" htmlFor="comment">Название достижения:
                             <HelpButton  overlay={achievementPopover} placement={"top"} />
                         </label>
-                        <textarea className="form-control area_text" name="comment"
+                        <textarea className="form-control area_text" name="comment" disabled={this.state.status != 'Ожидает проверки'}
                                   placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
                                   required onChange={this.updateDescr} value={this.state.ach} style={{marginTop: "0"}}/>
                     </div>
@@ -264,7 +265,7 @@ class EditAchievement extends Component {
                                 <input className="form-check-input" type="checkbox" id="defaultCheck1" onChange={(e) =>
                                     this.setState({hasDateDiapasone: !this.state.hasDateDiapasone})}
                                        checked={this.state.hasDateDiapasone}
-                                       style={{cursor: "pointer"}}/>
+                                       style={{cursor: "pointer"}} disabled={this.state.status != 'Ожидает проверки'}/>
                                 <label className="form-check-label" htmlFor="defaultCheck1"
                                        style={{cursor: "pointer", color: "#595959"}}>
                                     диапазон дат
@@ -283,20 +284,20 @@ class EditAchievement extends Component {
 
 
                             {!this.state.hasDateDiapasone &&
-                            <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
+                            <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult} disabled={this.state.status != 'Ожидает проверки'}
                                                   updater={this.handleDateChange} defaultValue={this.state.dateValue}/>}
                             {this.state.hasDateDiapasone && <table>
                                 <tbody>
                                 <tr>
                                     <td>С:</td>
-                                    <td><AchievementDateInput className="form-control"
+                                    <td><AchievementDateInput className="form-control" disabled={this.state.status != 'Ожидает проверки'}
                                                               isValid={this.state.dateValidationResult}
                                                               updater={this.handleStartDateChange}
                                                               defaultValue={this.state.dateValue}/></td>
                                 </tr>
                                 <tr>
                                     <td>По:</td>
-                                    <td><AchievementDateInput className="form-control"
+                                    <td><AchievementDateInput className="form-control" disabled={this.state.status != 'Ожидает проверки'}
                                                               isValid={this.state.endDateValidationResult}
                                                               updater={this.handleEndDateChange}
                                                               defaultValue={this.state.endDateValue}/></td>
@@ -305,7 +306,7 @@ class EditAchievement extends Component {
                             </table>}
                         </div>
                     </div>
-                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations}/>
+                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations} disabled={this.state.status != 'Ожидает проверки'}/>
                 </form>}
 
 
@@ -327,7 +328,8 @@ class EditAchievement extends Component {
                 </div>
                 <button type="button" id="SubmitButton" disabled={!this.isValid()}
                         className="btn btn-primary btn-md button_send"
-                        data-target="#exampleModal" value="отправить" onClick={this.editKrit}>
+                        data-target="#exampleModal" value="отправить" onClick={this.editKrit}
+                disabled={this.state.status != 'Ожидает проверки'}>
                     отправить
                 </button>
             </div>

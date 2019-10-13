@@ -8,6 +8,8 @@ class StaffStudentsRating extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {}
+
         let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '10в', '11а', '11б', '11в'];
         let crits = Object.keys(staffContextStore.criterias);
         for (let i = 0; i < crits.length; i++) {
@@ -26,11 +28,9 @@ class StaffStudentsRating extends Component {
             style: {'vertical-align': 'middle'},
             classes: 'text-center'
         })
-    };
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        console.log(nextProps)
-    }
+        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
+    };
 
     numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
 
@@ -66,8 +66,35 @@ class StaffStudentsRating extends Component {
             classes: 'text-center'
         }];
 
+    handleDirectionSelect(e) {
+        this.setState({currentDirection: e.target.value})
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (staffContextStore.faculty == 'ВШЖиМК' && staffContextStore.directions && staffContextStore.directions.length > 0)
+            if (!this.state.currentDirection)
+                this.setState({currentDirection: staffContextStore.directions[0]})
+    }
 
     render() {
+        let filtered = this.props.data
+        if (staffContextStore.faculty == 'ВШЖиМК' && this.state.currentDirection) {
+            filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
+        }
+
+        let sorted = filtered.sort(function(obj1, obj2) {
+            let diff = obj2.Ball-obj1.Ball;
+            if (diff != 0)
+                return obj2.Ball-obj1.Ball;
+            else {
+                for (let crit of Object.keys(obj1.Crits)) {
+                    diff = obj2.Crits[crit] - obj1.Crits[crit];
+                    if (diff != 0) return diff
+                }
+                return 0
+            }
+        });
+
         return (
             <main>
                 <div id="panel" className="row justify_center">
@@ -86,11 +113,17 @@ class StaffStudentsRating extends Component {
                                 }}>Назад
                                 </button>
                                 <form action="/api/getResultTable">
+                                    <input type="hidden" name="faculty" value={staffContextStore.faculty} />
                                     <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
                                 </form>
                             </div>
 
                         </div>
+                        {staffContextStore.faculty == 'ВШЖиМК' && staffContextStore.directions && staffContextStore.directions.length > 0
+                        && <select id='1' className="form-control selectors" onChange={this.handleDirectionSelect}>
+                            {staffContextStore.directions.map(dir =>
+                                <option value={dir}>{dir}</option> )}
+                        </select>}
                         <hr className="hr_blue"/>
                         <table className="table table-bordered" id='users'>
                             <thead>
@@ -103,7 +136,7 @@ class StaffStudentsRating extends Component {
                             </tbody>
                         </table>
 
-                        <BootstrapTable keyField='_id' data={this.props.data} columns={this.columns}></BootstrapTable>
+                        <BootstrapTable keyField='_id' data={sorted} columns={this.columns}/>
 
                     </div>
                 </div>

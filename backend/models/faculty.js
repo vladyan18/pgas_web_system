@@ -5,6 +5,7 @@ const facultySchema = mongoose.Schema({
   Name: String,
     OfficialName: String,
     DirName: String,
+    Directions: [String],
     AdditionStopped: Boolean,
     CritsId: String,
     AnnotationsToCritsId: String

@@ -181,10 +181,10 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
         var stat = fs.statSync(filePath);
         res.setHeader('Content-Length', stat.size);
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-Disposition', 'inline');
         file.pipe(res);
     } else {
-        res.setHeader('Content-Disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-Disposition', 'inline; filename=' + filename);
         res.setHeader('Content-Transfer-Encoding', 'binary');
         res.setHeader('Content-Type', 'application/octet-stream');
         res.sendFile(filePath)

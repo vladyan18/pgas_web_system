@@ -213,14 +213,17 @@ exports.addAchieveToUser = function (userId, achieveId) {
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 };
 
-exports.AddToRating = async function (userId) {
-    let u = await UserModel.findOne({ _id: userId });
+exports.AddToRating = async function (userId, Direction) {
+    //let u = await UserModel.findOne({ _id: userId });
     //redis.del(u.id + '_user');
-    return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true } })
+    if (Direction)
+        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true, Direction: Direction} })
+    else
+        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true} })
 };
 
 exports.RemoveFromRating = async function (userId) {
-    let u = await UserModel.findOne({ _id: userId });
+    //let u = await UserModel.findOne({ _id: userId });
     //redis.del(u.id + '_user');
     return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: false } })
 };
@@ -311,6 +314,7 @@ exports.CreateFaculty = async function (Faculty) {
 };
 
 exports.GetCriterias = async function (facultyName) {
+    console.log(facultyName)
     let facObject = await FacultyModel.findOne({Name: facultyName});
     if (facObject.CritsId)
         return await CriteriasModel.findById(facObject.CritsId, 'Crits');

@@ -15,8 +15,10 @@ export default class CriteriasForm extends Component {
             this.props.valuesCallback(['1 (7а)'])
         } else {
             let sel = [];
+            let globalCrit = this.props.crits
             for (let i = 1; i < this.props.values.length; i++) {
                 let crit = this.props.crits;
+                globalCrit = globalCrit[this.props.values[i-1]]
                 let id = '';
                 for (let j = 0; j < i; j++) {
                     id += this.props.values[j];
@@ -25,6 +27,11 @@ export default class CriteriasForm extends Component {
 
                 sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
             }
+            globalCrit = globalCrit[this.props.values[this.props.values.length-1]]
+            if (isNaN(globalCrit[Object.keys(globalCrit)[0]]))
+                sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+
+
 
             this.state = {
                 selects: sel,
@@ -105,7 +112,7 @@ export default class CriteriasForm extends Component {
             <select id='1'
                     className={"form-control selectors firstCourse unique7a" + +(this.props.critError ? " is-invalid" : '')}
                     required name="check2" style={{marginTop: "0", cursor: "pointer"}}
-                    onChange={this.handleSelect} defaultValue={this.state.crit}>
+                    onChange={this.handleSelect} defaultValue={this.state.crit} disabled={this.props.disabled}>
                 <option disabled>Критерий</option>
                 <option value="1 (7а)" id="7a">
                     7а (оценки)

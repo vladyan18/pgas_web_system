@@ -20,7 +20,7 @@ class StaffStudentsContainer extends Component {
     }
 
     render() {
-        return <StaffStudentsRating data={CurrentContestRatingStore.users}/>
+        return staffContextStore.criterias && <StaffStudentsRating data={CurrentContestRatingStore.users}/> || null
     }
 }
 
