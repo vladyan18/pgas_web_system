@@ -38,7 +38,8 @@ class EditAchievement extends Component {
                 confirmations: ach.confirmations,
                 charsInvalid: false,
                 status: ach.status,
-                ball: ach.ball
+                ball: ach.ball,
+                comment: ach.comment
             }
         }
     }
@@ -165,6 +166,7 @@ class EditAchievement extends Component {
 
         res.achievement = this.state.ach;
         res.confirmations = [];
+        res.comment = this.state.comment
         if (this.state.confirmations)
             for (let i = 0; i < this.state.confirmations.length; i++) {
                 res.confirmations.push({
