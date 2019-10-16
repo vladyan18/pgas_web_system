@@ -428,8 +428,8 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
     let waitingForCheck = 0
     for (let user of users) {
         for (let ach of user.Achievement) {
-            if (ach.status == 'Отклонено') declined += 1
-            if (ach.status == 'Ожидает проверки') waitingForCheck += 1
+            if (ach.status == 'Отказано') declined += 1
+            if (ach.status == 'Ожидает проверки' || !ach.status) waitingForCheck += 1
             if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') continue
             accepted += 1
             achCount += 1
@@ -445,7 +445,7 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
                 achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0
             }
             achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1
-            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.balls
+            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball
 
             if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].indexOf('РИНЦ') > 0) RINC += 1
             else
