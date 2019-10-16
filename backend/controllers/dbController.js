@@ -400,3 +400,74 @@ exports.addConfirmationToUser = async function (userId, confId) {
 exports.updateConfirmCrawlResult = async function (confirmId, crawlResult) {
     return ConfirmationModel.findByIdAndUpdate(confirmId, {$set: {CrawlResult: crawlResult, IsCrawled: true}})
 };
+
+exports.getStatisticsForFaculty = async function(facultyName, isInRating = true) {
+    let users = await UserModel.find({Faculty: facultyName, IsInRating: isInRating})
+        .populate(
+            {
+                path: 'Achievement',
+                populate: {
+                    path: 'confirmations.id'
+                }
+            }
+        ).lean().exec()
+
+    let articlesIndexCol = 3
+    if (facultyName == 'Физфак') articlesIndexCol = 2
+    let achCount = 0
+    let critsCounts = {}
+    let critsBalls = {}
+    let achieves = {}
+    let achievesBalls = {}
+    let RINC = 0
+    let SCOPUS = 0
+    let VAK = 0
+    let unindexed = 0
+    let accepted = 0
+    let declined = 0
+    let waitingForCheck = 0
+    for (let user of users) {
+        for (let ach of user.Achievement) {
+            if (ach.status == 'Отклонено') declined += 1
+            if (ach.status == 'Ожидает проверки') waitingForCheck += 1
+            if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') continue
+            accepted += 1
+            achCount += 1
+            if (!critsCounts[ach.chars[0]]) {
+                critsCounts[ach.chars[0]] = 0
+                critsBalls[ach.chars[0]] = 0
+            }
+            critsCounts[ach.chars[0]] += 1
+            critsBalls[ach.chars[0]]  += ach.ball
+
+            if (!achieves[ach.chars[0] + ' ' + ach.chars[1]]) {
+                achieves[ach.chars[0] + ' ' + ach.chars[1]] = 0
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0
+            }
+            achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1
+            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.balls
+
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].indexOf('РИНЦ') > 0) RINC += 1
+            else
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('Scopus') > 0) SCOPUS += 1
+            else
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('ВАК') > 0) VAK += 1
+            else if (ach.chars[articlesIndexCol] && ach.chars[0] == '5 (8б)') unindexed += 1
+        }
+    }
+    let res = {'Total achs count': achCount,
+        'Accepted': accepted,
+        'Declined': declined,
+        'Waiting': waitingForCheck,
+        'RINC': RINC,
+        'SCOPUS': SCOPUS,
+        'VAK': VAK,
+        'Unindexed': unindexed,
+        'CritsCounts': critsCounts,
+        'CritsBalls': critsBalls,
+        'Achieves': achieves,
+        'AchievesBalls': achievesBalls
+    }
+
+    return res
+}

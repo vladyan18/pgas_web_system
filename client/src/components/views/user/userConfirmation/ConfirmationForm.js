@@ -352,7 +352,7 @@ class ConfirmationForm extends Component {
             <div>
                 <div style={this.headerContainerStyle}>
                     <p>Подтверждения: </p>
-                    {!this.props.disabled && <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
+                    { <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
                         добавить
                     </b>}
                 </div>

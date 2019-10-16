@@ -176,18 +176,35 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
 
     filename = filename.substr(filename.search('-') + 1);
     filename = filename.substr(filename.search('-') + 1);
-    if (filename.endsWith('.pdf')) {
-        var file = fs.createReadStream(filePath);
-        var stat = fs.statSync(filePath);
-        res.setHeader('Content-Length', stat.size);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline');
-        file.pipe(res);
-    } else {
-        res.setHeader('Content-Disposition', 'inline; filename=' + filename);
-        res.setHeader('Content-Transfer-Encoding', 'binary');
-        res.setHeader('Content-Type', 'application/octet-stream');
-        res.sendFile(filePath)
+    try {
+        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI')
+        if (filename.endsWith('.pdf')) {
+            var file = fs.createReadStream(filePath);
+            var stat = fs.statSync(filePath);
+            res.setHeader('Content-Length', stat.size);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline');
+            file.pipe(res);
+        } else
+        if (filename.endsWith('.jpg')) {
+            var file = fs.createReadStream(filePath);
+            var stat = fs.statSync(filePath);
+            res.setHeader('Content-Length', stat.size);
+            res.setHeader('Content-Type', 'image/jpg');
+            res.setHeader('Content-Disposition', 'inline');
+            file.pipe(res);
+        }
+        else{
+            res.setHeader('Content-Disposition', 'inline; filename=' + filename);
+            res.setHeader('Content-Transfer-Encoding', 'binary');
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.sendFile(filePath)
+        }
+    }
+    catch (e) {
+        let response = {response: "Not found"}
+        console.log(e)
+        res.sendStatus(404)
     }
 };
 
@@ -348,7 +365,34 @@ module.exports.updateAchieve = async function (req, res) {
                 month: 'numeric',
                 day: 'numeric'
             };
-            achieve.status = 'Ожидает проверки';
+            let oldAch = await db.findAchieveById(id)
+            for (let field of Object.keys(req.body.data))
+            {
+                if (field == 'confirmations' || field == 'achDate')
+                {
+                    continue
+                }
+                if (field == 'chars')
+                {
+                    let changeDetected = false
+                    for (let i = 0; i < oldAch.chars.length; i++)
+                        if (oldAch.chars[i] != req.body.data.chars[i])
+                        {
+                            console.log('CHANGE DETECTED', oldAch.chars[i], req.body.data.chars[i])
+                            changeDetected = true
+                            break
+                        }
+                    if (!changeDetected) continue
+                }
+                console.log(field, oldAch[field], req.body.data[field])
+                if (oldAch[field] != req.body.data[field])
+                {
+
+                    achieve.status = 'Ожидает проверки';
+                    achieve.ball = undefined
+                }
+            }
+
             achieve.date = new Date().toLocaleString('ru', options);
 
             let createdAchieve = await db.updateAchieve(id, achieve);

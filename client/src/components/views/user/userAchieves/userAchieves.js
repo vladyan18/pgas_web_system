@@ -30,6 +30,11 @@ class UserAchieves extends Component {
     }
 
     render() {
+        let summaryBall = 0
+        if (userAchievesStore.achieves)
+        for (let ach of userAchievesStore.achieves)
+            if (ach.status == 'Принято' || ach.status == 'Принято с изменениями')
+                summaryBall += ach.ball
         return (<div className="col-md-9 rightBlock" id="panel">
 
             <p id="username" className="headline">{this.props.userName}</p>
@@ -46,7 +51,8 @@ class UserAchieves extends Component {
             </div>
 
             <div className="category">
-                <h3 className="achGroup">Текущие достижения</h3>
+                <h3 className="achGroup" style={{display: 'flex', justifyContent: 'space-between'}}>
+                    Текущие достижения. <p style={{textAlign: 'right', margin: '0'}}>Суммарный балл: {summaryBall}</p></h3>
                 <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
             </div>
 

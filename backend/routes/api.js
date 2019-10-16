@@ -300,6 +300,7 @@ router.get('/waitForNotify', adminAuth, notifyController.waitForNotifies);
  * @auth adminAuth required
  */
 router.get('/getResultTable', adminAuth, docxController.getResultTable);
+router.get('/getStatistics', adminAuth, adminController.getStatisticsForFaculty);
 
 /**
  * Get actions history data

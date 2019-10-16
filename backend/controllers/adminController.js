@@ -1,3 +1,4 @@
+
 const db = require('./dbController');
 const notify = require('./notificationController');
 const history = require('./historyNotesController');
@@ -235,6 +236,10 @@ module.exports.getRating = async function (req, res) {
   res.status(200).send({ Users: users })
 };
 
+module.exports.getStatisticsForFaculty = async function(req, res) {
+    res.status(200).send(await db.getStatisticsForFaculty(req.query.faculty))
+}
+
 const balls = async function (id, faculty) {
     let criterias = await db.GetCriterias(faculty);
     if (!criterias) return null;
@@ -365,3 +370,4 @@ const MatrBallsLegacy = function (Crit, faculty) {
     }
     return Summ
 };
+

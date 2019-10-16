@@ -37,7 +37,8 @@ class EditAchievement extends Component {
                 hasDateDiapasone: !!ach.endingDate,
                 confirmations: ach.confirmations,
                 charsInvalid: false,
-                status: ach.status
+                status: ach.status,
+                ball: ach.ball
             }
         }
     }
@@ -159,6 +160,8 @@ class EditAchievement extends Component {
         res.crit = this.state.chars[0];
 
         res.chars = this.state.chars;
+        res.status = this.state.status
+        res.ball = this.state.ball
 
         res.achievement = this.state.ach;
         res.confirmations = [];
@@ -328,8 +331,7 @@ class EditAchievement extends Component {
                 </div>
                 <button type="button" id="SubmitButton" disabled={!this.isValid()}
                         className="btn btn-primary btn-md button_send"
-                        data-target="#exampleModal" value="отправить" onClick={this.editKrit}
-                disabled={this.state.status != 'Ожидает проверки'}>
+                        data-target="#exampleModal" value="отправить" onClick={this.editKrit}>
                     отправить
                 </button>
             </div>
