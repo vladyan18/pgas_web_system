@@ -10,17 +10,79 @@ class StaffStudentsRating extends Component {
 
         this.state = {}
 
+        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
+    };
+
+    numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
+
+    columns = [
+        ];
+
+    handleDirectionSelect(e) {
+        this.setState({currentDirection: e.target.value})
+    }
+
+    componentDidMount() {
+        this.columns = [{
+            dataField: 'Num',
+            text: '№',
+            isDummyField: true,
+            csvExport: false,
+            formatter: this.numFormatter,
+            headerClasses: 'text-center',
+            headerStyle: {fontSize:'smaller'},
+            style: {'vertical-align': 'middle', fontSize:'smaller'},
+            classes: 'text-center'
+
+        },
+            {
+                dataField: 'Name',
+                text: 'Ф.И.О.',
+                headerStyle: {fontSize:'smaller'},
+                style: {fontSize:'smaller'},
+                headerClasses: ''
+            },
+            {
+                dataField: 'Type',
+                text: 'М/Б',
+                headerClasses: 'text-center',
+                headerStyle: {width: '10px', fontSize:'smaller'},
+                style: {'vertical-align': 'middle', fontSize: 'small', overflow: 'hidden', width: '10px'},
+                classes: 'text-center',
+                formatter: (cell, row) => row.Type[0]
+            },
+            {
+                dataField: 'Course',
+                text: 'Курс',
+                headerClasses: 'text-center',
+                headerStyle: {fontSize:'smaller'},
+                style: {'vertical-align': 'middle',  fontSize:'smaller'},
+                classes: 'text-center'
+            }]
+
         let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '10в', '11а', '11б', '11в'];
-        let crits = Object.keys(staffContextStore.criterias);
+        let crits = Object.keys(this.props.crits)
+        if (this.props.userMode)
+            this.columns.push({
+                dataField: 'Ball',
+                text: 'Итого',
+                headerClasses: 'text-center',
+                headerStyle: {borderRight: '3px dotted black', fontSize:'smaller'},
+                style: {'vertical-align': 'middle', borderRight: '3px dotted black', fontWeight: 'bold', fontSize:'smaller'},
+                classes: 'text-center'
+            })
+
         for (let i = 0; i < crits.length; i++) {
             this.columns.push({
                 dataField: "Crits." + crits[i] + "",
                 text: critsNames[i],
                 headerClasses: 'text-center',
-                style: {'vertical-align': 'middle'},
+                headerStyle: {'vertical-align': 'middle', fontSize:'x-small', padding: '3px'},
+                style: {'vertical-align': 'middle', fontSize:'x-small', padding: '3px'},
                 classes: 'text-center'
             })
         }
+        if (!this.props.userMode)
         this.columns.push({
             dataField: 'Ball',
             text: 'Итого',
@@ -28,57 +90,21 @@ class StaffStudentsRating extends Component {
             style: {'vertical-align': 'middle'},
             classes: 'text-center'
         })
-
-        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
-    };
-
-    numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
-
-    columns = [
-        {
-            dataField: 'Num',
-            text: '№',
-            isDummyField: true,
-            csvExport: false,
-            formatter: this.numFormatter,
-            headerClasses: 'text-center',
-            style: {'vertical-align': 'middle'},
-            classes: 'text-center'
-
-        },
-        {
-            dataField: 'Name',
-            text: 'Ф.И.О.',
-            headerClasses: ''
-        },
-        {
-            dataField: 'Type',
-            text: 'Ступ. обуч.',
-            headerClasses: 'text-center',
-            style: {'vertical-align': 'middle'},
-            classes: 'text-center'
-        },
-        {
-            dataField: 'Course',
-            text: 'Курс',
-            headerClasses: 'text-center',
-            style: {'vertical-align': 'middle'},
-            classes: 'text-center'
-        }];
-
-    handleDirectionSelect(e) {
-        this.setState({currentDirection: e.target.value})
+        this.setState({columns: this.columns})
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (staffContextStore.faculty == 'ВШЖиМК' && staffContextStore.directions && staffContextStore.directions.length > 0)
+
+        if (this.props.faculty == 'ВШЖиМК' && this.props.directions && this.props.directions.length > 0)
             if (!this.state.currentDirection)
-                this.setState({currentDirection: staffContextStore.directions[0]})
+                this.setState({currentDirection: this.props.directions[0]})
+
+
     }
 
     render() {
         let filtered = this.props.data
-        if (staffContextStore.faculty == 'ВШЖиМК' && this.state.currentDirection) {
+        if (this.props.faculty == 'ВШЖиМК' && this.state.currentDirection) {
             filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
         }
 
@@ -96,8 +122,6 @@ class StaffStudentsRating extends Component {
         });
 
         return (
-            <main>
-                <div id="panel" className="row justify_center">
 
                     <div className="col-9 general">
                         <div className="profile" style={{"display": "flex", "justify-content": "space-between"}}>
@@ -112,16 +136,16 @@ class StaffStudentsRating extends Component {
                                     this.props.history.goBack()
                                 }}>Назад
                                 </button>
-                                <form action="/api/getResultTable">
+                                {!this.props.userMode && <form action="/api/getResultTable">
                                     <input type="hidden" name="faculty" value={staffContextStore.faculty} />
                                     <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
-                                </form>
+                                </form>}
                             </div>
 
                         </div>
-                        {staffContextStore.faculty == 'ВШЖиМК' && staffContextStore.directions && staffContextStore.directions.length > 0
+                        {this.props.faculty == 'ВШЖиМК' && this.props.directions && this.props.directions.length > 0
                         && <select id='1' className="form-control selectors" onChange={this.handleDirectionSelect}>
-                            {staffContextStore.directions.map(dir =>
+                            {this.props.directions.map(dir =>
                                 <option value={dir}>{dir}</option> )}
                         </select>}
                         <hr className="hr_blue"/>
@@ -136,11 +160,12 @@ class StaffStudentsRating extends Component {
                             </tbody>
                         </table>
 
-                        <BootstrapTable keyField='_id' data={sorted} columns={this.columns}/>
+                        {this.state.columns &&
+                            <div style={{overflowX: 'auto'}}>
+                        <BootstrapTable   keyField='_id' data={sorted} columns={this.state.columns}/>
+                            </div>}
 
                     </div>
-                </div>
-            </main>
         )
     }
 }

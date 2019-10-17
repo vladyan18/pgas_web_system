@@ -62,6 +62,17 @@ class UserPersonalStore {
         else return ''
     }
 
+    get Direction() {
+        if (this.personal) return this.personal.Direction;
+        else return ''
+    }
+
+    get IsInRating() {
+        console.log(this.personal)
+        if (this.personal) return this.personal.IsInRating;
+        else return false
+    }
+
     constructor() {
 
     }
@@ -78,7 +89,9 @@ decorate(UserPersonalStore, {
     Course: computed,
     Faculty: computed,
     Type: computed,
-    Birthdate: computed
+    Birthdate: computed,
+    Direction: computed,
+    IsInRating: computed
 });
 
 export default new UserPersonalStore();

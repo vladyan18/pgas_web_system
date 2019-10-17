@@ -4,6 +4,7 @@ import {observer} from "mobx-react";
 import StaffStudentsRating from "../../views/staff/staffStudentsRating";
 import CurrentContestRatingStore from "../../../stores/staff/currentContestRatingStore";
 import staffContextStore from "../../../stores/staff/staffContextStore";
+import {withRouter} from "react-router";
 
 class StaffStudentsContainer extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ class StaffStudentsContainer extends Component {
         this.getUsers = this.getUsers.bind(this);
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this.getUsers()
     }
 
@@ -20,7 +21,17 @@ class StaffStudentsContainer extends Component {
     }
 
     render() {
-        return staffContextStore.criterias && <StaffStudentsRating data={CurrentContestRatingStore.users}/> || null
+        return staffContextStore.criterias &&
+            <main>
+                <div id="panel" className="row justify_center">
+                        <StaffStudentsRating
+                            faculty={staffContextStore.faculty}
+                            directions={staffContextStore.directions}
+                            crits={staffContextStore.criterias}
+                            data={CurrentContestRatingStore.users}/>
+                </div>
+            </main>
+            || null
     }
 }
 

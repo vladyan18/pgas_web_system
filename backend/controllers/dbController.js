@@ -444,6 +444,16 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
                 achieves[ach.chars[0] + ' ' + ach.chars[1]] = 0
                 achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0
             }
+
+            if (ach.chars[0] = '6 (9а)') {
+                if (!achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]]) {
+                    achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0
+                    achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0
+                }
+                achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += 1
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += ach.ball
+            }
+
             achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1
             achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball
 

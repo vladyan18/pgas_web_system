@@ -69,8 +69,10 @@ module.exports.getProfile = async function (req, res) {
             Birthdate: User.Birthdate,
             SpbuId: User.SpbuId,
             Faculty: User.Faculty,
+            Direction: User.Direction,
             Type: User.Type,
-            Course: User.Course
+            Course: User.Course,
+            IsInRating: User.IsInRating
         });
     else res.status(404).send({})
 };
@@ -426,4 +428,41 @@ module.exports.deleteAchieve = async function (req, res) {
             console.log(err);
             res.status(500).send(err)
         }
+};
+
+module.exports.getRating = async function (req, res) {
+
+    if (req.user && req.user._json.email)
+        id = req.user._json.email;
+    else id = req.user.user_id;
+
+    let requestingUser = await db.findUserById(id);
+
+    let facultyName = req.query.faculty
+    if (requestingUser.Faculty != facultyName) {
+        res.sendStatus(401)
+        return
+    }
+
+    let kri = JSON.parse((await db.GetCriterias(facultyName)).Crits)
+    let users = [];
+    let Users = await db.CurrentUsers(facultyName);
+    for (let user of Users) {
+        let sumBall = 0;
+        let crits = {};
+        for (key of Object.keys(kri)) {
+            crits[key] = 0;
+        }
+        Achs = await db.findAchieves(user.id);
+        for(let ach of Achs) {
+            if (!ach) continue;
+            if (ach.ball) {
+                crits[ach.crit] += ach.ball;
+                sumBall += ach.ball;
+            }
+        }
+        let fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+        users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction})
+    }
+    res.status(200).send({ Users: users })
 };

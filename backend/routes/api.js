@@ -258,6 +258,7 @@ router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
  * @auth adminAuth required
  */
 router.get('/getRating', adminAuth, adminController.getRating);
+router.get('/getRatingForUser', auth, userController.getRating);
 
 router.get('/getAdmins', adminAuth, adminController.getAdmins);
 

@@ -14,6 +14,8 @@ import {observer} from "mobx-react";
 
 import EditAchievementContainer from "./containers/user/editAchievementContainer";
 import UserAddAchievementContainer from "./containers/user/userAddAchievementContainer";
+import UserStudentsContainer from "./containers/user/userStudentsRatingContainer";
+import staffStudentsRatingContainer, {StaffStudentsContainerFabric} from "./containers/staff/staffStudentsRatingContainer";
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
@@ -63,6 +65,7 @@ class User extends Component {
                 <Switch>
                     <Route path="/home" component={UserAchievesContainer}/>
                     <Route path="/achievement/:id" component={EditAchievementContainer}/>
+                    <Route path="/rating" component={UserStudentsContainer}/>
                     <Route path="/upload" component={UserAddAchievementContainer}/>
                     <Route path="/documents" component={UserCommonInfoContainer}/>
                     <Route path="/profile" component={UserProfileContainer}/>
