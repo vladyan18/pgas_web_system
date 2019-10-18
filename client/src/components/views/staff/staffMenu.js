@@ -87,8 +87,9 @@ class StaffMenu extends Component {
                                     <div className="centered menuButtonContainer">
                                         <button type="button" id="SubmitButton"
                                                 className="btn btn-success menuButton "
-                                                value="Панель сотрудника">
-                                            История
+                                                value="Панель сотрудника"
+                                        onClick={() => this.props.history.push('/staff/statistics')}>
+                                            Статистика
                                         </button>
                                     </div>
                                 </div>
