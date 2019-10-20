@@ -191,6 +191,7 @@ module.exports.Checked = async function (req, res) {
                 Id: user._id,
                 user: str,
                 Course: user.Course,
+                Type: user.Type,
                 IsInRating: user.IsInRating,
                 IsHiddenInRating: user.IsHiddenInRating,
                 Achievements: user.Achievement,

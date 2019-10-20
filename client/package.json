@@ -7,6 +7,8 @@
     "chart.js": "^2.8.0",
     "chartjs-plugin-labels": "^1.1.0",
     "http-proxy-middleware": "^0.19.1",
+    "ml": "^5.0.0",
+    "ml-hclust": "^3.0.0",
     "mobx": "^5.14.2",
     "mobx-react": "^6.1.4",
     "pca-js": "^1.0.2",

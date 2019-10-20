@@ -3,9 +3,10 @@ import '../../../style/user_main.css';
 import {observer} from "mobx-react";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {fetchGet} from "../../../services/fetchService";
-import {Doughnut, Bar, Chart, Scatter} from 'react-chartjs-2';
+import {Doughnut, Bar, Chart, Scatter, Radar} from 'react-chartjs-2';
 import 'chartjs-plugin-labels';
 import PCA from "pca-js"
+import { agnes } from 'ml-hclust';
 
 let originalDoughnutDraw = Chart.controllers.doughnut.prototype.draw;
 Chart.helpers.extend(Chart.controllers.doughnut.prototype, {
@@ -51,12 +52,23 @@ class StaffStatistics extends Component {
         this.setState({statistics: await statisticsProm, users: (await usersProm).Info})
     }
 
-    makeUsersMatrix(users) {
+    makeUsersMatrix(users, summaryBalls, radarData) {
         let crits = staffContextStore.criterias
         let usersMatrix = []
+        let radarCounts = {}
         for (let user of users)
         {
+            summaryBalls[user.user] = 0
             let userRow = []
+
+            if (!radarData[user.Type + user.Course]) {
+                radarData[user.Type + user.Course] = []
+                radarCounts[user.Type + user.Course] = []
+            for (let i = 0; i < Object.keys(crits).length; i++)
+                radarData[user.Type + user.Course].push(0)
+                radarCounts[user.Type + user.Course].push(0)
+            }
+
             for (let i = 0; i < Object.keys(crits).length; i++)
                 userRow.push(0)
 
@@ -65,10 +77,23 @@ class StaffStatistics extends Component {
                 if (!ach.status == 'Принято' && !ach.status == 'Принято с изменениями') continue
                 let index = Object.keys(crits).indexOf(ach.chars[0])
                 userRow[index] += ach.ball
+                radarData[user.Type + user.Course][index] += ach.ball
+                radarCounts[user.Type + user.Course][index] += 1
+                summaryBalls[user.user] += ach.ball
             }
 
             usersMatrix.push(userRow)
         }
+
+        for (let course of Object.keys(radarData))
+        {
+            for (let i = 0; i < radarData[course].length; i++)
+            {
+                if (radarCounts[course][i] > 0 )
+                    radarData[course][i] = radarData[course][i] / radarCounts[course][i]
+            }
+        }
+
         return usersMatrix
     }
 
@@ -83,21 +108,22 @@ class StaffStatistics extends Component {
     }
 
     render() {
-        let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata
+        let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata, radarDataForVisualize, radarData = {}
+        let summaryBalls = {}
         if (this.state.users && staffContextStore.criterias)
         {
-            let usersMatrix = this.makeUsersMatrix(this.state.users)
+            let usersMatrix = this.makeUsersMatrix(this.state.users, summaryBalls, radarData)
             reducedMatrix = this.makePCA(usersMatrix)
 
             let PCAdataset = []
+            let AGNESdataset = []
             let labels = []
             for (let i = 0; i < reducedMatrix.adjustedData[0].length; i++)
             {
                 PCAdataset.push({x: reducedMatrix.adjustedData[0][i], y:reducedMatrix.adjustedData[1][i] })
+                AGNESdataset.push([reducedMatrix.adjustedData[0][i], reducedMatrix.adjustedData[1][i]])
                 labels.push(this.state.users[i].user)
             }
-
-            console.log(labels)
 
             PCAdata = {
                 labels: labels,
@@ -106,6 +132,24 @@ class StaffStatistics extends Component {
                     backgroundColor: '#ff0000',
                     data: PCAdataset
                 }]
+            }
+
+            radarDataForVisualize = {
+                labels: Object.keys(staffContextStore.criterias),
+                datasets: []
+            }
+            let colors = ['rgba(102,233,125,0.76)', 'rgba(0,0,255,0.75)', 'rgba(255,252,7,0.75)', 'rgba(255,167,0,0.75)',
+                'rgba(147,0,165,0.75)', 'rgba(255,0,2,0.75)']
+            for (let course of Object.keys(radarData))
+            {
+                console.log(course, radarData[course])
+                radarDataForVisualize.datasets.push(
+                    {
+                        label: course,
+                        data: radarData[course],
+                        backgroundColor: colors[Object.keys(radarData).indexOf(course)]
+                    }
+                )
             }
         }
         if (this.state.statistics) {
@@ -303,17 +347,30 @@ class StaffStatistics extends Component {
                                 {(this.state.statistics && staffContextStore.criterias) &&  <Bar data={medBallsCritsData} options={barChartOptions}/>}
                             </div>
                         </div>
+                        <div style={{display: "flex", justifyContent: "space-between"}}>
                         <div style={{width: "500px"}}>
-                            <h3>Some experimental shit: </h3>
+                            <h3>Результат PCA: </h3>
                             {(this.state.statistics && staffContextStore.criterias) &&  <Scatter data={PCAdata} options = {{
+                                legend: {
+                                    display: false
+                                },
                                 tooltips: {
                                 callbacks: {
                                 label: function(tooltipItem, data) {
-                                var label = data.labels[tooltipItem.index];
-                                return label + ': (' + tooltipItem.xLabel + ', ' + tooltipItem.yLabel + ')';
+                                let label = data.labels[tooltipItem.index];
+                                return label + ': ' + summaryBalls[label];
                             }
                             }}
                             }}/>}
+                        </div>
+
+
+                        </div>
+                        <div style={{display: "flex", justifyContent: "center", marginTop: '30px'}}>
+                        <div style={{width: "1000px"}}>
+                            <h3>Средние баллы по курсам: </h3>
+                            {(this.state.statistics && staffContextStore.criterias) &&  <Radar data={radarDataForVisualize} />}
+                        </div>
                         </div>
                     </div>
                 </div>
