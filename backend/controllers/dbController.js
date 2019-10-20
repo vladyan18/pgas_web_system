@@ -462,7 +462,7 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
             if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('Scopus') > 0) SCOPUS += 1
             else
             if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('ВАК') > 0) VAK += 1
-            else if (ach.chars[articlesIndexCol] && ach.chars[0] == '5 (8б)') unindexed += 1
+            else if (ach.chars[0] == '5 (8б)') unindexed += 1
         }
     }
     let res = {'Total achs count': achCount,

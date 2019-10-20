@@ -3,8 +3,9 @@ import '../../../style/user_main.css';
 import {observer} from "mobx-react";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {fetchGet} from "../../../services/fetchService";
-import {Doughnut, Bar, Chart} from 'react-chartjs-2';
+import {Doughnut, Bar, Chart, Scatter} from 'react-chartjs-2';
 import 'chartjs-plugin-labels';
+import PCA from "pca-js"
 
 let originalDoughnutDraw = Chart.controllers.doughnut.prototype.draw;
 Chart.helpers.extend(Chart.controllers.doughnut.prototype, {
@@ -43,16 +44,70 @@ class StaffStatistics extends Component {
     };
 
     async componentDidMount() {
-        let statistics = await fetchGet('/api/getStatistics', {faculty: staffContextStore.faculty})
-        console.log('stat', statistics)
-        this.setState({statistics: statistics})
+        let statisticsProm = fetchGet('/api/getStatistics', {faculty: staffContextStore.faculty})
+
+        let usersProm = fetchGet('/api/checked', {faculty: staffContextStore.faculty})
+
+        this.setState({statistics: await statisticsProm, users: (await usersProm).Info})
     }
 
+    makeUsersMatrix(users) {
+        let crits = staffContextStore.criterias
+        let usersMatrix = []
+        for (let user of users)
+        {
+            let userRow = []
+            for (let i = 0; i < Object.keys(crits).length; i++)
+                userRow.push(0)
 
+            for (let ach of user.Achievements)
+            {
+                if (!ach.status == 'Принято' && !ach.status == 'Принято с изменениями') continue
+                let index = Object.keys(crits).indexOf(ach.chars[0])
+                userRow[index] += ach.ball
+            }
 
+            usersMatrix.push(userRow)
+        }
+        return usersMatrix
+    }
+
+    makePCA(usersMatrix) {
+        let vectors = PCA.getEigenVectors(usersMatrix)
+        let first = PCA.computePercentageExplained(vectors,vectors[0])
+        let second = PCA.computePercentageExplained(vectors,vectors[1])
+        console.log('EXPL', first, second)
+        let adData = PCA.computeAdjustedData(usersMatrix,vectors[0], vectors[1])
+        console.log('DATA', adData)
+        return adData
+    }
 
     render() {
-        let data, critsData, critsBallsData, medBallsCritsData
+        let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata
+        if (this.state.users && staffContextStore.criterias)
+        {
+            let usersMatrix = this.makeUsersMatrix(this.state.users)
+            reducedMatrix = this.makePCA(usersMatrix)
+
+            let PCAdataset = []
+            let labels = []
+            for (let i = 0; i < reducedMatrix.adjustedData[0].length; i++)
+            {
+                PCAdataset.push({x: reducedMatrix.adjustedData[0][i], y:reducedMatrix.adjustedData[1][i] })
+                labels.push(this.state.users[i].user)
+            }
+
+            console.log(labels)
+
+            PCAdata = {
+                labels: labels,
+                datasets: [{
+                    label: 'Scatter Dataset',
+                    backgroundColor: '#ff0000',
+                    data: PCAdataset
+                }]
+            }
+        }
         if (this.state.statistics) {
             data = {
                 labels: [
@@ -112,8 +167,10 @@ class StaffStatistics extends Component {
             if (crits) {
                 for (let i = 0; i < Object.keys(crits).length; i++)
                     critBallssDataset[Object.keys(crits)[i]] = this.state.statistics.CritsBalls[Object.keys(crits)[i]]
-                for (let i = 0; i < Object.keys(crits).length; i++)
+                for (let i = 0; i < Object.keys(crits).length; i++) {
                     if (!critBallssDataset[Object.keys(crits)[i]]) critBallssDataset[Object.keys(crits)[i]] = 0
+                    //critBallssDataset[Object.keys(crits)[i]] = critBallssDataset[Object.keys(crits)[i]].toFixed(2)
+                }
             }
             if (crits)
             critsBallsData = {
@@ -245,6 +302,18 @@ class StaffStatistics extends Component {
                                 <h3>Средний балл за достижение: </h3>
                                 {(this.state.statistics && staffContextStore.criterias) &&  <Bar data={medBallsCritsData} options={barChartOptions}/>}
                             </div>
+                        </div>
+                        <div style={{width: "500px"}}>
+                            <h3>Some experimental shit: </h3>
+                            {(this.state.statistics && staffContextStore.criterias) &&  <Scatter data={PCAdata} options = {{
+                                tooltips: {
+                                callbacks: {
+                                label: function(tooltipItem, data) {
+                                var label = data.labels[tooltipItem.index];
+                                return label + ': (' + tooltipItem.xLabel + ', ' + tooltipItem.yLabel + ')';
+                            }
+                            }}
+                            }}/>}
                         </div>
                     </div>
                 </div>
