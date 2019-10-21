@@ -6,6 +6,7 @@
     "bootstrap": "^4.3.1",
     "chart.js": "^2.8.0",
     "chartjs-plugin-labels": "^1.1.0",
+    "file-saver": "^2.0.2",
     "http-proxy-middleware": "^0.19.1",
     "ml": "^5.0.0",
     "ml-hclust": "^3.0.0",
@@ -26,7 +27,8 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "^2.1.8",
     "react-text-mask": "^5.4.3",
-    "recharts": "^1.8.3"
+    "recharts": "^1.8.3",
+    "xlsx-style": "^0.8.13"
   },
   "scripts": {
     "start": "react-scripts start",
