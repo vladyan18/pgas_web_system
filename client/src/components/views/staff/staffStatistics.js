@@ -112,7 +112,7 @@ class StaffStatistics extends Component {
 
     render() {
         let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata, radarDataForVisualize, radarData = {}, radarCounts= {}
-        let lineDataForVisualize, coursesCounts = {}, coursesCountsDataForVisualize = {}
+        let lineDataForVisualize, coursesCounts = {}, coursesCountsDataForVisualize = {}, coursesCountsPerStudentDataForVisualize = {}
         let summaryBalls = {}
         if (this.state.users && staffContextStore.criterias)
         {
@@ -157,10 +157,39 @@ class StaffStatistics extends Component {
                 }]
             }
 
+            coursesCountsPerStudentDataForVisualize = {
+                labels: Object.keys(staffContextStore.criterias),
+                datasets: []
+            }
+
+            for (let course of Object.keys(coursesCounts)) {
+                let countsPerStudent = []
+
+                console.log(Object.keys(radarCounts), course[-1])
+                let radLabel = ''
+                if (course[0] == 'Б') radLabel = 'Бакалавриат'
+                if (course[0] == 'М') radLabel = 'Магистратура'
+                if (course[0] == 'С') radLabel = 'Специалитет'
+                radLabel += course[course.length - 1]
+
+                for (let i = 0; i < radarCounts[radLabel].length; i++) {
+                    countsPerStudent.push(0)
+                    if (coursesCounts[course] > 0)
+                        countsPerStudent[i] = radarCounts[radLabel][i] / coursesCounts[course]
+                }
+                coursesCountsPerStudentDataForVisualize.datasets.push(
+                    {
+                        label: course,
+                        data: countsPerStudent,
+                        backgroundColor: colors[Object.keys(radarData).indexOf(radLabel)],
+                        borderColor: colors[Object.keys(radarData).indexOf(radLabel)],
+                        fill: false
+                    })
+            }
 
             for (let course of Object.keys(radarData))
             {
-                console.log(course, radarData[course])
+
                 radarDataForVisualize.datasets.push(
                     {
                         label: course,
@@ -171,7 +200,6 @@ class StaffStatistics extends Component {
                     }
                 )
 
-                console.log('RC', radarCounts[course])
                 lineDataForVisualize.datasets.push(
                     {
                         label: course,
@@ -181,6 +209,7 @@ class StaffStatistics extends Component {
                         fill: false
                     }
                 )
+
             }
         }
         if (this.state.statistics) {
@@ -431,6 +460,13 @@ class StaffStatistics extends Component {
                             <div style={{width: "1000px"}}>
                                 <h3>Кол-во достижений по курсам: </h3>
                                 {(this.state.statistics && staffContextStore.criterias) &&  <Line data={lineDataForVisualize} />}
+                            </div>
+                        </div>
+
+                        <div style={{display: "flex", justifyContent: "center", marginTop: '30px'}}>
+                            <div style={{width: "1000px"}}>
+                                <h3>Кол-во достижений на человека по курсам: </h3>
+                                {(this.state.statistics && staffContextStore.criterias) &&  <Line data={coursesCountsPerStudentDataForVisualize} />}
                             </div>
                         </div>
                     </div>
