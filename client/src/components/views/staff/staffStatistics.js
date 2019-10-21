@@ -3,7 +3,7 @@ import '../../../style/user_main.css';
 import {observer} from "mobx-react";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {fetchGet} from "../../../services/fetchService";
-import {Doughnut, Bar, Chart, Scatter, Radar} from 'react-chartjs-2';
+import {Doughnut, Bar, Chart, Scatter, Line} from 'react-chartjs-2';
 import 'chartjs-plugin-labels';
 import PCA from "pca-js"
 import { agnes } from 'ml-hclust';
@@ -20,7 +20,7 @@ Chart.helpers.extend(Chart.controllers.doughnut.prototype, {
             ctx = chart.chart.ctx;
 
 
-        let fontSize = (height / 250).toFixed(2);
+        let fontSize = (height / 270).toFixed(2);
         ctx.font = fontSize + "em sans-serif";
         ctx.textBaseline = "middle";
 
@@ -52,21 +52,24 @@ class StaffStatistics extends Component {
         this.setState({statistics: await statisticsProm, users: (await usersProm).Info})
     }
 
-    makeUsersMatrix(users, summaryBalls, radarData) {
+    makeUsersMatrix(users, summaryBalls, radarData, radarCounts, coursesCounts) {
         let crits = staffContextStore.criterias
         let usersMatrix = []
-        let radarCounts = {}
         for (let user of users)
         {
             summaryBalls[user.user] = 0
             let userRow = []
 
+            if (!coursesCounts[user.Type[0] + user.Course]) coursesCounts[user.Type[0] + user.Course] = 0
+            coursesCounts[user.Type[0] + user.Course] += 1
+
             if (!radarData[user.Type + user.Course]) {
                 radarData[user.Type + user.Course] = []
                 radarCounts[user.Type + user.Course] = []
-            for (let i = 0; i < Object.keys(crits).length; i++)
+            for (let i = 0; i < Object.keys(crits).length; i++) {
                 radarData[user.Type + user.Course].push(0)
                 radarCounts[user.Type + user.Course].push(0)
+            }
             }
 
             for (let i = 0; i < Object.keys(crits).length; i++)
@@ -74,7 +77,7 @@ class StaffStatistics extends Component {
 
             for (let ach of user.Achievements)
             {
-                if (!ach.status == 'Принято' && !ach.status == 'Принято с изменениями') continue
+                if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') continue
                 let index = Object.keys(crits).indexOf(ach.chars[0])
                 userRow[index] += ach.ball
                 radarData[user.Type + user.Course][index] += ach.ball
@@ -108,11 +111,12 @@ class StaffStatistics extends Component {
     }
 
     render() {
-        let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata, radarDataForVisualize, radarData = {}
+        let data, critsData, critsBallsData, medBallsCritsData, reducedMatrix, PCAdata, radarDataForVisualize, radarData = {}, radarCounts= {}
+        let lineDataForVisualize, coursesCounts = {}, coursesCountsDataForVisualize = {}
         let summaryBalls = {}
         if (this.state.users && staffContextStore.criterias)
         {
-            let usersMatrix = this.makeUsersMatrix(this.state.users, summaryBalls, radarData)
+            let usersMatrix = this.makeUsersMatrix(this.state.users, summaryBalls, radarData, radarCounts, coursesCounts)
             reducedMatrix = this.makePCA(usersMatrix)
 
             let PCAdataset = []
@@ -138,8 +142,22 @@ class StaffStatistics extends Component {
                 labels: Object.keys(staffContextStore.criterias),
                 datasets: []
             }
+            lineDataForVisualize = {
+                labels: Object.keys(staffContextStore.criterias),
+                datasets: []
+            }
+
             let colors = ['rgba(102,233,125,0.76)', 'rgba(0,0,255,0.75)', 'rgba(255,252,7,0.75)', 'rgba(255,167,0,0.75)',
                 'rgba(147,0,165,0.75)', 'rgba(255,0,2,0.75)']
+            coursesCountsDataForVisualize = {
+                labels: Object.keys(coursesCounts),
+                datasets: [{
+                    data: Object.values(coursesCounts),
+                    backgroundColor:colors
+                }]
+            }
+
+
             for (let course of Object.keys(radarData))
             {
                 console.log(course, radarData[course])
@@ -147,7 +165,20 @@ class StaffStatistics extends Component {
                     {
                         label: course,
                         data: radarData[course],
-                        backgroundColor: colors[Object.keys(radarData).indexOf(course)]
+                        backgroundColor: colors[Object.keys(radarData).indexOf(course)],
+                        borderColor: colors[Object.keys(radarData).indexOf(course)],
+                        fill: false
+                    }
+                )
+
+                console.log('RC', radarCounts[course])
+                lineDataForVisualize.datasets.push(
+                    {
+                        label: course,
+                        data: radarCounts[course],
+                        backgroundColor: colors[Object.keys(radarData).indexOf(course)],
+                        borderColor: colors[Object.keys(radarData).indexOf(course)],
+                        fill: false
                     }
                 )
             }
@@ -364,13 +395,43 @@ class StaffStatistics extends Component {
                             }}/>}
                         </div>
 
+                            <div style={{width: "500px", marginBottom: "30px"}}>
+                                <h3 style={{marginBottom: '10px'}}>Кол-во подающих по курсам</h3>
+                                {this.state.statistics &&  <Doughnut data={coursesCountsDataForVisualize} options={{
+                                    legend: {
+                                        showLegend: false
+                                    },
+                                    plugins: {
+                                        labels: [
+                                            {
+                                                render: 'label',
+                                                position: 'outside',
+                                                fontColor: '#000000',
+                                                outsidePadding: 6,
+                                                textMargin: 10
+                                            },
+                                            {
+                                                render: 'value',
+                                                fontColor: '#000000'
+                                            }
+                                        ]
+                                    }
+                                }}/>}
+                            </div>
 
                         </div>
                         <div style={{display: "flex", justifyContent: "center", marginTop: '30px'}}>
                         <div style={{width: "1000px"}}>
                             <h3>Средние баллы по курсам: </h3>
-                            {(this.state.statistics && staffContextStore.criterias) &&  <Radar data={radarDataForVisualize} />}
+                            {(this.state.statistics && staffContextStore.criterias) &&  <Line data={radarDataForVisualize} />}
                         </div>
+                        </div>
+
+                        <div style={{display: "flex", justifyContent: "center", marginTop: '30px'}}>
+                            <div style={{width: "1000px"}}>
+                                <h3>Кол-во достижений по курсам: </h3>
+                                {(this.state.statistics && staffContextStore.criterias) &&  <Line data={lineDataForVisualize} />}
+                            </div>
                         </div>
                     </div>
                 </div>
