@@ -17,12 +17,18 @@ function fitToColumn (arrayOfArray) {
     })
 }
 
+function getDate(d) {
+    if (!d) return undefined;
+    d = new Date(d);
+    return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + "." + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + "." + d.getFullYear();
+}
+
 export const makeExportUsersTable = async (users, faculty) => {
 
     if (!users || users.length == 0) return
 
     let table = []
-    table.push(['ФИО', 'Ст. об.', 'Курс', 'Критерий', 'Хар-ки', 'Достижение', 'Балл'])
+    table.push(['ФИО', 'Ст. об.', 'Курс', 'Дата', 'Критерий', 'Хар-ки', 'Достижение', 'Балл'])
 
     for (let user of users)
     {
@@ -33,6 +39,7 @@ export const makeExportUsersTable = async (users, faculty) => {
             row.push(user.user)
             row.push(user.Type[0])
             row.push(user.Course)
+            row.push(ach.achDate ? getDate(ach.achDate) : 'н/д')
             row.push(ach.chars[0])
             row.push(ach.chars.toString())
             row.push(ach.achievement)
