@@ -16,7 +16,7 @@ const Staff = React.lazy(() => import('./components/staff'));
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {isRegistered: 'unknown'};
+        this.state = {isRegistered: 'unknown', isLogged: false, authChecked: false};
 
         fetch("api/getProfile", {
             method: "GET"
@@ -28,21 +28,24 @@ class App extends Component {
             });
     }
 
-    componentWillMount(nextProps, nextState, nextContext) {
-        Auth.fetchAuth().then(() => {
-            if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
+    componentDidMount() {
+        Auth.isUserAuthenticated().then((status) => {
+            this.setState({isLogged: status})
         })
     }
 
-    componentWillUpdate(nextProps, nextState, nextContext) {
-        Auth.fetchAuth().then(() => {
-            if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        Auth.isUserAuthenticated().then((status) => {
+            if (status != this.state.isLogged || !this.state.authChecked)
+            this.setState({isLogged: status, authChecked: true})
         })
     }
 
     render() {
+        if (!this.state.authChecked) return null
+
         return (
-            Auth.isUserAuthenticated() ?
+            this.state.isLogged ?
                 <Suspense fallback={
                     <div style={{backGroundColor: "#e2e2e2", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
                     <div id="floatingCirclesG">

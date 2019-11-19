@@ -97,15 +97,38 @@ const superAdminAuth = async (req, res, next) => {
  */
 router.get('/', (req, res) => res.redirect('/home'));
 
-/**
- * Route serving login via auth0
- * @name Login
- * @path {GET} /login
- */
-router.get('/login', passport.authenticate('auth0', {
-    scope: 'openid email profile'
-}), function (req, res) {
-    res.redirect('/')
+router.post('/login', async function (req, res) {
+    let errState = false
+    console.log('LOGIN', req.body.username);
+    let opts = {
+        ldap: {
+            url: process.env.LDAP_URL,
+            baseDN: 'dc=ad,dc=pu,dc=ru', username: req.body.username, password: req.body.password
+        }
+    };
+    passport.authenticate('ActiveDirectory', opts,  (err, user, info) => {
+        if (err) {
+            console.log('ERROR', err);
+            if(errState) return
+            errState = true
+            return res.redirect('/login');
+        }
+
+        if (!user) {
+            if(errState) return
+            errState = true
+            return res.redirect('/login')
+        }
+        req.logIn(user, async function (err) {
+            if (err) {
+                console.log('ERR', err)
+            }
+            console.log('LOGGED', user);
+            const returnTo = req.session.returnTo;
+            delete req.session.returnTo;
+            res.redirect(returnTo || '/home')
+        })
+    })(req, res)
 });
 
 /**

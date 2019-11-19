@@ -42,6 +42,24 @@ exports.findUserByAchieve = async function(id){
 };
 
 
+exports.migrate = async function(id, lastName) {
+    let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru'}).lean();
+    if (u && u.LastName == lastName)
+    {
+        await UserModel.findOneAndUpdate({id: id}, {
+            $set: {
+                Achievement: u.Achievement,
+                Confirmations: u.Confirmations,
+                Role: u.Role,
+                Rights: u.Rights,
+                IsInRating: u.IsInRating
+            }
+        })
+
+        await UserModel.findOneAndRemove({SpbuId: id + '@student.spbu.ru'})
+    }
+}
+
 exports.isRegistered = async function(id){
     //r = (await redis.get(id + '_reg')) == 'true';
     //if (!r) {

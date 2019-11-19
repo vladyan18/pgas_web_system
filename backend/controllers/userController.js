@@ -56,6 +56,7 @@ module.exports.dynamic = async function (req, res) {
  * */
 module.exports.getProfile = async function (req, res) {
     let User;
+    console.log('BACK ID', req.user.user_id)
     if (req.user._json.email)
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
