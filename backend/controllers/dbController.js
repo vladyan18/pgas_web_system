@@ -56,7 +56,7 @@ exports.migrate = async function(id, lastName) {
             }
         })
 
-        await UserModel.findOneAndRemove({SpbuId: id + '@student.spbu.ru'})
+        await UserModel.findOneAndRemove({_id: u._id})
     }
 }
 
@@ -118,7 +118,7 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
 exports.isUser = function(token){
     return UserModel.findOne({id: token},function(err, user){
         if(err)
-            return res.send('Error');
+            return false;
           
         if(!user){
           return false
