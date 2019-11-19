@@ -28,7 +28,8 @@ passport.serializeUser( async function (user, done) {
     //console.log('SERIALIZE', user);
     let id = user._json.sAMAccountName;
     console.log('ID', id)
-    if (!await db.isUser(id)) {
+    let isUser = await db.isUser(id)
+    if (!isUser) {
         let Type = user._json.department
         Type = Type[0].toString().toUpperCase() + Type.slice(1, Type.length)
 

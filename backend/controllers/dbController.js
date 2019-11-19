@@ -56,7 +56,7 @@ exports.migrate = async function(id, lastName) {
             }
         })
 
-        await UserModel.findOneAndRemove({SpbuId: id + '@student.spbu.ru'})
+        await UserModel.findOneAndRemove({_id: u._id})
     }
 }
 
