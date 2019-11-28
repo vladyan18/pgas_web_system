@@ -46,7 +46,7 @@ exports.migrate = async function(id, lastName) {
     let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru'}).lean();
     if (u && u.LastName == lastName)
     {
-        await UserModel.findOneAndUpdate({id: id}, {
+       await UserModel.findOneAndUpdate({id: id}, {
             $set: {
                 Achievement: u.Achievement,
                 Confirmations: u.Confirmations,
