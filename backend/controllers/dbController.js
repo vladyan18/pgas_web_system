@@ -56,6 +56,7 @@ exports.migrate = async function(id, lastName) {
             }
         })
 
+        if (u.id != id)
         await UserModel.findOneAndRemove({_id: u._id})
     }
 }
@@ -334,7 +335,7 @@ exports.CreateFaculty = async function (Faculty) {
 exports.GetCriterias = async function (facultyName) {
     console.log(facultyName)
     let facObject = await FacultyModel.findOne({Name: facultyName});
-    if (facObject.CritsId)
+    if (facObject && facObject.CritsId)
         return await CriteriasModel.findById(facObject.CritsId, 'Crits');
     else return undefined
 };

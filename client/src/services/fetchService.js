@@ -1,5 +1,13 @@
 import React from 'react';
 
+function FetchError(message, body) {
+    this.body = body
+    this.message = message || 'Error while fetching';
+    this.stack = (new Error()).stack;
+}
+FetchError.prototype = Object.create(Error.prototype);
+FetchError.prototype.constructor = FetchError;
+
 async function sendObject(url, obj) {
     let response = await fetch(url, {
         method: 'POST',
@@ -37,7 +45,7 @@ async function get(url, obj) {
     });
     if (response.ok)
         return response.json();
-    else return undefined
+    else throw new FetchError('Error while fetching', await response.json())
 }
 
 
