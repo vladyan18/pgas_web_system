@@ -5,17 +5,28 @@ class UserPersonalStore {
     personal;
     Role;
     Rights;
+    facultyRawName;
 
     async update() {
-        let result = await fetchGet('/api/getProfile', {});
-        console.log('GET PROFILE', result);
-        this.personal = result;
-        if (result)
-            await fetchGet('/api/getRights', {id: result.id}).then((res2) => {
-                this.Role = res2.Role;
-                this.Rights = res2.Rights
-            });
-        return result
+        try {
+            let result = await fetchGet('/api/getProfile', {});
+            console.log('GET PROFILE', result);
+            this.personal = result;
+            if (result)
+                await fetchGet('/api/getRights', {id: result.id}).then((res2) => {
+                    this.Role = res2.Role;
+                    this.Rights = res2.Rights
+                });
+            return result
+        }
+        catch (e) {
+            if (e.body.Error == 404 && e.body.facultyRawName)
+            {
+                this.facultyRawName = e.body.facultyRawName
+                console.log(this.facultyRawName)
+            }
+            else throw new Error('Error with login')
+        }
     }
 
     get fio() {
@@ -82,6 +93,7 @@ decorate(UserPersonalStore, {
     personal: observable,
     Role: observable,
     Rights: observable,
+    facultyRawName: observable,
     fio: computed,
     LastName: computed,
     FirstName: computed,
