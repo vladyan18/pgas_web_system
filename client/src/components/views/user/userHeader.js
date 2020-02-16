@@ -4,7 +4,7 @@ import logoBss from '../../../img/logo_bss2.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore'
 import {observer} from "mobx-react";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 
 class UserHeader extends Component {
     constructor(props) {

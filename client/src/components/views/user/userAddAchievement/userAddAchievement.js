@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
 import CriteriasForm from './criteriasForm';
 import CriteriasStore from '../../../../stores/criteriasStore'
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import AchievementDateInput from "../../../AchievementDateInput";
 import ConfirmationForm from "../userConfirmation/ConfirmationForm";
 import userAchievesStore from "../../../../stores/userAchievesStore";

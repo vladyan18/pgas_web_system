@@ -1,4 +1,5 @@
 import userPersonalStore from "../stores/userPersonalStore";
+import {BASE_URL} from "../common/constants";
 
 class Auth {
 
@@ -12,13 +13,14 @@ class Auth {
     }
 
     static async fetchAuth() {
-        let resp = await fetch("api/isAuth", {
+        let resp = await fetch(BASE_URL + "/isAuth", {
             method: "GET"
         });
-        resp.json().then((x) => {
-            userPersonalStore.Role = x.role;
-            console.log('CUR ROLE: ' + userPersonalStore.Role, x)
-        });
+        if (resp.status === 200) {
+            resp.json().then((x) => {
+                userPersonalStore.Role = x.role;
+            });
+        }
         return resp.status === 200
     }
 
@@ -28,12 +30,7 @@ class Auth {
      * @returns {boolean}
      */
     static async isUserAuthenticated() {
-        let res = await this.fetchAuth()
-
-        console.log('AUTH', res)
-        return res;
-
-
+        return await this.fetchAuth();
     }
 
     /**

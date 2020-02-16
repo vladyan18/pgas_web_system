@@ -13,7 +13,7 @@ const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
 //const redisClient = require('./config/redis');
 const frontendPath = path.join(__dirname, '../frontend', '/build');
-const port = 8080;
+const port = 80;
 
 require('dotenv').config();
 const app = express();
@@ -28,7 +28,7 @@ const sess = {
   resave: false,
   saveUninitialized: true,
     store: new MongoStore({
-        url: 'mongodb://bekhterev:pgastest@mongo:27017/bekhterev?authSource=admin'
+        url: 'mongodb://bekhterev:pgastest@localhost:27017/bekhterev?authSource=admin'
     })
 };
 

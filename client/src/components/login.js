@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import logoBss from '../img/logo_bss2.png';
 import lock from '../img/lock.png';
+import {BASE_URL} from "../common/constants";
 
 class Login extends Component {
     constructor(props) {
@@ -35,7 +36,7 @@ class Login extends Component {
                                 Для получения/восстановления единого пароля обратитесь к сотрудникам службы технической
                                 поддержки.</div>
 
-                            <form id = 'login' method ='post'  action="/api/login">
+                            <form id = 'login' method ='post'  action={BASE_URL + "/login"}>
                             <label id='name'>Имя пользователя</label><br/>
                                 <input type='text' id='name' name = 'username' className="form-control" required/><br/>
                                 <label id='password'>Пароль</label><br/>

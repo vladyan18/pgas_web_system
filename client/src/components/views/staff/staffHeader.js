@@ -3,7 +3,7 @@ import logo from '../../../img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore'
 import {observer} from "mobx-react";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown"
 import DropdownButton from "react-bootstrap/DropdownButton"
 import staffContextStore from "../../../stores/staff/staffContextStore";

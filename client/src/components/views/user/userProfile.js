@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/add_portfolio.css';
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 
 class UserProfile extends Component {
     constructor(props) {

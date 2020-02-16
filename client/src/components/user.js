@@ -9,7 +9,7 @@ import UserProfileContainer from "./containers/user/userProfileContainer";
 import Auth from "../modules/Auth";
 import userPersonalStore from "../stores/userPersonalStore";
 import CriteriasStore from "../stores/criteriasStore"
-import {Switch, withRouter} from "react-router";
+import {Switch, withRouter} from "react-router-dom";
 import {observer} from "mobx-react";
 
 import EditAchievementContainer from "./containers/user/editAchievementContainer";

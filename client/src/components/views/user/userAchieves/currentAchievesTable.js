@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 
 
 const columns = [{

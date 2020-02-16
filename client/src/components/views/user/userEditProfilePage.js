@@ -4,7 +4,7 @@ import lock from '../../../img/lock.png';
 import logo from '../../../img/gerb.png';
 import DateInput from "../../DateInput";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 
 class UserEditProfilePage extends Component {
     constructor(props) {

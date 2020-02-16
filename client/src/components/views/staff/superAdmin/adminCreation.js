@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../../style/user_main.css';
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import {fetchSendObj} from "../../../../services/fetchService";
 
 class AdminCreation extends Component {

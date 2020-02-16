@@ -4,7 +4,7 @@ import {observer} from "mobx-react";
 import StaffStudentsRating from "../../views/staff/staffStudentsRating";
 import CurrentContestRatingStore from "../../../stores/staff/currentContestRatingStore";
 import staffContextStore from "../../../stores/staff/staffContextStore";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import {fetchGet} from "../../../services/fetchService";
 import userPersonalStore from "../../../stores/userPersonalStore";
 import criteriasStore from "../../../stores/criteriasStore";

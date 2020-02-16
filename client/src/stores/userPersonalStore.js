@@ -9,23 +9,24 @@ class UserPersonalStore {
 
     async update() {
         try {
-            let result = await fetchGet('/api/getProfile', {});
+            let result = await fetchGet('/getProfile', {});
             console.log('GET PROFILE', result);
             this.personal = result;
             if (result)
-                await fetchGet('/api/getRights', {id: result.id}).then((res2) => {
+                await fetchGet('/getRights', {id: result.id}).then((res2) => {
                     this.Role = res2.Role;
                     this.Rights = res2.Rights
                 });
             return result
         }
         catch (e) {
-            if (e.body.Error == 404 && e.body.facultyRawName)
+            if (e.body && e.body.Error == 404 && e.body.facultyRawName)
             {
                 this.facultyRawName = e.body.facultyRawName
                 console.log(this.facultyRawName)
             }
-            else throw new Error('Error with login')
+            console.log(e);
+            throw new Error('Error with login')
         }
     }
 

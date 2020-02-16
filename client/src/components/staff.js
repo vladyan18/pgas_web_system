@@ -2,7 +2,7 @@ import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
-import {Switch} from "react-router";
+import {Switch} from "react-router-dom";
 import StaffHeaderContainer from "./containers/staff/staffHeaderContainer";
 import StaffMenu from './views/staff/staffMenu'
 import userPersonalStore from "../stores/userPersonalStore";

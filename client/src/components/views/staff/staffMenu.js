@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../style/rating.css';
 import {observer} from "mobx-react";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import userPersonalStore from "../../../stores/userPersonalStore";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {fetchGet} from "../../../services/fetchService";
