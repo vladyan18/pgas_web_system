@@ -52,9 +52,7 @@ function UserCommonInfo(props) {
                     Обнаружили ошибку или неточность? Есть вопросы по работе системы?
                 </p>
                 <p className="desc_selectors desc_criterion_dspo ">
-                    По всем вопросам можно обращаться к <a target="_blank"
-                                                           href="https://vk.com/vladvolosnikov">разработчику</a> системы. <br/>
-                    Либо в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu">паблика Стипкома
+                    По всем вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu"> Стипкома
                     Студсовета ПМ-ПУ.</a>
                 </p>
             </div>
