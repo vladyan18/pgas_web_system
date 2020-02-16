@@ -8,7 +8,7 @@ function UserHeaderContainer(props) {
     let pathname;
     switch (location.pathname) {
         case '/home':
-            pathname = 'Личный кабинет портфолио';
+            pathname = 'Мои достижения';
             break;
         case '/upload':
             pathname = 'Добавление достижения';
