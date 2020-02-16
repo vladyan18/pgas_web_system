@@ -19,7 +19,7 @@ class Auth {
             userPersonalStore.Role = x.role;
             console.log('CUR ROLE: ' + userPersonalStore.Role, x)
         });
-        localStorage.setItem('auth', (resp.status === 200).toString());
+        return resp.status === 200
     }
 
     /**
@@ -27,8 +27,13 @@ class Auth {
      *
      * @returns {boolean}
      */
-    static isUserAuthenticated() {
-        return localStorage.getItem('auth') == 'true';
+    static async isUserAuthenticated() {
+        let res = await this.fetchAuth()
+
+        console.log('AUTH', res)
+        return res;
+
+
     }
 
     /**

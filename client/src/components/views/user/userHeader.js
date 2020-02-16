@@ -20,7 +20,7 @@ class UserHeader extends Component {
         return <header>
             <div className="row page_top">
                 <div className="col-8 block_header">
-                    <img src={logoBss} className="logo_img" style={{ height: "45px"}}/>
+                    <img src={logoBss} className="logo_img" style={{ height: "30px"}}/>
                     <div className="p_header">
                         Студенческий совет СПбГУ <br/>
                         {this.props.pageName}

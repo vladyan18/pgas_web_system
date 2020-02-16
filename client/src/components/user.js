@@ -39,11 +39,11 @@ class User extends Component {
 
         let profile = await userPersonalStore.update();
         if (profile) {
-            CriteriasStore.getCriteriasForFaculty(profile.Faculty);
-            await CriteriasStore.getAnnotations(profile.Faculty);
+            await CriteriasStore.getCriteriasForFaculty(profile.Faculty);
+            if (CriteriasStore.criterias) await CriteriasStore.getAnnotations(profile.Faculty);
             this.setState({ready: true})
         } else {
-            this.props.history.push('/register')
+            //this.props.history.push('/register')
         }
 
 
@@ -57,7 +57,39 @@ class User extends Component {
     }
 
     render() {
-        return (<>{(this.state.ready) && <div className="container-fluid">
+        if (!CriteriasStore.criterias && CriteriasStore.facultyRawName) // Error handling when criterias not found
+            return (
+            <>{(this.state.ready) &&
+            <div className="container-fluid">
+                <UserHeaderContainer/>
+                <div className="container main_block">
+                    <div className="rightBlock" id="panel" style={{display: 'flex', justifyContent: 'center', padding:'50px'}}>
+
+                        <p>Ваш Студсовет еще не предоставил все необходимые данные для системы. Обратитесь в свой Студсовет. <br/><br/>
+                            Факультет: <b>{CriteriasStore.facultyRawName}</b></p>
+                    </div>
+                </div>
+            </div>}</>
+            )
+
+        if (userPersonalStore.facultyRawName) // Error handling when faculty not found
+            return (
+                <>{
+                <div className="container-fluid">
+                    <UserHeaderContainer/>
+                    <div className="container main_block">
+                        <div className="rightBlock" id="panel" style={{display: 'flex', justifyContent: 'center', padding:'50px'}}>
+
+                            <p>Поддержка вашего факультета в системе еще не реализована. Обратитесь в свой Студсовет. <br/><br/>
+                                Факультет: <b>{userPersonalStore.facultyRawName}</b></p>
+                        </div>
+                    </div>
+                </div>}</>
+            )
+
+        return (
+
+            <>{(this.state.ready) && <div className="container-fluid">
         <UserHeaderContainer/>
         <div className="container main_block">
             <div className="row">

@@ -25,29 +25,27 @@ module.exports.dynamic = async function (req, res) {
         var id = req.user._json.email;
     else var id = req.user.user_id;
 
-    achPr = db.findAchieves(id);
+    let User = await db.findUserById(id) // TODO OPTIMIZE
+    if (User)
+        await db.findAchieves(id).then(async (v) => {
+                for (let i = 0; i < v.length; i++) {
+                    let confirms = [];
+                    if (v[i].confirmations)
+                        for (let j = 0; j < v[i].confirmations.length; j++) {
 
-    db.findUserById(id).then((User) => { // TODO OPTIMIZE
-        achPr.then(async (v) => {
+                            let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
+                            if (!confirm) continue
+                            confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
+                            confirms.push(confirm)
+                        }
+                    v[i].confirmations = confirms
+                }
 
-
-            for (let i = 0; i < v.length; i++) {
-                let confirms = [];
-                if (v[i].confirmations)
-                    for (let j = 0; j < v[i].confirmations.length; j++) {
-
-                        let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
-                        if (!confirm) continue
-                        confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
-                        confirms.push(confirm)
-                    }
-                v[i].confirmations = confirms
-            }
-
-            User.Achs = v;
-            res.status(200).send(User)
+                User.Achs = v;
+                res.status(200).send(User)
         })
-    })
+    else res.status(404).send({Error: 404})
+
 };
 
 /**
@@ -56,11 +54,12 @@ module.exports.dynamic = async function (req, res) {
  * */
 module.exports.getProfile = async function (req, res) {
     let User;
+    console.log('BACK ID', req.user.user_id)
     if (req.user._json.email)
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
 
-    if (User.Registered)
+    if (User && User.Registered)
         res.status(200).send({
             id: User.id,
             LastName: User.LastName,
@@ -74,7 +73,7 @@ module.exports.getProfile = async function (req, res) {
             Course: User.Course,
             IsInRating: User.IsInRating
         });
-    else res.status(404).send({})
+    else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName})
 };
 
 module.exports.getRights = async function (req, res) {

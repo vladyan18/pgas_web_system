@@ -42,6 +42,25 @@ exports.findUserByAchieve = async function(id){
 };
 
 
+exports.migrate = async function(id, lastName) {
+    let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru'}).lean();
+    if (u && u.LastName == lastName)
+    {
+       await UserModel.findOneAndUpdate({id: id}, {
+            $set: {
+                Achievement: u.Achievement,
+                Confirmations: u.Confirmations,
+                Role: u.Role,
+                Rights: u.Rights,
+                IsInRating: u.IsInRating
+            }
+        })
+
+        if (u.id != id)
+        await UserModel.findOneAndRemove({_id: u._id})
+    }
+}
+
 exports.isRegistered = async function(id){
     //r = (await redis.get(id + '_reg')) == 'true';
     //if (!r) {
@@ -100,7 +119,7 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
 exports.isUser = function(token){
     return UserModel.findOne({id: token},function(err, user){
         if(err)
-            return res.send('Error');
+            return false
           
         if(!user){
           return false
@@ -316,7 +335,7 @@ exports.CreateFaculty = async function (Faculty) {
 exports.GetCriterias = async function (facultyName) {
     console.log(facultyName)
     let facObject = await FacultyModel.findOne({Name: facultyName});
-    if (facObject.CritsId)
+    if (facObject && facObject.CritsId)
         return await CriteriasModel.findById(facObject.CritsId, 'Crits');
     else return undefined
 };

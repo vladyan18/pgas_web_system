@@ -62,7 +62,7 @@ module.exports.getCriterias = async function (req, res) {
         let criterias = await db.GetCriterias(req.query.faculty);
         if (criterias)
             res.status(200).send(criterias.Crits);
-        else res.status(404).send({})
+        else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName})
     } catch (e) {
         res.status(500).send(e)
     }
