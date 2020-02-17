@@ -98,7 +98,7 @@ const superAdminAuth = async (req, res, next) => {
 router.get('/', (req, res) => res.redirect('/home'));
 
 router.post('/login', async function (req, res) {
-    let errState = false
+    let errState = false;
     console.log('LOGIN', req.body.username);
     let opts = {
         ldap: {
@@ -126,7 +126,7 @@ router.post('/login', async function (req, res) {
             console.log('LOGGED', user);
             const returnTo = req.session.returnTo;
             delete req.session.returnTo;
-            res.redirect(returnTo || '/home')
+            res.redirect(returnTo || 'http://localhost:3000/home')
         })
     })(req, res)
 });

@@ -3,11 +3,10 @@ import '../../../../style/user_main.css';
 import CurrentAchievesTable from "./currentAchievesTable";
 import userAchievesStore from "../../../../stores/userAchievesStore";
 import {observer} from "mobx-react";
-/** @jsx jsx */
 import {css, jsx} from '@emotion/core';
+/** @jsx jsx */
 import styled from '@emotion/styled';
 import {BASE_API_URL} from "../../../../common/constants";
-
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
 `;

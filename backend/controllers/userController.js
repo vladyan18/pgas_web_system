@@ -82,6 +82,7 @@ module.exports.getRights = async function (req, res) {
 };
 
 module.exports.isAuth = async function (req, res) {
+    console.log(req.isAuthenticated());
     if (req.isAuthenticated())
         res.json({
             success: true,
