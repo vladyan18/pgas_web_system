@@ -6,6 +6,7 @@ import {observer} from "mobx-react";
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
+import {BASE_API_URL} from "../../../../common/constants";
 
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
@@ -31,8 +32,6 @@ const Panel = styled.div`
 class UserAchieves extends Component {
     constructor(props) {
         super(props);
-
-
     };
 
     componentDidMount() {
@@ -40,7 +39,7 @@ class UserAchieves extends Component {
     }
 
     getAchieves() {
-        fetch("/api/getUserInfo", {
+        fetch(BASE_API_URL + "/getUserInfo", {
             method: "GET"
         }).then((resp) => {
             return resp.json()
@@ -72,7 +71,7 @@ class UserAchieves extends Component {
         `}>
           <b>Текущие достижения</b>
         </div>
-        <form action="/api/getAnket">
+        <form action={BASE_API_URL + "/getAnket"}>
           <input type="submit" id="download" className="btn" css={mainButton} value="Скачать анкету"/>
         </form>
       </div>
