@@ -180,7 +180,7 @@ module.exports.getResultTable = async function (req, res) {
             for (key of Object.keys(kri)) {
                 crits[key] = 0;
             }
-            Achs = await db.findAchieves(user.id);
+            Achs = await db.findActualAchieves(user.id);
             for (let ach of Achs) {
                 if (!ach) continue;
                 if (ach.ball) {

@@ -11,3 +11,5 @@ frontend/package-lock.json
 nginx/build/
 client/build
 .idea
+docker-compose.yml
+.env

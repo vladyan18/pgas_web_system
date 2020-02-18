@@ -80,7 +80,7 @@ module.exports.getCriteriasAndSchema = async function (req, res) {
 };
 
 function isValue(str) { //проверка содержатся ли в ячейке баллы
-    if (!str) return false;
+    if (str === '' || str === undefined || str === null) return false;
     str = str.toString();
     let l = str.length;
 

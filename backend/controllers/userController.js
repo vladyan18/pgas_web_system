@@ -27,7 +27,7 @@ module.exports.dynamic = async function (req, res) {
 
     let User = await db.findUserById(id) // TODO OPTIMIZE
     if (User)
-        await db.findAchieves(id).then(async (v) => {
+        await db.findActualAchieves(id).then(async (v) => {
                 for (let i = 0; i < v.length; i++) {
                     let confirms = [];
                     if (v[i].confirmations)
@@ -38,7 +38,7 @@ module.exports.dynamic = async function (req, res) {
                             confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
                             confirms.push(confirm)
                         }
-                    v[i].confirmations = confirms
+                    v[i].confirmations = confirms;
                 }
 
                 User.Achs = v;
@@ -453,7 +453,7 @@ module.exports.getRating = async function (req, res) {
         for (key of Object.keys(kri)) {
             crits[key] = 0;
         }
-        Achs = await db.findAchieves(user.id);
+        Achs = await db.findActualAchieves(user.id);
         for(let ach of Achs) {
             if (!ach) continue;
             if (ach.ball) {

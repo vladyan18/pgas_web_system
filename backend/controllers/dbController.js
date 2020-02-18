@@ -42,37 +42,37 @@ exports.findUserByAchieve = async function(id){
 };
 
 
-exports.migrate = async function(id, lastName) {
+exports.migrate = async function(id) {
     let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru'}).lean();
-    if (u && u.LastName == lastName)
+    if (u)
     {
        await UserModel.findOneAndUpdate({id: id}, {
             $set: {
+                LastName: u.LastName,
+                FirstName: u.FirstName,
+                Patronymic: u.Patronymic,
+                Birthdate: u.Birthdate,
+                Faculty: u.Faculty,
+                Registered: true,
+                Course: u.Course,
+                Type: u.Type,
+                IsInRating: false,
+                Settings: u.Settings,
                 Achievement: u.Achievement,
                 Confirmations: u.Confirmations,
                 Role: u.Role,
-                Rights: u.Rights,
-                IsInRating: u.IsInRating
+                Rights: u.Rights
             }
-        })
+        });
 
-        if (u.id != id)
+        if (u.id !== id)
         await UserModel.findOneAndRemove({_id: u._id})
     }
-}
+};
 
 exports.isRegistered = async function(id){
-    //r = (await redis.get(id + '_reg')) == 'true';
-    //if (!r) {
-        u = await UserModel.findOne({id: id}, 'Registered').lean();
-        r = u.Registered;
-
-       // if (r) {
-       //     redis.set(id + '_reg', 'true')
-      //  }
-    //}
-
-    return r
+    u = await UserModel.findOne({id: id}, 'Registered').lean();
+    return u.Registered;
 };
 
 
@@ -132,14 +132,10 @@ exports.createUser = function(User){
     return UserModel.create(User)
 };
 
-exports.findAchieves = async function (user_id) {
-    //return redis.getAsync(user_id + '_achs').then(async (res) => {
-    //   if (!res) {
-            User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
-            let b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
-            //redis.setAsync(user_id + '_achs', JSON.stringify(b));
-            return(b)
-    // } else return JSON.parse(res)})
+exports.findActualAchieves = async function (user_id) {
+    User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
+    const b = await AchieveModel.find({_id: {$in: User.Achievement}, achDate: {$gte: new Date(2019, 1, 1, 0, 0, 0, 0)}}).lean();
+    return(b);
 };
 
 exports.findAchieveById = async function (id) {

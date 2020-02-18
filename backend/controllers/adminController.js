@@ -206,7 +206,7 @@ module.exports.getUser = async function (req, res) {
     let ip = await req.url.slice(6);
 
     db.findUser(ip).then((User) => {
-        db.findAchieves(User.id).then((v) => {
+        db.findActualAchieves(User.id).then((v) => {
             User.Achs = v;
             res.status(200).send(User)
         })
@@ -223,7 +223,7 @@ module.exports.getRating = async function (req, res) {
       for (key of Object.keys(kri)) {
           crits[key] = 0;
       }
-    Achs = await db.findAchieves(user.id);
+    Achs = await db.findActualAchieves(user.id);
     for(let ach of Achs) {
         if (!ach) continue;
         if (ach.ball) {
@@ -247,7 +247,7 @@ const balls = async function (id, faculty) {
 
     let kri = JSON.parse(criterias.Crits);
     let balls = 0;
-    let Achs = await db.findAchieves(id);
+    let Achs = await db.findActualAchieves(id);
   let kriteries = {};
 
   for (key of Object.keys(kri)) {

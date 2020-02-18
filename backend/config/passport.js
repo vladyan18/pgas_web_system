@@ -3,12 +3,6 @@ const Auth0Strategy = require('passport-auth0');
 const db = require('../controllers/dbController');
 let ActiveDirectoryStrategy = require('./ldapstrategy');
 
-
-facultiesMap = {
-    'Факультет прикладной математики-процессов управления': 'ПМ-ПУ'
-}
-
-
 passport.use(new ActiveDirectoryStrategy({
     integrated: false,
     ldap: {
@@ -24,46 +18,27 @@ passport.use(new ActiveDirectoryStrategy({
 
 
 passport.serializeUser( async function (user, done) {
-    console.log('SERIALIZE', user);
-    let id = user._json.sAMAccountName;
-    console.log('ID', id)
-    let isUser = await db.isUser(id)
+    const id = user._json.sAMAccountName;
+    const isUser = await db.isUser(id);
 
+    let isRegistered = false;
     if (!isUser) {
-        let Type = user._json.department
-        Type = Type[0].toString().toUpperCase() + Type.slice(1, Type.length)
-        console.log(user._json.company, facultiesMap[user._json.company])
-        if (facultiesMap[user._json.company]) {
-            console.log('Creating user...')
             await db.createUser({
                 Role: "User",
                 id: id,
-                LastName: user.name.lastName,
-                FirstName: user.name.firstName,
-                Patronymic: user.name.middleName,
-                Course: user._json.title ? user._json.title[0] : undefined,
-                Birthdate: user._json.description ? makeDate(user._json.description) : undefined,
-                Type: Type ? Type : undefined,
-                Faculty: facultiesMap[user._json.company],
-                SpbuId: user._json.mail,
                 Ball: 0,
                 Achievement: [],
-                Registered: true
+                Registered: false
             });
-            await db.migrate(id, user.name.lastName)
-        }
-        else user.facultyNotFound = true
-        r = false
-    } else r = await db.isRegistered(id);
-    user.Registered = r;
+            await db.migrate(id);
+    } else isRegistered = await db.isRegistered(id);
+    user.Registered = isRegistered;
     let role = await db.getUserRights(id);
     if (role) {
         user.Role = role.Role;
         user.Rights = role.Rights;
     }
-    user.facultyRawName = user._json.company;
-    user.user_id = id
-    //console.log('SERIALIZED', user);
+    user.user_id = id;
     done(null, user)
 });
 

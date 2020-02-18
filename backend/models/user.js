@@ -3,7 +3,7 @@ const connection = require('../config/db');
 
 const userSchema = mongoose.Schema({
   id: String,
-    SpbuId: String,
+  SpbuId: String,
   Role: String,
   Rights: [String],
   Registered: Boolean,
