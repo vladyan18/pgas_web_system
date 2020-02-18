@@ -43,7 +43,7 @@ class User extends Component {
             if (CriteriasStore.criterias) await CriteriasStore.getAnnotations(profile.Faculty);
             this.setState({ready: true})
         } else {
-            //this.props.history.push('/register')
+            this.props.history.push('/register')
         }
 
 

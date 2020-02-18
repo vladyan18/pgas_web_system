@@ -1,5 +1,5 @@
 import React from 'react';
-import {BASE_URL} from "../common/constants";
+import {BASE_API_URL} from "../common/constants";
 
 function FetchError(message, body) {
     this.body = body;
@@ -10,7 +10,7 @@ FetchError.prototype = Object.create(Error.prototype);
 FetchError.prototype.constructor = FetchError;
 
 async function sendObject(url, obj) {
-    let response = await fetch(BASE_URL + url, {
+    let response = await fetch(BASE_API_URL + url, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -23,7 +23,7 @@ async function sendObject(url, obj) {
 }
 
 async function sendWithoutRes(url, obj) {
-    let response = await fetch(BASE_URL + url, {
+    let response = await fetch(BASE_API_URL + url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ async function get(url, obj) {
         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(obj[k]))
         .join('&');
     url = url + '?' + query;
-    let response = await fetch(BASE_URL + url, {
+    let response = await fetch(BASE_API_URL + url, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',

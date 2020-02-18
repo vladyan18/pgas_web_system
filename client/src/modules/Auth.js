@@ -1,5 +1,5 @@
 import userPersonalStore from "../stores/userPersonalStore";
-import {BASE_URL} from "../common/constants";
+import {BASE_API_URL} from "../common/constants";
 
 class Auth {
 
@@ -13,7 +13,7 @@ class Auth {
     }
 
     static async fetchAuth() {
-        let resp = await fetch(BASE_URL + "/isAuth", {
+        let resp = await fetch(BASE_API_URL + "/isAuth", {
             method: "GET"
         });
         if (resp.status === 200) {
