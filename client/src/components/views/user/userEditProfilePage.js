@@ -13,7 +13,6 @@ class UserEditProfilePage extends Component {
         this.state.LastName = props.personal.LastName;
         this.state.Name = props.personal.FirstName;
         this.state.Patronymic = props.personal.Patronymic;
-        this.state.SpbuId = props.personal.SpbuId;
         this.state.Birthdate = getDate(props.personal.Birthdate);
         this.state.Faculty = props.personal.Faculty;
         this.state.Type = props.personal.Type;
@@ -30,7 +29,6 @@ class UserEditProfilePage extends Component {
             user.lastname = this.state.LastName;
             user.name = this.state.Name;
             user.patronymic = this.state.Patronymic;
-            user.spbuId = this.state.SpbuId;
             user.birthdate = makeDate(this.state.Birthdate);
             user.faculty = this.state.Faculty;
             user.type = this.state.Type;
@@ -97,12 +95,6 @@ class UserEditProfilePage extends Component {
                                            updater={this.handleDateChange}
                                            isValid={this.state.dateValidationResult}/><br/>
 
-                                <span className="redText" style={{"margin-top": "2rem"}}>*</span><label>Почта
-                                СПбГУ</label><br/>
-                                <input type='text' style={{margin: "0"}} id='name' name='name' value={this.state.SpbuId}
-                                       onChange={(e) => this.handleChange(e, 'SpbuId')}
-                                       className="form-control" required autoComplete="off"
-                                       placeholder="st******@student.spbu.ru"/><br/>
                                 <span className="redText">*</span><label>Факультет</label><br/>
                                 <select id="faculty" className="form-control " value={this.state.Faculty}
                                         onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue="">

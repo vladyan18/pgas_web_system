@@ -18,15 +18,17 @@ module.exports.getAnket = async function (req, res) {
         user = await
             db.findUserById(req.user.user_id);
         let W = user.Achievement;
-        for (let i of W) {
-            let Ach = await
-                db.findAchieveById(i);
-            await
-            achievs.push(Ach)
-        }
+        //for (let i of W) {
+        //    let Ach = await
+        //        db.findAchieveById(i);
+        //    await
+        //    achievs.push(Ach)
+        //}
+
+	achievs = await db.findActualAchieves(user.id);
 
         let faculty = await db.GetFaculty(user.Faculty);
-
+        let criterias = JSON.parse((await db.GetCriterias(user.Faculty)).Crits);
 
         var zip = new require('node-zip')();
 
@@ -69,7 +71,13 @@ module.exports.getAnket = async function (req, res) {
         if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate));
         f06 = String(f06).replace("BD", datestring);
         let confirmNum = {val: 1, confirms: {}};
-        crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)'];
+        //crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)'];
+        crits = Object.keys(criterias);
+        console.log('KRITS:', crits);
+        if (crits.length !== 13) {
+          crits.splice(9, 0,'DUMMY');
+        }
+        console.log('KRITS:', crits);
         for (var i = 0; i < 13; i++) {
             curAchs = achievs.filter(o => (o && o.crit == crits[i]));
             cStr = '<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="000000' + (16 + i * 3 + (i > 2 ? 3 : 0)).toString(16).toUpperCase() + '"><w:pPr><w:jc w:val="center"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rFonts w:ascii="Times New Roman" w:cs="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman"/><w:b w:val="1"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">A';

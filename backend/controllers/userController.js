@@ -230,7 +230,7 @@ module.exports.addFileForConfirmation = function (req, res) {
 
         let confirmation = JSON.parse(req.body.data);
         confirmation.FilePath = req.file.path;
-        confirmation.Data = 'http://localhost:3000/api/getConfirm/' + req.file.filename;
+        confirmation.Data = '/api/getConfirm/' + req.file.filename;
         confirmation.Date = Date.now();
         confirmation.Size = req.file.size;
         db.createConfirmation(confirmation).then(

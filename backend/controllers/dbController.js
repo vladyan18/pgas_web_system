@@ -33,7 +33,6 @@ exports.getUserRights = function (id) {
 
 exports.findUserByAchieve = async function(id){
 
-    console.log('GET ID', id, typeof id)
     let ach = await AchieveModel.findById(id.toString())
     console.log('ACH', ach)
     let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
@@ -43,7 +42,7 @@ exports.findUserByAchieve = async function(id){
 
 
 exports.migrate = async function(id) {
-    let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru'}).lean();
+    let u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru', id: {$ne: id}}).lean();
     if (u)
     {
        await UserModel.findOneAndUpdate({id: id}, {
@@ -51,6 +50,7 @@ exports.migrate = async function(id) {
                 LastName: u.LastName,
                 FirstName: u.FirstName,
                 Patronymic: u.Patronymic,
+		SpbuId: id + '@student.spbu.ru',
                 Birthdate: u.Birthdate,
                 Faculty: u.Faculty,
                 Registered: true,
@@ -134,8 +134,19 @@ exports.createUser = function(User){
 
 exports.findActualAchieves = async function (user_id) {
     User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
-    const b = await AchieveModel.find({_id: {$in: User.Achievement}, achDate: {$gte: new Date(2019, 1, 1, 0, 0, 0, 0)}}).lean();
-    return(b);
+    const b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
+    let actualAchieves = [];
+    for (let i = 0; i < b.length; i++) {
+      if (b[i].crit === "7а" || b[i].crit === "1 (7а)") {
+        actualAchieves.push(b[i]);
+        continue;
+      }
+
+      if (b[i].achDate >= new Date(2019, 1, 1, 0, 0, 0, 0)) {
+        actualAchieves.push(b[i]);
+      }
+    }
+    return(actualAchieves);
 };
 
 exports.findAchieveById = async function (id) {
@@ -156,10 +167,12 @@ exports.createAchieve = async function (achieve) {
 };
 
 exports.deleteAchieve = async function (id) {
-   // redis.del(id + '_ach2');
+    console.log('DELETE', id);
     AchieveModel.findByIdAndRemove(id).then((x) => {
     });
-    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
+    let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}});
+    if (!u) return true;
+    console.log('DELETION', u);
     for(var i = u.Achievement.length - 1; i >= 0; i--) {
         if(u.Achievement[i] === id) {
             u.Achievement.splice(i, 1);
@@ -211,7 +224,6 @@ exports.registerUser = function (userId, lastname, name, patronymic, birthdate, 
             FirstName: name,
             Patronymic: patronymic,
             Birthdate: birthdate,
-            SpbuId: spbuId,
             Faculty: faculty,
             Course: course,
             Type: type,

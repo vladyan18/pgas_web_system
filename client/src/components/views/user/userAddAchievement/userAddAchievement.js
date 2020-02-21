@@ -23,12 +23,13 @@ class UserAddAchievement extends Component {
         this.sendKrit = this.sendKrit.bind(this);
         this.updateChars = this.updateChars.bind(this);
         this.updateConfirmations = this.updateConfirmations.bind(this);
+        this.crits = Object.keys(CriteriasStore.criterias);
     }
 
     updateChars(value, isValid) {
         let st = this.state;
-        if (value[0] == '1 (7а)') {
-            if (userAchievesStore.achieves.some((x) => x.chars[0] == '1 (7а)')) {
+        if (value[0] == this.crits[0]) {
+            if (userAchievesStore.achieves.some((x) => x.chars[0] == this.crits[0])) {
                 st.critError = true;
                 st.critErrorMessage = "Достижение за критерий 7а уже добавлено"
             } else if (userPersonalStore.Course == 1) {
@@ -104,7 +105,14 @@ class UserAddAchievement extends Component {
 
     checkValidityBeforeSend() {
 
-        if (this.state.chars[0] != '1 (7а)') {
+	if (this.crits[0] === '7а' && this.state.chars[0] === this.crits[0]) {
+            if (this.state.charsInvalid === undefined) {
+                this.setState({charsInvalid: true});
+                return false;
+            } else if (this.state.charsInvalid) return false;
+        }
+
+        if (this.state.chars[0] != this.crits[0]) {
             if (this.state.charsInvalid === undefined) {
                 this.setState({charsInvalid: true});
                 return false;
@@ -208,7 +216,7 @@ class UserAddAchievement extends Component {
 
                     <div className="show_hide_c11">
                     </div>
-                    {(this.state.chars && this.state.chars[0] != '1 (7а)') && <FormGroup id="textForm">
+                    {(this.state.chars && this.state.chars[0] != this.crits[0]) && <FormGroup id="textForm">
                         <div className="form_elem_with_left_border" style={{marginTop: "20px"}}>
                             <label className="control-label" htmlFor="comment">Название достижения:
                                 <HelpButton  overlay={achievementPopover} placement={"top"} />

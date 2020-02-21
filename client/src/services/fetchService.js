@@ -10,6 +10,9 @@ FetchError.prototype = Object.create(Error.prototype);
 FetchError.prototype.constructor = FetchError;
 
 async function sendObject(url, obj) {
+    if (url.startsWith('/api/')) {
+        url = url.replace('/api/', '/');
+    }
     let response = await fetch(BASE_API_URL + url, {
         method: 'POST',
         headers: {
@@ -23,6 +26,9 @@ async function sendObject(url, obj) {
 }
 
 async function sendWithoutRes(url, obj) {
+    if (url.startsWith('/api/')) {
+        url = url.replace('/api/', '/');
+    }
     let response = await fetch(BASE_API_URL + url, {
         method: 'POST',
         headers: {
@@ -34,6 +40,9 @@ async function sendWithoutRes(url, obj) {
 }
 
 async function get(url, obj) {
+    if (url.startsWith('/api/')) {
+        url = url.replace('/api/', '/');
+    }
     let query = Object.keys(obj)
         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(obj[k]))
         .join('&');

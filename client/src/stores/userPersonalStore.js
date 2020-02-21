@@ -20,10 +20,9 @@ class UserPersonalStore {
             return result
         }
         catch (e) {
-            if (e.body && e.body.Error == 404 && e.body.facultyRawName)
+            if (e.body && e.body.Error === 404)
             {
-                this.facultyRawName = e.body.facultyRawName
-                console.log(this.facultyRawName)
+		return null;
             }
             console.log(e);
             throw new Error('Error with login')
@@ -31,7 +30,7 @@ class UserPersonalStore {
     }
 
     get fio() {
-        return this.LastName + ' ' + this.FirstName + ' ' + this.Patronymic
+        return this.LastName + ' ' + this.FirstName + (this.Patronymic ? ' ' + this.Patronymic : '');
     }
 
     get LastName() {

@@ -10,9 +10,15 @@ export default class CriteriasForm extends Component {
         super(props);
         this.handleSelect = this.handleSelect.bind(this);
 
+	this.critsTitles = Object.keys(this.props.crits);
+	this.critsOffset = this.critsTitles.length == 13 ? 1 : 0;
         if (!this.props.values) {
-            this.state = {selects: [], length: 1, crit: '1 (7а)', values: []};
-            this.props.valuesCallback(['1 (7а)'])
+            if (this.critsTitles[0] === "7а") {
+              this.state = {selects: [{id: '7a', num: 2, value: '', options: Object.keys(this.props.crits["7а"])}], length: 1, crit: this.critsTitles[0], values: ['7а']};
+            } else {
+              this.state = {selects: [], length: 1, crit: this.critsTitles[0], values: []};
+            }
+            this.props.valuesCallback([this.critsTitles[0]])
         } else {
             let sel = [];
             let globalCrit = this.props.crits
@@ -52,7 +58,6 @@ export default class CriteriasForm extends Component {
         let state = {...this.state};
         let key = Number(e.target.id);
         if (key == state.length && key == (state.values.length)) {
-            console.log('POP1', state.values[state.values.length-1])
             state.values.pop();
             state.length -= 1;
         }
@@ -60,14 +65,11 @@ export default class CriteriasForm extends Component {
 
         if (key < state.length) {
             let d = state.length - key;
-            console.log('D', d, state.length, key)
             for (let i = 0; i < d; i++) {
-                console.log('POP', state.values[state.values.length-1])
                 state.values.pop();
                 state.selects.pop();
                 state.length -= 1;
             }
-            console.log('POP', state.values[state.values.length-1])
 
             state.values.pop();
             state.length -= 1;
@@ -79,7 +81,6 @@ export default class CriteriasForm extends Component {
         } else state.length += 1
         //this.setState(state)
 
-        console.log('PUSH', e.target.value)
         state.values.push(e.target.value);
         if (state.selects.length >= state.values.length)
             state.selects.pop()
@@ -114,43 +115,45 @@ export default class CriteriasForm extends Component {
                     required name="check2" style={{marginTop: "0", cursor: "pointer"}}
                     onChange={this.handleSelect} defaultValue={this.state.crit} disabled={this.props.disabled}>
                 <option disabled>Критерий</option>
-                <option value="1 (7а)" id="7a">
+                <option value={this.critsTitles[0]} id="7a">
                     7а (оценки)
                 </option>
-                <option value="2 (7б)">
+                <option value={this.critsTitles[1]}>
                     7б (проекты)
                 </option>
-                <option value="3 (7в)">
+                <option value={this.critsTitles[2]}>
                     7в (олимпиады)
                 </option>
-                <option value="4 (8а)">
+                <option value={this.critsTitles[3]}>
                     8а (призы за науку, гранты)
                 </option>
-                <option value="5 (8б)">
+                <option value={this.critsTitles[4]}>
                     8б (статьи)
                 </option>
-                <option value="6 (9а)">
+                <option value={this.critsTitles[5]}>
                     9а (обществ. деят. в СПбГУ)
                 </option>
-                <option value="7 (9б)">
+                <option value={this.critsTitles[6]}>
                     9б (информационная деят.)
                 </option>
-                <option value="8 (10а)">
+                <option value={this.critsTitles[7]}>
                     10а (награды за творч. деят.)
                 </option>
-                <option value="9 (10б)">
+                <option value={this.critsTitles[8]}>
                     10б (произв. искусства)
                 </option>
-                <option value="10 (10в)">
+		{this.critsOffset &&
+                <option value={this.critsTitles[9]}>
                     10в (обществ. деят. не в СПбГУ)
                 </option>
-                <option value="11 (11а)">
+		}
+                <option value={this.critsTitles[9 + this.critsOffset]}>
                     11а (призы в спорте)
                 </option>
-                <option value="12 (11б)">
+                <option value={this.critsTitles[10 + this.critsOffset]}>
                     11б (участие в спорте)
                 </option>
-                <option value="13 (11в)">
+                <option value={this.critsTitles[11 + this.critsOffset]}>
                     11в (ГТО)
                 </option>
             </select>

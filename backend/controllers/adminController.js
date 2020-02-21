@@ -11,6 +11,22 @@ const EventEmitter = require('events');
 class UpdateEmitter extends EventEmitter {}
 const AdminEmitter = new UpdateEmitter();
 
+module.exports.prepareForNewPgas = async function (req, res) {
+    const users = await db.allUsers();
+
+    for (const user of users) {
+        let achieves = await db.findActualAchieves(user.id);
+
+
+        for (const achieve of achieves) {
+            if ((achieve.status === 'Принято' || achieve.status === 'Отказано') && ( achieve.crit === '1 (7а)' || achieve.crit === '7а')) {
+                console.log(user.LastName);
+                await db.deleteAchieve(achieve._id);
+            }
+        }
+    }
+};
+
 module.exports.setUser = async function(req,res){
     await db.ChangeRole(req.body.Id, false);
     res.sendStatus(200)

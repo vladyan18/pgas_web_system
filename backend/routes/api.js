@@ -251,6 +251,8 @@ router.get('/getFaculty', auth, facultyController.getFaculty);
 
 router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
 
+router.get('/prepareForNewPgas', superAdminAuth, adminController.prepareForNewPgas);
+
 /**
  * Get current rating for admin
  * @name getRating

@@ -20,12 +20,13 @@ passport.use(new ActiveDirectoryStrategy({
 passport.serializeUser( async function (user, done) {
     const id = user._json.sAMAccountName;
     const isUser = await db.isUser(id);
-
+    console.log('SpbuID', id + '@student.spbu.ru');
     let isRegistered = false;
     if (!isUser) {
             await db.createUser({
                 Role: "User",
                 id: id,
+		SpbuId: id + '@student.spbu.ru',
                 Ball: 0,
                 Achievement: [],
                 Registered: false
