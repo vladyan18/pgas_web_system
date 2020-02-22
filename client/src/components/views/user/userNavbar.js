@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../../style/user_main.css';
-import UserNavItem from "./userNavItem";
-import userPersonalStore from "../../../stores/userPersonalStore";
-import {observer} from "mobx-react";
+import UserNavItem from './userNavItem';
+import userPersonalStore from '../../../stores/userPersonalStore';
+import {observer} from 'mobx-react';
 
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
@@ -20,17 +20,17 @@ const LeftNavbar = css`
 `;
 
 function UserNavbar(props) {
-    return <div className="col-md-3 leftBlock">
-        <div css={LeftNavbar}>
-            <ul className="ul_nav">
-                <UserNavItem to='/home'>Мои достижения</UserNavItem>
-                <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
-                {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
-                <UserNavItem to='/documents'>Информация</UserNavItem>
-                <UserNavItem to='/profile'>Мой профиль</UserNavItem>
-            </ul>
-        </div>
+  return <div className="col-md-3 leftBlock">
+    <div css={LeftNavbar}>
+      <ul className="ul_nav">
+        <UserNavItem to='/home'>Мои достижения</UserNavItem>
+        <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
+        {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
+        <UserNavItem to='/documents'>Информация</UserNavItem>
+        <UserNavItem to='/profile'>Мой профиль</UserNavItem>
+      </ul>
     </div>
+  </div>;
 }
 
-export default observer(UserNavbar)
+export default observer(UserNavbar);

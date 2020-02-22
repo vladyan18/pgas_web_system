@@ -1,63 +1,77 @@
 import React from 'react';
-import '../../../style/commonInfo.css'
+import '../../../style/commonInfo.css';
+import {css, jsx} from '@emotion/core';
+/** @jsx jsx */
+import styled from '@emotion/styled';
+
+const horizontalLine = css`
+    border-top: 1px solid #9F2D20;
+`;
+
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+`;
 
 function UserCommonInfo(props) {
-    return (<div className="col-md-9 rightBlock">
-        <div className="block_main_right">
-            <p className="headline">
+  return (<Panel className="col-md-9 rightBlock">
+    <div className="block_main_right">
+      <p className="headline">
                 Информация
-            </p>
-            <hr className="hr_blue"/>
-            <div className="blue_bg">
-                <p className="header_info_desc">
+      </p>
+      <hr css={horizontalLine}/>
+      <div className="blue_bg">
+        <p className="header_info_desc" style={{fontWeight: '500'}}>
                     Документы ПГАС
-                </p>
-                <p className="desc_selectors desc_criterion_dspo ">
-                    <a className="document" target="_blank"
-                       href="https://students.spbu.ru/mmen-stipendii/stipendii/povyshennaya-akademicheskaya-stipendiya">
-                                        <span className="name_doc">
+        </p>
+        <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
+          <a target="_blank"
+            href="https://students.spbu.ru/mmen-stipendii/stipendii/povyshennaya-akademicheskaya-stipendiya">
+            <span className="name_doc">
                                             Раздел ПГАС на сайте УРМ СПбГУ
-                                        </span>
-                    </a>
-                    <br/>
-                    <a className="document" target="_blank" href="https://students.spbu.ru/files/20190911_2616.pdf">
-                                            <span className="name_doc">
+            </span>
+          </a>
+          <br/>
+          <a target="_blank" href="https://students.spbu.ru/files/412_12022020.PDF">
+            <span className="name_doc">
                                                 Распоряжение об организации работы по назначению ПГАС
-                                            </span>
-                    </a>
-                    <br/>
-                    <a className="document" target="_blank"
-                       href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf">
-                                            <span className="name_doc">
+            </span>
+          </a>
+          <br/>
+          <a target="_blank"
+            href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf">
+            <span className="name_doc">
                                                 Постановление УС об определении размера ПГАС
-                                            </span>
-                    </a>
-                </p>
-            </div>
-            <div className="blue_bg">
-                <p className="header_info_desc">
+            </span>
+          </a>
+        </p>
+      </div>
+
+      <div className="blue_bg">
+        <p className="header_info_desc" style={{fontWeight: '500'}}>
                     Объявлен прием заявлений на академическую стипендию в повышенном размере
-                </p>
-                <p className="desc_selectors desc_criterion_dspo ">
+        </p>
+        <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
                     Уважаемые студенты!
-                    <br/>
-                    Сотрудники учебных отделов по направлениям в срок до 17:45 3 октября 2019 года принимают от
+          <br/>
+                    Сотрудники учебных отделов по направлениям в срок до 17:45 2 марта 2020 года принимают от
                     студентов Университета, получающих академическую стипендию, заявления-анкеты на повышенную
                     государственную академическую стипендию, заполненные только в электронном виде и распечатанные в
                     соответствии с установленной формой.
-                </p>
-            </div>
-            <div className="blue_bg">
-                <p className="header_info_desc">
+        </p>
+      </div>
+      <div className="blue_bg">
+
+        <p className="header_info_desc" style={{fontWeight: '500'}}>
                     Обнаружили ошибку или неточность? Есть вопросы по работе системы?
-                </p>
-                <p className="desc_selectors desc_criterion_dspo ">
+        </p>
+        <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
                     По всем вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu"> Стипкома
                     Студсовета ПМ-ПУ.</a>
-                </p>
-            </div>
-        </div>
-    </div>)
+        </p>
+      </div>
+    </div>
+  </Panel>);
 }
 
-export default UserCommonInfo
+export default UserCommonInfo;

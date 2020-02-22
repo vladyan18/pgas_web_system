@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
-import FacultyCreation from "../../../views/staff/superAdmin/facultyCreation";
+import FacultyCreation from '../../../views/staff/superAdmin/facultyCreation';
 
 class FacultyCreationContainer extends Component {
-    constructor(props) {
-        super(props);
-    };
+  constructor(props) {
+    super(props);
+  };
 
 
-    render() {
-        return (
-            <FacultyCreation/>
-        )
-    }
+  render() {
+    return (
+      <FacultyCreation/>
+    );
+  }
 }
 
-export default FacultyCreationContainer
+export default FacultyCreationContainer;

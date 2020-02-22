@@ -253,7 +253,7 @@ module.exports.addFileForConfirmation = function (req, res) {
  * @function addAchieve
  * */
 
-
+/*
 let browser
 puppeteer.launch().then((newBrowser) => browser = newBrowser)
 
@@ -318,6 +318,8 @@ autoCheckConfirms = async function (achievement) {
         })
     }
 };
+*/
+
 
 module.exports.addAchieve = function (req, res) {
     if (!fs.existsSync(uploadsPath)) {
@@ -328,9 +330,22 @@ module.exports.addAchieve = function (req, res) {
             if (err) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
-            let achieve = JSON.parse(req.body.data);
 
-            let options = {
+            if (req.user._json && req.user._json.email)
+                id = req.user._json.email;
+            else id = req.user.user_id;
+
+            let achieve = JSON.parse(req.body.data);
+            const user = await db.findUserById(id);
+            let validationResult = false;
+            try {
+                validationResult = await db.validateAchievement(achieve, user);
+            } catch (e) {
+                console.log('Ach validation outer error');
+            }
+            if (!validationResult) return res.sendStatus(400);
+
+            const options = {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
@@ -341,11 +356,8 @@ module.exports.addAchieve = function (req, res) {
 
             achieve.comment = '';
             let createdAchieve = await db.createAchieve(achieve);
-            if (req.user._json && req.user._json.email)
-                id = req.user._json.email;
-            else id = req.user.user_id;
             await db.addAchieveToUser(id, createdAchieve._id);
-            autoCheckConfirms(createdAchieve).then();
+            //autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
@@ -361,6 +373,22 @@ module.exports.addAchieve = function (req, res) {
 module.exports.updateAchieve = async function (req, res) {
     try {
         let achieve = req.body.data;
+
+        let user_id;
+        if (req.user._json && req.user._json.email)
+            user_id = req.user._json.email;
+        else user_id = req.user.user_id;
+
+        const user = await db.findUserById(user_id);
+        let validationResult = false;
+        try {
+            validationResult = await db.validateAchievement(achieve, user);
+        } catch (e) {
+            console.log('Ach validation outer error');
+        }
+
+        if (!validationResult) return res.sendStatus(400);
+
             let id = req.body.achId;
             let options = {
                 year: 'numeric',
@@ -380,16 +408,13 @@ module.exports.updateAchieve = async function (req, res) {
                     for (let i = 0; i < oldAch.chars.length; i++)
                         if (oldAch.chars[i] != req.body.data.chars[i])
                         {
-                            console.log('CHANGE DETECTED', oldAch.chars[i], req.body.data.chars[i])
-                            changeDetected = true
+                            changeDetected = true;
                             break
                         }
                     if (!changeDetected) continue
                 }
-                console.log(field, oldAch[field], req.body.data[field])
                 if (oldAch[field] != req.body.data[field])
                 {
-
                     achieve.status = 'Ожидает проверки';
                     achieve.ball = undefined
                 }
@@ -398,7 +423,7 @@ module.exports.updateAchieve = async function (req, res) {
             achieve.date = new Date().toLocaleString('ru', options);
 
             let createdAchieve = await db.updateAchieve(id, achieve);
-            autoCheckConfirms(createdAchieve).then();
+            //autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
             console.log(err);

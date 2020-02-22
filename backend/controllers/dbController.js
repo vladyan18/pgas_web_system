@@ -341,7 +341,6 @@ exports.CreateFaculty = async function (Faculty) {
 };
 
 exports.GetCriterias = async function (facultyName) {
-    console.log(facultyName)
     let facObject = await FacultyModel.findOne({Name: facultyName});
     if (facObject && facObject.CritsId)
         return await CriteriasModel.findById(facObject.CritsId, 'Crits');
@@ -508,3 +507,54 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
 
     return res
 }
+
+exports.validateAchievement = async function(achievement, user) {
+    if (!achievement || !user) return false;
+    let crits = {};
+    let facObject = await FacultyModel.findOne({Name: user.Faculty});
+    if (facObject && facObject.CritsId)
+        crits = JSON.parse( (await CriteriasModel.findById(facObject.CritsId, 'Crits')).Crits );
+    else {
+        throw new Error('There are no criterion for faculty ' + user.Faculty);
+    }
+
+    try {
+        const critsTitles = Object.keys(crits);
+        if (!achievement.crit || !achievement.chars || !Array.isArray(achievement.chars)) return false;
+        if (!(crits[achievement.crit])) return false;
+
+        // проверка характеристик
+        let currentLevelOfCriterion = crits;
+        for (let i = 0; i < achievement.chars.length; i++) {
+            if (!currentLevelOfCriterion[achievement.chars[i]]) return false;
+            currentLevelOfCriterion = currentLevelOfCriterion[achievement.chars[i]];
+        }
+        if (isNaN(Number(currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]]))) {
+            // в старой версии критериев было допустимо опускать характеристики в 7а
+            if (achievement.crit !== critsTitles[0]) return false;
+
+            currentLevelOfCriterion = currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]];
+            if (isNaN(Number(currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]]))) return false;
+        }
+
+        // проверка даты и описания; в 7а это не нужно
+        if (achievement.crit !== critsTitles[0]) {
+            if (!achievement.achievement) return false;
+            if (!achievement.achDate) return false;
+            const achDate = new Date(achievement.achDate);
+            if (!(achDate instanceof Date)) return false;
+            const minimalDate = new Date('2019-02-01');
+            const maximalDate = new Date('2020-01-31');
+            if (achDate < minimalDate || achDate > maximalDate) return false;
+            if (achievement.endingDate) {
+                const achEndingDate = new Date(achievement.endingDate);
+                if (!(achEndingDate instanceof Date)) return false;
+                if (achEndingDate < achDate) return false;
+            }
+        }
+
+        return true;
+    } catch (e) {
+        console.error('Ach validation error | User: ' + user.id, e);
+    }
+};

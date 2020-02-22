@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import logo from '../../../img/gerb.png';
 import '../../../style/user_main.css';
-import userPersonalStore from '../../../stores/userPersonalStore'
-import {observer} from "mobx-react";
-import {withRouter} from "react-router";
+import userPersonalStore from '../../../stores/userPersonalStore';
+import {observer} from 'mobx-react';
+import {withRouter} from 'react-router-dom';
 import logoBss from '../../../assets/img/logo_bss.svg';
 import logoSPbU from '../../../assets/img/CoA_Small_whitebg.svg';
 // import userPersonalStore from '../../../stores/userPersonalStore';
@@ -57,60 +57,60 @@ const verticalAlign = css`
 
 
 class UserHeader extends Component {
-    constructor(props) {
-        super(props);
-        this.switchToStaff = this.switchToStaff.bind(this);
-    };
+  constructor(props) {
+    super(props);
+    this.switchToStaff = this.switchToStaff.bind(this);
+  };
 
-    switchToStaff() {
-        this.props.history.push('/staff');
-    }
+  switchToStaff() {
+    this.props.history.push('/staff');
+  }
 
-    render() {
-    let props = this.props;
-return <header>
-    <div className="row" css={pageTop}>
-      <div className="col-8" css={blockHeader}>
-        <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
-          <img src={logoSPbU} css={css`height: 55px;`}/>
-        </a>
-        <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
-          <div css={logoBackground}>
-            <LogoBSS src={logoBss} alt={'БСС'}/>
-          </div>
-        </a>
-        <div className="p_header">
-          <span css={css`color: #595959;`}>Студенческий совет СПбГУ</span> <br/>
-          <span css={css`padding-left: 13px; color: black;`}>{props.pageName}</span>
-        </div>
-      </div>
-
-      <div className="col-4">
-        <div css={css`display: flex; justify-content: flex-end;`}>
-
-          <div css={verticalAlign}>
-            <div css={css`margin-right: 20px; font-size: medium;`}>
-            {userPersonalStore && userPersonalStore.fio}
+  render() {
+    const props = this.props;
+    return <header>
+      <div className="row" css={pageTop}>
+        <div className="col-8" css={blockHeader}>
+          <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
+            <img src={logoSPbU} css={css`height: 55px;`}/>
+          </a>
+          <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
+            <div css={logoBackground}>
+              <LogoBSS src={logoBss} alt={'БСС'}/>
             </div>
+          </a>
+          <div className="p_header">
+            <span css={css`color: #595959;`}>Студенческий совет СПбГУ</span> <br/>
+            <span css={css`padding-left: 13px; color: black;`}>{props.pageName}</span>
           </div>
-          <div>
-            <form action="/api/logout">
-              <button type="submit"
-                className="btn btn-outline-danger"
-                css={css`
+        </div>
+
+        <div className="col-4">
+          <div css={css`display: flex; justify-content: flex-end;`}>
+
+            <div css={verticalAlign}>
+              <div css={css`margin-right: 20px; font-size: medium;`}>
+                {userPersonalStore && userPersonalStore.fio}
+              </div>
+            </div>
+            <div>
+              <form action="/api/logout">
+                <button type="submit"
+                  className="btn btn-outline-danger"
+                  css={css`
                 border-color: #9F2D20;
                 color: #9F2D20;
                 `}
-                action="/api/logout">
+                  action="/api/logout">
                 Выход
-              </button>
-            </form>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </header>;
-    }
+    </header>;
+  }
 }
 
-export default withRouter(observer(UserHeader))
+export default withRouter(observer(UserHeader));

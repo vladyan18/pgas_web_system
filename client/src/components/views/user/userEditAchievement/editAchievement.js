@@ -214,7 +214,7 @@ class EditAchievement extends Component {
 
         return (<div className="col-md-9 rightBlock" id="panel">
             <div className="block_main_right">
-                <div className="profile" style={{"display: flex; justify-content": "space-between"}}>
+                <div className="profile" style={{"display": "flex", "justifyContent": "space-between"}}>
                     <p className="headline" style={{"margin-bottom": "auto"}}>
                         Достижение
                     </p>

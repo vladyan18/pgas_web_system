@@ -1,16 +1,16 @@
 import React, {Component} from 'react';
 import '../../../../style/user_main.css';
-import ManageUsers from "../../../views/staff/superAdmin/ManageUsers";
+import ManageUsers from '../../../views/staff/superAdmin/ManageUsers';
 
 class ManageUsersContainer extends Component {
-    constructor(props) {
-        super(props);
-    };
+  constructor(props) {
+    super(props);
+  };
 
 
-    render() {
-        return (<ManageUsers></ManageUsers>)
-    }
+  render() {
+    return (<ManageUsers></ManageUsers>);
+  }
 }
 
-export default ManageUsersContainer
+export default ManageUsersContainer;

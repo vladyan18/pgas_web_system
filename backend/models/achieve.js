@@ -5,7 +5,7 @@ const achieveSchema = mongoose.Schema({
   date: String,
   crit: String,
   chars: [String],
-    confirmations: [
+  confirmations: [
         {
       id: {
             type: mongoose.Schema.Types.ObjectId,
@@ -15,11 +15,11 @@ const achieveSchema = mongoose.Schema({
         }],
   status: String,
   achDate: Date,
-    endingDate: Date,
+  endingDate: Date,
   achievement: String,
   comment: String,
   ball: Number,
-    isArchived: Boolean,
+  isArchived: Boolean,
 });
 
 const Achieve = connection.model('Achieve', achieveSchema);

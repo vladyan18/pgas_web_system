@@ -1,31 +1,30 @@
 import React from 'react';
 import '../../../style/user_main.css';
-import UserHeader from "../../views/user/userHeader";
-import {withRouter} from "react-router-dom";
+import UserHeader from '../../views/user/userHeader';
+import {withRouter} from 'react-router-dom';
 
 function UserHeaderContainer(props) {
-    const {location} = props;
-    let pathname;
-    switch (location.pathname) {
-        case '/home':
-            pathname = 'Мои достижения';
-            break;
-        case '/upload':
-            pathname = 'Добавление достижения';
-            break;
-        case '/documents':
-            pathname = 'Информация';
-            break;
-        case '/profile':
-            pathname = 'Мой профиль';
-            break;
-        case '/achievement/*':
-            pathname = 'Достижение';
-            break;
-
-    }
-    return <UserHeader pageName={pathname}/>
+  const {location} = props;
+  let pathname;
+  switch (location.pathname) {
+    case '/home':
+      pathname = 'Мои достижения';
+      break;
+    case '/upload':
+      pathname = 'Добавление достижения';
+      break;
+    case '/documents':
+      pathname = 'Информация';
+      break;
+    case '/profile':
+      pathname = 'Мой профиль';
+      break;
+    case '/achievement/*':
+      pathname = 'Достижение';
+      break;
+  }
+  return <UserHeader pageName={pathname}/>;
 }
 
 UserHeaderContainer = withRouter(UserHeaderContainer);
-export default UserHeaderContainer
+export default UserHeaderContainer;

@@ -18,12 +18,6 @@ module.exports.getAnket = async function (req, res) {
         user = await
             db.findUserById(req.user.user_id);
         let W = user.Achievement;
-        //for (let i of W) {
-        //    let Ach = await
-        //        db.findAchieveById(i);
-        //    await
-        //    achievs.push(Ach)
-        //}
 
 	achievs = await db.findActualAchieves(user.id);
 
@@ -71,7 +65,6 @@ module.exports.getAnket = async function (req, res) {
         if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate));
         f06 = String(f06).replace("BD", datestring);
         let confirmNum = {val: 1, confirms: {}};
-        //crits = ['1 (7а)', '2 (7б)', '3 (7в)', '4 (8а)', '5 (8б)', '6 (9а)', '7 (9б)', '8 (10а)', '9 (10б)', '10 (10в)', '11 (11а)', '12 (11б)', '13 (11в)'];
         crits = Object.keys(criterias);
         console.log('KRITS:', crits);
         if (crits.length !== 13) {

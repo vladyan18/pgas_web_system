@@ -9,6 +9,7 @@ var compress = require('compression');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const morgan = require('morgan');
+const helmet = require('helmet');
 const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
 //const redisClient = require('./config/redis');
@@ -17,6 +18,7 @@ const port = 8080;
 
 require('dotenv').config();
 const app = express();
+app.use(helmet());
 
 app.set('etag', false);
 app.use(morgan('dev'));
