@@ -99,20 +99,21 @@ router.get('/', (req, res) => res.redirect('/home'));
 
 router.post('/login', async function (req, res) {
     let errState = false;
-    let username = req.body.username;
-    if (username.indexOf('@') !== -1) {
-        username = username.slice(0, username.indexOf('@')) + '@ad.pu.ru';
+    let username = '';
+    if (req.body.username.indexOf('@') !== -1) {
+        username = req.body.username.substring(0, req.body.username.indexOf('@')) + '@ad.pu.ru';
     } else {
-        username = username + '@ad.pu.ru';
+        username = req.body.username + '@ad.pu.ru';
     }
-    console.log('LOGIN', username);
     let opts = {
         ldap: {
             url: process.env.LDAP_URL,
             baseDN: 'dc=ad,dc=pu,dc=ru', username: username, password: req.body.password
         }
     };
+    req.body.username = username;
     passport.authenticate('ActiveDirectory', opts,  (err, user, info) => {
+        console.log('LOGGED', err, user, info);
         if (err) {
             console.log('ERROR', err);
             if(errState) return
@@ -129,7 +130,6 @@ router.post('/login', async function (req, res) {
             if (err) {
                 console.log('ERR', err)
             }
-            console.log('LOGGED', user);
             const returnTo = req.session.returnTo;
             delete req.session.returnTo;
             res.redirect(returnTo || '/home')

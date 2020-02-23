@@ -32,7 +32,7 @@ class Login extends Component {
           <div className="col-xl-4 col-lg-6 col-md-8 col-sm-8 col-10 login">
             <img src={lock} className="pic_lock" alt={'login'}/>
             <div className="title_text">Вход в систему ПГАС</div>
-            <div className="header_logo_text">Для входа необходимо использовать единый логин (st******@ad.pu.ru)</div>
+            <div className="header_logo_text">Для входа необходимо использовать единый логин (st******)</div>
 
             <form id = 'login' method ='post' action={'/api/login'}>
               <label id='name'>Имя пользователя</label><br/>

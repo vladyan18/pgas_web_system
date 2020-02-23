@@ -31,6 +31,7 @@ const Panel = styled.div`
 class UserAchieves extends Component {
   constructor(props) {
     super(props);
+    this.checkConfirms = this.checkConfirms.bind(this);
   };
 
   componentDidMount() {
@@ -49,6 +50,30 @@ class UserAchieves extends Component {
           });
           userAchievesStore.achieves = data.Achs;
         });
+  }
+
+  checkConfirms(e) {
+    const achsWithoutConfirms = [];
+    let message = '\n';
+    for (const ach of userAchievesStore.achieves) {
+      if (!ach.confirmations || ach.confirmations.length === 0) {
+        if (ach.crit !== '1 (7а)' && ach.crit !== '7а') {
+          achsWithoutConfirms.push(ach);
+          message += ach.crit + '. ' + ach.achievement + '\n';
+        }
+      }
+    }
+
+    if (achsWithoutConfirms.length > 0) {
+      // eslint-disable-next-line
+      if (!confirm(
+          'У Вас есть достижения, к которым не приложены подтверждения:\n' +
+          message +
+          '\nВы уверены, что хотите скачать документы?')) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }
   }
 
   render() {
@@ -73,7 +98,7 @@ class UserAchieves extends Component {
         `}>
             <b>Текущие достижения</b>
           </div>
-          <form action={BASE_API_URL + '/getAnket'}>
+          <form action={BASE_API_URL + '/getAnket'} onSubmit={this.checkConfirms}>
             <input type="submit" id="download" className="btn" css={mainButton} value="Скачать анкету"/>
           </form>
         </div>

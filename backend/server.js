@@ -23,7 +23,6 @@ app.use(helmet());
 app.set('etag', false);
 app.use(morgan('dev'));
 
-
 const sess = {
   secret: '5c6a5cc5f3fd8718f419ff27',
   cookie: {},

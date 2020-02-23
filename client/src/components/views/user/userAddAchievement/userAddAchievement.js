@@ -9,7 +9,7 @@ import userAchievesStore from '../../../../stores/userAchievesStore';
 import userPersonalStore from '../../../../stores/userPersonalStore';
 import {FormGroup, OverlayTrigger, Popover} from 'react-bootstrap';
 import HelpButton from '../helpButton';
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 

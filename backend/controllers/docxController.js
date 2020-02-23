@@ -1,11 +1,16 @@
 
 const db = require('./dbController');
 const path = require('path');
+const promisify = require('promisify-node');
 const fs = require('fs');
+const promFs = promisify(fs);
 const XlsxPopulate = require('xlsx-populate');
 const translitter = require('cyrillic-to-translit-js');
-
+const pdflib = require('pdf-lib');
+const fontkit = require('@pdf-lib/fontkit');
 const anketPath = path.join(__dirname, '..');
+const docx = require('docx');
+const QRCode = require('qrcode');
 
 module.exports.getAnket = async function (req, res) {
     try {
@@ -65,6 +70,7 @@ module.exports.getAnket = async function (req, res) {
         if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate));
         f06 = String(f06).replace("BD", datestring);
         let confirmNum = {val: 1, confirms: {}};
+        const allConfirmations = [];
         crits = Object.keys(criterias);
         console.log('KRITS:', crits);
         if (crits.length !== 13) {
@@ -89,6 +95,7 @@ module.exports.getAnket = async function (req, res) {
                     for (let confirmWrapped of ach.confirmations) {
                         confirm = await db.getConfirmByIdForUser(confirmWrapped.id);
                         confirm.additionalInfo = confirmWrapped.additionalInfo;
+                        allConfirmations.push(confirm);
                         proof = getProofString(confirm, confirmNum).replace(/&/g, '&amp;').replace(/</g, '&lt;');
                         proofStr += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' + proof + '</w:t></w:r></w:p>';
                     }
@@ -113,21 +120,78 @@ module.exports.getAnket = async function (req, res) {
                 f06 = String(f06).replace(cStr + (i + 1) + '</w:t></w:r><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr></w:r></w:p>', str);
             }
         }
-
         zip.file('word/document.xml', f06);
 
-        fs.writeFileSync(anketPath + "/docs/result/" + user._id + "_anketa.docx", zip.generate({
+        const anket = Buffer.from(zip.generate({
             base64: false,
             compression: 'DEFLATE'
         }), 'binary');
 
-        res.download(path.resolve(anketPath + "/docs/result/" + user._id + "_anketa.docx"), user.LastName + '_анкета_ПГАС.docx');
+        const zip2 = new require('node-zip')();
+
+        zip2.file(user.LastName + '_анкета_ПГАС.docx', anket);
+
+        const filteredConfirmations = getFilteredConfirms(allConfirmations, confirmNum);
+        const links = [];
+        for (let i = 0; i < filteredConfirmations.length; i++) {
+
+            if (filteredConfirmations[i].data.Type === 'doc') {
+                if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
+                    const confFile = await promFs.readFile(filteredConfirmations[i].data.FilePath);
+                    zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name + '.pdf',
+                        await makeStamp(confFile, 'Приложение № ' + filteredConfirmations[i].num));
+                } else {
+                    const confFile = await promFs.readFile(filteredConfirmations[i].data.FilePath);
+                    zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name +
+                        filteredConfirmations[i].data.FilePath.slice(
+                            filteredConfirmations[i].data.FilePath.lastIndexOf('.'),
+                            filteredConfirmations[i].data.FilePath.length
+                        ),
+                        confFile);
+                }
+            }
+
+            if (filteredConfirmations[i].data.Type === 'link') {
+                links.push(filteredConfirmations[i]);
+            }
+        }
+
+        if (links.length > 0) {
+            const confirmationWithLinks = await makeConfirmationFileWithLinks(links);
+            zip2.file('QR-коды.docx', confirmationWithLinks);
+        }
+
+        const archive = zip2.generate({
+            base64: false,
+            compression: 'DEFLATE'
+        });
+        const archiveForResp = Buffer.from(archive, 'binary');
+
+        res.setHeader('Content-Disposition', 'attachment; filename=' + translitter().transform(user.LastName + '_ПГАС.zip', '_'));
+        res.send(archiveForResp);
+        //fs.writeFileSync(anketPath + "/docs/result/" + user._id + "_data.zip", archive, 'binary');
+        //res.download(path.resolve(anketPath + "/docs/result/" + user._id + "_data.zip"), user.LastName + "_data.zip");
+            //res.send(new Buffer(archive));
+        //res.download(path.resolve(anketPath + "/docs/result/" + user._id + "_anketa.docx"), user.LastName + '_анкета_ПГАС.docx');
     }
     catch (err) {
         console.log(err);
         res.status(500).send(err)
     }
 
+};
+
+getFilteredConfirms = function (confirms, confirmNum) {
+    const filtered = [];
+    const addedIds = [];
+
+    for (let i = 0; i < confirms.length; i++) {
+        if (addedIds.indexOf(confirms[i]._id) !== -1) continue;
+
+        filtered.push({data: confirms[i], num: confirmNum.confirms[confirms[i]._id]});
+        addedIds.push(confirms[i]._id);
+    }
+    return filtered
 };
 
 getProofString = function (confirm, confirmNum) {
@@ -166,6 +230,44 @@ getProofString = function (confirm, confirmNum) {
                 (confirm.SZ.Paragraph ? ', п. ' + confirm.SZ.Paragraph : '')
     }
 };
+
+async function makeConfirmationFileWithLinks(links) {
+
+    const doc = new docx.Document();
+
+    const paragraphs = [];
+    for (let i = 0; i < links.length; i++) {
+        const buffer = QRCode.toBuffer(links[i].data.Data);
+
+        const imageOfQR = docx.Media.addImage(doc, buffer);
+
+        paragraphs.push(
+                new docx.Paragraph({
+                    children: [
+                        new docx.TextRun({
+                            text: "Приложение № " + links[i].num + '. ' ,
+                            bold: true,
+                            size: 26,
+                            font: 'Calibri'
+                        }),
+                        new docx.TextRun({
+                            text: (links[i].data.additionalInfo ? links[i].data.additionalInfo : ''),
+                            size: 26,
+                            font: 'Calibri'
+                        })
+                    ],
+                })
+        )
+        paragraphs.push(new docx.Paragraph(imageOfQR));
+        paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun('')]}));
+
+        }
+    doc.addSection({
+        children: paragraphs
+    });
+
+    return docx.Packer.toBuffer(doc);
+}
 
 module.exports.getResultTable = async function (req, res) {
     try {
@@ -245,6 +347,24 @@ module.exports.getResultTable = async function (req, res) {
 
 };
 
+const font9404 = fs.readFileSync(path.join(__dirname, '../fonts/9404.ttf'));
+async function makeStamp(file, stamp) {
+    const pdfDoc = await pdflib.PDFDocument.load(file);
+    pdfDoc.registerFontkit(fontkit);
+    const customFont = await pdfDoc.embedFont(font9404);
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    const { height } = firstPage.getSize();
+
+    firstPage.drawText(stamp, {
+        x: 15,
+        y: height - 25,
+        size: 10,
+        font: customFont,
+    });
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes);
+}
 
 function getDateFromStr(d) {
     console.log(d);

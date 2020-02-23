@@ -22,9 +22,7 @@ var ActiveDirectory = _interopDefault(require('activedirectory'));
 
 var DEFAULT_USERNAME_FIELD = 'username';
 var DEFAULT_PASSWORD_FIELD = 'password';
-var DEFAULT_ATTRS = ['dn', 'displayName', 'givenName', 'middleName', 'sn', 'title', 'company', 'department', 'manager', 'directReports',
-    'info', 'memberOf', 'url', 'initials', 'profilePath',
-    'userPrincipalName', 'sAMAccountName', 'mail', 'description'];
+var DEFAULT_ATTRS = ['dn', 'displayName', 'givenName', 'middleName','sAMAccountName'];
 
 var DEFAULT_FILTER = function DEFAULT_FILTER(username) {
     return '(&(objectclass=user)(|(sAMAccountName=' + username + ')(UserPrincipalName=' + username + ')))';
