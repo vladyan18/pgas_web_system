@@ -131,10 +131,10 @@ export default class CriteriasForm extends Component {
                     8а (призы за науку, гранты)
         </option>
         <option value={this.critsTitles[4]}>
-                    8б (статьи)
+                    8б (статьи / тезисы / конференции)
         </option>
         <option value={this.critsTitles[5]}>
-                    9а (обществ. деят. в СПбГУ)
+                    9а (обществ. деят. {this.critsOffset && 'в СПбГУ'})
         </option>
         <option value={this.critsTitles[6]}>
                     9б (информационная деят.)

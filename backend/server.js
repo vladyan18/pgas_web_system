@@ -30,7 +30,7 @@ const sess = {
   resave: false,
   saveUninitialized: true,
     store: new MongoStore({
-        url: 'mongodb://bekhterev:pgastest@mongo:27017/bekhterev?authSource=admin'
+        url: `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:27017/${process.env.DB_NAME}?authSource=admin`
     })
 };
 

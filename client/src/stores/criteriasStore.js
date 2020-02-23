@@ -13,25 +13,20 @@ class CriteriasStore {
     async getAnnotations(facultyName) {
         let result = await fetchGet('/api/getAnnotations', {faculty: facultyName});
         if (result) {
-            this.annotations = result.annotations
-            this.learningProfile = result.learningProfile
+            this.annotations = result.annotations;
+            this.learningProfile = result.learningProfile;
         }
     }
 
-    getCriteriasForFaculty(facultyName) {
-        fetchGet('/api/getCriterias', {faculty: facultyName}).then((result) => {
+    async getCriteriasForFaculty(facultyName) {
+        try {
+            const result = await fetchGet('/api/getCriterias', {faculty: facultyName});
             if (result) {
                 this.criterias = result;
             }
-        })
-            .catch((error) => {
-                if (error.body.Error == 404)
-                {
-                    this.facultyRawName = error.body.facultyRawName
-                    console.log(this.facultyRawName)
-                }
-                else console.log(error)
-            })
+        } catch(error) {
+                console.log(error)
+        }
     }
 
     constructor() {
