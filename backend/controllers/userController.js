@@ -10,8 +10,6 @@ const db = require('./dbController');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
-const pdflib = require('pdf-lib');
-const fontkit = require('@pdf-lib/fontkit');
 
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
 const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
@@ -171,7 +169,7 @@ module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
     res.status(200).send(confirms)
 };
 
-const font9404 = fs.readFileSync(path.join(__dirname, '../fonts/9404.ttf'));
+
 module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
     let filename = await req.url.slice(12);
 
@@ -182,34 +180,12 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
     try {
         if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI')
         if (filename.endsWith('.pdf')) {
-            let file = fs.readFileSync(filePath);
-            const pdfDoc = await pdflib.PDFDocument.load(file);
-            pdfDoc.registerFontkit(fontkit);
-            const customFont = await pdfDoc.embedFont(font9404);
-            const pages = pdfDoc.getPages();
-            const firstPage = pages[0];
-            const { width, height } = firstPage.getSize();
-
-            firstPage.drawText('Приложение № 1', {
-                x: 15,
-                y: height - 25,
-                size: 10,
-                font: customFont,
-            });
-            const pdfBytes = await pdfDoc.save();
-            const buffer = Buffer.from(pdfBytes);
-
-            res.setHeader('Content-Length', buffer.length);
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', 'inline');
-            res.send(buffer)
-            /*
             var file = fs.createReadStream(filePath);
             var stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline');
-            file.pipe(res); */
+            file.pipe(res);
         } else
         if (filename.endsWith('.jpg')) {
             var file = fs.createReadStream(filePath);

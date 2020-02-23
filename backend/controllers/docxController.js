@@ -1,9 +1,10 @@
 
 const db = require('./dbController');
 const path = require('path');
-const promisify = require('promisify-node');
+//const promisify = require('promisify-node');
+const util = require('util');
 const fs = require('fs');
-const promFs = promisify(fs);
+const fsReadFile = util.promisify(fs.readFile);
 const XlsxPopulate = require('xlsx-populate');
 const translitter = require('cyrillic-to-translit-js');
 const pdflib = require('pdf-lib');
@@ -137,11 +138,11 @@ module.exports.getAnket = async function (req, res) {
 
             if (filteredConfirmations[i].data.Type === 'doc') {
                 if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
-                    const confFile = await promFs.readFile(filteredConfirmations[i].data.FilePath);
+                    const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
                     zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name + '.pdf',
                         await makeStamp(confFile, 'Приложение № ' + filteredConfirmations[i].num));
                 } else {
-                    const confFile = await promFs.readFile(filteredConfirmations[i].data.FilePath);
+                    const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
                     zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name +
                         filteredConfirmations[i].data.FilePath.slice(
                             filteredConfirmations[i].data.FilePath.lastIndexOf('.'),
