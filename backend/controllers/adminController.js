@@ -112,6 +112,7 @@ module.exports.updateAchieve = async function (req, res) {
 
     let achieve = req.body;
     let id = req.body._id;
+    let uid;
     if (req.user._json.email)
         uid = req.user._json.email;
     else uid = req.user.user_id;

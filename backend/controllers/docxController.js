@@ -15,8 +15,9 @@ const QRCode = require('qrcode');
 
 module.exports.getAnket = async function (req, res) {
     try {
-        achievs = [];
+        let achievs = [];
 
+        let user;
         if (req.user._json.email)
             user = await
                 db.findUserById(req.user._json.email);
@@ -30,22 +31,22 @@ module.exports.getAnket = async function (req, res) {
         let faculty = await db.GetFaculty(user.Faculty);
         let criterias = JSON.parse((await db.GetCriterias(user.Faculty)).Crits);
 
-        var zip = new require('node-zip')();
+        let zip = new require('node-zip')();
 
         /* читаем файлы архива в память */
-        f01 = fs.readFileSync(anketPath + '/docs/Anketa/_rels/.rels');
-        f02 = fs.readFileSync(anketPath + '/docs/Anketa/docProps/app.xml');
-        f03 = fs.readFileSync(anketPath + '/docs/Anketa/docProps/core.xml');
-        f04 = fs.readFileSync(anketPath + '/docs/Anketa/word/_rels/document.xml.rels');
-        f05 = fs.readFileSync(anketPath + '/docs/Anketa/word/fontTable.xml');
-        f06 = fs.readFileSync(anketPath + '/docs/Anketa/word/document.xml');
-        f07 = fs.readFileSync(anketPath + '/docs/Anketa/word/header1.xml');
-        f08 = fs.readFileSync(anketPath + '/docs/Anketa/word/header2.xml');
-        f09 = fs.readFileSync(anketPath + '/docs/Anketa/word/numbering.xml');
-        f10 = fs.readFileSync(anketPath + '/docs/Anketa/word/settings.xml');
-        f11 = fs.readFileSync(anketPath + '/docs/Anketa/word/styles.xml');
-        f12 = fs.readFileSync(anketPath + '/docs/Anketa/[Content_Types].xml');
-        f13 = fs.readFileSync(anketPath + '/docs/Anketa/word/theme/theme1.xml');
+        let f01 = fs.readFileSync(anketPath + '/docs/Anketa/_rels/.rels');
+        let f02 = fs.readFileSync(anketPath + '/docs/Anketa/docProps/app.xml');
+        let f03 = fs.readFileSync(anketPath + '/docs/Anketa/docProps/core.xml');
+        let f04 = fs.readFileSync(anketPath + '/docs/Anketa/word/_rels/document.xml.rels');
+        let f05 = fs.readFileSync(anketPath + '/docs/Anketa/word/fontTable.xml');
+        let f06 = fs.readFileSync(anketPath + '/docs/Anketa/word/document.xml');
+        let f07 = fs.readFileSync(anketPath + '/docs/Anketa/word/header1.xml');
+        let f08 = fs.readFileSync(anketPath + '/docs/Anketa/word/header2.xml');
+        let f09 = fs.readFileSync(anketPath + '/docs/Anketa/word/numbering.xml');
+        let f10 = fs.readFileSync(anketPath + '/docs/Anketa/word/settings.xml');
+        let f11 = fs.readFileSync(anketPath + '/docs/Anketa/word/styles.xml');
+        let f12 = fs.readFileSync(anketPath + '/docs/Anketa/[Content_Types].xml');
+        let f13 = fs.readFileSync(anketPath + '/docs/Anketa/word/theme/theme1.xml');
         /* тут все остальные файлы */
 
         /* создаём zip-объект */
@@ -68,29 +69,30 @@ module.exports.getAnket = async function (req, res) {
         f06 = String(f06).replace("&lt;COURSE&gt;", user.Course);
         f06 = String(f06).replace("EMAIL", user.SpbuId);
         f06 = String(f06).replace("STDIR", faculty.DirName);
+        let datestring;
         if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate));
         f06 = String(f06).replace("BD", datestring);
         let confirmNum = {val: 1, confirms: {}};
         const allConfirmations = [];
-        crits = Object.keys(criterias);
+        let crits = Object.keys(criterias);
         console.log('KRITS:', crits);
         if (crits.length !== 13) {
           crits.splice(9, 0,'DUMMY');
         }
         console.log('KRITS:', crits);
         for (var i = 0; i < 13; i++) {
-            curAchs = achievs.filter(o => (o && o.crit == crits[i]));
-            cStr = '<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="000000' + (16 + i * 3 + (i > 2 ? 3 : 0)).toString(16).toUpperCase() + '"><w:pPr><w:jc w:val="center"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rFonts w:ascii="Times New Roman" w:cs="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman"/><w:b w:val="1"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">A';
+            let curAchs = achievs.filter(o => (o && o.crit == crits[i]));
+            let cStr = '<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="000000' + (16 + i * 3 + (i > 2 ? 3 : 0)).toString(16).toUpperCase() + '"><w:pPr><w:jc w:val="center"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rFonts w:ascii="Times New Roman" w:cs="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman"/><w:b w:val="1"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">A';
             if (curAchs.length == 0) {
-                nStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:sz w:val="20" /><w:szCs w:val="20" /></w:rPr><w:t xml:space="preserve">Нет</w:t></w:r></w:p>';
+                let nStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:sz w:val="20" /><w:szCs w:val="20" /></w:rPr><w:t xml:space="preserve">Нет</w:t></w:r></w:p>';
                 f06 = String(f06).replace(cStr + (i + 1) + '</w:t></w:r><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr></w:r></w:p>', nStr);
             }
             else {
-                str = "";
+                let str = "";
                 let num = 1;
-                for (ach of curAchs) {
-                    proof = '';
-                    proofStr = '';
+                for (let ach of curAchs) {
+                    let proof = '';
+                    let proofStr = '';
                     if (ach.confirmations.length == 0)
                         proofStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' + 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ' + '</w:t></w:r></w:p>';
                     for (let confirmWrapped of ach.confirmations) {
@@ -104,7 +106,7 @@ module.exports.getAnket = async function (req, res) {
                     else {
                         str += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">'
                             + ((num != 1) ? '</w:t></w:r></w:p><w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' : '') + num + '. ' + ach.achievement.replace(/&/g, '&amp;').replace(/</g, '&lt;') + (ach.achDate ? (' (' + (ach.endingDate ? (getDateFromStr(new Date(ach.achDate)) + '-' + getDateFromStr(new Date(ach.endingDate))) : getDateFromStr(new Date(ach.achDate)) )  + ')') : '') + '</w:t></w:r></w:p>';
-                        charsStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:i /><w:sz w:val="15" /><w:szCs w:val="15" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">';
+                        let charsStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:i /><w:sz w:val="15" /><w:szCs w:val="15" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">';
                         for (var c = 0; c < ach.chars.length; c++) {
                             if (c > 0) charsStr += ', ';
                             charsStr += ach.chars[c].replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -135,7 +137,6 @@ module.exports.getAnket = async function (req, res) {
         const filteredConfirmations = getFilteredConfirms(allConfirmations, confirmNum);
         const links = [];
         for (let i = 0; i < filteredConfirmations.length; i++) {
-
             try {
                 if (filteredConfirmations[i].data.Type === 'doc') {
                     if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
@@ -288,7 +289,7 @@ module.exports.getResultTable = async function (req, res) {
             for (key of Object.keys(kri)) {
                 crits[key] = 0;
             }
-            Achs = await db.findActualAchieves(user.id);
+            let Achs = await db.findActualAchieves(user.id);
             for (let ach of Achs) {
                 if (!ach) continue;
                 if (ach.ball) {
@@ -305,7 +306,7 @@ module.exports.getResultTable = async function (req, res) {
                 if (diff != 0)
                     return obj2.Ball-obj1.Ball;
                 else {
-                    for (crit of Object.keys(obj1.Crits)) {
+                    for (let crit of Object.keys(obj1.Crits)) {
                         diff = obj2.Crits[crit] - obj1.Crits[crit];
                         if (diff != 0) return diff
                     }

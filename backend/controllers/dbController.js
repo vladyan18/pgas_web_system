@@ -16,7 +16,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 exports.findUserById = async function (id) {
     //return redis.getAsync(id + '_user').then(async (res) => {
     // if (!res) {
-            res = await UserModel.findOne({id: id}).lean();
+            let res = await UserModel.findOne({id: id}).lean();
     // if (res) redis.setAsync(id + '_user', JSON.stringify(res))
     // } else res = JSON.parse(res);
         return res
@@ -69,7 +69,7 @@ exports.migrate = async function(id) {
 };
 
 exports.isRegistered = async function(id){
-    u = await UserModel.findOne({id: id}, 'Registered').lean();
+    let u = await UserModel.findOne({id: id}, 'Registered').lean();
     return u.Registered;
 };
 
@@ -87,7 +87,7 @@ exports.NewUsers = function (faculty) {
 };
 
 exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
-    let error, users
+    let error, users;
     if (!checked) {
     error, users = await UserModel.find()
         .or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
@@ -117,9 +117,9 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
 exports.isUser = function(token){
     return UserModel.findOne({id: token},function(err, user){
         if(err)
-            return false
+            return false;
           
-        if(!user){
+        if (!user){
           return false
         }         
         return true
@@ -131,7 +131,7 @@ exports.createUser = function(User){
 };
 
 exports.findActualAchieves = async function (user_id) {
-    User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
+    let User = await UserModel.findOne({id: user_id}, 'Achievement').lean();
     const b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
     let actualAchieves = [];
     for (let i = 0; i < b.length; i++) {
@@ -171,7 +171,7 @@ exports.deleteAchieve = async function (id) {
     let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}});
     if (!u) return true;
     console.log('DELETION', u);
-    for(var i = u.Achievement.length - 1; i >= 0; i--) {
+    for(let i = u.Achievement.length - 1; i >= 0; i--) {
         if(u.Achievement[i] === id) {
             u.Achievement.splice(i, 1);
             break
@@ -280,14 +280,14 @@ exports.ChangeAchieve = async function (id,isGood) {
 
 exports.comment = async function(id,comment){
     //redis.del(id + '_ach2');
-    u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
+    let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
     //redis.del(u.id + '_achs');
   return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
   })
 };
 
 exports.toggleHide = async function (id) {
-    u = await UserModel.findById(id);
+    let u = await UserModel.findById(id);
     //redis.del(id + '_user');
     return UserModel.findOneAndUpdate({_id: id}, {$set: {IsHiddenInRating: (!u.IsHiddenInRating)}}, function (err, result) {
     })
@@ -369,7 +369,7 @@ exports.UploadAnnotationsToFaculty = async function (annotations, learningProfil
 exports.GetAnnotationsForFaculty = async function (facultyName) {
     let facObject = await FacultyModel.findOne({Name: facultyName});
     console.log('FACULTY NAME', facultyName);
-    annObj = await AnnotationsModel.findById(facObject.AnnotationsToCritsId);
+    let annObj = await AnnotationsModel.findById(facObject.AnnotationsToCritsId);
     return annObj
 };
 
@@ -441,7 +441,7 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
                     path: 'confirmations.id'
                 }
             }
-        ).lean().exec()
+        ).lean().exec();
 
     let articlesIndexCol = 3
     if (facultyName == 'Физфак') articlesIndexCol = 2

@@ -1,7 +1,6 @@
 /** User controller
  * @module userController
  */
-
 const path = require('path');
 const passport = require(path.join(__dirname, '../config/passport'));
 const upload = require(path.join(__dirname, '../config/multer'));
@@ -97,7 +96,7 @@ module.exports.isAuth = async function (req, res) {
  * @function getAch
  * */
 module.exports.getAch = async function (req, res) {
-    id = req.query.achievement;
+    let id = req.query.achievement;
     let ach = await db.findAchieveById(id);
     let confirms = [];
 
@@ -119,6 +118,7 @@ module.exports.registerUser = async function (req, res) {
     try {
         let data = req.body;
         console.log(data);
+        let id;
         if (req.user && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;
@@ -142,6 +142,7 @@ module.exports.addConfirmation = function (req, res) {
     if (data.Data)
         if (!(data.Data.startsWith('http://') || data.Data.startsWith('https://')))
             data.Data = '//' + data.Data;
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -161,10 +162,11 @@ module.exports.addConfirmation = function (req, res) {
 };
 
 module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
-    user = await db.findUserById(id);
+    let user = await db.findUserById(id);
     let confirms = await db.getConfirmations(user.Confirmations);
     res.status(200).send(confirms)
 };
@@ -216,7 +218,7 @@ module.exports.addFileForConfirmation = function (req, res) {
     }
 
     uploadConfirmation(req, res, async function (err) {
-
+        let id;
         if (req.user && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;
@@ -330,6 +332,7 @@ module.exports.addAchieve = function (req, res) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
 
+            let id;
             if (req.user._json && req.user._json.email)
                 id = req.user._json.email;
             else id = req.user.user_id;
@@ -394,7 +397,7 @@ module.exports.updateAchieve = async function (req, res) {
                 month: 'numeric',
                 day: 'numeric'
             };
-            let oldAch = await db.findAchieveById(id)
+            let oldAch = await db.findAchieveById(id);
             for (let field of Object.keys(req.body.data))
             {
                 if (field == 'confirmations' || field == 'achDate')
@@ -442,6 +445,7 @@ module.exports.deleteAchieve = async function (req, res) {
         try {
             let id = req.body.achId;
 
+            let User;
             if (req.user._json.email)
                 User = await db.findUserById(req.user._json.email);
             else User = await db.findUserById(req.user.user_id);
@@ -459,6 +463,7 @@ module.exports.deleteAchieve = async function (req, res) {
 
 module.exports.getRating = async function (req, res) {
 
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -480,7 +485,7 @@ module.exports.getRating = async function (req, res) {
         for (key of Object.keys(kri)) {
             crits[key] = 0;
         }
-        Achs = await db.findActualAchieves(user.id);
+        let Achs = await db.findActualAchieves(user.id);
         for(let ach of Achs) {
             if (!ach) continue;
             if (ach.ball) {
