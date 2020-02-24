@@ -8,6 +8,7 @@ export default class CriteriasForm extends Component {
   constructor(props) {
     super(props);
     this.handleSelect = this.handleSelect.bind(this);
+    this.checkValidity = this.checkValidity.bind(this);
 
     this.critsTitles = Object.keys(this.props.crits);
     this.critsOffset = this.critsTitles.length == 13 ? 1 : 0;
@@ -35,8 +36,11 @@ export default class CriteriasForm extends Component {
       globalCrit = globalCrit[this.props.values[this.props.values.length-1]];
       if (isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
         sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+      } else if (this.critsTitles[0] === '7а') {
+        if (isNaN(globalCrit[0])) {
+          sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+        }
       }
-
 
       this.state = {
         selects: sel,
@@ -44,15 +48,37 @@ export default class CriteriasForm extends Component {
         crit: this.props.values[0],
         values: this.props.values.slice(),
       };
-      this.props.valuesCallback(this.state.values, true);
+      this.checkValidity();
+      //this.props.valuesCallback(this.state.values, true);
     }
 
     // this.state = {selects: [{value:'', options: []}]}
   }
 
+  checkValidity() {
+    const state = {...this.state};
+    let crit = this.props.crits;
+    let id = '';
+    const val = {...state.values};
+    for (let i = 0; i < state.length; i++) {
+      id += state.values[i];
+      crit = crit[state.values[i]];
+    }
+    const keys = Object.keys(crit);
+    const critsTitles = Object.keys(this.props.crits);
+    if (isNaN(Number(keys[0])) || (critsTitles[0] === '7а' && isNaN(Number(crit[0])))) {
+      //state.selects.push({id: id + 'new', num: state.length + 1, value: '', options: keys});
+      this.props.valuesCallback(state.values, false);
+    } else {
+      this.props.valuesCallback(state.values, true);
+    }
+    this.setState(state);
+  }
+
   handleSelect(e) {
     e.preventDefault();
     e.stopPropagation();
+
     const state = {...this.state};
     const key = Number(e.target.id);
     if (key == state.length && key == (state.values.length)) {
@@ -95,7 +121,9 @@ export default class CriteriasForm extends Component {
       crit = crit[state.values[i]];
     }
     const keys = Object.keys(crit);
-    if (isNaN(Number(keys[0]))) {
+    const critsTitles = Object.keys(this.props.crits);
+    console.log('T', critsTitles[0] === '7а' && isNaN(Number(crit[0])));
+    if (isNaN(Number(keys[0])) || (critsTitles[0] === '7а' && isNaN(Number(crit[0])))) {
       this.props.valuesCallback(state.values, false);
       state.selects.push({id: id + e.target.value, num: state.length + 1, value: '', options: keys});
     } else {
@@ -134,7 +162,7 @@ export default class CriteriasForm extends Component {
                     8б (статьи / тезисы / конференции)
         </option>
         <option value={this.critsTitles[5]}>
-                    9а (обществ. деят. {this.critsOffset && 'в СПбГУ'})
+                    9а (обществ. деят. {this.critsOffset ? 'в СПбГУ' : ''})
         </option>
         <option value={this.critsTitles[6]}>
                     9б (информационная деят.)

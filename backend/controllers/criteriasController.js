@@ -1,3 +1,4 @@
+const adminController = require( "./adminController");
 const db = require('./dbController');
 const path = require('path');
 const fs = require('fs');
@@ -6,6 +7,7 @@ const upload = require(path.join(__dirname, '../config/multer'));
 const uploadsPath = path.join(__dirname, '../docs/');
 const anketPath = path.join(__dirname, '..');
 const xlsx = require('xlsx');
+const md5 = require('md5');
 
 
 module.exports.upload = async function (req, res) {
@@ -44,7 +46,7 @@ module.exports.UploadAnnotationsToFaculty = async function (req, res) {
 module.exports.GetAnnotationsForFaculty = async function (req, res) {
     let annotations = await db.GetAnnotationsForFaculty(req.query.faculty);
     if (annotations && (annotations.AnnotationsToCrits || annotations.LearningProfile) ) {
-        let result = {}
+        let result = {};
         result.annotations = annotations.AnnotationsToCrits;
         result.learningProfile = annotations.LearningProfile;
         return res.status(200).send(result);
@@ -54,7 +56,23 @@ module.exports.GetAnnotationsForFaculty = async function (req, res) {
 
 module.exports.saveCriteriasForFaculty = async function (req, res) {
     await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
+    checkActualityOfUsersAchievements(req.body.faculty).then((res) => console.log('Check finished'));
+
     return res.sendStatus(200)
+};
+
+const checkActualityOfUsersAchievements = async function(faculty) {
+    const users = (await db.GetUsersWithAllInfo(faculty, false)).concat(await db.GetUsersWithAllInfo(faculty, true));
+    const crits = await db.GetCriterias(faculty, true);
+
+    console.log(faculty);
+    console.log(Object.keys(crits));
+    for (const user of users) {
+        for (const achievement of user.Achievement) {
+            await db.checkActualityOfAchievementCharacteristics(achievement, crits)
+        }
+        await adminController.balls(user.id, faculty);
+    }
 };
 
 module.exports.getCriterias = async function (req, res) {

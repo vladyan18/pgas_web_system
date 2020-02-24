@@ -20,6 +20,7 @@ const achieveSchema = mongoose.Schema({
   comment: String,
   ball: Number,
   isArchived: Boolean,
+  criteriasHash: String,
 });
 
 const Achieve = connection.model('Achieve', achieveSchema);

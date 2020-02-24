@@ -13,3 +13,7 @@
 .user-table__edited-row {
     background-color: #f3c66b;
 }
+
+.user-table__incorrect-row {
+    background-color: #f38a00;
+}

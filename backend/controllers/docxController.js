@@ -136,20 +136,24 @@ module.exports.getAnket = async function (req, res) {
         const links = [];
         for (let i = 0; i < filteredConfirmations.length; i++) {
 
-            if (filteredConfirmations[i].data.Type === 'doc') {
-                if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
-                    const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
-                    zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name + '.pdf',
-                        await makeStamp(confFile, 'Приложение № ' + filteredConfirmations[i].num));
-                } else {
-                    const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
-                    zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name +
-                        filteredConfirmations[i].data.FilePath.slice(
-                            filteredConfirmations[i].data.FilePath.lastIndexOf('.'),
-                            filteredConfirmations[i].data.FilePath.length
-                        ),
-                        confFile);
+            try {
+                if (filteredConfirmations[i].data.Type === 'doc') {
+                    if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
+                        const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
+                        zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name + '.pdf',
+                            await makeStamp(confFile, 'Приложение № ' + filteredConfirmations[i].num));
+                    } else {
+                        const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
+                        zip2.file(filteredConfirmations[i].num + '. ' + filteredConfirmations[i].data.Name +
+                            filteredConfirmations[i].data.FilePath.slice(
+                                filteredConfirmations[i].data.FilePath.lastIndexOf('.'),
+                                filteredConfirmations[i].data.FilePath.length
+                            ),
+                            confFile);
+                    }
                 }
+            } catch (e) {
+                console.log('Error with confirmations', user.id, filteredConfirmations[i].data.Name);
             }
 
             if (filteredConfirmations[i].data.Type === 'link') {

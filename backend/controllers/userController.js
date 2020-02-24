@@ -403,9 +403,12 @@ module.exports.updateAchieve = async function (req, res) {
                 }
                 if (field == 'chars')
                 {
-                    let changeDetected = false
+                    let changeDetected = false;
+                    if (oldAch.chars.length !== req.body.data.chars.length) {
+                        changeDetected = true;
+                    }
                     for (let i = 0; i < oldAch.chars.length; i++)
-                        if (oldAch.chars[i] != req.body.data.chars[i])
+                        if (oldAch.chars[i] !== req.body.data.chars[i])
                         {
                             changeDetected = true;
                             break

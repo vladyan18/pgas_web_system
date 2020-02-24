@@ -112,6 +112,14 @@ module.exports.updateAchieve = async function (req, res) {
 
     let achieve = req.body;
     let id = req.body._id;
+    if (req.user._json.email)
+        uid = req.user._json.email;
+    else uid = req.user.user_id;
+    const user = await db.findUserById(uid);
+    const isValid = await db.validateAchievement(achieve, user);
+    if (!isValid) {
+        return res.sendStatus(400);
+    }
             let options = {
                 year: 'numeric',
                 month: 'numeric',
@@ -122,24 +130,27 @@ module.exports.updateAchieve = async function (req, res) {
 
             let oldAchieve = await db.findAchieveById(id);
             let createdAchieve = await db.updateAchieve(id, achieve);
-            if (req.user._json.email)
-                uid = req.user._json.email;
-            else uid = req.user.user_id;
 
             var args = {};
             args.from = oldAchieve;
             args.to = createdAchieve;
             history.WriteToHistory(req, id, uid, 'Change', args);
-            balls(uid);
+    module.exports.balls(uid);
             res.sendStatus(200);
             AdminEmitter.emit('Update');
             notify.emitChange(req, createdAchieve).then()
 };
 
 module.exports.AchSuccess = async function (req, res) {
-    await db.ChangeAchieve(req.body.Id, true);
     let u = await db.findUser(req.body.UserId);
-    balls(u.id, u.Faculty);
+    const achievement = await db.findAchieveById(req.body.Id);
+    const checkResult = await db.validateAchievement(achievement, u);
+    if (!checkResult) {
+        return res.sendStatus(400);
+    }
+
+    await db.ChangeAchieve(req.body.Id, true);
+    module.exports.balls(u.id, u.Faculty);
     res.sendStatus(200);
     AdminEmitter.emit('Update');
     notify.emitSuccess(req, u).then();
@@ -149,7 +160,7 @@ module.exports.AchSuccess = async function (req, res) {
 module.exports.AchFailed = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, false);
     let u = await db.findUser(req.body.UserId);
-    balls(u.id, u.Faculty);
+    module.exports.balls(u.id, u.Faculty);
     AdminEmitter.emit('Update');
     res.sendStatus(200);
     notify.emitDecline(req, u).then();
@@ -257,7 +268,7 @@ module.exports.getStatisticsForFaculty = async function(req, res) {
     res.status(200).send(await db.getStatisticsForFaculty(req.query.faculty))
 }
 
-const balls = async function (id, faculty) {
+module.exports.balls = async function (id, faculty) {
     let criterias = await db.GetCriterias(faculty);
     if (!criterias) return null;
 

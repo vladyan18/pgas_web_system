@@ -51,6 +51,8 @@ class CurrentAchievesTable extends Component {
     switch (row.status) {
       case 'Отказано':
         return baseClass + ' user-table__declined-row';
+      case 'Данные некорректны':
+        return baseClass + ' user-table__incorrect-row';
       case 'Изменено':
         return baseClass + ' user-table__edited-row';
       case 'Принято с изменениями':

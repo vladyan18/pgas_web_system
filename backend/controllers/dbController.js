@@ -8,6 +8,7 @@ const CriteriasModel = require('../models/criterias');
 const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
+const md5 = require('md5');
 
 //const redis = require('../config/redis');
 var ObjectId = require('mongoose').Types.ObjectId;
@@ -32,11 +33,8 @@ exports.getUserRights = function (id) {
 };
 
 exports.findUserByAchieve = async function(id){
-
     let ach = await AchieveModel.findById(id.toString())
-    console.log('ACH', ach)
     let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
-    console.log('USER', user)
     return user
 };
 
@@ -340,11 +338,17 @@ exports.CreateFaculty = async function (Faculty) {
     return faculty
 };
 
-exports.GetCriterias = async function (facultyName) {
+exports.GetCriterias = async function (facultyName, fullInfo) {
     let facObject = await FacultyModel.findOne({Name: facultyName});
-    if (facObject && facObject.CritsId)
-        return await CriteriasModel.findById(facObject.CritsId, 'Crits');
-    else return undefined
+    if (!fullInfo) {
+        if (facObject && facObject.CritsId)
+            return await CriteriasModel.findById(facObject.CritsId, 'Crits');
+        else return undefined
+    } else {
+        if (facObject && facObject.CritsId)
+            return await CriteriasModel.findById(facObject.CritsId);
+        else return undefined
+    }
 };
 
 exports.GetCriteriasAndSchema = async function (facultyName) {
@@ -399,6 +403,7 @@ exports.UploadCriteriasToFaculty = async function (crits, faculty) {
     let critsObject = {};
     critsObject.Date = Date.now();
     critsObject.Crits = JSON.stringify(crits.crits);
+    critsObject.Hash = md5(JSON.stringify(crits.crits));
     critsObject.CritsSchema = JSON.stringify(crits.schema);
     critsObject.FacultyId = facultyObject._id.toString();
 
@@ -506,9 +511,10 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
     }
 
     return res
-}
+};
 
 exports.validateAchievement = async function(achievement, user) {
+    console.log(achievement)
     if (!achievement || !user) return false;
     let crits = {};
     let facObject = await FacultyModel.findOne({Name: user.Faculty});
@@ -529,7 +535,7 @@ exports.validateAchievement = async function(achievement, user) {
             if (!currentLevelOfCriterion[achievement.chars[i]]) return false;
             currentLevelOfCriterion = currentLevelOfCriterion[achievement.chars[i]];
         }
-        if (isNaN(Number(currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]]))) {
+        if (isNaN(Number(Object.keys(currentLevelOfCriterion)[0]))) {
             // в старой версии критериев было допустимо опускать характеристики в 7а
             if (achievement.crit !== critsTitles[0]) return false;
 
@@ -556,5 +562,56 @@ exports.validateAchievement = async function(achievement, user) {
         return true;
     } catch (e) {
         console.error('Ach validation error | User: ' + user.id, e);
+    }
+};
+
+exports.checkActualityOfAchievementCharacteristics = async function(achievement, criterias) {
+    if (achievement.criteriasHash === criterias.Hash) return;
+
+    const correctChars = [];
+    const incorrectChars = [];
+    let currentLevel = JSON.parse(criterias.Crits);
+
+    if (Object.keys(criterias)[0].indexOf('(') === -1) {
+        if (achievement.crit.indexOf('(') !== -1) {
+            achievement.crit = achievement.crit.substring(
+                achievement.crit.indexOf('(')+1,
+                achievement.crit.indexOf(')')
+            );
+            if (achievement.crit === '10в') {
+                achievement.crit = '9а';
+                achievement.chars.splice(1, 0, 'Организация прочих мероприятий');
+            } else if (achievement.crit === '9а' && achievement.chars.length > 3) {
+                achievement.chars.splice(1, 0, 'Организация мероприятий при участии СПбГУ');
+            }
+            achievement.chars[0] = achievement.crit;
+        }
+    }
+
+    for (let i = 0; i < achievement.chars.length; i++) {
+        achievement.chars[i] = achievement.chars[i].replace(/\(\d*\)/g, '').trim();
+        if (currentLevel[achievement.chars[i]]) {
+            correctChars.push(achievement.chars[i]);
+            currentLevel = currentLevel[achievement.chars[i]];
+        } else {
+            incorrectChars.push(achievement.chars[i]);
+        }
+    }
+
+    console.log(correctChars, incorrectChars);
+
+    if (!isNaN(Number(currentLevel[0]))) {
+        console.log(Number(currentLevel[0]));
+        console.log('CORRECT MIGRATION');
+        achievement.chars = correctChars;
+        achievement.criteriasHash = criterias.Hash;
+        await this.updateAchieve(achievement._id, achievement);
+
+    } else {
+        achievement.chars = [achievement.crit];
+        achievement.status = 'Данные некорректны';
+        achievement.criteriasHash = criterias.Hash;
+        achievement.ball = undefined;
+        await this.updateAchieve(achievement._id, achievement);
     }
 };
