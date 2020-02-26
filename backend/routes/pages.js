@@ -21,7 +21,6 @@ const path = require('path');
 const passport = require('passport');
 const frontendPath = path.join(__dirname, '../../frontend', '/build');
 const db = require('../controllers/dbController.js');
-const fs = require('fs');
 
 /**
  * If not authenticated, redirect to /login <br/>
@@ -122,13 +121,12 @@ router.post('/login', async function (req, res) {
         console.log('LOGGED', err, newUser, info);
         if (err) {
             console.log('ERROR', err);
-            if(errState) return
-            errState = true
+            if(errState) return;
+            errState = true;
             return res.redirect('/login');
         }
 
         if (!newUser) {
-	    //return res.redirect('/login');
             newUser = {};
             newUser._json = {};
             newUser._json.sAMAccountName = st;
@@ -144,27 +142,6 @@ router.post('/login', async function (req, res) {
         })
     })(req, res)
 });
-
-/**
- * Route serving callback from auth0
- * @name Auth callback
- * @path {GET} /callback
- */
-router.get('/callback', function (req, res, next) {
-    passport.authenticate('auth0', function (err, user, info) {
-        if (err) { return next(err) }
-        if (!user) { return res.redirect('/login') }
-        req.logIn(user, function (err) {
-            if (err) { return next(err) }
-            const returnTo = req.session.returnTo;
-            delete req.session.returnTo;
-            res.redirect('http://localhost:3000')
-        });
-    })(req, res, next)
-});
-
-
-var homepage = fs.readFileSync(path.join(frontendPath, '/user_main.html')).toString();
 
 /**
  * Route serving home page

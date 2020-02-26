@@ -267,14 +267,13 @@ module.exports.getRating = async function (req, res) {
 
 module.exports.getStatisticsForFaculty = async function(req, res) {
     res.status(200).send(await db.getStatisticsForFaculty(req.query.faculty))
-}
+};
 
 module.exports.balls = async function (id, faculty) {
     let criterias = await db.GetCriterias(faculty);
     if (!criterias) return null;
 
     let kri = JSON.parse(criterias.Crits);
-    let balls = 0;
     let Achs = await db.findActualAchieves(id);
   let kriteries = {};
 
@@ -284,7 +283,7 @@ module.exports.balls = async function (id, faculty) {
 
   for(let ach of Achs) {
       if (!ach) continue;
-      if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
+      if (ach.status !== 'Принято' && ach.status !== 'Принято с изменениями') {
           ach.ball = undefined;
           db.updateAchieve(ach._id, ach).then();
           continue
@@ -308,10 +307,10 @@ module.exports.balls = async function (id, faculty) {
         if (true) // (CheckSystem(key, kriteries[key]))
         {
             if (faculty === 'ВШЖиМК' || faculty === 'Соцфак') {
-                balls += MatrBallsLegacy(kriteries[key], faculty)
+                MatrBallsLegacy(kriteries[key], faculty)
             }
             else {
-                balls += MatrBalls(kriteries[key])
+                MatrBalls(kriteries[key])
             }
         } else for (let ach of kriteries[key]) ach['ach'].ball = undefined;
         for (let curAch of kriteries[key]) {
@@ -321,11 +320,9 @@ module.exports.balls = async function (id, faculty) {
     }
 };
 
+// eslint-disable-next-line no-unused-vars
 const CheckSystem = function(crit, ach) {
     if (!ach) return false;
-    //if (crit == '10 (10в)' || crit == '12 (11б)' ) {
-    //    return ach.filter(o => o).length >= 2
-    //}
     else return true
 };
 
@@ -335,7 +332,6 @@ const MatrBalls = function (Crit) {
 
     for (let i = 0; i < Crit.length; i++) {
         if (!Crit[i]) continue;
-      var q = 0;
        let maxIndex;
         for (let ach = 0; ach < Crit.length; ach++) {
             if (!Crit[ach]['balls']) continue;

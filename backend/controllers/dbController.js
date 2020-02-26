@@ -10,18 +10,8 @@ const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
 const md5 = require('md5');
 
-//const redis = require('../config/redis');
-var ObjectId = require('mongoose').Types.ObjectId;
-
 exports.findUserById = async function (id) {
-    //return redis.getAsync(id + '_user').then(async (res) => {
-    // if (!res) {
-            let res = await UserModel.findOne({id: id}).lean();
-    // if (res) redis.setAsync(id + '_user', JSON.stringify(res))
-    // } else res = JSON.parse(res);
-        return res
-    //})
-
+    return await UserModel.findOne({id: id}).lean()
 };
 
 exports.findUser = function(id){
@@ -33,9 +23,8 @@ exports.getUserRights = function (id) {
 };
 
 exports.findUserByAchieve = async function(id){
-    let ach = await AchieveModel.findById(id.toString())
-    let user = await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
-    return user
+    let ach = await AchieveModel.findById(id.toString());
+    return await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}})
 };
 
 
@@ -121,7 +110,7 @@ exports.isUser = function(token){
           
         if (!user){
           return false
-        }         
+        }
         return true
     })
 };
@@ -149,28 +138,17 @@ exports.findActualAchieves = async function (user_id) {
 
 exports.findAchieveById = async function (id) {
     return await AchieveModel.findById(id).lean();
-
-   // return redis.getAsync(id + '_ach2').then(async (res) => {
-      //  if (!res) {
-            let b = await AchieveModel.findById(id).lean();
-         //   redis.setAsync(id + '_ach2', JSON.stringify(b));
-            return(b)
-      //  } else return JSON.parse(res)})
 };
 
 exports.createAchieve = async function (achieve) {
-    let a = await AchieveModel.create(achieve);
-   // redis.setAsync(a._id + '_ach2', JSON.stringify(a));
-  return a
+    return await AchieveModel.create(achieve);
 };
 
 exports.deleteAchieve = async function (id) {
-    console.log('DELETE', id);
-    AchieveModel.findByIdAndRemove(id).then((x) => {
+    AchieveModel.findByIdAndRemove(id).then(() => {
     });
     let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}});
     if (!u) return true;
-    console.log('DELETION', u);
     for(let i = u.Achievement.length - 1; i >= 0; i--) {
         if(u.Achievement[i] === id) {
             u.Achievement.splice(i, 1);
@@ -178,31 +156,22 @@ exports.deleteAchieve = async function (id) {
         }
     }
     await UserModel.findOneAndUpdate({id: u.id}, {Achievement: u.Achievement});
-    //redis.del(u.id + '_achs');
-    //redis.del(u.id + '_user');
     return true
 };
 
 exports.updateAchieve = async function (id, achieve) {
-    //redis.del(id + '_ach2');
-    //u = this.findUserByAchieve(id)
-    //u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-    //redis.del(u.id + '_achs');
-    //redis.del(u.id + '_user');
     let newAch = {
         crit: achieve.crit,
         chars: achieve.chars, status: achieve.status,
         achievement: achieve.achievement, ball: achieve.ball,
         achDate: achieve.achDate, comment: achieve.comment,
         endingDate: achieve.endingDate,
-    }
+    };
 
     if (achieve.confirmations && achieve.confirmations.length > 0) {
-        newAch.confirmations = achieve.confirmations
-
+        newAch.confirmations = achieve.confirmations;
 
         for (let i = 0; i < achieve.confirmations.length; i++) {
-            console.log(achieve.confirmations[i])
             newAch.confirmations[i] = achieve.confirmations[i]
         }
     }
@@ -214,8 +183,6 @@ exports.updateAchieve = async function (id, achieve) {
 };
 
 exports.registerUser = function (userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type, settings) {
-    //redis.set(id + '_reg', true);
-    //redis.del(id + '_user');
     return UserModel.findOneAndUpdate({id: userId}, {
         $set: {
             LastName: lastname,
@@ -233,32 +200,24 @@ exports.registerUser = function (userId, lastname, name, patronymic, birthdate, 
 
 
 exports.addAchieveToUser = function (userId, achieveId) {
-    //redis.del(userId + '_achs');
-    //redis.del(userId + '_user');
   return UserModel.findOneAndUpdate({ id: userId }, { $push: { Achievement: achieveId } })
 };
 
 exports.AddToRating = async function (userId, Direction) {
-    //let u = await UserModel.findOne({ _id: userId });
-    //redis.del(u.id + '_user');
     if (Direction)
-        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true, Direction: Direction} })
+        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true, Direction: Direction} });
     else
-        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true} })
+        return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: true} });
 };
 
 exports.RemoveFromRating = async function (userId) {
-    //let u = await UserModel.findOne({ _id: userId });
-    //redis.del(u.id + '_user');
     return UserModel.findOneAndUpdate({ _id: userId }, { $set: { IsInRating: false } })
 };
 
-exports.ChangeAchieve = async function (id,isGood) {
-    //redis.del(id + '_ach2');
-    let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
+exports.ChangeAchieve = async function (id, accept = false) {
+    await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
 
-    //redis.del(u.id + '_achs');
-  if (isGood === true) {
+  if (accept) {
       let Ach = await AchieveModel.findById(id);
     if(Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями'){
       return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { status: 'Принято с изменениями'} }, function (err, result) {
@@ -279,16 +238,13 @@ exports.ChangeAchieve = async function (id,isGood) {
 
 
 exports.comment = async function(id,comment){
-    //redis.del(id + '_ach2');
-    let u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-    //redis.del(u.id + '_achs');
+    await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
   return AchieveModel.findOneAndUpdate({ _id: id }, { $set: { comment: comment} }, function (err, result) {
   })
 };
 
 exports.toggleHide = async function (id) {
     let u = await UserModel.findById(id);
-    //redis.del(id + '_user');
     return UserModel.findOneAndUpdate({_id: id}, {$set: {IsHiddenInRating: (!u.IsHiddenInRating)}}, function (err, result) {
     })
 };
@@ -299,7 +255,6 @@ exports.allAchieves = function () {
 };
 
 exports.setBalls = function(id,balls){
-    //redis.del(id + '_user');
   return UserModel.findOneAndUpdate({ id: id }, { $set: { Ball: balls} }, function (err, result) {
   })
 };
@@ -333,7 +288,6 @@ exports.CreateFaculty = async function (Faculty) {
         if (!superAdmin.Rights) superAdmin.Rights = [];
         superAdmin.Rights.push(Faculty.Name);
         await UserModel.findOneAndUpdate({'_id': superAdmin._id}, {$set: {Rights: superAdmin.Rights}});
-        //redis.del(superAdmin.Id + '_user');
     }
     return faculty
 };
@@ -368,14 +322,12 @@ exports.UploadAnnotationsToFaculty = async function (annotations, learningProfil
 
 exports.GetAnnotationsForFaculty = async function (facultyName) {
     let facObject = await FacultyModel.findOne({Name: facultyName});
-    console.log('FACULTY NAME', facultyName);
     let annObj = await AnnotationsModel.findById(facObject.AnnotationsToCritsId);
     return annObj
 };
 
 
 exports.ChangeRole = function (id, isAdmin) {
-    //redis.del(id + '_user');
   if (isAdmin === true) {
     return UserModel.findOneAndUpdate({ id: id }, { $set: { Role: 'Admin'} }, function (err, result) {
       console.log(result)
@@ -397,9 +349,7 @@ exports.createHistoryNote = async function (historyNote) {
 };
 
 exports.UploadCriteriasToFaculty = async function (crits, faculty) {
-    console.log('FIND', faculty);
     let facultyObject = await FacultyModel.findOne({Name: faculty});
-    console.log('FOUND', facultyObject);
     let critsObject = {};
     critsObject.Date = Date.now();
     critsObject.Crits = JSON.stringify(crits.crits);
@@ -443,60 +393,61 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
             }
         ).lean().exec();
 
-    let articlesIndexCol = 3
-    if (facultyName == 'Физфак') articlesIndexCol = 2
-    let achCount = 0
-    let critsCounts = {}
-    let critsBalls = {}
-    let achieves = {}
-    let achievesBalls = {}
-    let RINC = 0
-    let SCOPUS = 0
-    let VAK = 0
-    let unindexed = 0
-    let accepted = 0
-    let declined = 0
-    let waitingForCheck = 0
+    let articlesIndexCol = 3;
+    if (facultyName === 'Физфак') articlesIndexCol = 2;
+    let achCount = 0;
+    let critsCounts = {};
+    let critsBalls = {};
+    let achieves = {};
+    let achievesBalls = {};
+    let RINC = 0;
+    let SCOPUS = 0;
+    let VAK = 0;
+    let unindexed = 0;
+    let accepted = 0;
+    let declined = 0;
+    let waitingForCheck = 0;
     for (let user of users) {
         for (let ach of user.Achievement) {
-            if (ach.status == 'Отказано') declined += 1
-            if (ach.status == 'Ожидает проверки' || !ach.status) waitingForCheck += 1
-            if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') continue
-            accepted += 1
-            achCount += 1
+            if (ach.status === 'Отказано') declined += 1;
+            if (ach.status === 'Ожидает проверки' || !ach.status) waitingForCheck += 1;
+            if (ach.status !== 'Принято' && ach.status !== 'Принято с изменениями') continue;
+            accepted += 1;
+            achCount += 1;
             if (!critsCounts[ach.chars[0]]) {
-                critsCounts[ach.chars[0]] = 0
-                critsBalls[ach.chars[0]] = 0
+                critsCounts[ach.chars[0]] = 0;
+                critsBalls[ach.chars[0]] = 0;
             }
-            critsCounts[ach.chars[0]] += 1
-            critsBalls[ach.chars[0]]  += ach.ball
+            critsCounts[ach.chars[0]] += 1;
+            critsBalls[ach.chars[0]]  += ach.ball;
 
             if (!achieves[ach.chars[0] + ' ' + ach.chars[1]]) {
-                achieves[ach.chars[0] + ' ' + ach.chars[1]] = 0
-                achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0
+                achieves[ach.chars[0] + ' ' + ach.chars[1]] = 0;
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0;
             }
 
-            if (ach.chars[0] == '6 (9а)') {
+            if (ach.chars[0] === '6 (9а)') {
                 if (!achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]]) {
-                    achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0
-                    achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0
+                    achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0;
+                    achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0;
                 }
-                achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += 1
-                achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += ach.ball
+                achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += 1;
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += ach.ball;
             }
 
-            achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1
-            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball
+            achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1;
+            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball;
 
-            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].indexOf('РИНЦ') > 0) RINC += 1
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].indexOf('РИНЦ') > 0) RINC += 1;
             else
-            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('Scopus') > 0) SCOPUS += 1
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('Scopus') > 0) SCOPUS += 1;
             else
-            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('ВАК') > 0) VAK += 1
-            else if (ach.chars[0] == '5 (8б)') unindexed += 1
+            if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('ВАК') > 0) VAK += 1;
+            else if (ach.chars[0] === '5 (8б)') unindexed += 1
         }
     }
-    let res = {'Total achs count': achCount,
+    return {
+        'Total achs count': achCount,
         'Accepted': accepted,
         'Declined': declined,
         'Waiting': waitingForCheck,
@@ -509,12 +460,9 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
         'Achieves': achieves,
         'AchievesBalls': achievesBalls
     }
-
-    return res
 };
 
 exports.validateAchievement = async function(achievement, user) {
-    console.log(achievement)
     if (!achievement || !user) return false;
     let crits = {};
     let facObject = await FacultyModel.findOne({Name: user.Faculty});

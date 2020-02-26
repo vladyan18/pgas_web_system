@@ -19,9 +19,6 @@ const notifyController = require('../controllers/notificationController');
 const historyController = require('../controllers/historyNotesController');
 const criteriasController = require('../controllers/criteriasController');
 const db = require('../controllers/dbController.js');
-const path = require('path');
-const upload = require('../config/multer');
-
 /**
  * If not authenticated, or do not have Admin rigths, redirect to 404
 

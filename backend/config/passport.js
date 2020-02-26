@@ -1,6 +1,5 @@
 'use strict'
 const passport = require('passport');
-const Auth0Strategy = require('passport-auth0');
 const db = require('../controllers/dbController');
 let ActiveDirectoryStrategy = require('./ldapstrategy');
 
@@ -50,9 +49,3 @@ passport.deserializeUser(function (user, done) {
 });
 
 module.exports = passport;
-
-function makeDate(d) {
-    if (!d) return undefined;
-    let date = d.split('.');
-    return new Date(date[2] + '-' + date[1] + '-' + date[0])
-}

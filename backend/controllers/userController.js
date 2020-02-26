@@ -3,13 +3,10 @@
  * @module userController
  */
 const path = require('path');
-const passport = require(path.join(__dirname, '../config/passport'));
 const upload = require(path.join(__dirname, '../config/multer'));
 const uploadConfirmation = require(path.join(__dirname, '../config/confirmationMulter'));
 const db = require('./dbController');
 const fs = require('fs');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
 
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
 const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
@@ -33,7 +30,7 @@ module.exports.dynamic = async function (req, res) {
                         for (let j = 0; j < v[i].confirmations.length; j++) {
 
                             let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
-                            if (!confirm) continue
+                            if (!confirm) continue;
                             confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
                             confirms.push(confirm)
                         }
@@ -53,7 +50,6 @@ module.exports.dynamic = async function (req, res) {
  * */
 module.exports.getProfile = async function (req, res) {
     let User;
-    console.log('BACK ID', req.user.user_id)
     if (req.user._json.email)
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
@@ -119,7 +115,7 @@ module.exports.getAch = async function (req, res) {
 module.exports.registerUser = async function (req, res) {
     try {
         let data = req.body;
-        console.log(data);
+        console.log('New registration: ', data);
         let id;
         if (req.user && req.user._json.email)
             id = req.user._json.email;
@@ -182,18 +178,18 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
     filename = filename.substr(filename.search('-') + 1);
     filename = filename.substr(filename.search('-') + 1);
     try {
-        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI')
+        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI');
         if (filename.endsWith('.pdf')) {
-            var file = fs.createReadStream(filePath);
-            var stat = fs.statSync(filePath);
+            let file = fs.createReadStream(filePath);
+            let stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline');
             file.pipe(res);
         } else
         if (filename.endsWith('.jpg')) {
-            var file = fs.createReadStream(filePath);
-            var stat = fs.statSync(filePath);
+            let file = fs.createReadStream(filePath);
+            let stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', 'image/jpg');
             res.setHeader('Content-Disposition', 'inline');
@@ -207,9 +203,14 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
         }
     }
     catch (e) {
-        let response = {response: "Not found"};
-        console.log(e);
-        res.sendStatus(404);
+        if (e instanceof URIError) {
+            console.log(e);
+            res.sendStatus(404);
+        } else
+        {
+            res.sendStatus(400);
+            throw e;
+        }
     }
 };
 
@@ -429,7 +430,7 @@ module.exports.updateAchieve = async function (req, res) {
 
             achieve.date = new Date().toLocaleString('ru', options);
 
-            let createdAchieve = await db.updateAchieve(id, achieve);
+            await db.updateAchieve(id, achieve);
             //autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
@@ -452,10 +453,10 @@ module.exports.deleteAchieve = async function (req, res) {
                 User = await db.findUserById(req.user._json.email);
             else User = await db.findUserById(req.user.user_id);
 
-            if (User.Role != 'Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
+            if (User.Role !== 'Admin' &&  User.Role !== 'SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
                 return res.sendStatus(404);
 
-            let result = await db.deleteAchieve(id);
+            await db.deleteAchieve(id);
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
@@ -472,9 +473,9 @@ module.exports.getRating = async function (req, res) {
 
     let requestingUser = await db.findUserById(id);
 
-    let facultyName = req.query.faculty
-    if (requestingUser.Faculty != facultyName) {
-        res.sendStatus(401)
+    let facultyName = req.query.faculty;
+    if (requestingUser.Faculty !== facultyName) {
+        res.sendStatus(401);
         return
     }
 

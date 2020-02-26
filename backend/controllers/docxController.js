@@ -12,26 +12,25 @@ const fontkit = require('@pdf-lib/fontkit');
 const anketPath = path.join(__dirname, '..');
 const docx = require('docx');
 const QRCode = require('qrcode');
+const Zip = require('node-zip');
 
 module.exports.getAnket = async function (req, res) {
     try {
         let achievs = [];
 
         let user;
-        if (req.user._json.email)
-            user = await
-                db.findUserById(req.user._json.email);
-    else
-        user = await
-            db.findUserById(req.user.user_id);
-        let W = user.Achievement;
+        if (req.user._json.email) {
+            user = await db.findUserById(req.user._json.email);
+        } else {
+            user = await db.findUserById(req.user.user_id);
+        }
 
-	achievs = await db.findActualAchieves(user.id);
+        achievs = await db.findActualAchieves(user.id);
 
         let faculty = await db.GetFaculty(user.Faculty);
         let criterias = JSON.parse((await db.GetCriterias(user.Faculty)).Crits);
 
-        let zip = new require('node-zip')();
+        let zip = new Zip();
 
         /* читаем файлы архива в память */
         let f01 = fs.readFileSync(anketPath + '/docs/Anketa/_rels/.rels');
@@ -75,15 +74,14 @@ module.exports.getAnket = async function (req, res) {
         let confirmNum = {val: 1, confirms: {}};
         const allConfirmations = [];
         let crits = Object.keys(criterias);
-        console.log('KRITS:', crits);
         if (crits.length !== 13) {
           crits.splice(9, 0,'DUMMY');
         }
-        console.log('KRITS:', crits);
-        for (var i = 0; i < 13; i++) {
-            let curAchs = achievs.filter(o => (o && o.crit == crits[i]));
+
+        for (let i = 0; i < 13; i++) {
+            let curAchs = achievs.filter(o => (o && o.crit === crits[i]));
             let cStr = '<w:p w:rsidR="00000000" w:rsidDel="00000000" w:rsidP="00000000" w:rsidRDefault="00000000" w:rsidRPr="00000000" w14:paraId="000000' + (16 + i * 3 + (i > 2 ? 3 : 0)).toString(16).toUpperCase() + '"><w:pPr><w:jc w:val="center"/><w:rPr/></w:pPr><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rFonts w:ascii="Times New Roman" w:cs="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman"/><w:b w:val="1"/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rtl w:val="0"/></w:rPr><w:t xml:space="preserve">A';
-            if (curAchs.length == 0) {
+            if (curAchs.length === 0) {
                 let nStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:sz w:val="20" /><w:szCs w:val="20" /></w:rPr><w:t xml:space="preserve">Нет</w:t></w:r></w:p>';
                 f06 = String(f06).replace(cStr + (i + 1) + '</w:t></w:r><w:r w:rsidDel="00000000" w:rsidR="00000000" w:rsidRPr="00000000"><w:rPr><w:rtl w:val="0"/></w:rPr></w:r></w:p>', nStr);
             }
@@ -93,21 +91,21 @@ module.exports.getAnket = async function (req, res) {
                 for (let ach of curAchs) {
                     let proof = '';
                     let proofStr = '';
-                    if (ach.confirmations.length == 0)
+                    if (ach.confirmations.length === 0)
                         proofStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' + 'УКАЗАТЬ ПОДТВЕРЖДЕНИЕ' + '</w:t></w:r></w:p>';
                     for (let confirmWrapped of ach.confirmations) {
-                        confirm = await db.getConfirmByIdForUser(confirmWrapped.id);
+                        let confirm = await db.getConfirmByIdForUser(confirmWrapped.id);
                         confirm.additionalInfo = confirmWrapped.additionalInfo;
                         allConfirmations.push(confirm);
                         proof = getProofString(confirm, confirmNum).replace(/&/g, '&amp;').replace(/</g, '&lt;');
                         proofStr += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' + proof + '</w:t></w:r></w:p>';
                     }
-                    if (i == 0) str = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t>Да</w:t></w:r></w:p>';
+                    if (i === 0) str = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="center" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t>Да</w:t></w:r></w:p>';
                     else {
                         str += '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">'
-                            + ((num != 1) ? '</w:t></w:r></w:p><w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' : '') + num + '. ' + ach.achievement.replace(/&/g, '&amp;').replace(/</g, '&lt;') + (ach.achDate ? (' (' + (ach.endingDate ? (getDateFromStr(new Date(ach.achDate)) + '-' + getDateFromStr(new Date(ach.endingDate))) : getDateFromStr(new Date(ach.achDate)) )  + ')') : '') + '</w:t></w:r></w:p>';
+                            + ((num !== 1) ? '</w:t></w:r></w:p><w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:b /><w:sz w:val="20" /><w:szCs w:val="20" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">' : '') + num + '. ' + ach.achievement.replace(/&/g, '&amp;').replace(/</g, '&lt;') + (ach.achDate ? (' (' + (ach.endingDate ? (getDateFromStr(new Date(ach.achDate)) + '-' + getDateFromStr(new Date(ach.endingDate))) : getDateFromStr(new Date(ach.achDate)) )  + ')') : '') + '</w:t></w:r></w:p>';
                         let charsStr = '<w:p w:rsidR="00560C7E" w:rsidRDefault="00E56E56"><w:pPr><w:snapToGrid w:val="0" /><w:jc w:val="left" /></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" /><w:i /><w:sz w:val="15" /><w:szCs w:val="15" /><w:rtl w:val="0"/><w:lang w:val="en-US" /></w:rPr><w:t xml:space="preserve">';
-                        for (var c = 0; c < ach.chars.length; c++) {
+                        for (let c = 0; c < ach.chars.length; c++) {
                             if (c > 0) charsStr += ', ';
                             charsStr += ach.chars[c].replace(/&/g, '&amp;').replace(/</g, '&lt;')
                         }
@@ -130,7 +128,7 @@ module.exports.getAnket = async function (req, res) {
             compression: 'DEFLATE'
         }), 'binary');
 
-        const zip2 = new require('node-zip')();
+        const zip2 = new Zip();
 
         zip2.file(user.LastName + '_анкета_ПГАС.docx', anket);
 
@@ -187,7 +185,7 @@ module.exports.getAnket = async function (req, res) {
 
 };
 
-getFilteredConfirms = function (confirms, confirmNum) {
+const getFilteredConfirms = function (confirms, confirmNum) {
     const filtered = [];
     const addedIds = [];
 
@@ -200,8 +198,8 @@ getFilteredConfirms = function (confirms, confirmNum) {
     return filtered
 };
 
-getProofString = function (confirm, confirmNum) {
-    if (confirm.Type == 'doc') {
+const getProofString = function (confirm, confirmNum) {
+    if (confirm.Type === 'doc') {
         let str;
         if (confirmNum.confirms[confirm._id])
             str = 'Приложение ' + confirmNum.confirms[confirm._id] +
@@ -214,7 +212,7 @@ getProofString = function (confirm, confirmNum) {
         }
         return str
     }
-    if (confirm.Type == 'link') {
+    if (confirm.Type === 'link') {
         let str;
         if (confirmNum.confirms[confirm._id])
             str = 'Приложение ' + confirmNum.confirms[confirm._id] +
@@ -228,7 +226,7 @@ getProofString = function (confirm, confirmNum) {
 
         return str
     }
-    if (confirm.Type == 'SZ') {
+    if (confirm.Type === 'SZ') {
         if (!confirm.SZ)
             return 'СЗ: ' + confirm.Name;
         else
@@ -277,10 +275,8 @@ async function makeConfirmationFileWithLinks(links) {
 
 module.exports.getResultTable = async function (req, res) {
     try {
-        console.log('QUERY', req.query)
-        let faculty = await db.GetFaculty(req.query.faculty)
-        console.log(faculty)
-        let kri = JSON.parse((await db.GetCriterias(req.query.faculty)).Crits)
+        let faculty = await db.GetFaculty(req.query.faculty);
+        let kri = JSON.parse((await db.GetCriterias(req.query.faculty)).Crits);
         let users = [];
         let Users = await db.CurrentUsers(req.query.faculty);
         for (let user of Users) {
@@ -303,12 +299,12 @@ module.exports.getResultTable = async function (req, res) {
 
             users.sort(function(obj1, obj2) {
                 let diff = obj2.Ball-obj1.Ball;
-                if (diff != 0)
+                if (diff !== 0)
                     return obj2.Ball-obj1.Ball;
                 else {
                     for (let crit of Object.keys(obj1.Crits)) {
                         diff = obj2.Crits[crit] - obj1.Crits[crit];
-                        if (diff != 0) return diff
+                        if (diff !== 0) return diff
                     }
                     return 0
                 }
@@ -320,20 +316,21 @@ module.exports.getResultTable = async function (req, res) {
                 try {
                     workbook.sheet(0).cell("A4").value(faculty.OfficialName);
                     // Modify the workbook.
-                    for (var i = 0; i < users.length; i++) {
-                        var r = [];
+                    for (let i = 0; i < users.length; i++) {
+                        let r = [];
                         r[0] = i + 1;
                         r[1] = users[i].Name;
                         r[2] = users[i].Type;
                         r[3] = users[i].Course;
-                        for (var j = 0; j < Object.keys(users[i].Crits).length; j++) {
+                        for (let j = 0; j < Object.keys(users[i].Crits).length; j++) {
                             r.push(users[i].Crits[Object.keys(users[i].Crits)[j]])
                         }
                         r.push(users[i].Ball);
                         workbook.sheet(0).cell("A" + (i + 5)).value([r]);
                     }
-                    for (var i = 1; i < 19; i++)
+                    for (let i = 1; i < 19; i++) {
                         workbook.sheet(0).column(i).style("horizontalAlignment", "center");
+                    }
                     workbook.sheet(0).column("B").style("horizontalAlignment", "left");
                     workbook.sheet(0).cell("B1").style("horizontalAlignment", "center");
 
@@ -354,6 +351,7 @@ module.exports.getResultTable = async function (req, res) {
 };
 
 const font9404 = fs.readFileSync(path.join(__dirname, '../fonts/9404.ttf'));
+// eslint-disable-next-line no-unused-vars
 async function makeStamp(file, stamp) {
     const pdfDoc = await pdflib.PDFDocument.load(file);
     pdfDoc.registerFontkit(fontkit);
