@@ -88,7 +88,7 @@ if (process.env.ENV_T == 'production') {
     var credentials = {key: privateKey, cert: certificate};
 
 
-    httpsServer = https.createSecureServer(credentials, app);
+    const httpsServer = https.createSecureServer(credentials, app);
 
     http.createServer(app).listen(80);
 

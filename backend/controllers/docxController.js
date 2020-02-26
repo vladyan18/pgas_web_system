@@ -137,7 +137,7 @@ module.exports.getAnket = async function (req, res) {
         const filteredConfirmations = getFilteredConfirms(allConfirmations, confirmNum);
         const links = [];
         for (let i = 0; i < filteredConfirmations.length; i++) {
-            try {
+            /*try {
                 if (filteredConfirmations[i].data.Type === 'doc') {
                     if (filteredConfirmations[i].data.FilePath.endsWith('.pdf')) {
                         const confFile = await fsReadFile(filteredConfirmations[i].data.FilePath);
@@ -155,7 +155,7 @@ module.exports.getAnket = async function (req, res) {
                 }
             } catch (e) {
                 console.log('Error with confirmations', user.id, filteredConfirmations[i].data.Name);
-            }
+            }*/
 
             if (filteredConfirmations[i].data.Type === 'link') {
                 links.push(filteredConfirmations[i]);
@@ -286,7 +286,7 @@ module.exports.getResultTable = async function (req, res) {
         for (let user of Users) {
             let sumBall = 0;
             let crits = {};
-            for (key of Object.keys(kri)) {
+            for (let key of Object.keys(kri)) {
                 crits[key] = 0;
             }
             let Achs = await db.findActualAchieves(user.id);

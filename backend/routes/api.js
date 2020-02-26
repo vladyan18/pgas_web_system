@@ -1,3 +1,4 @@
+'use strict'
 /** Express router providing API
  * @module API
  * @requires express
@@ -27,6 +28,7 @@ const upload = require('../config/multer');
  * @function adminAuth
  * */
 const adminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -41,6 +43,7 @@ const adminAuth = async (req, res, next) => {
 
 
 const superAdminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;

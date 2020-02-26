@@ -248,10 +248,10 @@ module.exports.getRating = async function (req, res) {
   for (let user of Users) {
       let sumBall = 0;
       let crits = {};
-      for (key of Object.keys(kri)) {
+      for (let key of Object.keys(kri)) {
           crits[key] = 0;
       }
-    Achs = await db.findActualAchieves(user.id);
+    let Achs = await db.findActualAchieves(user.id);
     for(let ach of Achs) {
         if (!ach) continue;
         if (ach.ball) {
@@ -278,7 +278,7 @@ module.exports.balls = async function (id, faculty) {
     let Achs = await db.findActualAchieves(id);
   let kriteries = {};
 
-  for (key of Object.keys(kri)) {
+  for (let key of Object.keys(kri)) {
     kriteries[key] = []
   }
 
@@ -290,7 +290,6 @@ module.exports.balls = async function (id, faculty) {
           continue
       }
       let curKrit = kri;
-      console.log(ach.chars)
       if (Array.isArray(curKrit)) {
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit, 'chars': ach.chars})
       }
@@ -305,7 +304,7 @@ module.exports.balls = async function (id, faculty) {
       }
   }
 
-    for (key of Object.keys(kri)) {
+    for (let key of Object.keys(kri)) {
         if (true) // (CheckSystem(key, kriteries[key]))
         {
             if (faculty === 'ВШЖиМК' || faculty === 'Соцфак') {
@@ -337,6 +336,7 @@ const MatrBalls = function (Crit) {
     for (let i = 0; i < Crit.length; i++) {
         if (!Crit[i]) continue;
       var q = 0;
+       let maxIndex;
         for (let ach = 0; ach < Crit.length; ach++) {
             if (!Crit[ach]['balls']) continue;
             var shift = i;

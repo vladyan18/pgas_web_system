@@ -1,3 +1,4 @@
+'use strict'
 const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
 const db = require('../controllers/dbController');
@@ -20,7 +21,7 @@ passport.use(new ActiveDirectoryStrategy({
 passport.serializeUser( async function (user, done) {
     const id = user._json.sAMAccountName;
     const isUser = await db.isUser(id);
-    console.log('SpbuID', id + '@student.spbu.ru');
+    console.log('SpbuID', id + '@student.spbu.ru', 'IsUser:', isUser);
     let isRegistered = false;
     if (!isUser) {
             await db.createUser({
@@ -40,6 +41,7 @@ passport.serializeUser( async function (user, done) {
         user.Rights = role.Rights;
     }
     user.user_id = id;
+    console.log('User', id, 'successfuly logged in');
     done(null, user)
 });
 

@@ -23,6 +23,10 @@
     working_dir: /opt/
     environment:
       LDAP_URL: ldap://srvdc.ad.pu.ru
+      DB_USER: bekhterev
+      DB_PASSWORD: pgastest
+      DB_HOST: mongo
+      DB_NAME: bekhterev
     command: bash -c "npm start"
     ports:
       - "8080:8080"

@@ -1,3 +1,4 @@
+'use strict'
 /** User controller
  * @module userController
  */
@@ -18,9 +19,10 @@ const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations')
  * @function dynamic
  * */
 module.exports.dynamic = async function (req, res) {
+    let id;
     if (req.user._json.email)
-        var id = req.user._json.email;
-    else var id = req.user.user_id;
+        id = req.user._json.email;
+    else id = req.user.user_id;
 
     let User = await db.findUserById(id) // TODO OPTIMIZE
     if (User)
@@ -482,7 +484,7 @@ module.exports.getRating = async function (req, res) {
     for (let user of Users) {
         let sumBall = 0;
         let crits = {};
-        for (key of Object.keys(kri)) {
+        for (let key of Object.keys(kri)) {
             crits[key] = 0;
         }
         let Achs = await db.findActualAchieves(user.id);
