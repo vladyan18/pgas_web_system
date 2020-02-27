@@ -18,6 +18,17 @@ class App extends Component {
         super(props);
         this.state = {isRegistered: 'unknown', isLogged: false, authChecked: false};
 
+        /*fetch("api/getProfile", {
+            method: "GET"
+        }).then((resp) => {
+            return resp.json()
+        })
+            .then((profile) => {
+                userPersonalStore.personal = profile
+            });*/
+    }
+
+    componentDidMount() {
         fetch("api/getProfile", {
             method: "GET"
         }).then((resp) => {
@@ -26,9 +37,7 @@ class App extends Component {
             .then((profile) => {
                 userPersonalStore.personal = profile
             });
-    }
 
-    componentDidMount() {
         Auth.isUserAuthenticated().then((status) => {
             this.setState({isLogged: status})
         })

@@ -72,7 +72,7 @@ class UserHeader extends Component {
       <div className="row" css={pageTop}>
         <div className="col-8" css={blockHeader}>
           <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
-            <img src={logoSPbU} css={css`height: 55px;`}/>
+            <img src={logoSPbU} css={css`height: 55px;`} alt={'СПбГУ'}/>
           </a>
           <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
             <div css={logoBackground}>
