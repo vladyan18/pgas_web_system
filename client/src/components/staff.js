@@ -1,5 +1,6 @@
 import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
+import '../assets/fontawesome-free-5.12.1-web/css/regular.min.css'
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
 import {Switch} from "react-router-dom";
