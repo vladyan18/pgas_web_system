@@ -45,13 +45,13 @@ class App extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         Auth.isUserAuthenticated().then((status) => {
-            if (status != this.state.isLogged || !this.state.authChecked)
+            if (status !== this.state.isLogged || !this.state.authChecked)
             this.setState({isLogged: status, authChecked: true})
         })
     }
 
     render() {
-        if (!this.state.authChecked) return null
+        if (!this.state.authChecked) return null;
 
         return (
             this.state.isLogged ?

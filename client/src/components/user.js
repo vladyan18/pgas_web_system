@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
 import UserHeaderContainer from './containers/user/userHeaderContainer';
 import UserNavbarContainer from './containers/user/userNavbarContainer';
@@ -14,8 +14,7 @@ import {observer} from 'mobx-react';
 
 import EditAchievementContainer from './containers/user/editAchievementContainer';
 import UserAddAchievementContainer from './containers/user/userAddAchievementContainer';
-import UserStudentsContainer from './containers/user/userStudentsRatingContainer';
-import staffStudentsRatingContainer, {StaffStudentsContainerFabric} from './containers/staff/staffStudentsRatingContainer';
+const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route {...rest} render={(props) => (
@@ -53,47 +52,15 @@ class User extends Component {
   }
 
   render() {
-    if (!CriteriasStore.criterias && CriteriasStore.facultyRawName) // Error handling when criterias not found
-    {
-      return (
-        <>{(this.state.ready) &&
-            <div className="container-fluid">
-              <UserHeaderContainer/>
-              <div className="container main_block">
-                <div className="rightBlock" id="panel" style={{display: 'flex', justifyContent: 'center', padding: '50px'}}>
-
-                  <p>Ваш Студсовет еще не предоставил все необходимые данные для системы. Обратитесь в свой Студсовет. <br/><br/>
-                            Факультет: <b>{CriteriasStore.facultyRawName}</b></p>
-                </div>
-              </div>
-            </div>}</>
-      );
-    }
-
-    if (userPersonalStore.facultyRawName) // Error handling when faculty not found
-    {
-      return (
-        <>{
-          <div className="container-fluid">
-            <UserHeaderContainer/>
-            <div className="container main_block">
-              <div className="rightBlock" id="panel" style={{display: 'flex', justifyContent: 'center', padding: '50px'}}>
-
-                <p>Поддержка вашего факультета в системе еще не реализована. Обратитесь в свой Студсовет. <br/><br/>
-                                Факультет: <b>{userPersonalStore.facultyRawName}</b></p>
-              </div>
-            </div>
-          </div>}</>
-      );
-    }
-
     return (
 
-      <>{(this.state.ready) && <div className="container-fluid">
+      <><div className="container-fluid">
         <UserHeaderContainer/>
+        {(this.state.ready) &&
         <div className="container main_block">
           <div className="row">
             <UserNavbarContainer/>
+            <Suspense fallback={null}>
             <Switch>
               <Route path="/home" component={UserAchievesContainer}/>
               <Route path="/achievement/:id" component={EditAchievementContainer}/>
@@ -103,10 +70,12 @@ class User extends Component {
               <Route path="/profile" component={UserProfileContainer}/>
               <Route path="/" component={UserAchievesContainer}/>
             </Switch>
+            </Suspense>
+            </div>
           </div>
         </div>
-
-      </div>}
+      }
+      </div>
       </>);
   }
 }
