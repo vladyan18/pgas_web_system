@@ -17,12 +17,33 @@ const LeftNavbar = css`
     margin-left: 0;
     padding-left: 0;
   };
+   & > ul > li {
+          @media only screen and (max-device-width: 480px) {
+      font-size: medium;
+      }
+   };
+   @media only screen and (max-device-width: 480px) {
+      width:100%;
+   }
+`;
+
+const leftBlock = css`
+                  @media only screen and (max-device-width: 480px) {
+                    margin-bottom: 1rem;
+                 }
+`;
+
+const ulNav = css`
+   @media only screen and (max-device-width: 480px) {
+      margin-bottom: 0px;
+      padding-bottom: 0px;
+   }
 `;
 
 function UserNavbar(props) {
-  return <div className="col-md-3 leftBlock">
+  return <div className="col-md-3 leftBlock" css={leftBlock}>
     <div css={LeftNavbar}>
-      <ul className="ul_nav">
+      <ul className="ul_nav" css={ulNav}>
         <UserNavItem to='/home'>Мои достижения</UserNavItem>
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}

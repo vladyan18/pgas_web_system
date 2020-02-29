@@ -29,8 +29,8 @@ const columns = [{
 }, {
   dataField: 'comment',
   text: 'Комментарий',
-  style: {textAlign: 'left', verticalAlign: 'middle'},
-  headerStyle: {verticalAlign: 'middle', textAlign: 'left'},
+  style: {textAlign: 'right', verticalAlign: 'middle'},
+  headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
 }];
 
 class CurrentAchievesTable extends Component {

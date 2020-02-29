@@ -15,7 +15,7 @@ const Panel = styled.div`
 
 function UserCommonInfo(props) {
   return (<Panel className="col-md-9 rightBlock">
-    <div className="block_main_right">
+    <div className="block_main_right" css={css`margin-bottom: 2rem;`}>
       <p className="headline">
                 Информация
       </p>

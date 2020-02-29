@@ -24,6 +24,9 @@ const blockHeader = css`
     display: flex;
     font-size: 14px;
     align-items: center;
+    @media only screen and (max-device-width: 480px) {
+    max-width: 45%;
+  }
 `;
 
 const logoBackground = css`
@@ -34,12 +37,28 @@ const logoBackground = css`
   flex-direction: column;
   justify-content: center;
   clip-path: polygon(0 0, 60% 0, 100% 100%, 40% 100%);
+  @media only screen and (max-device-width: 480px) {
+    height: 35px;
+    width: 40px;
+  }
+  
 `;
 
 const LogoBSS = styled.img`
   height: 55px;
   align-self: center;
   padding-right: 10px;
+  @media only screen and (max-device-width: 480px) {
+    height: 35px;
+  }
+`;
+
+const LogoSPbU = styled.img`
+  height: 55px;
+  @media only screen and (max-device-width: 480px) {
+    height: 32px;
+  }
+
 `;
 
 const ButtonsBlock = styled.div`
@@ -53,6 +72,24 @@ const verticalAlign = css`
   display: flex; 
   flex-direction: column; 
   justify-content: center;
+`;
+
+const rightPanel = css `
+    @media only screen and (max-device-width: 480px) {
+    max-width: 55%;
+    flex: 0 0 55%;
+  }
+`;
+
+const FIO = css `
+margin-right: 20px; 
+font-size: medium;
+  @media only screen and (max-device-width: 800px) {
+    font-size: small;
+  }
+  @media only screen and (max-device-width: 480px) {
+    font-size: x-small;
+  }
 `;
 
 
@@ -72,7 +109,7 @@ class UserHeader extends Component {
       <div className="row" css={pageTop}>
         <div className="col-8" css={blockHeader}>
           <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
-            <img src={logoSPbU} css={css`height: 55px;`} alt={'СПбГУ'}/>
+            <LogoSPbU src={logoSPbU} alt={'СПбГУ'}/>
           </a>
           <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
             <div css={logoBackground}>
@@ -85,11 +122,11 @@ class UserHeader extends Component {
           </div>
         </div>
 
-        <div className="col-4">
+        <div className="col-4" css={rightPanel}>
           <div css={css`display: flex; justify-content: flex-end;`}>
 
             <div css={verticalAlign}>
-              <div css={css`margin-right: 20px; font-size: medium;`}>
+              <div css={FIO}>
                 {userPersonalStore && userPersonalStore.fio}
               </div>
             </div>
@@ -100,6 +137,10 @@ class UserHeader extends Component {
                   css={css`
                 border-color: #9F2D20;
                 color: #9F2D20;
+                  @media only screen and (max-device-width: 480px) {
+                    font-size: smaller;
+                    border-color: transparent;
+                 }
                 `}
                   action="/api/logout">
                 Выход
