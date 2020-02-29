@@ -13,14 +13,14 @@ passport.use(new ActiveDirectoryStrategy({
     console.log('AD', ad);
     if (profile)
         return done(null, profile);
-    else return (null, false)
+    else return done(null, false)
 }));
 
 
 passport.serializeUser( async function (user, done) {
     const id = user._json.sAMAccountName;
     const isUser = await db.isUser(id);
-    console.log('SpbuID', id + '@student.spbu.ru', 'IsUser:', isUser);
+    console.log('SpbuID', id + '@student.spbu.ru', 'IsUser:', !!isUser);
     let isRegistered = false;
     if (!isUser) {
             await db.createUser({

@@ -123,7 +123,7 @@ router.post('/login', async function (req, res) {
             console.log('ERROR', err);
             if(errState) return;
             errState = true;
-            return res.redirect('/login');
+            return res.sendStatus(400);
         }
 
         if (!newUser) {
@@ -136,9 +136,7 @@ router.post('/login', async function (req, res) {
             if (err) {
                 console.log('ERR', err)
             }
-            const returnTo = req.session.returnTo;
-            delete req.session.returnTo;
-            res.redirect(returnTo || '/home')
+            res.sendStatus(200)
         })
     })(req, res)
 });
