@@ -46,6 +46,7 @@ module.exports.getAnket = async function (req, res) {
         let f11 = fs.readFileSync(anketPath + '/docs/Anketa/word/styles.xml');
         let f12 = fs.readFileSync(anketPath + '/docs/Anketa/[Content_Types].xml');
         let f13 = fs.readFileSync(anketPath + '/docs/Anketa/word/theme/theme1.xml');
+        let f14 = fs.readFileSync(anketPath + '/docs/Anketa/word/webSettings.xml');
         /* тут все остальные файлы */
 
         /* создаём zip-объект */
@@ -61,6 +62,7 @@ module.exports.getAnket = async function (req, res) {
         zip.file('word/styles.xml', f11);
         zip.file('[Content_Types].xml', f12);
         zip.file('word/theme/theme1.xml', f13);
+        zip.file('word/webSettings.xml', f14);
         /* тут все остальные файлы */
 
         f06 = String(f06).replace("FIO", user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic);

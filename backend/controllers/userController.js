@@ -187,11 +187,12 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
             res.setHeader('Content-Disposition', 'inline');
             file.pipe(res);
         } else
-        if (filename.endsWith('.jpg')) {
+        if (filename.endsWith('.jpg') || filename.endsWith('.png') ) {
+            let ending = filename.endsWith('.jpg') ? 'jpg' : 'png';
             let file = fs.createReadStream(filePath);
             let stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
-            res.setHeader('Content-Type', 'image/jpg');
+            res.setHeader('Content-Type', 'image/' + ending);
             res.setHeader('Content-Disposition', 'inline');
             file.pipe(res);
         }
