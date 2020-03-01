@@ -137,6 +137,7 @@ router.post('/login', async function (req, res) {
                 console.log('ERR', err)
             }
             res.sendStatus(200)
+            console.log('AUTH RESULT', req.user);
         })
     })(req, res)
 });

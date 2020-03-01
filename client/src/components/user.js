@@ -36,6 +36,8 @@ class User extends Component {
   async componentDidMount() {
     const profile = await userPersonalStore.update();
     if (profile) {
+      //Promise.allSettled([CriteriasStore.getCriteriasForFaculty(profile.Faculty), CriteriasStore.getAnnotations(profile.Faculty)])
+      //  .then(() => this.setState({ready: true}));
       await CriteriasStore.getCriteriasForFaculty(profile.Faculty);
       if (CriteriasStore.criterias) await CriteriasStore.getAnnotations(profile.Faculty);
       this.setState({ready: true});
@@ -48,7 +50,6 @@ class User extends Component {
     // check authenticated status and toggle state based on that
     await Auth.fetchAuth();
     this.setState({authenticated: Auth.isUserAuthenticated()});
-    console.log(this.state.authenticated);
   }
 
   render() {
@@ -73,7 +74,6 @@ class User extends Component {
             </Suspense>
             </div>
           </div>
-        </div>
       }
       </div>
       </>);
