@@ -75,25 +75,28 @@ exports.NewUsers = function (faculty) {
     return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
 };
 
-exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
-    let error, users;
+exports.GetUsersWithAllInfo = async function (faculty, checked=false, stale=false) {
+    let users;
     if (!checked) {
-    error, users = await UserModel.find()
+    users = await UserModel.find()
         .or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
         .populate(
             {
                 path: 'Achievement',
+                match: { achDate: {$gte: '2019-02-1'}},
                 populate : {
                     path : 'confirmations.id'
                 }
             }
         ).lean().exec()
+        console.log(users);
     }
     else {
-        error, users = await UserModel.find({Faculty: faculty, IsInRating: true})
+        users = await UserModel.find({Faculty: faculty, IsInRating: true})
             .populate(
                 {
                     path: 'Achievement',
+                    match: { achDate: {$gte: '2019-02-1'}},
                     populate: {
                         path: 'confirmations.id'
                     }
@@ -101,7 +104,7 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false) {
             ).lean().exec()
     }
     return users
-}
+};
 
 exports.isUser = function(token){
     return UserModel.findOne({id: token},function(err, user){

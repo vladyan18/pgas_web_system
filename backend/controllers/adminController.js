@@ -4,9 +4,6 @@ const notify = require('./notificationController');
 const history = require('./historyNotesController');
 const path = require('path');
 const Kri = require(__dirname + "/Kriterii.json");
-const fs = require('fs');
-const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
-const upload = require(path.join(__dirname, '../config/multer'));
 const EventEmitter = require('events');
 class UpdateEmitter extends EventEmitter {}
 const AdminEmitter = new UpdateEmitter();
