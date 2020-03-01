@@ -1,7 +1,7 @@
 'use strict'
 const passport = require('passport');
 const db = require('../controllers/dbController');
-let ActiveDirectoryStrategy = require('./ldapstrategy');
+const ActiveDirectoryStrategy = require('./ldapstrategy');
 
 passport.use(new ActiveDirectoryStrategy({
     integrated: false,
@@ -10,7 +10,7 @@ passport.use(new ActiveDirectoryStrategy({
         baseDN: 'dc=ad,dc=pu,dc=com',
     }
 }, function (profile, ad, done) {
-    console.log('AD', ad);
+    console.log('AD', profile, ad);
     if (profile)
         return done(null, profile);
     else return done(null, false)
@@ -45,6 +45,7 @@ passport.serializeUser( async function (user, done) {
 });
 
 passport.deserializeUser(function (user, done) {
+    console.log('Des', user.user_id);
     done(null, user)
 });
 
