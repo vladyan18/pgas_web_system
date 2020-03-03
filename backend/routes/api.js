@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /** Express router providing API
  * @module API
  * @requires express
@@ -10,6 +10,7 @@
  * @const
  */
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const userController = require('../controllers/userController.js');
 const adminController = require('../controllers/adminController.js');
@@ -25,33 +26,32 @@ const db = require('../controllers/dbController.js');
  * @function adminAuth
  * */
 const adminAuth = async (req, res, next) => {
-    let id;
-    if (req.user._json && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
-    let User = await db.findUserById(id);
-    if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
-        next()
-    }
-    else {
-        return res.redirect('/404')
-    }
+  let id;
+  if (req.user._json && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+  const User = await db.findUserById(id);
+  if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
+    next();
+  } else {
+    return res.redirect('/404');
+  }
 };
 
 
 const superAdminAuth = async (req, res, next) => {
-    let id;
-    if (req.user._json && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
-    console.log(id);
-    let User = await db.findUserById(id);
-    console.log(User);
-    if (req.isAuthenticated() && (User.Role === 'SuperAdmin')) {
-        next()
-    } else {
-        return res.redirect('/404')
-    }
+  let id;
+  if (req.user._json && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+  console.log(id);
+  const User = await db.findUserById(id);
+  console.log(User);
+  if (req.isAuthenticated() && (User.Role === 'SuperAdmin')) {
+    next();
+  } else {
+    return res.redirect('/404');
+  }
 };
 
 /**
@@ -60,12 +60,11 @@ const superAdminAuth = async (req, res, next) => {
  * @function regAuth
  * */
 const regAuth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next()
-    }
-    else {
-        return res.redirect('/login')
-    }
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    return res.redirect('/login');
+  }
 };
 
 /**
@@ -76,12 +75,11 @@ const regAuth = (req, res, next) => {
  * @function auth
  * */
 const auth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-            next();
-    }
-    else {
-        return res.sendStatus(401);
-    }
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    return res.sendStatus(401);
+  }
 };
 
 /**
@@ -112,7 +110,7 @@ router.get('/getRights', auth, userController.getRights);
  * @path {POST} /comment
  * @auth adminAuth required
  */
-router.post('/comment', adminAuth, adminController.Comment);
+router.post('/comment', adminAuth, adminController.comment);
 
 /**
  * Add achievement
@@ -185,7 +183,7 @@ router.post('/adm_update_achieve', adminAuth, adminController.updateAchieve);
  * @path {GET} /getUsersForAdmin
  * @auth adminAuth required
  */
-router.get('/getUsersForAdmin', adminAuth, adminController.dynamic);
+router.get('/getUsersForAdmin', adminAuth, adminController.getUsersForAdmin);
 
 /**
  * Approve achievement
@@ -193,7 +191,7 @@ router.get('/getUsersForAdmin', adminAuth, adminController.dynamic);
  * @path {POST} /AchSuccess
  * @auth adminAuth required
  */
-router.post('/AchSuccess', adminAuth, adminController.AchSuccess);
+router.post('/AchSuccess', adminAuth, adminController.acceptAchievement);
 
 /**
  * Decline achievement
@@ -201,7 +199,7 @@ router.post('/AchSuccess', adminAuth, adminController.AchSuccess);
  * @path {POST} /AchFailed
  * @auth adminAuth required
  */
-router.post('/AchFailed', adminAuth, adminController.AchFailed);
+router.post('/AchFailed', adminAuth, adminController.declineAchievement);
 
 /**
  * Add user to rating
@@ -209,7 +207,7 @@ router.post('/AchFailed', adminAuth, adminController.AchFailed);
  * @path {POST} /AddToRating
  * @auth adminAuth required
  */
-router.post('/AddToRating', adminAuth, adminController.AddToRating);
+router.post('/AddToRating', adminAuth, adminController.addUserToRating);
 
 /**
  * Remove user from rating
@@ -217,7 +215,7 @@ router.post('/AddToRating', adminAuth, adminController.AddToRating);
  * @path {POST} /RemoveFromRating
  * @auth adminAuth required
  */
-router.post('/RemoveFromRating', adminAuth, adminController.RemoveFromRating);
+router.post('/RemoveFromRating', adminAuth, adminController.removeUserFromRating);
 
 /**
  * Set role as user
@@ -243,7 +241,7 @@ router.post('/createAdmin', superAdminAuth, adminController.createAdmin);
  * @path {GET} /checked
  * @auth adminAuth required
  */
-router.get('/checked', adminAuth, adminController.Checked);
+router.get('/checked', adminAuth, adminController.getCheckedUsers);
 
 router.get('/getFacultiesList', auth, facultyController.getFacultiesList);
 
@@ -251,7 +249,6 @@ router.get('/getFaculty', auth, facultyController.getFaculty);
 
 router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
 
-router.get('/prepareForNewPgas', superAdminAuth, adminController.prepareForNewPgas);
 
 /**
  * Get current rating for admin
@@ -311,14 +308,14 @@ router.get('/getStatistics', adminAuth, adminController.getStatisticsForFaculty)
  * @path {GET} /getHistory
  * @auth adminAuth required
  */
-router.get('/getHistory', adminAuth, historyController.GetHistory);
+router.get('/getHistory', adminAuth, historyController.getHistory);
 
 router.post('/uploadCriterias', criteriasController.upload);
 
 router.post('/saveCriterias', superAdminAuth, criteriasController.saveCriteriasForFaculty);
 
-router.post('/updateAnnotations', adminAuth, criteriasController.UploadAnnotationsToFaculty);
-router.get('/getAnnotations', auth, criteriasController.GetAnnotationsForFaculty);
+router.post('/updateAnnotations', adminAuth, criteriasController.uploadAnnotationsToFaculty);
+router.get('/getAnnotations', auth, criteriasController.getAnnotationsForFaculty);
 
 router.get('/getCriterias', auth, criteriasController.getCriterias);
 

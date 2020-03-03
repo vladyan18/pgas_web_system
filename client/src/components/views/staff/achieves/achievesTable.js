@@ -11,12 +11,18 @@ class AchievesTable extends Component {
         this.accept = this.accept.bind(this);
         this.decline = this.decline.bind(this);
         this.edit = this.edit.bind(this);
-        this.handleCommentChange = this.handleCommentChange.bind(this)
+        this.handleCommentChange = this.handleCommentChange.bind(this);
+        this.auto_grow = this.auto_grow.bind(this);
     };
+
+    auto_grow(e) {
+        e.target.style.height = "5px";
+        e.target.style.height = (e.target.scrollHeight)+"px";
+    }
 
     statusFormatter = (cell, row) => (
         row.status + (row.ball ? '('+row.ball+')': '')
-    )
+    );
 
     charsFormatter = (cell, row) =>
         (
@@ -34,18 +40,28 @@ class AchievesTable extends Component {
     newComments = {};
     commentsFormatter = (cell, row) =>
         (
-            <div className="input-group commentContainer" onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget))
-                    document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
-            }}>
+            <div className="input-group commentContainer" style={{height: 'unset', width: '100%'}}>
+                <div style={{width: '100%'}}>
             <textarea id={row._id} className={"form-control" + (row.comment ? " commentSended" : "")}
     defaultValue={row.comment}
-    onChange={(e) => this.newComments[row._id] = e.target.value} style={{height: "8.2rem"}}/>
-                <div className="input-group-append" style={{"marginRight": "0px"}}>
-                    <button class="btn btn-info" style={{"font-size": "x-small", "margin": "0px", backgroundColor: "#3d5c61"}} onClick={(e) => {
+    onChange={(e) => this.newComments[row._id] = e.target.value} style={{height: "8.2rem", width: '100%'}}/>
+                <div  style={{"marginRight": "0px"}}>
+                    <button className="btn btn-danger"
+                            style={{"font-size": "xx-small", "margin": "0px", backgroundColor: "#61363a"}}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
+                            }}>Отмена
+                    </button>
+                    <button className="btn btn-info" style={{"font-size": "xx-small", "margin": "0px", backgroundColor: "#3d5c61"}}
+                             onClick={(e) => {
+                        //e.preventDefault();
+                        //e.stopPropagation();
                         this.handleCommentChange(e, row._id)
                     }}>Ок
                     </button>
+                </div>
                 </div>
             </div>
         );
@@ -171,12 +187,12 @@ class AchievesTable extends Component {
     }
 
     render() {
-        let filteredAchieves
+        let filteredAchieves;
         if (this.props.filters.hideCheckedAchieves)
         {
             filteredAchieves = this.props.data.filter(x => (x.status != 'Принято' && x.status != 'Принято с изменениями'))
         }
-        else filteredAchieves = this.props.data
+        else filteredAchieves = this.props.data;
         return (
             <div className="adminAchievesTableContainer">
                 <BootstrapTable keyField='_id' data={filteredAchieves} columns={this.columns}

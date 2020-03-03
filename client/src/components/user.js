@@ -12,8 +12,8 @@ import CriteriasStore from '../stores/criteriasStore';
 import {Switch, withRouter} from 'react-router-dom';
 import {observer} from 'mobx-react';
 
-import EditAchievementContainer from './containers/user/editAchievementContainer';
-import UserAddAchievementContainer from './containers/user/userAddAchievementContainer';
+const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
+const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
 const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
 
 const PrivateRoute = ({component: Component, ...rest}) => (

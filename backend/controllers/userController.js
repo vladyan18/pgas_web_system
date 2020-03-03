@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /** User controller
  * @module userController
  */
@@ -12,99 +12,98 @@ const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
 const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
 
 /**
- * Get all new canditates
+ * Get all new candidates
  * @function dynamic
  * */
-module.exports.dynamic = async function (req, res) {
-    let id;
-    if (req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
+module.exports.dynamic = async function(req, res) {
+  let id;
+  if (req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
 
-    let User = await db.findUserById(id) // TODO OPTIMIZE
-    if (User)
-        await db.findActualAchieves(id).then(async (v) => {
-                for (let i = 0; i < v.length; i++) {
-                    let confirms = [];
-                    if (v[i].confirmations)
-                        for (let j = 0; j < v[i].confirmations.length; j++) {
+  const User = await db.findUserById(id); // TODO OPTIMIZE
+  if (User) {
+    await db.findActualAchieves(id).then(async (v) => {
+      for (let i = 0; i < v.length; i++) {
+        const confirms = [];
+        if (v[i].confirmations) {
+          for (let j = 0; j < v[i].confirmations.length; j++) {
+            const confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
+            if (!confirm) continue;
+            confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
+            confirms.push(confirm);
+          }
+        }
+        v[i].confirmations = confirms;
+      }
 
-                            let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
-                            if (!confirm) continue;
-                            confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
-                            confirms.push(confirm)
-                        }
-                    v[i].confirmations = confirms;
-                }
-
-                User.Achs = v;
-                res.status(200).send(User)
-        })
-    else res.status(404).send({Error: 404})
-
+      User.Achs = v;
+      res.status(200).send(User);
+    });
+  } else res.status(404).send({Error: 404});
 };
 
 /**
  * Get user profile
  * @function getProfile
  * */
-module.exports.getProfile = async function (req, res) {
-    let User;
-    if (req.user._json.email)
-        User = await db.findUserById(req.user._json.email);
-    else User = await db.findUserById(req.user.user_id);
+module.exports.getProfile = async function(req, res) {
+  let User;
+  if (req.user._json.email) {
+    User = await db.findUserById(req.user._json.email);
+  } else User = await db.findUserById(req.user.user_id);
 
-    if (User && User.Registered)
-        res.status(200).send({
-            id: User.id,
-            LastName: User.LastName,
-            FirstName: User.FirstName,
-            Patronymic: User.Patronymic,
-            Birthdate: User.Birthdate,
-            SpbuId: User.SpbuId,
-            Faculty: User.Faculty,
-            Direction: User.Direction,
-            Type: User.Type,
-            Course: User.Course,
-            IsInRating: User.IsInRating
-        });
-    else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName})
+  if (User && User.Registered) {
+    res.status(200).send({
+      id: User.id,
+      LastName: User.LastName,
+      FirstName: User.FirstName,
+      Patronymic: User.Patronymic,
+      Birthdate: User.Birthdate,
+      SpbuId: User.SpbuId,
+      Faculty: User.Faculty,
+      Direction: User.Direction,
+      Type: User.Type,
+      Course: User.Course,
+      IsInRating: User.IsInRating,
+    });
+  } else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName});
 };
 
-module.exports.getRights = async function (req, res) {
-    let User = await db.getUserRights(req.query.id);
-    res.status(200).send({Role: User.Role, Rights: User.Rights})
+module.exports.getRights = async function(req, res) {
+  const User = await db.getUserRights(req.query.id);
+  res.status(200).send({Role: User.Role, Rights: User.Rights});
 };
 
-module.exports.isAuth = async function (req, res) {
-    console.log('IsAuth:', req.isAuthenticated());
-    if (req.isAuthenticated())
-        res.json({
-            success: true,
-            message: "user has successfully authenticated ",
-            role: req.user.Role,
-            rights: req.user.Rights,
-            cookies: req.cookies
-        });
-    else res.status(401).send()
+module.exports.isAuth = async function(req, res) {
+  console.log('IsAuth:', req.isAuthenticated());
+  if (req.isAuthenticated()) {
+    res.json({
+      success: true,
+      message: 'user has successfully authenticated ',
+      role: req.user.Role,
+      rights: req.user.Rights,
+      cookies: req.cookies,
+    });
+  } else res.status(401).send();
 };
 
 /**
  * Get achievement
  * @function getAch
  * */
-module.exports.getAch = async function (req, res) {
-    let id = req.query.achievement;
-    let ach = await db.findAchieveById(id);
-    let confirms = [];
+module.exports.getAch = async function(req, res) {
+  const id = req.query.achievement;
+  const ach = await db.findAchieveById(id);
+  const confirms = [];
 
-    for (let i = 0; i < ach.confirmations.length; i++) {
-        let confirm = await db.getConfirmByIdForUser(ach.confirmations[i].id);
-        confirm.additionalInfo = ach.confirmations[i].additionalInfo;
-        confirms.push(confirm)
-    }
-    ach.confirmations = confirms;
-    res.status(200).send(ach)
+  for (let i = 0; i < ach.confirmations.length; i++) {
+    const confirm = await db.getConfirmByIdForUser(ach.confirmations[i].id);
+    confirm.additionalInfo = ach.confirmations[i].additionalInfo;
+    confirms.push(confirm);
+  }
+  ach.confirmations = confirms;
+  res.status(200).send(ach);
 };
 
 /**
@@ -112,144 +111,140 @@ module.exports.getAch = async function (req, res) {
  * @function registerUser
  * */
 
-module.exports.registerUser = async function (req, res) {
-    try {
-        let data = req.body;
-        console.log('New registration: ', data);
-        let id;
-        if (req.user && req.user._json.email)
-            id = req.user._json.email;
-        else id = req.user.user_id;
-        await db.registerUser(id, data.lastname, data.name, data.patronymic,
-            data.birthdate, data.spbuId, data.faculty, data.course, data.type,
-            data.settings);
-        req.session.passport.user.Registered = true;
-        req.session.save(function (err) {
-            console.log(err);
+module.exports.registerUser = async function(req, res) {
+  try {
+    const data = req.body;
+    console.log('New registration: ', data);
+    let id;
+    if (req.user && req.user._json.email) {
+      id = req.user._json.email;
+    } else id = req.user.user_id;
+    await db.registerUser(id, data.lastname, data.name, data.patronymic,
+        data.birthdate, data.spbuId, data.faculty, data.course, data.type,
+        data.settings);
+    req.session.passport.user.Registered = true;
+    req.session.save(function(err) {
+      console.log(err);
+    });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+};
+
+module.exports.addConfirmation = function(req, res) {
+  const data = req.body;
+  data.Date = Date.now();
+  if (data.Data) {
+    if (!(data.Data.startsWith('http://') || data.Data.startsWith('https://'))) {
+      data.Data = '//' + data.Data;
+    }
+  }
+  let id;
+  if (req.user && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+
+  const userPromise = db.findUserById(id);
+
+  db.createConfirmation(data).then(
+      (result) => {
+        userPromise.then((user) => {
+          if (!user.Confirmations || !user.Confirmations.some((x) => x === result._id.toString())) {
+            db.addConfirmationToUser(user._id, result._id).then(() => res.status(200).send(result));
+          } else res.status(200).send(result);
         });
-        res.sendStatus(200)
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err)
-    }
+      },
+  );
 };
 
-module.exports.addConfirmation = function (req, res) {
-    let data = req.body;
-    data.Date = Date.now();
-    if (data.Data)
-        if (!(data.Data.startsWith('http://') || data.Data.startsWith('https://')))
-            data.Data = '//' + data.Data;
+module.exports.getConfirmations = async function(req, res) { // TODO SECURITY
+  let id;
+  if (req.user && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+  const user = await db.findUserById(id);
+  const confirms = await db.getConfirmations(user.Confirmations);
+  res.status(200).send(confirms);
+};
+
+
+module.exports.getConfirmation = async function(req, res) { // TODO SECURITY
+  let filename = await req.url.slice(12);
+
+  const filePath = path.join(__dirname, '../static/confirmations/' + filename);
+
+  filename = filename.substr(filename.search('-') + 1);
+  filename = filename.substr(filename.search('-') + 1);
+  try {
+    if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI');
+    if (filename.endsWith('.pdf')) {
+      const file = fs.createReadStream(filePath);
+      const stat = fs.statSync(filePath);
+      res.setHeader('Content-Length', stat.size);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+      file.pipe(res);
+    } else
+    if (filename.endsWith('.jpg') || filename.endsWith('.png') ) {
+      const ending = filename.endsWith('.jpg') ? 'jpg' : 'png';
+      const file = fs.createReadStream(filePath);
+      const stat = fs.statSync(filePath);
+      res.setHeader('Content-Length', stat.size);
+      res.setHeader('Content-Type', 'image/' + ending);
+      res.setHeader('Content-Disposition', 'inline');
+      file.pipe(res);
+    } else {
+      res.setHeader('Content-Disposition', 'inline; filename=' + filename);
+      res.setHeader('Content-Transfer-Encoding', 'binary');
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.sendFile(filePath);
+    }
+  } catch (e) {
+    if (e instanceof URIError) {
+      console.log(e);
+      res.sendStatus(404);
+    } else {
+      res.sendStatus(400);
+      throw e;
+    }
+  }
+};
+
+module.exports.addFileForConfirmation = function(req, res) {
+  if (!fs.existsSync(uploadsConfirmationsPath)) {
+    fs.mkdirSync(uploadsConfirmationsPath);
+  }
+
+  uploadConfirmation(req, res, async function(err) {
     let id;
-    if (req.user && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
+    if (req.user && req.user._json.email) {
+      id = req.user._json.email;
+    } else id = req.user.user_id;
 
-    let userPromise = db.findUserById(id);
+    const userPromise = db.findUserById(id);
 
-    db.createConfirmation(data).then(
+    if (err) {
+      return res.status(400).send('ERROR: Max file size = 15MB');
+    }
+
+    const confirmation = JSON.parse(req.body.data);
+    confirmation.FilePath = req.file.path;
+    confirmation.Data = '/api/getConfirm/' + req.file.filename;
+    confirmation.Date = Date.now();
+    confirmation.Size = req.file.size;
+    db.createConfirmation(confirmation).then(
         (result) => {
-            userPromise.then((user) => {
-                if (!user.Confirmations || !user.Confirmations.some((x) => x == result._id.toString())) {
-                    db.addConfirmationToUser(user._id, result._id).then(() => res.status(200).send(result))
-                } else res.status(200).send(result)
-            })
-
-        }
-    )
-};
-
-module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
-    let id;
-    if (req.user && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
-    let user = await db.findUserById(id);
-    let confirms = await db.getConfirmations(user.Confirmations);
-    res.status(200).send(confirms)
-};
-
-
-module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
-    let filename = await req.url.slice(12);
-
-    let filePath = path.join(__dirname, '../static/confirmations/' + filename);
-
-    filename = filename.substr(filename.search('-') + 1);
-    filename = filename.substr(filename.search('-') + 1);
-    try {
-        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI');
-        if (filename.endsWith('.pdf')) {
-            let file = fs.createReadStream(filePath);
-            let stat = fs.statSync(filePath);
-            res.setHeader('Content-Length', stat.size);
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', 'inline');
-            file.pipe(res);
-        } else
-        if (filename.endsWith('.jpg') || filename.endsWith('.png') ) {
-            let ending = filename.endsWith('.jpg') ? 'jpg' : 'png';
-            let file = fs.createReadStream(filePath);
-            let stat = fs.statSync(filePath);
-            res.setHeader('Content-Length', stat.size);
-            res.setHeader('Content-Type', 'image/' + ending);
-            res.setHeader('Content-Disposition', 'inline');
-            file.pipe(res);
-        }
-        else{
-            res.setHeader('Content-Disposition', 'inline; filename=' + filename);
-            res.setHeader('Content-Transfer-Encoding', 'binary');
-            res.setHeader('Content-Type', 'application/octet-stream');
-            res.sendFile(filePath)
-        }
-    }
-    catch (e) {
-        if (e instanceof URIError) {
-            console.log(e);
-            res.sendStatus(404);
-        } else
-        {
-            res.sendStatus(400);
-            throw e;
-        }
-    }
-};
-
-module.exports.addFileForConfirmation = function (req, res) {
-
-    if (!fs.existsSync(uploadsConfirmationsPath)) {
-        fs.mkdirSync(uploadsConfirmationsPath)
-    }
-
-    uploadConfirmation(req, res, async function (err) {
-        let id;
-        if (req.user && req.user._json.email)
-            id = req.user._json.email;
-        else id = req.user.user_id;
-
-        let userPromise = db.findUserById(id);
-
-        if (err) {
-            return res.status(400).send('ERROR: Max file size = 15MB')
-        }
-
-        let confirmation = JSON.parse(req.body.data);
-        confirmation.FilePath = req.file.path;
-        confirmation.Data = '/api/getConfirm/' + req.file.filename;
-        confirmation.Date = Date.now();
-        confirmation.Size = req.file.size;
-        db.createConfirmation(confirmation).then(
-            (result) => {
-                result.FilePath = undefined;
-                userPromise.then((user) => {
-                    if (!user.Confirmations || !user.Confirmations.some((x) => x == result._id.toString())) {
-                        db.addConfirmationToUser(user._id, result._id).then(() => res.status(200).send(result))
-                    } else res.status(200).send(result)
-                })
-
-            }
-        )
-    })
+          result.FilePath = undefined;
+          userPromise.then((user) => {
+            if (!user.Confirmations || !user.Confirmations.some((x) => x === result._id.toString())) {
+              db.addConfirmationToUser(user._id, result._id).then(() => res.status(200).send(result));
+            } else res.status(200).send(result);
+          });
+        },
+    );
+  });
 };
 
 
@@ -326,179 +321,174 @@ autoCheckConfirms = async function (achievement) {
 */
 
 
-module.exports.addAchieve = function (req, res) {
-    if (!fs.existsSync(uploadsPath)) {
-        fs.mkdirSync(uploadsPath)
+module.exports.addAchieve = function(req, res) {
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath);
+  }
+  upload(req, res, async function(err) {
+    try {
+      if (err) {
+        return res.status(400).send('ERROR: Max file size = 15MB');
+      }
+
+      let id;
+      if (req.user._json && req.user._json.email) {
+        id = req.user._json.email;
+      } else id = req.user.user_id;
+
+      const achieve = JSON.parse(req.body.data);
+      const user = await db.findUserById(id);
+      let validationResult = false;
+      try {
+        validationResult = await db.validateAchievement(achieve, user);
+      } catch (e) {
+        console.log('Ach validation outer error');
+      }
+      if (!validationResult) return res.sendStatus(400);
+
+      const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      };
+      achieve.status = 'Ожидает проверки';
+      achieve.date = new Date().toLocaleString('ru', options);
+
+
+      achieve.comment = '';
+      const createdAchieve = await db.createAchieve(achieve);
+      await db.addAchieveToUser(id, createdAchieve._id);
+      // autoCheckConfirms(createdAchieve).then();
+      res.sendStatus(200);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
     }
-    upload(req, res, async function (err) {
-        try {
-            if (err) {
-                return res.status(400).send('ERROR: Max file size = 15MB')
-            }
-
-            let id;
-            if (req.user._json && req.user._json.email)
-                id = req.user._json.email;
-            else id = req.user.user_id;
-
-            let achieve = JSON.parse(req.body.data);
-            const user = await db.findUserById(id);
-            let validationResult = false;
-            try {
-                validationResult = await db.validateAchievement(achieve, user);
-            } catch (e) {
-                console.log('Ach validation outer error');
-            }
-            if (!validationResult) return res.sendStatus(400);
-
-            const options = {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            };
-            achieve.status = 'Ожидает проверки';
-            achieve.date = new Date().toLocaleString('ru', options);
-
-
-            achieve.comment = '';
-            let createdAchieve = await db.createAchieve(achieve);
-            await db.addAchieveToUser(id, createdAchieve._id);
-            //autoCheckConfirms(createdAchieve).then();
-            res.sendStatus(200)
-        } catch (err) {
-            console.log(err);
-            res.status(500).send(err)
-        }
-    })
+  });
 };
 
 /**
  * Change achieve
  * @function updateAchieve
  * */
-module.exports.updateAchieve = async function (req, res) {
+module.exports.updateAchieve = async function(req, res) {
+  try {
+    const achieve = req.body.data;
+
+    let userId;
+    if (req.user._json && req.user._json.email) {
+      userId = req.user._json.email;
+    } else userId = req.user.user_id;
+
+    const user = await db.findUserById(userId);
+    let validationResult = false;
     try {
-        let achieve = req.body.data;
+      validationResult = await db.validateAchievement(achieve, user);
+    } catch (e) {
+      console.log('Ach validation outer error');
+    }
 
-        let user_id;
-        if (req.user._json && req.user._json.email)
-            user_id = req.user._json.email;
-        else user_id = req.user.user_id;
+    if (!validationResult) return res.sendStatus(400);
 
-        const user = await db.findUserById(user_id);
-        let validationResult = false;
-        try {
-            validationResult = await db.validateAchievement(achieve, user);
-        } catch (e) {
-            console.log('Ach validation outer error');
+    const id = req.body.achId;
+    const options = {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    };
+    const oldAch = await db.findAchieveById(id);
+    for (const field of Object.keys(req.body.data)) {
+      if (field === 'confirmations' || field === 'achDate') {
+        continue;
+      }
+      if (field === 'chars') {
+        let changeDetected = false;
+        if (oldAch.chars.length !== req.body.data.chars.length) {
+          changeDetected = true;
         }
-
-        if (!validationResult) return res.sendStatus(400);
-
-            let id = req.body.achId;
-            let options = {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            };
-            let oldAch = await db.findAchieveById(id);
-            for (let field of Object.keys(req.body.data))
-            {
-                if (field == 'confirmations' || field == 'achDate')
-                {
-                    continue
-                }
-                if (field == 'chars')
-                {
-                    let changeDetected = false;
-                    if (oldAch.chars.length !== req.body.data.chars.length) {
-                        changeDetected = true;
-                    }
-                    for (let i = 0; i < oldAch.chars.length; i++)
-                        if (oldAch.chars[i] !== req.body.data.chars[i])
-                        {
-                            changeDetected = true;
-                            break
-                        }
-                    if (!changeDetected) continue
-                }
-                if (oldAch[field] != req.body.data[field])
-                {
-                    achieve.status = 'Ожидает проверки';
-                    achieve.ball = undefined
-                }
-            }
-
-            achieve.date = new Date().toLocaleString('ru', options);
-
-            await db.updateAchieve(id, achieve);
-            //autoCheckConfirms(createdAchieve).then();
-            res.sendStatus(200)
-        } catch (err) {
-            console.log(err);
-            res.status(500).send(err)
+        for (let i = 0; i < oldAch.chars.length; i++) {
+          if (oldAch.chars[i] !== req.body.data.chars[i]) {
+            changeDetected = true;
+            break;
+          }
         }
+        if (!changeDetected) continue;
+      }
+      if (oldAch[field] !== req.body.data[field]) {
+        achieve.status = 'Ожидает проверки';
+        achieve.ball = undefined;
+      }
+    }
+
+    achieve.date = new Date().toLocaleString('ru', options);
+
+    await db.updateAchieve(id, achieve);
+    // autoCheckConfirms(createdAchieve).then();
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
 };
 
 /**
  * Delete achieve
  * @function deleteAchieve
  * */
-module.exports.deleteAchieve = async function (req, res) {
+module.exports.deleteAchieve = async function(req, res) {
+  try {
+    const id = req.body.achId;
 
-        try {
-            let id = req.body.achId;
+    let User;
+    if (req.user._json.email) {
+      User = await db.findUserById(req.user._json.email);
+    } else User = await db.findUserById(req.user.user_id);
 
-            let User;
-            if (req.user._json.email)
-                User = await db.findUserById(req.user._json.email);
-            else User = await db.findUserById(req.user.user_id);
+    if (User.Role !== 'Admin' && User.Role !== 'SuperAdmin' && !User.Achievement.some((o) => (o && o === id))) {
+      return res.sendStatus(404);
+    }
 
-            if (User.Role !== 'Admin' &&  User.Role !== 'SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
-                return res.sendStatus(404);
-
-            await db.deleteAchieve(id);
-            res.sendStatus(200)
-        } catch (err) {
-            console.log(err);
-            res.status(500).send(err)
-        }
+    await db.deleteAchieve(id);
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
 };
 
-module.exports.getRating = async function (req, res) {
+module.exports.getRating = async function(req, res) {
+  let id;
+  if (req.user && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
 
-    let id;
-    if (req.user && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
+  const requestingUser = await db.findUserById(id);
 
-    let requestingUser = await db.findUserById(id);
+  const facultyName = req.query.faculty;
+  if (requestingUser.Faculty !== facultyName) {
+    res.sendStatus(401);
+    return;
+  }
 
-    let facultyName = req.query.faculty;
-    if (requestingUser.Faculty !== facultyName) {
-        res.sendStatus(401);
-        return
+  const kri = JSON.parse((await db.getCriterias(facultyName)).Crits);
+  const users = [];
+  const Users = await db.getCurrentUsers(facultyName);
+  for (const user of Users) {
+    let sumBall = 0;
+    const crits = {};
+    for (const key of Object.keys(kri)) {
+      crits[key] = 0;
     }
-
-    let kri = JSON.parse((await db.GetCriterias(facultyName)).Crits)
-    let users = [];
-    let Users = await db.CurrentUsers(facultyName);
-    for (let user of Users) {
-        let sumBall = 0;
-        let crits = {};
-        for (let key of Object.keys(kri)) {
-            crits[key] = 0;
-        }
-        let Achs = await db.findActualAchieves(user.id);
-        for(let ach of Achs) {
-            if (!ach) continue;
-            if (ach.ball) {
-                crits[ach.crit] += ach.ball;
-                sumBall += ach.ball;
-            }
-        }
-        let fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
-        users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction})
+    const Achs = await db.findActualAchieves(user.id);
+    for (const ach of Achs) {
+      if (!ach) continue;
+      if (ach.ball) {
+        crits[ach.crit] += ach.ball;
+        sumBall += ach.ball;
+      }
     }
-    res.status(200).send({ Users: users })
+    const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+    users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction});
+  }
+  res.status(200).send({Users: users});
 };

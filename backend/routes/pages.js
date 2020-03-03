@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /** Express router providing html pages
  * @module pagesRouter
  * @requires express
@@ -16,6 +16,7 @@ const express = require('express');
  * @type {object}
  * @const
  */
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const path = require('path');
 const passport = require('passport');
@@ -30,14 +31,13 @@ const db = require('../controllers/dbController.js');
  * @function auth
  * */
 const auth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        if (req.user.Registered)
-            next();
-        else return res.redirect('/register')
-    }
-    else {
-        return res.redirect('/login')
-    }
+  if (req.isAuthenticated()) {
+    if (req.user.Registered) {
+      next();
+    } else return res.redirect('/register');
+  } else {
+    return res.redirect('/login');
+  }
 };
 
 /**
@@ -46,12 +46,11 @@ const auth = (req, res, next) => {
  * @function regAuth
  * */
 const regAuth = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next()
-    }
-    else {
-        return res.redirect('/login')
-    }
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    return res.redirect('/login');
+  }
 };
 
 /**
@@ -60,17 +59,16 @@ const regAuth = (req, res, next) => {
  * @function adminAuth
  * */
 const adminAuth = async (req, res, next) => {
-    let id;
-    if (req.user._json && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
-    let User = await db.findUserById(id);
-    if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
-        next()
-    }
-    else {
-        return res.redirect('/404')
-    }
+  let id;
+  if (req.user._json && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+  const User = await db.findUserById(id);
+  if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
+    next();
+  } else {
+    return res.redirect('/404');
+  }
 };
 
 /**
@@ -79,17 +77,16 @@ const adminAuth = async (req, res, next) => {
  * @function adminAuth
  * */
 const superAdminAuth = async (req, res, next) => {
-    let id;
-    if (req.user._json && req.user._json.email)
-        id = req.user._json.email;
-    else id = req.user.user_id;
-    let User = await db.findUserById(id);
-    if (req.isAuthenticated() && User.Role === 'SuperAdmin') {
-        next()
-    }
-    else {
-        return res.redirect('/404')
-    }
+  let id;
+  if (req.user._json && req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+  const User = await db.findUserById(id);
+  if (req.isAuthenticated() && User.Role === 'SuperAdmin') {
+    next();
+  } else {
+    return res.redirect('/404');
+  }
 };
 
 /**
@@ -99,47 +96,47 @@ const superAdminAuth = async (req, res, next) => {
  */
 router.get('/', (req, res) => res.redirect('/home'));
 
-router.post('/login', async function (req, res) {
-    let errState = false;
-    let username = '';
-    console.log('Start logging', req.body.username);
-    if (req.body.username.indexOf('@') !== -1) {
-        username = req.body.username.substring(0, req.body.username.indexOf('@')) + '@ad.pu.ru';
-    } else {
-        username = req.body.username + '@ad.pu.ru';
+router.post('/login', async function(req, res) {
+  let errState = false;
+  let username = '';
+  console.log('Start logging', req.body.username);
+  if (req.body.username.indexOf('@') !== -1) {
+    username = req.body.username.substring(0, req.body.username.indexOf('@')) + '@ad.pu.ru';
+  } else {
+    username = req.body.username + '@ad.pu.ru';
+  }
+  const opts = {
+    ldap: {
+      url: process.env.LDAP_URL,
+      baseDN: 'dc=ad,dc=pu,dc=ru', username: username, password: req.body.password,
+    },
+  };
+  const st = req.body.username.substring(0, req.body.username.indexOf('@'));
+  // req.body.username = username;
+  passport.authenticate('ActiveDirectory', opts, (err, user, info) => {
+    let newUser = user;
+    console.log('LOGGED', err, newUser, info);
+    if (err) {
+      console.log('ERROR', err);
+      if (errState) return;
+      errState = true;
+      return res.sendStatus(400);
     }
-    let opts = {
-        ldap: {
-            url: process.env.LDAP_URL,
-            baseDN: 'dc=ad,dc=pu,dc=ru', username: username, password: req.body.password
-        }
-    };
-    let st = req.body.username.substring(0, req.body.username.indexOf('@'));
-    //req.body.username = username;
-    passport.authenticate('ActiveDirectory', opts,  (err, user, info) => {
-        let newUser = user;
-        console.log('LOGGED', err, newUser, info);
-        if (err) {
-            console.log('ERROR', err);
-            if(errState) return;
-            errState = true;
-            return res.sendStatus(400);
-        }
 
-        if (!newUser) {
-            newUser = {};
-            newUser._json = {};
-            newUser._json.sAMAccountName = st;
-        }
+    if (!newUser) {
+      newUser = {};
+      newUser._json = {};
+      newUser._json.sAMAccountName = st;
+    }
 
-        req.logIn(newUser, async function (err) {
-            if (err) {
-                console.log('ERR', err)
-            }
-            res.sendStatus(200)
-            console.log('AUTH RESULT', req.user);
-        })
-    })(req, res)
+    req.logIn(newUser, async function(err) {
+      if (err) {
+        console.log('ERR', err);
+      }
+      res.sendStatus(200);
+      console.log('AUTH RESULT', req.user);
+    });
+  })(req, res);
 });
 
 /**
@@ -148,8 +145,8 @@ router.post('/login', async function (req, res) {
  * @path {GET} /home
  * @auth
  */
-router.get('/home', auth,  (req, res) => {
-    res.sendFile(path.join(frontendPath, '/user_main.html'))
+router.get('/home', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/user_main.html'));
 });
 
 /**
@@ -158,13 +155,13 @@ router.get('/home', auth,  (req, res) => {
  * @path {GET} /register
  * @auth not registered can get this page
  */
-router.get('/register',regAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/register.html'))
+router.get('/register', regAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/register.html'));
 });
 
 
-router.get('/upload',auth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/add.html'))
+router.get('/upload', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/add.html'));
 });
 
 /**
@@ -173,8 +170,8 @@ router.get('/upload',auth,(req, res) => {
  * @path {GET} /prims
  * @auth
  */
-router.get('/prims',auth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/prim.html'))
+router.get('/prims', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/prim.html'));
 });
 
 /**
@@ -183,8 +180,8 @@ router.get('/prims',auth,(req, res) => {
  * @path {GET} /profile
  * @auth
  */
-router.get('/profile',auth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/myprofile.html'))
+router.get('/profile', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/myprofile.html'));
 });
 
 /**
@@ -192,8 +189,8 @@ router.get('/profile',auth,(req, res) => {
  * @name Edit profile page
  * @path {GET} /editProfile
  */
-router.get('/editProfile',auth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/edit_myprofile.html'))
+router.get('/editProfile', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/edit_myprofile.html'));
 });
 
 /**
@@ -204,19 +201,19 @@ router.get('/editProfile',auth,(req, res) => {
  */
 router.get('/achievement/:id',
     async (req, res, next) => {
-        let id;
-        if (req.user._json && req.user._json.email)
-            id = req.user._json.email;
-        else id = req.user.user_id;
-        let User = await db.findUserById(id);
-        if (req.isAuthenticated() &&  (User.Achievement.some(o => o == req.params.id) || User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
-            next()
-        }
-        else {
-            return res.redirect('/404')
-        }},
+      let id;
+      if (req.user._json && req.user._json.email) {
+        id = req.user._json.email;
+      } else id = req.user.user_id;
+      const User = await db.findUserById(id);
+      if (req.isAuthenticated() && (User.Achievement.some((o) => o == req.params.id) || User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
+        next();
+      } else {
+        return res.redirect('/404');
+      }
+    },
     (req, res) => {
-        res.sendFile(path.join(frontendPath, '/achievement.html'))
+      res.sendFile(path.join(frontendPath, '/achievement.html'));
     });
 
 /**
@@ -225,8 +222,8 @@ router.get('/achievement/:id',
  * @path {GET} /documents
  * @auth
  */
-router.get('/documents',auth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/criterion.html'))
+router.get('/documents', auth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/criterion.html'));
 });
 
 /**
@@ -235,9 +232,9 @@ router.get('/documents',auth,(req, res) => {
  * @path {GET} /logout
  */
 router.get('/logout', (req, res) => {
-    req.session.destroy();
-    req.logout();
-    res.redirect('/home')
+  req.session.destroy();
+  req.logout();
+  res.redirect('/home');
 });
 
 /**
@@ -246,8 +243,8 @@ router.get('/logout', (req, res) => {
  * @path {GET} /admin
  * @auth AdminAuth required
  */
-router.get('/admin',adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/admin.html'))
+router.get('/admin', adminAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/admin.html'));
 });
 
 /**
@@ -256,8 +253,8 @@ router.get('/admin',adminAuth, (req, res) => {
  * @path {GET} /processed
  * @auth AdminAuth required
  */
-router.get('/processed',adminAuth,(req, res) => {
-    res.sendFile(path.join(frontendPath, '/processed.html'))
+router.get('/processed', adminAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/processed.html'));
 });
 
 /**
@@ -266,8 +263,8 @@ router.get('/processed',adminAuth,(req, res) => {
  * @path {GET} /rating
  * @auth AdminAuth required
  */
-router.get('/rating',adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/rating.html'))
+router.get('/rating', adminAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/rating.html'));
 });
 
 /**
@@ -276,8 +273,8 @@ router.get('/rating',adminAuth, (req, res) => {
  * @path {GET} /info
  * @auth AdminAuth required
  */
-router.get('/info',adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/info.html'))
+router.get('/info', adminAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/info.html'));
 });
 
 /**
@@ -287,7 +284,7 @@ router.get('/info',adminAuth, (req, res) => {
  * @auth AdminAuth required
  */
 router.get('/history', adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/adminHistory.html'))
+  res.sendFile(path.join(frontendPath, '/adminHistory.html'));
 });
 
 /**
@@ -297,7 +294,7 @@ router.get('/history', adminAuth, (req, res) => {
  * @auth AdminAuth required
  */
 router.get('/currentAchieves', adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/currentAchieves.html'))
+  res.sendFile(path.join(frontendPath, '/currentAchieves.html'));
 });
 
 /**
@@ -306,12 +303,12 @@ router.get('/currentAchieves', adminAuth, (req, res) => {
  * @path {GET} /user/*
  * @auth AdminAuth required
  */
-router.get('/user/*',adminAuth, (req, res) => {
-    res.sendFile(path.join(frontendPath, '/profile_admin.html'))
+router.get('/user/*', adminAuth, (req, res) => {
+  res.sendFile(path.join(frontendPath, '/profile_admin.html'));
 });
 
 router.get('/admins', superAdminAuth, (req, res)=>{
-    res.sendFile(path.join(frontendPath, '/adminList.html'))
+  res.sendFile(path.join(frontendPath, '/adminList.html'));
 });
 
 /**
@@ -319,9 +316,8 @@ router.get('/admins', superAdminAuth, (req, res)=>{
  * @name 404
  * @path {GET} /*
  */
-router.get('*', function (req, res) {
-
-    res.sendFile(path.join(frontendPath, '/404.html'))
+router.get('*', function(req, res) {
+  res.sendFile(path.join(frontendPath, '/404.html'));
 });
 
 module.exports = router;

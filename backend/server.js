@@ -12,7 +12,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
-//const redisClient = require('./config/redis');
+// const redisClient = require('./config/redis');
 const frontendPath = path.join(__dirname, '../frontend', '/build');
 const port = 8080;
 
@@ -29,19 +29,19 @@ const sess = {
   resave: false,
   HttpOnly: true,
   saveUninitialized: true,
-    store: new MongoStore({
-        url: `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:27017/${process.env.DB_NAME}?authSource=admin`
-    })
+  store: new MongoStore({
+    url: `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:27017/${process.env.DB_NAME}?authSource=admin`,
+  }),
 };
 
 
-app.use(function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
   res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
   );
-  next()
+  next();
 });
 
 
@@ -53,8 +53,8 @@ app.use(express.static(path.join(frontendPath, '/public')));
 app.use(express.static(path.join(__dirname, '/static/confirmations')));
 
 if (process.env.ENV_T === 'production') {
-    app.set('trust proxy', 1);
-    sess.cookie.secure = true;
+  app.set('trust proxy', 1);
+  sess.cookie.secure = true;
 }
 
 app.use(session(sess));
