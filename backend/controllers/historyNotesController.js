@@ -2,9 +2,9 @@ const db = require('./dbController')
 
 
 module.exports.GetHistory = async function (req, res) {
-    notes = await db.GetHistoryNotes()
+    let notes = await db.GetHistoryNotes()
 
-    History = []
+    let History = []
 
     for (var i = 0; i < notes.length; i++) {
         var note = {}
@@ -36,6 +36,7 @@ module.exports.WriteToHistory = async function (req, TargetAchID, TargetUserID, 
         minute: 'numeric'
     }
     note.Date = new Date().toLocaleString('ru', options)
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id

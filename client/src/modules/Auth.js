@@ -1,54 +1,54 @@
-import userPersonalStore from "../stores/userPersonalStore";
+import userPersonalStore from '../stores/userPersonalStore';
+import {BASE_API_URL} from '../common/constants';
 
 class Auth {
-
-    /**
+  /**
      * Authenticate a user. Save a token string in Local Storage
      *
      * @param {string} token
      */
-    static authenticateUser(token) {
-        localStorage.setItem('token', token);
-    }
+  static authenticateUser(token) {
+    localStorage.setItem('token', token);
+  }
 
-    static async fetchAuth() {
-        let resp = await fetch("api/isAuth", {
-            method: "GET"
-        });
-        resp.json().then((x) => {
-            userPersonalStore.Role = x.role;
-            console.log('CUR ROLE: ' + userPersonalStore.Role, x)
-        });
-        localStorage.setItem('auth', (resp.status === 200).toString());
+  static async fetchAuth() {
+    const resp = await fetch(BASE_API_URL + '/isAuth', {
+      method: 'GET',
+    });
+    if (resp.status === 200) {
+      resp.json().then((x) => {
+        userPersonalStore.Role = x.role;
+      });
     }
+    return resp.status === 200;
+  }
 
-    /**
+  /**
      * Check if a user is authenticated - check if a token is saved in Local Storage
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
-    static isUserAuthenticated() {
-        return localStorage.getItem('auth') == 'true';
-    }
+  static async isUserAuthenticated() {
+    return await this.fetchAuth();
+  }
 
-    /**
+  /**
      * Deauthenticate a user. Remove a token from Local Storage.
      *
      */
-    static deauthenticateUser() {
-        localStorage.removeItem('token');
-    }
+  static deauthenticateUser() {
+    localStorage.removeItem('token');
+  }
 
-    /**
+  /**
      * Get a token value.
      *
      * @returns {string}
      */
 
-    static getToken() {
-        return localStorage.getItem('token');
-    }
-
+  static getToken() {
+    return localStorage.getItem('token');
+  }
 }
 
 export default Auth;

@@ -1,0 +1,19 @@
+.user-table__achieveRow {
+    cursor: pointer;
+}
+
+.user-table__declined-row {
+    background-color: #ffe6e4;
+}
+
+.user-table__accepted-row {
+    background-color: #e5f3e5;
+}
+
+.user-table__edited-row {
+    background-color: #f3c66b;
+}
+
+.user-table__incorrect-row {
+    background-color: #f38a00;
+}

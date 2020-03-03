@@ -7,35 +7,38 @@ class UpdateEmitter extends EventEmitter {
 const NotifyEmitter = new UpdateEmitter();
 
 module.exports.emitSuccess = async function (req, targetUser) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
-    ach = await db.findAchieveById(req.body.Id)
+    let ach = await db.findAchieveById(req.body.Id)
     db.findUserById(id).then((User) => {
-        var msg = User.FirstName + ' ' + User.LastName
+        let msg = User.FirstName + ' ' + User.LastName
         msg += ' подтвердил ' + ach.crit + ' для ' + targetUser.FirstName + ' ' + targetUser.LastName
         NotifyEmitter.emit('Update', 'Success', msg, User.id)
     })
 }
 
 module.exports.emitComment = async function (req, achieveId) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
-    ach = await db.findAchieveById(achieveId)
+    let ach = await db.findAchieveById(achieveId)
     db.findUserById(id).then(async (User) => {
         var msg = User.FirstName + ' ' + User.LastName
-        targetUser = await db.findUserByAchieve(ach._id)
+        let targetUser = await db.findUserByAchieve(ach._id)
         msg += ' прокомментировал ' + ach.crit + ' для ' + targetUser.FirstName + ' ' + targetUser.LastName
         NotifyEmitter.emit('Update', 'Comment', msg, User.id)
     })
 }
 
 module.exports.emitDecline = async function (req, targetUser) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
-    ach = await db.findAchieveById(req.body.Id)
+    let ach = await db.findAchieveById(req.body.Id)
     db.findUserById(id).then((User) => {
         var msg = User.FirstName + ' ' + User.LastName
         msg += ' отклонил ' + ach.crit + ' для ' + targetUser.FirstName + ' ' + targetUser.LastName
@@ -44,22 +47,24 @@ module.exports.emitDecline = async function (req, targetUser) {
 }
 
 module.exports.emitChange = async function (req, achieve) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
     db.findUserById(id).then(async (User) => {
         var msg = User.FirstName + ' ' + User.LastName
-        targetUser = await db.findUserByAchieve(achieve._id)
+        let targetUser = await db.findUserByAchieve(achieve._id)
         msg += ' изменил ' + achieve.crit + ' для ' + targetUser.FirstName + ' ' + targetUser.LastName
         NotifyEmitter.emit('Update', 'Change', msg, User.id)
     })
 }
 
 module.exports.AddToRating = async function (req, userId) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
-    targetUser = await db.findUser(userId)
+    let targetUser = await db.findUser(userId)
     db.findUserById(id).then((User) => {
         var msg = User.FirstName + ' ' + User.LastName
         msg += ' включил ' + targetUser.FirstName + ' ' + targetUser.LastName + ' в рейтинг'
@@ -68,10 +73,11 @@ module.exports.AddToRating = async function (req, userId) {
 }
 
 module.exports.RemoveFromRating = async function (req, userId) {
+    let id;
     if (req.user._json.email)
         id = req.user._json.email
     else id = req.user.user_id
-    targetUser = await db.findUser(userId)
+    let targetUser = await db.findUser(userId)
     db.findUserById(id).then((User) => {
         var msg = User.FirstName + ' ' + User.LastName
         msg += ' убрал ' + targetUser.FirstName + ' ' + targetUser.LastName + ' из рейтинга'

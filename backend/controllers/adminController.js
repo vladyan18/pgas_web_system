@@ -4,12 +4,25 @@ const notify = require('./notificationController');
 const history = require('./historyNotesController');
 const path = require('path');
 const Kri = require(__dirname + "/Kriterii.json");
-const fs = require('fs');
-const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
-const upload = require(path.join(__dirname, '../config/multer'));
 const EventEmitter = require('events');
 class UpdateEmitter extends EventEmitter {}
 const AdminEmitter = new UpdateEmitter();
+
+module.exports.prepareForNewPgas = async function (req, res) {
+    const users = await db.allUsers();
+
+    for (const user of users) {
+        let achieves = await db.findActualAchieves(user.id);
+
+
+        for (const achieve of achieves) {
+            if ((achieve.status === 'Принято' || achieve.status === 'Отказано') && ( achieve.crit === '1 (7а)' || achieve.crit === '7а')) {
+                console.log(user.LastName);
+                await db.deleteAchieve(achieve._id);
+            }
+        }
+    }
+};
 
 module.exports.setUser = async function(req,res){
     await db.ChangeRole(req.body.Id, false);
@@ -96,6 +109,15 @@ module.exports.updateAchieve = async function (req, res) {
 
     let achieve = req.body;
     let id = req.body._id;
+    let uid;
+    if (req.user._json.email)
+        uid = req.user._json.email;
+    else uid = req.user.user_id;
+    const user = await db.findUserById(uid);
+    const isValid = await db.validateAchievement(achieve, user);
+    if (!isValid) {
+        return res.sendStatus(400);
+    }
             let options = {
                 year: 'numeric',
                 month: 'numeric',
@@ -106,24 +128,27 @@ module.exports.updateAchieve = async function (req, res) {
 
             let oldAchieve = await db.findAchieveById(id);
             let createdAchieve = await db.updateAchieve(id, achieve);
-            if (req.user._json.email)
-                uid = req.user._json.email;
-            else uid = req.user.user_id;
 
             var args = {};
             args.from = oldAchieve;
             args.to = createdAchieve;
             history.WriteToHistory(req, id, uid, 'Change', args);
-            balls(uid);
+    module.exports.balls(uid);
             res.sendStatus(200);
             AdminEmitter.emit('Update');
             notify.emitChange(req, createdAchieve).then()
 };
 
 module.exports.AchSuccess = async function (req, res) {
-    await db.ChangeAchieve(req.body.Id, true);
     let u = await db.findUser(req.body.UserId);
-    balls(u.id, u.Faculty);
+    const achievement = await db.findAchieveById(req.body.Id);
+    const checkResult = await db.validateAchievement(achievement, u);
+    if (!checkResult) {
+        return res.sendStatus(400);
+    }
+
+    await db.ChangeAchieve(req.body.Id, true);
+    module.exports.balls(u.id, u.Faculty);
     res.sendStatus(200);
     AdminEmitter.emit('Update');
     notify.emitSuccess(req, u).then();
@@ -133,7 +158,7 @@ module.exports.AchSuccess = async function (req, res) {
 module.exports.AchFailed = async function (req, res) {
     await db.ChangeAchieve(req.body.Id, false);
     let u = await db.findUser(req.body.UserId);
-    balls(u.id, u.Faculty);
+    module.exports.balls(u.id, u.Faculty);
     AdminEmitter.emit('Update');
     res.sendStatus(200);
     notify.emitDecline(req, u).then();
@@ -206,7 +231,7 @@ module.exports.getUser = async function (req, res) {
     let ip = await req.url.slice(6);
 
     db.findUser(ip).then((User) => {
-        db.findAchieves(User.id).then((v) => {
+        db.findActualAchieves(User.id).then((v) => {
             User.Achs = v;
             res.status(200).send(User)
         })
@@ -220,10 +245,10 @@ module.exports.getRating = async function (req, res) {
   for (let user of Users) {
       let sumBall = 0;
       let crits = {};
-      for (key of Object.keys(kri)) {
+      for (let key of Object.keys(kri)) {
           crits[key] = 0;
       }
-    Achs = await db.findAchieves(user.id);
+    let Achs = await db.findActualAchieves(user.id);
     for(let ach of Achs) {
         if (!ach) continue;
         if (ach.ball) {
@@ -239,30 +264,28 @@ module.exports.getRating = async function (req, res) {
 
 module.exports.getStatisticsForFaculty = async function(req, res) {
     res.status(200).send(await db.getStatisticsForFaculty(req.query.faculty))
-}
+};
 
-const balls = async function (id, faculty) {
+module.exports.balls = async function (id, faculty) {
     let criterias = await db.GetCriterias(faculty);
     if (!criterias) return null;
 
     let kri = JSON.parse(criterias.Crits);
-    let balls = 0;
-    let Achs = await db.findAchieves(id);
+    let Achs = await db.findActualAchieves(id);
   let kriteries = {};
 
-  for (key of Object.keys(kri)) {
+  for (let key of Object.keys(kri)) {
     kriteries[key] = []
   }
 
   for(let ach of Achs) {
       if (!ach) continue;
-      if (ach.status != 'Принято' && ach.status != 'Принято с изменениями') {
+      if (ach.status !== 'Принято' && ach.status !== 'Принято с изменениями') {
           ach.ball = undefined;
           db.updateAchieve(ach._id, ach).then();
           continue
       }
       let curKrit = kri;
-      console.log(ach.chars)
       if (Array.isArray(curKrit)) {
           kriteries[ach.crit].push({'ach': ach, 'balls':curKrit, 'chars': ach.chars})
       }
@@ -277,14 +300,14 @@ const balls = async function (id, faculty) {
       }
   }
 
-    for (key of Object.keys(kri)) {
+    for (let key of Object.keys(kri)) {
         if (true) // (CheckSystem(key, kriteries[key]))
         {
             if (faculty === 'ВШЖиМК' || faculty === 'Соцфак') {
-                balls += MatrBallsLegacy(kriteries[key], faculty)
+                MatrBallsLegacy(kriteries[key], faculty)
             }
             else {
-                balls += MatrBalls(kriteries[key])
+                MatrBalls(kriteries[key])
             }
         } else for (let ach of kriteries[key]) ach['ach'].ball = undefined;
         for (let curAch of kriteries[key]) {
@@ -294,11 +317,9 @@ const balls = async function (id, faculty) {
     }
 };
 
+// eslint-disable-next-line no-unused-vars
 const CheckSystem = function(crit, ach) {
     if (!ach) return false;
-    //if (crit == '10 (10в)' || crit == '12 (11б)' ) {
-    //    return ach.filter(o => o).length >= 2
-    //}
     else return true
 };
 
@@ -308,7 +329,7 @@ const MatrBalls = function (Crit) {
 
     for (let i = 0; i < Crit.length; i++) {
         if (!Crit[i]) continue;
-      var q = 0;
+       let maxIndex;
         for (let ach = 0; ach < Crit.length; ach++) {
             if (!Crit[ach]['balls']) continue;
             var shift = i;

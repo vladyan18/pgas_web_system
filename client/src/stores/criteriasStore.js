@@ -8,22 +8,25 @@ class CriteriasStore {
     annotations;
     schema;
     learningProfile;
+    facultyRawName;
 
     async getAnnotations(facultyName) {
         let result = await fetchGet('/api/getAnnotations', {faculty: facultyName});
         if (result) {
-            this.annotations = result.annotations
-            this.learningProfile = result.learningProfile
+            this.annotations = result.annotations;
+            this.learningProfile = result.learningProfile;
         }
     }
 
-    getCriteriasForFaculty(facultyName) {
-        fetchGet('/api/getCriterias', {faculty: facultyName}).then((result) => {
+    async getCriteriasForFaculty(facultyName) {
+        try {
+            const result = await fetchGet('/api/getCriterias', {faculty: facultyName});
             if (result) {
-                console.log('RECEIVED CRITS', result);
                 this.criterias = result;
             }
-        })
+        } catch(error) {
+                console.log(error)
+        }
     }
 
     constructor() {
@@ -35,7 +38,8 @@ decorate(CriteriasStore, {
     criterias: observable,
     annotations: observable,
     schema: observable,
-    learningProfile: observable
+    learningProfile: observable,
+    facultyRawName: observable
 });
 
 export default new CriteriasStore();

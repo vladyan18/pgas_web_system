@@ -4,12 +4,12 @@ import lock from '../../../img/lock.png';
 import logo from '../../../img/gerb.png';
 import DateInput from "../../DateInput";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 import '../../../style/checkbox.css'
 import {OverlayTrigger, Popover} from "react-bootstrap";
 
 class UserRegistrationPage extends Component {
-    reqFields = ['LastName', 'Name', 'SpbuId', 'Birthdate', 'Faculty', 'Type', 'Course'];
+    reqFields = ['LastName', 'Name', 'Birthdate', 'Faculty', 'Type', 'Course'];
     constructor(props) {
         super(props);
         this.state = {isDateValid: false, Type: "Бакалавриат"};
@@ -51,7 +51,6 @@ class UserRegistrationPage extends Component {
             user.lastname = this.state.LastName;
             user.name = this.state.Name;
             user.patronymic = this.state.Patronymic;
-            user.spbuId = this.state.SpbuId;
             user.birthdate = makeDate(this.state.Birthdate);
             user.faculty = this.state.Faculty;
             user.type = this.state.Type;
@@ -146,12 +145,6 @@ class UserRegistrationPage extends Component {
                                 <DateInput style={{width: "100%"}} updater={this.handleDateChange}
                                            isValid={!this.state.BirthdateInvalid}/><br/>
 
-                                <span className="redText" style={{"margin-top": "2rem"}}>*</span><label>Почта
-                                СПбГУ</label><br/>
-                                <input type='text' style={{margin: "0"}} id='name' name='name'
-                                       onChange={(e) => this.handleChange(e, 'SpbuId')}
-                                       className={"form-control" + this.isValid('SpbuId')} required autoComplete="off"
-                                       placeholder="st******@student.spbu.ru"/><br/>
                                 <span className="redText">*</span><label>Факультет</label><br/>
                                 <select id="faculty" className={"form-control" + this.isValid('Faculty')}
                                         onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue=""

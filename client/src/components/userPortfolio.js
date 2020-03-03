@@ -6,4 +6,4 @@ function UserPortfolio(props) {
 
 }
 
-export default UserPortfolio
+export default UserPortfolio;

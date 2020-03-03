@@ -1,17 +1,12 @@
+'use strict'
 /** User controller
  * @module userController
  */
-
 const path = require('path');
-const passport = require(path.join(__dirname, '../config/passport'));
 const upload = require(path.join(__dirname, '../config/multer'));
 const uploadConfirmation = require(path.join(__dirname, '../config/confirmationMulter'));
 const db = require('./dbController');
 const fs = require('fs');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
-
-
 
 const uploadsPath = path.join(__dirname, '../../frontend/build/public/uploads');
 const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
@@ -21,33 +16,32 @@ const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations')
  * @function dynamic
  * */
 module.exports.dynamic = async function (req, res) {
+    let id;
     if (req.user._json.email)
-        var id = req.user._json.email;
-    else var id = req.user.user_id;
+        id = req.user._json.email;
+    else id = req.user.user_id;
 
-    achPr = db.findAchieves(id);
+    let User = await db.findUserById(id) // TODO OPTIMIZE
+    if (User)
+        await db.findActualAchieves(id).then(async (v) => {
+                for (let i = 0; i < v.length; i++) {
+                    let confirms = [];
+                    if (v[i].confirmations)
+                        for (let j = 0; j < v[i].confirmations.length; j++) {
 
-    db.findUserById(id).then((User) => { // TODO OPTIMIZE
-        achPr.then(async (v) => {
+                            let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
+                            if (!confirm) continue;
+                            confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
+                            confirms.push(confirm)
+                        }
+                    v[i].confirmations = confirms;
+                }
 
-
-            for (let i = 0; i < v.length; i++) {
-                let confirms = [];
-                if (v[i].confirmations)
-                    for (let j = 0; j < v[i].confirmations.length; j++) {
-
-                        let confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
-                        if (!confirm) continue
-                        confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
-                        confirms.push(confirm)
-                    }
-                v[i].confirmations = confirms
-            }
-
-            User.Achs = v;
-            res.status(200).send(User)
+                User.Achs = v;
+                res.status(200).send(User)
         })
-    })
+    else res.status(404).send({Error: 404})
+
 };
 
 /**
@@ -60,7 +54,7 @@ module.exports.getProfile = async function (req, res) {
         User = await db.findUserById(req.user._json.email);
     else User = await db.findUserById(req.user.user_id);
 
-    if (User.Registered)
+    if (User && User.Registered)
         res.status(200).send({
             id: User.id,
             LastName: User.LastName,
@@ -74,7 +68,7 @@ module.exports.getProfile = async function (req, res) {
             Course: User.Course,
             IsInRating: User.IsInRating
         });
-    else res.status(404).send({})
+    else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName})
 };
 
 module.exports.getRights = async function (req, res) {
@@ -83,6 +77,7 @@ module.exports.getRights = async function (req, res) {
 };
 
 module.exports.isAuth = async function (req, res) {
+    console.log('IsAuth:', req.isAuthenticated());
     if (req.isAuthenticated())
         res.json({
             success: true,
@@ -99,7 +94,7 @@ module.exports.isAuth = async function (req, res) {
  * @function getAch
  * */
 module.exports.getAch = async function (req, res) {
-    id = req.query.achievement;
+    let id = req.query.achievement;
     let ach = await db.findAchieveById(id);
     let confirms = [];
 
@@ -120,7 +115,8 @@ module.exports.getAch = async function (req, res) {
 module.exports.registerUser = async function (req, res) {
     try {
         let data = req.body;
-        console.log(data);
+        console.log('New registration: ', data);
+        let id;
         if (req.user && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;
@@ -144,6 +140,7 @@ module.exports.addConfirmation = function (req, res) {
     if (data.Data)
         if (!(data.Data.startsWith('http://') || data.Data.startsWith('https://')))
             data.Data = '//' + data.Data;
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -163,13 +160,15 @@ module.exports.addConfirmation = function (req, res) {
 };
 
 module.exports.getConfirmations = async function (req, res) { //TODO SECURITY
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
-    user = await db.findUserById(id);
+    let user = await db.findUserById(id);
     let confirms = await db.getConfirmations(user.Confirmations);
     res.status(200).send(confirms)
 };
+
 
 module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
     let filename = await req.url.slice(12);
@@ -179,20 +178,21 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
     filename = filename.substr(filename.search('-') + 1);
     filename = filename.substr(filename.search('-') + 1);
     try {
-        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI')
+        if (!fs.existsSync(filePath)) throw new URIError('Incorrect URI');
         if (filename.endsWith('.pdf')) {
-            var file = fs.createReadStream(filePath);
-            var stat = fs.statSync(filePath);
+            let file = fs.createReadStream(filePath);
+            let stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline');
             file.pipe(res);
         } else
-        if (filename.endsWith('.jpg')) {
-            var file = fs.createReadStream(filePath);
-            var stat = fs.statSync(filePath);
+        if (filename.endsWith('.jpg') || filename.endsWith('.png') ) {
+            let ending = filename.endsWith('.jpg') ? 'jpg' : 'png';
+            let file = fs.createReadStream(filePath);
+            let stat = fs.statSync(filePath);
             res.setHeader('Content-Length', stat.size);
-            res.setHeader('Content-Type', 'image/jpg');
+            res.setHeader('Content-Type', 'image/' + ending);
             res.setHeader('Content-Disposition', 'inline');
             file.pipe(res);
         }
@@ -204,9 +204,14 @@ module.exports.getConfirmation = async function (req, res) { //TODO SECURITY
         }
     }
     catch (e) {
-        let response = {response: "Not found"}
-        console.log(e)
-        res.sendStatus(404)
+        if (e instanceof URIError) {
+            console.log(e);
+            res.sendStatus(404);
+        } else
+        {
+            res.sendStatus(400);
+            throw e;
+        }
     }
 };
 
@@ -217,7 +222,7 @@ module.exports.addFileForConfirmation = function (req, res) {
     }
 
     uploadConfirmation(req, res, async function (err) {
-
+        let id;
         if (req.user && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;
@@ -230,7 +235,7 @@ module.exports.addFileForConfirmation = function (req, res) {
 
         let confirmation = JSON.parse(req.body.data);
         confirmation.FilePath = req.file.path;
-        confirmation.Data = 'http://localhost:3000/api/getConfirm/' + req.file.filename;
+        confirmation.Data = '/api/getConfirm/' + req.file.filename;
         confirmation.Date = Date.now();
         confirmation.Size = req.file.size;
         db.createConfirmation(confirmation).then(
@@ -253,7 +258,7 @@ module.exports.addFileForConfirmation = function (req, res) {
  * @function addAchieve
  * */
 
-
+/*
 let browser
 puppeteer.launch().then((newBrowser) => browser = newBrowser)
 
@@ -318,6 +323,8 @@ autoCheckConfirms = async function (achievement) {
         })
     }
 };
+*/
+
 
 module.exports.addAchieve = function (req, res) {
     if (!fs.existsSync(uploadsPath)) {
@@ -328,9 +335,23 @@ module.exports.addAchieve = function (req, res) {
             if (err) {
                 return res.status(400).send('ERROR: Max file size = 15MB')
             }
-            let achieve = JSON.parse(req.body.data);
 
-            let options = {
+            let id;
+            if (req.user._json && req.user._json.email)
+                id = req.user._json.email;
+            else id = req.user.user_id;
+
+            let achieve = JSON.parse(req.body.data);
+            const user = await db.findUserById(id);
+            let validationResult = false;
+            try {
+                validationResult = await db.validateAchievement(achieve, user);
+            } catch (e) {
+                console.log('Ach validation outer error');
+            }
+            if (!validationResult) return res.sendStatus(400);
+
+            const options = {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
@@ -341,11 +362,8 @@ module.exports.addAchieve = function (req, res) {
 
             achieve.comment = '';
             let createdAchieve = await db.createAchieve(achieve);
-            if (req.user._json && req.user._json.email)
-                id = req.user._json.email;
-            else id = req.user.user_id;
             await db.addAchieveToUser(id, createdAchieve._id);
-            autoCheckConfirms(createdAchieve).then();
+            //autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
@@ -361,13 +379,29 @@ module.exports.addAchieve = function (req, res) {
 module.exports.updateAchieve = async function (req, res) {
     try {
         let achieve = req.body.data;
+
+        let user_id;
+        if (req.user._json && req.user._json.email)
+            user_id = req.user._json.email;
+        else user_id = req.user.user_id;
+
+        const user = await db.findUserById(user_id);
+        let validationResult = false;
+        try {
+            validationResult = await db.validateAchievement(achieve, user);
+        } catch (e) {
+            console.log('Ach validation outer error');
+        }
+
+        if (!validationResult) return res.sendStatus(400);
+
             let id = req.body.achId;
             let options = {
                 year: 'numeric',
                 month: 'numeric',
                 day: 'numeric'
             };
-            let oldAch = await db.findAchieveById(id)
+            let oldAch = await db.findAchieveById(id);
             for (let field of Object.keys(req.body.data))
             {
                 if (field == 'confirmations' || field == 'achDate')
@@ -376,20 +410,20 @@ module.exports.updateAchieve = async function (req, res) {
                 }
                 if (field == 'chars')
                 {
-                    let changeDetected = false
+                    let changeDetected = false;
+                    if (oldAch.chars.length !== req.body.data.chars.length) {
+                        changeDetected = true;
+                    }
                     for (let i = 0; i < oldAch.chars.length; i++)
-                        if (oldAch.chars[i] != req.body.data.chars[i])
+                        if (oldAch.chars[i] !== req.body.data.chars[i])
                         {
-                            console.log('CHANGE DETECTED', oldAch.chars[i], req.body.data.chars[i])
-                            changeDetected = true
+                            changeDetected = true;
                             break
                         }
                     if (!changeDetected) continue
                 }
-                console.log(field, oldAch[field], req.body.data[field])
                 if (oldAch[field] != req.body.data[field])
                 {
-
                     achieve.status = 'Ожидает проверки';
                     achieve.ball = undefined
                 }
@@ -397,8 +431,8 @@ module.exports.updateAchieve = async function (req, res) {
 
             achieve.date = new Date().toLocaleString('ru', options);
 
-            let createdAchieve = await db.updateAchieve(id, achieve);
-            autoCheckConfirms(createdAchieve).then();
+            await db.updateAchieve(id, achieve);
+            //autoCheckConfirms(createdAchieve).then();
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
@@ -415,14 +449,15 @@ module.exports.deleteAchieve = async function (req, res) {
         try {
             let id = req.body.achId;
 
+            let User;
             if (req.user._json.email)
                 User = await db.findUserById(req.user._json.email);
             else User = await db.findUserById(req.user.user_id);
 
-            if (User.Role != 'Admin' &&  User.Role!='SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
+            if (User.Role !== 'Admin' &&  User.Role !== 'SuperAdmin' && !User.Achievement.some(o => (o && o == id)))
                 return res.sendStatus(404);
 
-            let result = await db.deleteAchieve(id);
+            await db.deleteAchieve(id);
             res.sendStatus(200)
         } catch (err) {
             console.log(err);
@@ -432,15 +467,16 @@ module.exports.deleteAchieve = async function (req, res) {
 
 module.exports.getRating = async function (req, res) {
 
+    let id;
     if (req.user && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
 
     let requestingUser = await db.findUserById(id);
 
-    let facultyName = req.query.faculty
-    if (requestingUser.Faculty != facultyName) {
-        res.sendStatus(401)
+    let facultyName = req.query.faculty;
+    if (requestingUser.Faculty !== facultyName) {
+        res.sendStatus(401);
         return
     }
 
@@ -450,10 +486,10 @@ module.exports.getRating = async function (req, res) {
     for (let user of Users) {
         let sumBall = 0;
         let crits = {};
-        for (key of Object.keys(kri)) {
+        for (let key of Object.keys(kri)) {
             crits[key] = 0;
         }
-        Achs = await db.findAchieves(user.id);
+        let Achs = await db.findActualAchieves(user.id);
         for(let ach of Achs) {
             if (!ach) continue;
             if (ach.ball) {

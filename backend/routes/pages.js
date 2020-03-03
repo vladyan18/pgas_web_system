@@ -1,3 +1,4 @@
+'use strict'
 /** Express router providing html pages
  * @module pagesRouter
  * @requires express
@@ -20,7 +21,6 @@ const path = require('path');
 const passport = require('passport');
 const frontendPath = path.join(__dirname, '../../frontend', '/build');
 const db = require('../controllers/dbController.js');
-const fs = require('fs');
 
 /**
  * If not authenticated, redirect to /login <br/>
@@ -60,6 +60,7 @@ const regAuth = (req, res, next) => {
  * @function adminAuth
  * */
 const adminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -78,6 +79,7 @@ const adminAuth = async (req, res, next) => {
  * @function adminAuth
  * */
 const superAdminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -97,37 +99,48 @@ const superAdminAuth = async (req, res, next) => {
  */
 router.get('/', (req, res) => res.redirect('/home'));
 
-/**
- * Route serving login via auth0
- * @name Login
- * @path {GET} /login
- */
-router.get('/login', passport.authenticate('auth0', {
-    scope: 'openid email profile'
-}), function (req, res) {
-    res.redirect('/')
+router.post('/login', async function (req, res) {
+    let errState = false;
+    let username = '';
+    console.log('Start logging', req.body.username);
+    if (req.body.username.indexOf('@') !== -1) {
+        username = req.body.username.substring(0, req.body.username.indexOf('@')) + '@ad.pu.ru';
+    } else {
+        username = req.body.username + '@ad.pu.ru';
+    }
+    let opts = {
+        ldap: {
+            url: process.env.LDAP_URL,
+            baseDN: 'dc=ad,dc=pu,dc=ru', username: username, password: req.body.password
+        }
+    };
+    let st = req.body.username.substring(0, req.body.username.indexOf('@'));
+    //req.body.username = username;
+    passport.authenticate('ActiveDirectory', opts,  (err, user, info) => {
+        let newUser = user;
+        console.log('LOGGED', err, newUser, info);
+        if (err) {
+            console.log('ERROR', err);
+            if(errState) return;
+            errState = true;
+            return res.sendStatus(400);
+        }
+
+        if (!newUser) {
+            newUser = {};
+            newUser._json = {};
+            newUser._json.sAMAccountName = st;
+        }
+
+        req.logIn(newUser, async function (err) {
+            if (err) {
+                console.log('ERR', err)
+            }
+            res.sendStatus(200)
+            console.log('AUTH RESULT', req.user);
+        })
+    })(req, res)
 });
-
-/**
- * Route serving callback from auth0
- * @name Auth callback
- * @path {GET} /callback
- */
-router.get('/callback', function (req, res, next) {
-    passport.authenticate('auth0', function (err, user, info) {
-        if (err) { return next(err) }
-        if (!user) { return res.redirect('/login') }
-        req.logIn(user, function (err) {
-            if (err) { return next(err) }
-            const returnTo = req.session.returnTo;
-            delete req.session.returnTo;
-            res.redirect('http://localhost:3000')
-        });
-    })(req, res, next)
-});
-
-
-var homepage = fs.readFileSync(path.join(frontendPath, '/user_main.html')).toString();
 
 /**
  * Route serving home page
@@ -191,6 +204,7 @@ router.get('/editProfile',auth,(req, res) => {
  */
 router.get('/achievement/:id',
     async (req, res, next) => {
+        let id;
         if (req.user._json && req.user._json.email)
             id = req.user._json.email;
         else id = req.user.user_id;

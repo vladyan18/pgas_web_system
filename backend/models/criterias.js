@@ -5,7 +5,8 @@ const criteriasSchema = mongoose.Schema({
     FacultyId: String,
     Date: Date,
     Crits: String,
-    CritsSchema: String
+    CritsSchema: String,
+    Hash: String
 });
 
 const Criterias = connection.model('Criterias', criteriasSchema);

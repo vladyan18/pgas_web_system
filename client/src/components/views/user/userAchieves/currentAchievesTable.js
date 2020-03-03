@@ -1,35 +1,36 @@
 import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
+import {css, jsx} from '@emotion/core';
+import './tableStyles.css';
 
+const achievementFormatter = function(cell, row) {
+  let statusTitle = null;
+  if (row.status !== 'Принято на рассмотрение')
+    statusTitle = <div style={{
+    fontSize: "x-small",
+    color: "#434343"
+    }}>{row.status}</div>;
+  return <><span style={{marginRight: "1rem"}}><b>{ row.crit }</b></span>{ row.achievement }{statusTitle}</>;
+};
 
 const columns = [{
-    dataField: 'crit',
-    text: 'Критерий',
-    style: {width: "8%", textAlign: "center", verticalAlign: "middle"},
-    headerStyle: {fontSize: "x-small", verticalAlign: "middle", textAlign: "center"}
+  dataField: 'achievement',
+  text: 'Достижение',
+  style: {width: '60%', textAlign: 'left', verticalAlign: 'middle'},
+  headerStyle: {verticalAlign: 'middle', textAlign: 'left'},
+  formatter: achievementFormatter,
 }, {
-    dataField: 'achievement',
-    text: 'Достижение',
-    style: {width: "40%", textAlign: "left", verticalAlign: "middle"},
-    headerStyle: {verticalAlign: "middle", textAlign: "center"}
+  dataField: 'ball',
+  text: 'Балл',
+  style: {width: '10%', textAlign: 'right', verticalAlign: 'middle'},
+  headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
 }, {
-    dataField: 'status',
-    hidden: window.screen.width < 700,
-    text: 'Статус',
-    style: {width: "15%", textAlign: "center", verticalAlign: "middle"},
-    headerStyle: {verticalAlign: "middle", textAlign: "center"},
-}, {
-    dataField: 'ball',
-    text: 'Балл',
-    style: {width: "10%", textAlign: "center", verticalAlign: "middle"},
-    headerStyle: {verticalAlign: "middle", textAlign: "center"}
-}, {
-    dataField: 'comment',
-    text: 'Комментарий',
-    style: {textAlign: "left"},
-    headerStyle: {verticalAlign: "middle", textAlign: "center"}
+  dataField: 'comment',
+  text: 'Комментарий',
+  style: {textAlign: 'right', verticalAlign: 'middle'},
+  headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
 }];
 
 class CurrentAchievesTable extends Component {
@@ -45,15 +46,21 @@ class CurrentAchievesTable extends Component {
         }
     };
 
-    rowClasses = (row, rowIndex) => {
-        if (row.status == 'Отказано')
-            return 'achieveRow declined-row';
-        if (row.status == 'Изменено')
-            return 'achieveRow edited-row';
-        if (row.status == 'Принято' || row.status == 'Принято с изменениями')
-            return 'achieveRow accepted-row';
-        else return 'achieveRow'
-    };
+    rowClasses(row) {
+    const baseClass = 'user-table__achieveRow';
+    switch (row.status) {
+      case 'Отказано':
+        return baseClass + ' user-table__declined-row';
+      case 'Данные некорректны':
+        return baseClass + ' user-table__incorrect-row';
+      case 'Изменено':
+        return baseClass + ' user-table__edited-row';
+      case 'Принято с изменениями':
+      case 'Принято':
+        return baseClass + ' user-table__accepted-row';
+    }
+    return baseClass;
+  };
 
     columnClasses(cell, row, rowIndex, colIndex) {
         if (colIndex == 2) return 'hideInMobile';
@@ -64,13 +71,15 @@ class CurrentAchievesTable extends Component {
     render() {
         if (this.props.currentAchieves && this.props.currentAchieves.length != 0)
             return (
-                <block_1 id="achBlock" style={{'display': 'block', 'overflow': 'auto'}}>
-                    <div id="row_docs" className='block_1'>
+                <div id="achBlock" style={{'display': 'block', 'overflow': 'auto'}}>
+                    <div id="row_docs">
                         <BootstrapTable keyField='_id' data={this.props.currentAchieves} columns={columns}
                                         rowEvents={this.rowEvents}
-                                        rowClasses={this.rowClasses} columnClasses={this.columnClasses}/>
+                                        rowClasses={this.rowClasses} columnClasses={this.columnClasses}
+bordered={false}
+/>
                     </div>
-                </block_1>
+                </div>
             );
         else return null
     }

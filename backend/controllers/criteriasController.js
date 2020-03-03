@@ -1,16 +1,13 @@
+const adminController = require( "./adminController");
 const db = require('./dbController');
 const path = require('path');
 const fs = require('fs');
-const XlsxPopulate = require('xlsx-populate');
 const upload = require(path.join(__dirname, '../config/multer'));
 const uploadsPath = path.join(__dirname, '../docs/');
-const anketPath = path.join(__dirname, '..');
 const xlsx = require('xlsx');
 
 
 module.exports.upload = async function (req, res) {
-
-
     if (!req.isAuthenticated() || req.user.Role != 'SuperAdmin') return res.sendStatus(404);
     if (!fs.existsSync(uploadsPath)) {
         fs.mkdirSync(uploadsPath)
@@ -37,14 +34,14 @@ module.exports.upload = async function (req, res) {
 };
 
 module.exports.UploadAnnotationsToFaculty = async function (req, res) {
-    let annotations = await db.UploadAnnotationsToFaculty(req.body.annotations, req.body.learningProfile, req.body.faculty);
+    await db.UploadAnnotationsToFaculty(req.body.annotations, req.body.learningProfile, req.body.faculty);
     return res.sendStatus(200)
 };
 
 module.exports.GetAnnotationsForFaculty = async function (req, res) {
     let annotations = await db.GetAnnotationsForFaculty(req.query.faculty);
     if (annotations && (annotations.AnnotationsToCrits || annotations.LearningProfile) ) {
-        let result = {}
+        let result = {};
         result.annotations = annotations.AnnotationsToCrits;
         result.learningProfile = annotations.LearningProfile;
         return res.status(200).send(result);
@@ -54,7 +51,23 @@ module.exports.GetAnnotationsForFaculty = async function (req, res) {
 
 module.exports.saveCriteriasForFaculty = async function (req, res) {
     await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
+    checkActualityOfUsersAchievements(req.body.faculty).then(() => console.log('Check finished'));
+
     return res.sendStatus(200)
+};
+
+const checkActualityOfUsersAchievements = async function(faculty) {
+    const users = (await db.GetUsersWithAllInfo(faculty, false)).concat(await db.GetUsersWithAllInfo(faculty, true));
+    const crits = await db.GetCriterias(faculty, true);
+
+    console.log(faculty);
+    console.log(Object.keys(crits));
+    for (const user of users) {
+        for (const achievement of user.Achievement) {
+            await db.checkActualityOfAchievementCharacteristics(achievement, crits)
+        }
+        await adminController.balls(user.id, faculty);
+    }
 };
 
 module.exports.getCriterias = async function (req, res) {
@@ -62,7 +75,7 @@ module.exports.getCriterias = async function (req, res) {
         let criterias = await db.GetCriterias(req.query.faculty);
         if (criterias)
             res.status(200).send(criterias.Crits);
-        else res.status(404).send({})
+        else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName})
     } catch (e) {
         res.status(500).send(e)
     }
@@ -80,12 +93,12 @@ module.exports.getCriteriasAndSchema = async function (req, res) {
 };
 
 function isValue(str) { //проверка содержатся ли в ячейке баллы
-    if (!str) return false;
+    if (str === '' || str === undefined || str === null) return false;
     str = str.toString();
     let l = str.length;
 
     for (let i = 0; i < l; i++) {
-        if (!/[\d\|\s,\.]/i.test(str[i])) return false
+        if (!/[\d|\s,.]/i.test(str[i])) return false
     }
     return true
 }
@@ -93,7 +106,6 @@ function isValue(str) { //проверка содержатся ли в ячей
 function listing(str) { //преобразование ячейки с баллами в list
     let list = [];
     let lastIndex = -1;
-    let lastIsComma = false;
     let lastIsDigit = false;
     let hadComma = false;
     let numOfDigit = 1;
@@ -114,11 +126,9 @@ function listing(str) { //преобразование ячейки с балл�
                 lastIsDigit = true
             }
         } else {
-            if (symbol == ',' || symbol == '.') {
-                lastIsComma = true;
+            if (symbol === ',' || symbol === '.') {
                 hadComma = true
             } else {
-                lastIsComma = false;
                 hadComma = false;
                 numOfDigit = 1
             }
@@ -181,9 +191,9 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     }
 
     if (lastCritInfo) {
-        if (lastCritInfo.row != globalCategoryRowIndex) {
+        if (lastCritInfo.row !== globalCategoryRowIndex) {
             let critName = getCellValue(globalCategoryRowIndex, 1, sheet);
-            if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ') != critName.toString().replace(/\s+/g, ' '))) {
+            if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ') !== critName.toString().replace(/\s+/g, ' '))) {
                 lastCritInfo.row = globalCategoryRowIndex;
                 lastCritInfo.crit = critName;
                 lastCritInfo.lastHeadRow = undefined
@@ -204,7 +214,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
         }
         let critName = getCellValue(mergedRowIndex, currentColumnIndex, sheet);
 
-        if (globalCategoryLastIndex < mergedRowIndex && (globalCategoryLastName != critName.toString().replace(/\s+/g, ' '))) {
+        if (globalCategoryLastIndex < mergedRowIndex && (globalCategoryLastName !== critName.toString().replace(/\s+/g, ' '))) {
             if (mergedRowIndex > globalCategoryLastIndex && mergedRowIndex > 247 && mergedRowIndex < 259)
                 globalCategoryLastName = critName;
             globalCategoryLastIndex = mergedRowIndex;
@@ -237,12 +247,9 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
             typesList.push({type: 'c'});
             if (lastCritInfo.lastHeadRow < currentRowIndex) {
                 lastCritInfo.lastHeadRow = currentRowIndex;
-                //typesList.push('nt') //= 'nc' + lastCritInfo.numTables
                 typesList[2].isNewSubTable = true
             }
 
-            //if (lastCritInfo.crit.toString().replace(/\s+/g, ' ') == '6 (9а)')
-            //    console.log('NT', currentRowIndex, lastCritInfo.lastHeadRow, typesList, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' '))
             lastCategory = true
         }
         if (isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet)) && lastCategory) {
@@ -254,12 +261,9 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     let prevRep = Table;
     let currentRepIndex = 0;
 
-    //if (categoryList[0] == '6 (9а)' && categoryList[1] == 'Безвозмездная педагогическая деятельность (10)')
-    //    console.log('ADD', categoryList, typesList)
     addToSchema(categoryList, typesList, schema);
     while (true) {
         if (!(categoryList[currentRepIndex] in prevRep)) {
-
             ierarchyAttend(prevRep, currentRepIndex, categoryList, value);
             break
         } else {
@@ -274,11 +278,11 @@ function isMaxBallsCell(r, c, sheet) {
     while (c >= 1) {
         let prevCellValue = getCellValue(r, c - 1, sheet);
         if (prevCellValue) {
-            if (prevCellValue.toString().toUpperCase().search('Максимальное количество баллов:'.toUpperCase()) != -1)
-                return true;
-            else return false
+            return prevCellValue.toString()
+                .toUpperCase()
+                .search('Максимальное количество баллов:'.toUpperCase()) !== -1;
         }
-        c--
+        c--;
     }
     return false
 }
@@ -286,7 +290,6 @@ function isMaxBallsCell(r, c, sheet) {
 function parseCrits(sheet) {
     let Table = {};
     let Schema = {};
-    let rowIndex = 0;
     let lastCritInfo = {numTables: 0};
 
     var range = xlsx.utils.decode_range(sheet['!ref']);

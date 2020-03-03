@@ -1,42 +1,52 @@
+'use strict'
 const passport = require('passport');
-const Auth0Strategy = require('passport-auth0');
 const db = require('../controllers/dbController');
+const ActiveDirectoryStrategy = require('./ldapstrategy');
 
-var strategy = new Auth0Strategy(
-    {
-      domain: 'vladyan18.eu.auth0.com',
-      clientID: 'GioyT7jHzp8opB8ZdMNeJsPRkID4RJNI',
-      clientSecret: 'jrV4PqnRFNVTjWwm2IY0sJ405h1Shl_501JZ1teBjqHbSN_22h00BhsQNq2dG5IY',
-      callbackURL:
-        process.env.AUTH0_CALLBACK_URL || '/callback'
-    },
-    async function (accessToken, refreshToken, extraParams, profile, done) {
-        if (profile._json && profile._json.email) id = profile._json.email;
-        else id = profile.user_id;
-      if(!await db.isUser(id)){
-        await db.createUser({Role : "User", id: id, Ball: 0,  Achievement: [], Registered: false})
-      }
-
-
-      return done(null, profile)
+passport.use(new ActiveDirectoryStrategy({
+    integrated: false,
+    ldap: {
+        url: process.env.LDAP_URL,
+        baseDN: 'dc=ad,dc=pu,dc=com',
     }
-);
+}, function (profile, ad, done) {
+    console.log('AD', profile, ad);
+    if (profile)
+        return done(null, profile);
+    else return done(null, false)
+}));
 
-passport.use(strategy);
 
-  passport.serializeUser( async function (user, done) {
-      if (user._json && user._json.email) id = user._json.email;
-      else id = user.user_id;
-      r = await db.isRegistered(id);
-    user.Registered = r;
-      let role = await db.getUserRights(id);
-      user.Role = role.Role;
-      user.Rights = role.Rights;
+passport.serializeUser( async function (user, done) {
+    const id = user._json.sAMAccountName;
+    const isUser = await db.isUser(id);
+    console.log('SpbuID', id + '@student.spbu.ru', 'IsUser:', !!isUser);
+    let isRegistered = false;
+    if (!isUser) {
+            await db.createUser({
+                Role: "User",
+                id: id,
+		SpbuId: id + '@student.spbu.ru',
+                Ball: 0,
+                Achievement: [],
+                Registered: false
+            });
+            await db.migrate(id);
+    } else isRegistered = await db.isRegistered(id);
+    user.Registered = isRegistered;
+    let role = await db.getUserRights(id);
+    if (role) {
+        user.Role = role.Role;
+        user.Rights = role.Rights;
+    }
+    user.user_id = id;
+    console.log('User', id, 'successfuly logged in');
     done(null, user)
-  });
-  
-  passport.deserializeUser(function (user, done) {
-      done(null, user)
-  });
+});
+
+passport.deserializeUser(function (user, done) {
+    console.log('Des', user.user_id);
+    done(null, user)
+});
 
 module.exports = passport;

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import staffContextStore from "../../../stores/staff/staffContextStore";
-import {withRouter} from "react-router";
+import {withRouter} from "react-router-dom";
 
 class StaffStudentsRating extends Component {
     constructor(props) {

@@ -1,3 +1,4 @@
+'use strict'
 /** Express router providing API
  * @module API
  * @requires express
@@ -18,15 +19,13 @@ const notifyController = require('../controllers/notificationController');
 const historyController = require('../controllers/historyNotesController');
 const criteriasController = require('../controllers/criteriasController');
 const db = require('../controllers/dbController.js');
-const path = require('path');
-const upload = require('../config/multer');
-
 /**
  * If not authenticated, or do not have Admin rigths, redirect to 404
 
  * @function adminAuth
  * */
 const adminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -41,6 +40,7 @@ const adminAuth = async (req, res, next) => {
 
 
 const superAdminAuth = async (req, res, next) => {
+    let id;
     if (req.user._json && req.user._json.email)
         id = req.user._json.email;
     else id = req.user.user_id;
@@ -80,7 +80,7 @@ const auth = (req, res, next) => {
             next();
     }
     else {
-        return res.redirect('/login')
+        return res.sendStatus(401);
     }
 };
 
@@ -250,6 +250,8 @@ router.get('/getFacultiesList', auth, facultyController.getFacultiesList);
 router.get('/getFaculty', auth, facultyController.getFaculty);
 
 router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
+
+router.get('/prepareForNewPgas', superAdminAuth, adminController.prepareForNewPgas);
 
 /**
  * Get current rating for admin

@@ -1,8 +1,9 @@
 import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
+import '../assets/fontawesome-free-5.12.1-web/css/all.css'
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
-import {Switch} from "react-router";
+import {Switch} from "react-router-dom";
 import StaffHeaderContainer from "./containers/staff/staffHeaderContainer";
 import StaffMenu from './views/staff/staffMenu'
 import userPersonalStore from "../stores/userPersonalStore";

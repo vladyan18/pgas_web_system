@@ -486,7 +486,7 @@ class ConfirmationForm extends Component {
                                                     <input {...getInputProps()} />
                                                     <p>Нажмите, либо перетащите файл</p>
                                                     <p style={{fontSize: "small", color: "#4f4f4f"}}>Максимальный
-                                                        размер: 50 Мб</p>
+                                                        размер: 15 Мб</p>
                                                 </div>}
                                                 <aside>
                                                     <ul>{this.state.file && <div>
@@ -506,8 +506,8 @@ class ConfirmationForm extends Component {
                                                                 </td>
                                                             </tr>
                                                         </table>
-                                                        {Math.ceil(this.state.file.size / 1024 / 1024) > 50 &&
-                                                        <span className="redText">Размер файла превышает 50 Мб</span>}
+                                                        {Math.ceil(this.state.file.size / 1024 / 1024) > 15 &&
+                                                        <span className="redText">Размер файла превышает 15 Мб</span>}
                                                     </div>}
                                                     </ul>
                                                 </aside>
@@ -517,7 +517,7 @@ class ConfirmationForm extends Component {
                                     </Dropzone>
                                     <button id="SaveButton" className="btn btn-success"
                                             disabled={!(this.state.Name && this.state.file) ||
-                                            Math.ceil(this.state.file.size / 1024 / 1024) > 50}
+                                            Math.ceil(this.state.file.size / 1024 / 1024) > 15}
                                             value="Назад" onClick={this.addConfirmation}>Сохранить
                                     </button>
                                 </form>

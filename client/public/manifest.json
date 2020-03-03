@@ -6,6 +6,16 @@
       "src": "logo_bss2_KRe_icon.ico",
       "sizes": "128x128 96x96 64x64 48x48 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "big_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "medium_icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
