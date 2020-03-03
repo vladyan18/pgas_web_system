@@ -83,20 +83,19 @@ exports.GetUsersWithAllInfo = async function (faculty, checked=false, stale=fals
         .populate(
             {
                 path: 'Achievement',
-                match: { achDate: {$gte: '2019-02-1'}},
+                match: { $or: [ {achDate: {$gte: '2019-02-1'}}, {$or: [ {crit: '7а'}, {crit: '1 (7а)'} ] } ] },
                 populate : {
                     path : 'confirmations.id'
                 }
             }
         ).lean().exec()
-        console.log(users);
     }
     else {
         users = await UserModel.find({Faculty: faculty, IsInRating: true})
             .populate(
                 {
                     path: 'Achievement',
-                    match: { achDate: {$gte: '2019-02-1'}},
+                    match: { $or: [ {achDate: {$gte: '2019-02-1'}}, {$or: [ {crit: '7а'}, {crit: '1 (7а)'} ] } ] },
                     populate: {
                         path: 'confirmations.id'
                     }

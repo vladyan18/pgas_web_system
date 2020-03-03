@@ -51,7 +51,7 @@ module.exports.GetAnnotationsForFaculty = async function (req, res) {
 
 module.exports.saveCriteriasForFaculty = async function (req, res) {
     await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
-    checkActualityOfUsersAchievements(req.body.faculty).then(() => console.log('Check finished'));
+    //checkActualityOfUsersAchievements(req.body.faculty).then(() => console.log('Check finished'));
 
     return res.sendStatus(200)
 };
