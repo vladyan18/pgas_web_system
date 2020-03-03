@@ -10,15 +10,15 @@ import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
 import {observer} from "mobx-react";
 
-const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"))
-const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"))
-const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"))
-const StaffCriteriasPage = React.lazy(() => import("./views/staff/staffCriteriasPage"))
-const StaffAnnotationsPage = React.lazy(() => import("./views/staff/staffAnnotationsPage"))
+const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"));
+const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"));
+const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"));
+const StaffCriteriasPage = React.lazy(() => import("./views/staff/staffCriteriasPage"));
+const StaffAnnotationsPage = React.lazy(() => import("./views/staff/staffAnnotationsPage"));
 const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage/CriteriasMenu'));
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
-const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"))
+const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"));
 
 const PrivateRoute = ({component: Component, ...rest}) => (
     <Route {...rest} render={props => (
