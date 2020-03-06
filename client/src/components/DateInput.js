@@ -39,7 +39,7 @@ class DateInput extends Component {
       mask={[/[0-3]/, /\d/, '.', /[0-1]/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
       className={'form-control date achDate' + (this.props.isValid === false ? ' is-invalid' : '') +
       (this.props.isValid ? ' is-valid' : '')} type="text"
-      placeholder='дд.мм.гггг' onChange={this.handleDateChange} value={this.state.value}
+      placeholder='дд.мм.гггг' inputmode="numeric" onChange={this.handleDateChange} value={this.state.value}
       disabled={this.props.disabled}/>
 
     );

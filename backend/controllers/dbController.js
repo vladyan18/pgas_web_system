@@ -83,7 +83,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {achDate: {$gte: '2019-02-1'}},
+              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: "7а"}, {crit: "1 (7а)"}]} ]},
               populate: {
                 path: 'confirmations.id',
               },
@@ -94,7 +94,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {achDate: {$gte: '2019-02-1'}},
+              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: "7а"}, {crit: "1 (7а)"}]} ]},
               populate: {
                 path: 'confirmations.id',
               },
