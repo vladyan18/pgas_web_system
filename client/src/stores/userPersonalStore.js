@@ -10,7 +10,6 @@ class UserPersonalStore {
     async update() {
         try {
             let result = await fetchGet('/getProfile', {});
-            console.log('GET PROFILE', result);
             this.personal = result;
             if (result)
                 await fetchGet('/getRights', {id: result.id}).then((res2) => {
@@ -79,7 +78,6 @@ class UserPersonalStore {
     }
 
     get IsInRating() {
-        console.log(this.personal)
         if (this.personal) return this.personal.IsInRating;
         else return false
     }

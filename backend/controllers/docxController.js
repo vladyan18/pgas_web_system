@@ -275,12 +275,17 @@ module.exports.getResultTable = async function(req, res) {
   try {
     const faculty = await db.getFaculty(req.query.faculty);
     const kri = JSON.parse((await db.getCriterias(req.query.faculty)).Crits);
+    const critNames = Object.keys(kri);
+    if (critNames[0] === '7а') {
+      critNames.splice(9, 0, '10в');
+    }
+
     const users = [];
     const Users = await db.getCurrentUsers(req.query.faculty);
     for (const user of Users) {
       let sumBall = 0;
       const crits = {};
-      for (const key of Object.keys(kri)) {
+      for (const key of critNames) {
         crits[key] = 0;
       }
       const Achs = await db.findActualAchieves(user.id);

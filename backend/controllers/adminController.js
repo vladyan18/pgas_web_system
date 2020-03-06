@@ -221,7 +221,9 @@ module.exports.getUser = async function(req, res) {
 };
 
 module.exports.getRating = async function(req, res) {
-  const kri = JSON.parse(JSON.stringify(Kri));
+  const criterias = await db.getCriterias(req.query.faculty);
+  const kri = JSON.parse(criterias.Crits);
+
   const users = [];
   const Users = await db.getCurrentUsers(req.query.faculty);
   for (const user of Users) {

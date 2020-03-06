@@ -8,7 +8,7 @@ class StaffStudentsRating extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {}
+        this.state = {};
 
         this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
     };
@@ -44,7 +44,7 @@ class StaffStudentsRating extends Component {
             },
             {
                 dataField: 'Type',
-                text: 'М/Б',
+                text: 'Ст. об.',
                 headerClasses: 'text-center',
                 headerStyle: {width: '10px', fontSize:'smaller'},
                 style: {'vertical-align': 'middle', fontSize: 'small', overflow: 'hidden', width: '10px'},
@@ -60,8 +60,11 @@ class StaffStudentsRating extends Component {
                 classes: 'text-center'
             }]
 
-        let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '10в', '11а', '11б', '11в'];
-        let crits = Object.keys(this.props.crits)
+        let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '11а', '11б', '11в'];
+        let crits = Object.keys(this.props.crits);
+        if (crits[0] !== '7а') {
+            critsNames.splice(9, 0, '10в')
+        }
         if (this.props.userMode)
             this.columns.push({
                 dataField: 'Ball',
@@ -72,7 +75,9 @@ class StaffStudentsRating extends Component {
                 classes: 'text-center'
             })
 
+
         for (let i = 0; i < crits.length; i++) {
+            console.log(crits[i])
             this.columns.push({
                 dataField: "Crits." + crits[i] + "",
                 text: critsNames[i],
@@ -103,7 +108,7 @@ class StaffStudentsRating extends Component {
     }
 
     render() {
-        let filtered = this.props.data
+        let filtered = this.props.data;
         if (this.props.faculty == 'ВШЖиМК' && this.state.currentDirection) {
             filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
         }
@@ -115,7 +120,7 @@ class StaffStudentsRating extends Component {
             else {
                 for (let crit of Object.keys(obj1.Crits)) {
                     diff = obj2.Crits[crit] - obj1.Crits[crit];
-                    if (diff != 0) return diff
+                    if (diff !== 0) return diff
                 }
                 return 0
             }
