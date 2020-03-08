@@ -18,6 +18,20 @@ class UserDetailedRating extends Component {
 
     render() {
         const props = this.props;
+        let filtered = this.props.data;
+        let sorted = filtered.sort(function(obj1, obj2) {
+            let diff = obj2.Ball-obj1.Ball;
+            if (diff != 0)
+                return obj2.Ball-obj1.Ball;
+            else {
+                for (let crit of Object.keys(obj1.Crits)) {
+                    diff = obj2.Crits[crit] - obj1.Crits[crit];
+                    if (diff !== 0) return diff
+                }
+                return 0
+            }
+        });
+
         return <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
             <div className="profile" style={{"display": "flex", "justify-content": "space-between"}} >
                 <div className="centered_ver">
@@ -44,7 +58,7 @@ class UserDetailedRating extends Component {
                     <option value={dir}>{dir}</option> )}
             </select>}
             <hr className="hr_blue"/>
-            { this.props.data.map((user, index) =>
+            { sorted.map((user, index) =>
                 <div style={{marginBottom: '2rem'}}>
                     <h4 style={{display: 'flex',
                         justifyContent: 'space-between',
