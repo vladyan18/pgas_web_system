@@ -67,6 +67,7 @@ module.exports.getProfile = async function(req, res) {
       Type: User.Type,
       Course: User.Course,
       IsInRating: User.IsInRating,
+      Registered: User.Registered,
     });
   } else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName});
 };
