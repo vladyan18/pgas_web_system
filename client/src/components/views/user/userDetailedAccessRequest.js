@@ -64,6 +64,7 @@ class UserDetailedAccessRequest extends Component {
 
     render() {
         if (!userPersonalStore.personal) return null;
+        if (!userPersonalStore.personal.Registered) return null;
 
         if (!userPersonalStore.Settings
             || userPersonalStore.Settings.detailedAccessAllowed === undefined
