@@ -6,6 +6,9 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 import {fetchGet} from '../../../services/fetchService';
 import {makeExportUsersTable} from '../../../services/exportXLSX';
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 
 class StaffMenu extends Component {
   constructor(props) {
@@ -46,7 +49,7 @@ class StaffMenu extends Component {
       <main>
         <div id="panel" className="row" style={{'justifyContent': 'center', 'display': 'flex'}}>
 
-          <div className="menu">
+          <div className="menu" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
             <p className="headline">
                             Меню сотрудника
             </p>

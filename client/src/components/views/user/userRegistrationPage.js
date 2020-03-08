@@ -56,9 +56,6 @@ class UserRegistrationPage extends Component {
             user.type = this.state.Type;
             user.course = this.state.Course;
 
-            if (this.state.AccessAllowed)
-                user.settings = {AccessAllowed: true};
-
             fetchSendWithoutRes('/api/registerUser', user).then((result) => {
                 if (result) this.props.history.push('/');
             })
@@ -76,25 +73,6 @@ class UserRegistrationPage extends Component {
 
 
     render() {
-
-        const allowAccessPopover = (
-            <Popover id="popover-basic" style={{width: "40rem"}}>
-                <Popover.Title as="h3">Согласие на открытие доступа</Popover.Title>
-                <Popover.Content>
-                    Ставя эту галочку, вы разрешаете участникам конкурса с вашего факультета, <b>также поставившим эту
-                    галочку</b>,
-                    просматривать ваши достижения в рейтинге на ПГАС. Такая возможность предоставляется в целях
-                    повышения открытости процесса и формирования доверия между всеми участниками назначения ПГАС.
-                    <br/>
-                    <i style={{fontSize: "small", color: "#5d5d5d"}}>Таким образом, ставя данную галочку, вы
-                        дополнительно даете согласие на публикацию информации,
-                        относящейся к вашим персональным данным в соответствии со статьей 9 Федерального закона
-                        от 27.07.2006 №152-ФЗ «О персональных данных», в целях повышения открытости процесса назначения
-                        ПГАС. Отзыв данного согласия
-                        возможен путем изменения настроек в профиле.</i>
-                </Popover.Content>
-            </Popover>
-        );
 
         return (
             <div className="container-fluid">
@@ -184,15 +162,6 @@ class UserRegistrationPage extends Component {
                                         return <option value={x + 1}>{x + 1}</option>
                                     })}
                                 </select><br/>
-
-                                <OverlayTrigger trigger={['hover']} placement="top"
-                                                overlay={allowAccessPopover}>
-                                    <div className="checkbox" style={{color: "green"}}>
-                                        <input type="checkbox" id="checkbox_1"
-                                               onChange={() => this.setState({AccessAllowed: !this.state.AccessAllowed})}/>
-                                        <label htmlFor="checkbox_1">Открыть участникам доступ к моим достижениям</label>
-                                    </div>
-                                </OverlayTrigger>
 
                                 <button type="button" onClick={this.register}
                                         className="btn btn-primary btn-md button_send"

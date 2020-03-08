@@ -10,6 +10,52 @@ import staffContextStore from '../../../stores/staff/staffContextStore';
 import staffNewAchievementsStore from '../../../stores/staff/staffNewAchievementsStore';
 import currentContestStore from '../../../stores/staff/currentContestStore';
 import currentContestRatingStore from '../../../stores/staff/currentContestRatingStore';
+import logoBss from '../../../assets/img/logo_bss.svg';
+import logoSPbU from '../../../assets/img/CoA_Small_whitebg.svg';
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
+
+const logoBackground = css`
+  background-color: #9F2D20;
+  height: 60px;
+  width: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  clip-path: polygon(0 0, 60% 0, 100% 100%, 40% 100%);
+  @media only screen and (max-device-width: 480px) {
+    height: 35px;
+    width: 40px;
+  }
+  
+`;
+
+const LogoBSS = styled.img`
+  height: 55px;
+  align-self: center;
+  padding-right: 10px;
+  @media only screen and (max-device-width: 480px) {
+    height: 35px;
+  }
+`;
+
+const LogoSPbU = styled.img`
+  height: 55px;
+  @media only screen and (max-device-width: 480px) {
+    height: 32px;
+  }
+
+`;
+
+const pageTop = css`
+    background-color: white;
+    border-bottom: 1px solid #a5a5a5;
+    align-items: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+`;
+
 
 class StaffHeader extends Component {
   constructor(props) {
@@ -37,12 +83,19 @@ class StaffHeader extends Component {
 
   render() {
     return <header>
-      <div className="row page_top">
-        <div className="col-9 block_header">
-          <img src={logo} className="logo_img"/>
+      <div className="row" css={pageTop}>
+        <div className="col-9 block_header" style={{marginTop: 0, marginBottom: 0}}>
+          <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
+            <LogoSPbU src={logoSPbU} alt={'СПбГУ'}/>
+          </a>
+          <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
+            <div css={logoBackground}>
+              <LogoBSS src={logoBss} alt={'БСС'}/>
+            </div>
+          </a>
           <div className="p_header">
-                        Санкт-Петербургский государственный университет <br/>
-            {this.props.pageName}
+            <span css={css`color: #595959;`}>Студенческий совет СПбГУ</span> <br/>
+            <span css={css`padding-left: 13px; color: black;`}>{this.props.pageName}</span>
           </div>
         </div>
 

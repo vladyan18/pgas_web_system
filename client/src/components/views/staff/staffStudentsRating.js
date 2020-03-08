@@ -3,6 +3,9 @@ import '../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {withRouter} from "react-router-dom";
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 
 class StaffStudentsRating extends Component {
     constructor(props) {
@@ -73,7 +76,7 @@ class StaffStudentsRating extends Component {
                 headerStyle: {borderRight: '3px dotted black', fontSize:'smaller'},
                 style: {'vertical-align': 'middle', borderRight: '3px dotted black', fontWeight: 'bold', fontSize:'smaller'},
                 classes: 'text-center'
-            })
+            });
 
 
         for (let i = 0; i < crits.length; i++) {
@@ -128,8 +131,8 @@ class StaffStudentsRating extends Component {
 
         return (
 
-                    <div className="col-9 general">
-                        <div className="profile" style={{"display": "flex", "justify-content": "space-between"}}>
+                    <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
+                        <div className="profile" style={{"display": "flex", "justify-content": "space-between"}} >
                             <div className="centered_ver">
                                 <p className="headline">
                                     Рейтинг студентов

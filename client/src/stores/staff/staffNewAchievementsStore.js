@@ -16,7 +16,6 @@ class staffNewAchievementsStore {
                     const letter2 = obj2.crit[obj2.crit.length - 1].charCodeAt(0);
                     const number1 = obj1.crit.substr(0, obj1.crit.length - 1);
                     const number2 = obj2.crit.substr(0, obj2.crit.length - 1);
-                    console.log(number1, letter1, number2, letter2)
                     let result = Number.parseInt(number1) - Number.parseInt(number2);
                     if (result === 0) {
                         result = letter1 - letter2;

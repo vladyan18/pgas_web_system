@@ -6,6 +6,7 @@ class CurrentContestStore {
 
     async update(facultyName) {
         let result = await fetchGet("/api/checked", {faculty: facultyName});
+        console.log('USERS UPDATED');
         for (let user of result.Info) {
             user.Achievements = user.Achievements.sort(function(obj1, obj2) {
                 if (obj1.crit.indexOf('(') !== -1)
@@ -15,7 +16,6 @@ class CurrentContestStore {
                     const letter2 = obj2.crit[obj2.crit.length - 1].charCodeAt(0);
                     const number1 = obj1.crit.substr(0, obj1.crit.length - 1);
                     const number2 = obj2.crit.substr(0, obj2.crit.length - 1);
-                    console.log(number1, letter1, number2, letter2)
                     let result = Number.parseInt(number1) - Number.parseInt(number2);
                     if (result === 0) {
                         result = letter1 - letter2;
@@ -25,16 +25,11 @@ class CurrentContestStore {
             });
         }
         result.Info = result.Info.sort(function(obj1, obj2) {
-            if (obj1.LastName > obj2.LastName) {
+            console.log('SORT', obj1.user > obj2.user, obj1.user )
+            if (obj1.user > obj2.user) {
                 return 1;
             }
-            if (obj1.LastName < obj2.LastName) {
-                return -1;
-            }
-            if (obj1.FirstName > obj2.FirstName) {
-                return 1;
-            }
-            if (obj1.FirstName < obj2.FirstName) {
+            if (obj1.user < obj2.user) {
                 return -1;
             }
             return 0;

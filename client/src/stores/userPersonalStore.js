@@ -62,6 +62,11 @@ class UserPersonalStore {
         else return ''
     }
 
+    get Settings() {
+        if (this.personal) return this.personal.Settings;
+        else return null;
+    }
+
     get Type() {
         if (this.personal) return this.personal.Type;
         else return ''
@@ -98,6 +103,7 @@ decorate(UserPersonalStore, {
     Patronymic: computed,
     Course: computed,
     Faculty: computed,
+    Settings: computed,
     Type: computed,
     Birthdate: computed,
     Direction: computed,

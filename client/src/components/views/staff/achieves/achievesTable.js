@@ -3,11 +3,14 @@ import '../../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
+import {observer} from "mobx-react";
+import AchievesComment from "./achievesComment";
 
 class AchievesTable extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {};
         this.accept = this.accept.bind(this);
         this.decline = this.decline.bind(this);
         this.edit = this.edit.bind(this);
@@ -21,50 +24,24 @@ class AchievesTable extends Component {
     }
 
     statusFormatter = (cell, row) => (
-        row.status + (row.ball ? '('+row.ball+')': '')
+        row.status + (row.ball !== undefined && row.ball !== null ? '('+row.ball+')': '')
     );
 
     charsFormatter = (cell, row) =>
         (
-            <div style={{"display": "flex", 'flex-wrap': "wrap", "max-width": "20rem"}}>
+            <div style={{"display": "flex", 'flexWrap': "wrap", "maxWidth": "20rem"}}>
                 {row.chars.map((x) => {
                     let str = x;
                     if (str.length > 35) {
                         str = x.substr(0, 15) + '...' + x.substr(x.length - 15, 15)
                     }
-                    return (<div className="charsItem">{str}</div>)
+                    return (<div key={row._id.toString() + x} className="charsItem">{str}</div>)
                 })}
             </div>
         );
 
     newComments = {};
-    commentsFormatter = (cell, row) =>
-        (
-            <div className="input-group commentContainer" style={{height: 'unset', width: '100%'}}>
-                <div style={{width: '100%'}}>
-            <textarea id={row._id} className={"form-control" + (row.comment ? " commentSended" : "")}
-    defaultValue={row.comment}
-    onChange={(e) => this.newComments[row._id] = e.target.value} style={{height: "8.2rem", width: '100%'}}/>
-                <div  style={{"marginRight": "0px"}}>
-                    <button className="btn btn-danger"
-                            style={{"font-size": "xx-small", "margin": "0px", backgroundColor: "#61363a"}}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
-                            }}>Отмена
-                    </button>
-                    <button className="btn btn-info" style={{"font-size": "xx-small", "margin": "0px", backgroundColor: "#3d5c61"}}
-                             onClick={(e) => {
-                        //e.preventDefault();
-                        //e.stopPropagation();
-                        this.handleCommentChange(e, row._id)
-                    }}>Ок
-                    </button>
-                </div>
-                </div>
-            </div>
-        );
+    commentsFormatter = (cell, row) => <AchievesComment row={row} updater={this.props.updater}/>;
 
     actionsFormatter = (cell, row) => (
         <div style={{"display": "block"}}>
@@ -130,11 +107,11 @@ class AchievesTable extends Component {
     ];
 
     rowClasses = (row, rowIndex) => {
-        if (row.status == 'Отказано')
+        if (row.status === 'Отказано')
             return 'declined-row';
-        if (row.status == 'Изменено')
+        if (row.status === 'Изменено')
             return 'edited-row';
-        if (row.status == 'Принято' || row.status == 'Принято с изменениями')
+        if (row.status === 'Принято' || row.status === 'Принято с изменениями')
             return 'accepted-row';
         else return ''
     };
@@ -180,8 +157,9 @@ class AchievesTable extends Component {
     handleCommentChange(e, id) {
         document.getElementById(id).defaultValue = this.newComments[id];
         console.log(this.newComments[id]);
-        fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then(
-            this.props.updater()
+        fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then( () => {
+                this.props.updater()
+            }
         );
         e.preventDefault()
     }

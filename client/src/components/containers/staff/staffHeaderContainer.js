@@ -7,6 +7,24 @@ function StaffHeaderContainer(props) {
   const {location} = props;
   let pathname;
   switch (location.pathname) {
+    case '/staff/manageAnnotations':
+      pathname = 'Управление примечаниями';
+      break;
+    case '/staff/criteriasPage':
+      pathname = 'Критерии';
+      break;
+    case '/staff/statistics':
+      pathname = 'Статистика';
+      break;
+    case '/staff/rating':
+      pathname = 'Рейтинг';
+      break;
+    case '/staff/newAchieves':
+      pathname = 'Новые достижения';
+      break;
+    case '/staff/current':
+      pathname = 'Текущий конкурс';
+      break;
     case '/staff':
       pathname = 'Меню сотрудника';
       break;

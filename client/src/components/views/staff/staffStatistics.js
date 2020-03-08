@@ -7,6 +7,9 @@ import {Doughnut, Bar, Chart, Scatter, Line} from 'react-chartjs-2';
 import 'chartjs-plugin-labels';
 import PCA from 'pca-js';
 import {agnes} from 'ml-hclust';
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 
 const originalDoughnutDraw = Chart.controllers.doughnut.prototype.draw;
 Chart.helpers.extend(Chart.controllers.doughnut.prototype, {
@@ -352,8 +355,8 @@ class StaffStatistics extends Component {
 
     return (
       <main>
-        <div id="panel" className="row justify_center">
-          <div className="col-9 general">
+        <div id="panel" className="row justify_center" >
+          <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
             <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between'}}>
               <div className="centered_ver">
                 <p className="headline">

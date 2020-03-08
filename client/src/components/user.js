@@ -12,6 +12,7 @@ import userPersonalStore from '../stores/userPersonalStore';
 import CriteriasStore from '../stores/criteriasStore';
 import {Switch, withRouter} from 'react-router-dom';
 import {observer} from 'mobx-react';
+import UserDetailedAccessRequest from "./views/user/userDetailedAccessRequest";
 
 const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
 const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
@@ -76,6 +77,7 @@ class User extends Component {
             </div>
           </div>
       }
+      <UserDetailedAccessRequest />
       </div>
       </>);
   }

@@ -83,7 +83,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: "7а"}, {crit: "1 (7а)"}]} ]},
+              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: '7а'}, {crit: '1 (7а)'}]}]},
               populate: {
                 path: 'confirmations.id',
               },
@@ -94,7 +94,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: "7а"}, {crit: "1 (7а)"}]} ]},
+              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: '7а'}, {crit: '1 (7а)'}]}]},
               populate: {
                 path: 'confirmations.id',
               },
@@ -433,12 +433,12 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
       achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1;
       achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball;
 
-      if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].indexOf('РИНЦ') > 0) RINC += 1;
+      if (ach.chars.some((x) => x.indexOf('РИНЦ') > 0)) RINC += 1;
       else
-      if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('Scopus') > 0) SCOPUS += 1;
+      if (ach.chars.some((x) => x.indexOf('Scopus') > 0)) SCOPUS += 1;
       else
-      if (ach.chars[articlesIndexCol] && ach.chars[articlesIndexCol].search('ВАК') > 0) VAK += 1;
-      else if (ach.chars[0] === '5 (8б)') unindexed += 1;
+      if (ach.chars.some((x) => x.indexOf('ВАК') > 0)) VAK += 1;
+      else if (ach.chars[0] === '5 (8б)' || ach.chars[0] === '8б') unindexed += 1;
     }
   }
   return {

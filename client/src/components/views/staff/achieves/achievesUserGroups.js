@@ -4,6 +4,9 @@ import AchievesGroup from './achievesGroup';
 import Modal from 'react-modal';
 import StaffChangeAchievement from '../StaffChangeAchievement';
 import staffContextStore from '../../../../stores/staff/staffContextStore';
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 
 class AchievesUserGroups extends React.PureComponent {
   constructor(props) {
@@ -64,7 +67,7 @@ class AchievesUserGroups extends React.PureComponent {
 
     return (
       <main id="main">{filteredUsers &&
-            <div id="panel" className="col list" style={{'width': '100%'}}>
+            <div id="panel" className="col list" style={{'width': '100%'}} css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
               <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <h2 style={{fontSize: '2rem'}}>
                   <b>Факультет: {staffContextStore.faculty}</b>
@@ -95,7 +98,7 @@ class AchievesUserGroups extends React.PureComponent {
               </div>
 
               {filteredUsers.map((item) => (
-                <div key={item._id}>
+                <div key={item.Id}>
                   <AchievesGroup item={item} updater={this.props.updater} openModal={this.openEditModal} filters={{hideCheckedAchieves: this.state.hideCheckedAchieves}}/>
                 </div>
               ))}
