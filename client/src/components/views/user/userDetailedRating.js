@@ -100,7 +100,9 @@ class UserDetailedRating extends Component {
                         </tr>)
                     }
                     </tbody>
-                    </table> || <div style={{width: '100%', textAlign:'center'}}>Пользователь не дал разрешение на просмотр его достижений.</div>}
+                    </table> }
+
+                    { user.Achievements === null && <div style={{width: '100%', textAlign:'center'}}>Пользователь не дал разрешение на просмотр его достижений.</div>}
                 </div>
             )
             }
