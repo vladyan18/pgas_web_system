@@ -488,7 +488,7 @@ module.exports.getRating = async function(req, res) {
         sumBall += ach.ball;
       }
     }
-    const shouldAddAchievements = requestingUser.Settings && requestingUser.Settings.detailedAccessAllowed && user.Settings.detailedAccessAllowed;
+    const shouldAddAchievements = requestingUser.Settings && requestingUser.Settings.detailedAccessAllowed && user.Settings && user.Settings.detailedAccessAllowed;
     const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
     users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction,
       Achievements: (shouldAddAchievements) ? Achs : null});
