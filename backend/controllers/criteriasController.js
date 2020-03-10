@@ -47,23 +47,24 @@ module.exports.getAnnotationsForFaculty = async function(req, res) {
   } else return res.sendStatus(404);
 };
 
-module.exports.saveCriteriasForFaculty = async function (req, res) {
-    await db.UploadCriteriasToFaculty(req.body.crits, req.body.faculty);
-    //checkActualityOfUsersAchievements(req.body.faculty).then(() => console.log('Check finished'));
+module.exports.saveCriteriasForFaculty = async function(req, res) {
+  await db.uploadCriteriasToFaculty(req.body.crits, req.body.faculty);
+  checkActualityOfUsersAchievements(req.body.faculty).then(() => console.log('Check finished'));
 
   return res.sendStatus(200);
 };
 
 const checkActualityOfUsersAchievements = async function(faculty) {
-  const users = (await db.getUsersWithAllInfo(faculty, false)).concat(await db.getUsersWithAllInfo(faculty, true));
+  const users = (await db.getCurrentUsers(faculty)).concat(await db.getNewUsers(faculty));
+  // const users = (await db.getUsersWithAllInfo(faculty, false)).concat(await db.getUsersWithAllInfo(faculty, true));
   const crits = await db.getCriterias(faculty, true);
 
   console.log(faculty);
   console.log(Object.keys(crits));
   for (const user of users) {
-    for (const achievement of user.Achievement) {
-      await db.checkActualityOfAchievementCharacteristics(achievement, crits);
-    }
+    // for (const achievement of user.Achievement) {
+    // await db.checkActualityOfAchievementCharacteristics(achievement, crits);
+    // }
     await adminController.balls(user.id, faculty);
   }
 };
