@@ -417,6 +417,9 @@ module.exports.updateAchieve = async function(req, res) {
         if (!changeDetected) continue;
       }
       if (oldAch[field] !== req.body.data[field]) {
+        if (oldAch.status !== 'Ожидает проверки') {
+          return res.sendStatus(403);
+        }
         achieve.status = 'Ожидает проверки';
         achieve.ball = undefined;
       }
