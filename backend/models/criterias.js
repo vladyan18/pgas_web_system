@@ -6,6 +6,7 @@ const criteriasSchema = mongoose.Schema({
   Date: Date,
   Crits: String,
   CritsSchema: String,
+  Limits: [],
   Hash: String,
 });
 

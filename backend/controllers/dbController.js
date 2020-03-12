@@ -294,7 +294,7 @@ exports.getCriterias = async function(facultyName, fullInfo) {
   const facObject = await FacultyModel.findOne({Name: facultyName});
   if (!fullInfo) {
     if (facObject && facObject.CritsId) {
-      return CriteriasModel.findById(facObject.CritsId, 'Crits');
+      return CriteriasModel.findById(facObject.CritsId, 'Crits Limits');
     } else return undefined;
   } else {
     if (facObject && facObject.CritsId) {
@@ -306,7 +306,7 @@ exports.getCriterias = async function(facultyName, fullInfo) {
 exports.getCriteriasAndSchema = async function(facultyName) {
   const facObject = await FacultyModel.findOne({Name: facultyName});
   if (facObject.CritsId) {
-    return CriteriasModel.findById(facObject.CritsId, 'Crits CritsSchema');
+    return CriteriasModel.findById(facObject.CritsId, 'Crits CritsSchema Limits');
   } else return undefined;
 };
 
@@ -351,6 +351,7 @@ exports.uploadCriteriasToFaculty = async function(crits, faculty) {
   critsObject.Crits = JSON.stringify(crits.crits);
   critsObject.Hash = md5(JSON.stringify(crits.crits));
   critsObject.CritsSchema = JSON.stringify(crits.schema);
+  critsObject.Limits = crits.limits;
   critsObject.FacultyId = facultyObject._id.toString();
 
   critsObject = await CriteriasModel.create(critsObject);

@@ -5,6 +5,7 @@ class StaffContextStore {
     faculty;
     criterias;
     schema;
+    limits;
     annotations;
     learningProfile;
     directions;
@@ -16,10 +17,11 @@ class StaffContextStore {
     async changeFaculty(newFaculty) {
         this.faculty = newFaculty;
         this.schema = undefined;
+        this.limits = undefined;
         this.annotations = undefined;
         this.learningProfile = undefined;
         let Faculty = await fetchGet('/api/getFaculty', {name: newFaculty});
-        this.directions = Faculty.Directions
+        this.directions = Faculty.Directions;
         let criterias = await fetchGet('/api/getCriterias', {faculty: newFaculty});
         this.criterias = criterias;
 
@@ -37,7 +39,8 @@ class StaffContextStore {
         let result = await fetchGet('/api/getCriteriasAndSchema', {faculty: this.faculty});
         if (result) {
             this.criterias = JSON.parse(result.Crits);
-            this.schema = JSON.parse(result.CritsSchema)
+            this.schema = JSON.parse(result.CritsSchema);
+            this.limits = result.Limits;
         }
     }
 }
@@ -46,6 +49,7 @@ decorate(StaffContextStore, {
     faculty: observable,
     criterias: observable,
     schema: observable,
+    limits: observable,
     annotations: observable,
     learningProfile: observable,
     directions: observable,

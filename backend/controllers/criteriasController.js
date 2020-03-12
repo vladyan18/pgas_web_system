@@ -280,9 +280,11 @@ function isMaxBallsCell(r, c, sheet) {
   while (c >= 1) {
     const prevCellValue = getCellValue(r, c - 1, sheet);
     if (prevCellValue) {
-      return prevCellValue.toString()
+      const isMaxBalls = prevCellValue.toString()
           .toUpperCase()
           .search('Максимальное количество баллов:'.toUpperCase()) !== -1;
+
+      return isMaxBalls;
     }
     c--;
   }
@@ -292,6 +294,7 @@ function isMaxBallsCell(r, c, sheet) {
 function parseCrits(sheet) {
   const Table = {};
   const Schema = {};
+  const Limits = [];
   const lastCritInfo = {numTables: 0};
 
   const range = xlsx.utils.decode_range(sheet['!ref']);
@@ -300,15 +303,19 @@ function parseCrits(sheet) {
     for (let col = range.s.c; col <= range.e.c; col++) {
       const cellValue = getCellValue(row, col, sheet);
 
-      if (isValue(cellValue) && !isMaxBallsCell(row, col, sheet)) {
-        attendInTable(cellValue, col, row, sheet, Table, lastCritInfo, Schema);
+      if (isValue(cellValue)) {
+        if (!isMaxBallsCell(row, col, sheet)) {
+          attendInTable(cellValue, col, row, sheet, Table, lastCritInfo, Schema);
+        } else {
+          Limits.push(cellValue);
+        }
       }
     }
   }
 
   const end = new Date().getTime();
   console.log('SecondWay: ' + (end - start).toString() + ' ms');
-  return {crits: Table, schema: Schema};
+  return {crits: Table, schema: Schema, limits: Limits};
 }
 
 

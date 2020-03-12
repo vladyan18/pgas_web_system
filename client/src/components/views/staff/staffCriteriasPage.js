@@ -48,7 +48,7 @@ class StaffCriteriasPage extends Component {
             <div style={{'width': '100%', 'height': '100%'}}>
               {(staffContextStore.criterias && staffContextStore.schema) &&
                             <CriteriasTableViewer criterias={staffContextStore.criterias}
-                              schema={staffContextStore.schema}/>}
+                              schema={staffContextStore.schema} limits={staffContextStore.limits}/>}
             </div>
           </div>
         </div>
