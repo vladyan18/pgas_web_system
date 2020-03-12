@@ -105,7 +105,7 @@ class CriteriasMenu extends Component {
             <div style={{'width': '70%', 'height': '100%'}}>
               {this.state.criterias &&
                                 <CriteriasTableViewer criterias={this.state.criterias.crits}
-                                  schema={this.state.criterias.schema}/>}
+                                  schema={this.state.criterias.schema} limits={this.state.criterias.limits}/>}
             </div>
           </div>
         </div>

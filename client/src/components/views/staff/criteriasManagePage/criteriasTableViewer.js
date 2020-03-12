@@ -302,8 +302,31 @@ class CriteriasTableViewer extends Component {
     }
 
     render() {
+        const limits = this.props.limits;
+        console.log('limits', limits);
+        console.log(this.props.criterias)
+        const areas = ['7', '8', '9', '10', '11'];
         return (
             <div>
+                {limits && <><p>Ограничения на максимальную сумму баллов по областям деятельности:</p>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Область</th>
+                        <th>Макс. сумма</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        limits.map((limit, index) =>
+                        <tr key={index}>
+                            <td>{areas[index]}</td>
+                            <td>{limit}</td>
+                        </tr>)
+                    }
+                    </tbody>
+                </table></>}
+
                 {Object.keys(this.props.criterias).map((key) => {
                     //if (key != '6 (9а)') return null;
 

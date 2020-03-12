@@ -223,23 +223,63 @@ module.exports.getUser = async function(req, res) {
 module.exports.getRating = async function(req, res) {
   const criterias = await db.getCriterias(req.query.faculty);
   const kri = JSON.parse(criterias.Crits);
+  const limits = criterias.Limits;
+
+  function getAreaNum(critName) {
+    const critNum = Object.keys(kri).indexOf(critName);
+    if (critNum === -1) return undefined;
+    const shift = Object.keys(kri).length === 12 ? 0 : 1;
+
+    if (critNum < 3) return 0;
+    if (critNum < 5) return 1;
+    if (critNum < 7) return 2;
+    if (critNum < 9 + shift) return 3;
+    return 4;
+  }
 
   const users = [];
   const Users = await db.getCurrentUsers(req.query.faculty);
   for (const user of Users) {
     let sumBall = 0;
     const crits = {};
+    const sums = [0, 0, 0, 0, 0];
+    const critsByAreas = [[], [], [], [], []];
+
     for (const key of Object.keys(kri)) {
       crits[key] = 0;
+      critsByAreas[getAreaNum(key)].push(key);
     }
     const Achs = await db.findActualAchieves(user.id);
+
     for (const ach of Achs) {
       if (!ach) continue;
       if (ach.ball) {
         crits[ach.crit] += ach.ball;
-        sumBall += ach.ball;
+        sums[getAreaNum(ach.crit)] += ach.ball;
       }
     }
+
+    if (limits) {
+      for (let i = 0; i < critsByAreas.length; i++) {
+        while (sums[i] > limits[i]) {
+          for (const crit of critsByAreas[i]) {
+            if (crits[crit] > 0 && sums[i] > limits[i]) {
+              const delta = (sums[i] - limits[i]);
+              sums[i] -= Math.min(delta, crits[crit]);
+              crits[crit] -= Math.min(delta, crits[crit]);
+            }
+          }
+        }
+      }
+    }
+
+
+    for (let i = 0; i < critsByAreas.length; i++) {
+      for (const crit of critsByAreas[i]) {
+        sumBall += crits[crit];
+      }
+    }
+
     const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
     users.push({_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction});
   }

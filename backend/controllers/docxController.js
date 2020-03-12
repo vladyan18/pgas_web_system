@@ -272,84 +272,124 @@ async function makeConfirmationFileWithLinks(links) {
 }
 
 module.exports.getResultTable = async function(req, res) {
-  try {
-    const faculty = await db.getFaculty(req.query.faculty);
-    const kri = JSON.parse((await db.getCriterias(req.query.faculty)).Crits);
-    const critNames = Object.keys(kri);
-    if (critNames[0] === '7а') {
-      critNames.splice(9, 0, '10в');
+  // try {
+  const faculty = await db.getFaculty(req.query.faculty);
+  const critsObject = await db.getCriterias(req.query.faculty);
+  const kri = JSON.parse(critsObject.Crits);
+  const limits = critsObject.Limits;
+  const critNames = Object.keys(kri);
+  if (critNames[0] === '7а') {
+    critNames.splice(9, 0, '10в');
+  }
+
+  function getAreaNum(critName) {
+    const critNum = Object.keys(kri).indexOf(critName);
+    if (critNum === -1) return undefined;
+    const shift = Object.keys(kri).length === 12 ? 0 : 1;
+
+    if (critNum < 3) return 0;
+    if (critNum < 5) return 1;
+    if (critNum < 7) return 2;
+    if (critNum < 9 + shift) return 3;
+    return 4;
+  }
+
+  const users = [];
+  const Users = await db.getCurrentUsers(req.query.faculty);
+  for (const user of Users) {
+    let sumBall = 0;
+    const crits = {};
+    const sums = [0, 0, 0, 0, 0];
+    const critsByAreas = [[], [], [], [], []];
+
+    for (const key of critNames) {
+      crits[key] = 0;
+      if (key === '10в') continue;
+      critsByAreas[getAreaNum(key)].push(key);
+    }
+    const Achs = await db.findActualAchieves(user.id);
+    for (const ach of Achs) {
+      if (!ach) continue;
+      if (ach.ball) {
+        crits[ach.crit] += ach.ball;
+        sums[getAreaNum(ach.crit)] += ach.ball;
+      }
     }
 
-    const users = [];
-    const Users = await db.getCurrentUsers(req.query.faculty);
-    for (const user of Users) {
-      let sumBall = 0;
-      const crits = {};
-      for (const key of critNames) {
-        crits[key] = 0;
-      }
-      const Achs = await db.findActualAchieves(user.id);
-      for (const ach of Achs) {
-        if (!ach) continue;
-        if (ach.ball) {
-          crits[ach.crit] += ach.ball;
-          sumBall += ach.ball;
-        }
-      }
-      const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
-      users.push({Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall});
-    }
-
-    users.sort(function(obj1, obj2) {
-      let diff = obj2.Ball-obj1.Ball;
-      if (diff !== 0) {
-        return obj2.Ball-obj1.Ball;
-      } else {
-        for (const crit of Object.keys(obj1.Crits)) {
-          diff = obj2.Crits[crit] - obj1.Crits[crit];
-          if (diff !== 0) return diff;
-        }
-        return 0;
-      }
-    });
-
-
-    XlsxPopulate.fromFileAsync(anketPath + '/docs/ResultTable.xlsx')
-        .then((workbook) => {
-          try {
-            workbook.sheet(0).cell('A4').value(faculty.OfficialName);
-            // Modify the workbook.
-            for (let i = 0; i < users.length; i++) {
-              const r = [];
-              r[0] = i + 1;
-              r[1] = users[i].Name;
-              r[2] = users[i].Type;
-              r[3] = users[i].Course;
-              for (let j = 0; j < Object.keys(users[i].Crits).length; j++) {
-                r.push(users[i].Crits[Object.keys(users[i].Crits)[j]]);
-              }
-              r.push(users[i].Ball);
-              workbook.sheet(0).cell('A' + (i + 5)).value([r]);
+    if (limits) {
+      for (let i = 0; i < critsByAreas.length; i++) {
+        while (sums[i] > limits[i]) {
+          for (const crit of critsByAreas[i]) {
+            if (crits[crit] > 0 && sums[i] > limits[i]) {
+              const delta = (sums[i] - limits[i]);
+              sums[i] -= Math.min(delta, crits[crit]);
+              crits[crit] -= Math.min(delta, crits[crit]);
             }
-            for (let i = 1; i < 19; i++) {
-              workbook.sheet(0).column(i).style('horizontalAlignment', 'center');
-            }
-            workbook.sheet(0).column('B').style('horizontalAlignment', 'left');
-            workbook.sheet(0).cell('B1').style('horizontalAlignment', 'center');
-
-            workbook.toFileAsync(anketPath + '/docs/ResultTable2.xlsx').then(() => {
-              res.download(path.resolve(anketPath + '/docs/ResultTable2.xlsx'), 'PGAS_' + translitter().transform(faculty.Name, '_') + '_' + (new Date()).getFullYear() + '.xlsx');
-            });
-          } catch (e) {
-            res.status(500).send(e);
           }
-        }).catch((e) => {
+        }
+      }
+    }
+
+    for (let i = 0; i < critsByAreas.length; i++) {
+      for (const crit of critsByAreas[i]) {
+        sumBall += crits[crit];
+      }
+    }
+
+    const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+    users.push({Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall});
+  }
+
+  users.sort(function(obj1, obj2) {
+    let diff = obj2.Ball-obj1.Ball;
+    if (diff !== 0) {
+      return obj2.Ball-obj1.Ball;
+    } else {
+      for (const crit of Object.keys(obj1.Crits)) {
+        diff = obj2.Crits[crit] - obj1.Crits[crit];
+        if (diff !== 0) return diff;
+      }
+      return 0;
+    }
+  });
+
+
+  XlsxPopulate.fromFileAsync(anketPath + '/docs/ResultTable.xlsx')
+      .then((workbook) => {
+        try {
+          workbook.sheet(0).cell('A4').value(faculty.OfficialName);
+          // Modify the workbook.
+          for (let i = 0; i < users.length; i++) {
+            const r = [];
+            r[0] = i + 1;
+            r[1] = users[i].Name;
+            r[2] = users[i].Type;
+            r[3] = users[i].Course;
+            for (let j = 0; j < Object.keys(users[i].Crits).length; j++) {
+              r.push(users[i].Crits[Object.keys(users[i].Crits)[j]]);
+            }
+            r.push(users[i].Ball);
+            workbook.sheet(0).cell('A' + (i + 5)).value([r]);
+          }
+          for (let i = 1; i < 19; i++) {
+            workbook.sheet(0).column(i).style('horizontalAlignment', 'center');
+          }
+          workbook.sheet(0).column('B').style('horizontalAlignment', 'left');
+          workbook.sheet(0).cell('B1').style('horizontalAlignment', 'center');
+
+          workbook.toFileAsync(anketPath + '/docs/ResultTable2.xlsx').then(() => {
+            res.download(path.resolve(anketPath + '/docs/ResultTable2.xlsx'), 'PGAS_' + translitter().transform(faculty.Name, '_') + '_' + (new Date()).getFullYear() + '.xlsx');
+          });
+        } catch (e) {
           res.status(500).send(e);
-        });
-  } catch (err) {
+        }
+      }).catch((e) => {
+        res.status(500).send(e);
+      });
+  /* } catch (err) {
     console.log(err);
     res.status(500).send(err);
-  }
+  }*/
 };
 
 const font9404 = fs.readFileSync(path.join(__dirname, '../fonts/9404.ttf'));
