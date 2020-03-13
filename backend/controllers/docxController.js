@@ -300,39 +300,26 @@ module.exports.getResultTable = async function(req, res) {
     let sumBall = 0;
     const crits = {};
     const sums = [0, 0, 0, 0, 0];
-    const critsByAreas = [[], [], [], [], []];
 
     for (const key of critNames) {
       crits[key] = 0;
-      if (key === '10в') continue;
-      critsByAreas[getAreaNum(key)].push(key);
     }
     const Achs = await db.findActualAchieves(user.id);
     for (const ach of Achs) {
       if (!ach) continue;
       if (ach.ball) {
         crits[ach.crit] += ach.ball;
+        sumBall += ach.ball;
         sums[getAreaNum(ach.crit)] += ach.ball;
       }
     }
 
     if (limits) {
-      for (let i = 0; i < critsByAreas.length; i++) {
-        while (sums[i] > limits[i]) {
-          for (const crit of critsByAreas[i]) {
-            if (crits[crit] > 0 && sums[i] > limits[i]) {
-              const delta = (sums[i] - limits[i]);
-              sums[i] -= Math.min(delta, crits[crit]);
-              crits[crit] -= Math.min(delta, crits[crit]);
-            }
-          }
+      for (let i = 0; i < sums.length; i++) {
+        if (sums[i] > limits[i]) {
+          const delta = sums[i] - limits[i];
+          sumBall -= delta;
         }
-      }
-    }
-
-    for (let i = 0; i < critsByAreas.length; i++) {
-      for (const crit of critsByAreas[i]) {
-        sumBall += crits[crit];
       }
     }
 

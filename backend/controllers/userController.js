@@ -475,12 +475,28 @@ module.exports.getRating = async function(req, res) {
     return;
   }
 
-  const kri = JSON.parse((await db.getCriterias(facultyName)).Crits);
+  function getAreaNum(critName) {
+    const critNum = Object.keys(kri).indexOf(critName);
+    if (critNum === -1) return undefined;
+    const shift = Object.keys(kri).length === 12 ? 0 : 1;
+
+    if (critNum < 3) return 0;
+    if (critNum < 5) return 1;
+    if (critNum < 7) return 2;
+    if (critNum < 9 + shift) return 3;
+    return 4;
+  }
+
+  const criterionObject = await db.getCriterias(facultyName);
+  const kri = JSON.parse(criterionObject.Crits);
+  const limits = criterionObject.Limits;
   const users = [];
   const Users = await db.getCurrentUsers(facultyName);
   for (const user of Users) {
     let sumBall = 0;
     const crits = {};
+    const sums = [0, 0, 0, 0, 0];
+
     for (const key of Object.keys(kri)) {
       crits[key] = 0;
     }
@@ -490,6 +506,16 @@ module.exports.getRating = async function(req, res) {
       if (ach.ball) {
         crits[ach.crit] += ach.ball;
         sumBall += ach.ball;
+        sums[getAreaNum(ach.crit)] += ach.ball;
+      }
+    }
+
+    if (limits) {
+      for (let i = 0; i < sums.length; i++) {
+        if (sums[i] > limits[i]) {
+          const delta = sums[i] - limits[i];
+          sumBall -= delta;
+        }
       }
     }
     const shouldAddAchievements = requestingUser.Settings && requestingUser.Settings.detailedAccessAllowed && user.Settings && user.Settings.detailedAccessAllowed;
