@@ -7,17 +7,24 @@ import staffContextStore from '../../../../stores/staff/staffContextStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
+import {observer} from "mobx-react";
+import SystematicsInfo from "./systematicsInfo";
 
 class AchievesUserGroups extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {modalIsOpen: false, modalAchId: ''};
+    this.state = {modalIsOpen: false, modalAchId: '', systematicsConflicts: []};
     Modal.setAppElement('#root');
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
     this.toggleCheckedAchieve = this.toggleCheckedAchieve.bind(this);
     this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
+    this.updateSystematicsCallback = this.updateSystematicsCallback.bind(this);
   };
+
+  updateSystematicsCallback(systematicsConflicts) {
+    this.setState({systematicsConflicts: systematicsConflicts})
+  }
 
   openEditModal(achId) {
     this.setState({modalIsOpen: true, modalAchId: achId});
@@ -52,13 +59,13 @@ class AchievesUserGroups extends React.PureComponent {
     let checkedAchCount = 0;
 
     let filteredUsers = this.props.users;
-    if (staffContextStore.faculty == 'ВШЖиМК' && this.state.currentDirection) {
-      filteredUsers = filteredUsers.filter((x) => x.Direction == this.state.currentDirection);
+    if (staffContextStore.faculty === 'ВШЖиМК' && this.state.currentDirection) {
+      filteredUsers = filteredUsers.filter((x) => x.Direction === this.state.currentDirection);
     }
 
     for (const user of filteredUsers) {
       for (const ach of user.Achievements) {
-        if (ach.status != 'Ожидает проверки' && ach.status != 'Изменено' ) {
+        if (ach.status !== 'Ожидает проверки' && ach.status !== 'Изменено' ) {
           checkedAchCount += 1;
         }
         totalAchCount += 1;
@@ -97,9 +104,16 @@ class AchievesUserGroups extends React.PureComponent {
                 </div>
               </div>
 
+              <SystematicsInfo users={this.props.users} updateSystematicsCallback={this.updateSystematicsCallback}/>
+
+
               {filteredUsers.map((item) => (
                 <div key={item.Id}>
-                  <AchievesGroup item={item} updater={this.props.updater} openModal={this.openEditModal} filters={{hideCheckedAchieves: this.state.hideCheckedAchieves}}/>
+                  <AchievesGroup item={item} updater={this.props.updater}
+                                 openModal={this.openEditModal}
+                                 filters={{hideCheckedAchieves: this.state.hideCheckedAchieves}}
+                                 systematicsConflicts={this.state.systematicsConflicts}
+                  />
                 </div>
               ))}
             </div>}
