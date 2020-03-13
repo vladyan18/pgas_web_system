@@ -23,15 +23,16 @@ class StaffContextStore {
         let Faculty = await fetchGet('/api/getFaculty', {name: newFaculty});
         this.directions = Faculty.Directions;
         let criterias = await fetchGet('/api/getCriterias', {faculty: newFaculty});
-        this.criterias = criterias;
+        this.criterias = JSON.parse(criterias.Crits);
+        this.limits = criterias.Limits;
 
     }
 
     async getAnnotations() {
         let result = await fetchGet('/api/getAnnotations', {faculty: this.faculty});
         if (result) {
-            this.annotations = result.annotations
-            this.learningProfile = result.learningProfile
+            this.annotations = result.annotations;
+            this.learningProfile = result.learningProfile;
         } else console.log('ANN NOT FOUND', this.faculty)
     }
 
