@@ -7,6 +7,7 @@ class CriteriasStore {
     criterias;
     annotations;
     schema;
+    limits;
     learningProfile;
     facultyRawName;
 
@@ -22,7 +23,8 @@ class CriteriasStore {
         try {
             const result = await fetchGet('/api/getCriterias', {faculty: facultyName});
             if (result) {
-                this.criterias = result;
+                this.criterias = JSON.parse(result.Crits);
+                this.limits = result.Limits;
             }
         } catch(error) {
                 console.log(error)
@@ -38,6 +40,7 @@ decorate(CriteriasStore, {
     criterias: observable,
     annotations: observable,
     schema: observable,
+    limits: observable,
     learningProfile: observable,
     facultyRawName: observable
 });

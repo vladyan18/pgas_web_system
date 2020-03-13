@@ -14,8 +14,14 @@ import criteriasStore from "../../../stores/criteriasStore";
 class UserDetailedRating extends Component {
     constructor(props) {
         super(props);
+        this.toggleDetailedMode = this.toggleDetailedMode.bind(this);
     };
 
+    toggleDetailedMode() {
+        if (this.props.toggleModeCallback) {
+            this.props.toggleModeCallback();
+        }
+    }
     render() {
         const props = this.props;
         let filtered = this.props.data;
@@ -32,6 +38,31 @@ class UserDetailedRating extends Component {
             }
         });
 
+        function getAreaNum(critName) {
+            const critNum = Object.keys(criteriasStore.criterias).indexOf(critName);
+            if (critNum === -1) return undefined;
+            const shift = Object.keys(criteriasStore.criterias).length === 12 ? 0 : 1;
+
+            if (critNum < 3) return 0;
+            if (critNum < 5) return 1;
+            if (critNum < 7) return 2;
+            if (critNum < 9 + shift) return 3;
+            return 4;
+        }
+
+        for (const user of sorted) {
+            user.sums = [0, 0, 0, 0, 0];
+            for (const ach of user.Achievements) {
+                user.sums[getAreaNum(ach.crit)] += ach.ball;
+            }
+        }
+
+        function hasOverhead(user, crit) {
+            return user.Crits[crit] > 0 &&
+                (user.sums[getAreaNum(crit)] > limits[getAreaNum(crit)])
+        }
+
+        const limits = criteriasStore.limits;
         return <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
             <div className="profile" style={{"display": "flex", "justify-content": "space-between"}} >
                 <div className="centered_ver">
@@ -40,6 +71,10 @@ class UserDetailedRating extends Component {
                     </p>
                 </div>
                 <div className="centered_ver" style={{"display": "flex"}}>
+                    {   this.props.toggleModeCallback &&
+                        <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-outline-info"
+                                value="Кратко" onClick={this.toggleDetailedMode}>Кратко </button>
+                    }
                     <button id="DeleteButton" className="btn btn-secondary"
                             value="Назад" onClick={() => {
                         this.props.history.goBack()
@@ -68,13 +103,20 @@ class UserDetailedRating extends Component {
                         <thead>
                         <tr style={{fontSize: 'small'}}>
                             {Object.keys(criteriasStore.criterias).map((crit) =>
-                                <td style={{textAlign: 'center', padding: '5px'}}><b>{crit}</b></td>)}
+                                <td style={{textAlign: 'center', padding: '5px'
+                                }}><b>{crit}</b></td>)}
                         </tr>
                         </thead>
                         <tbody id="usersTable">
                         <tr style={{fontSize: 'small'}}>
                             {Object.keys(user.Crits).map((crit) =>
-                                <td style={{textAlign: 'center', padding: '5px'}}>{user.Crits[crit]}</td>)}
+                                <td style={{textAlign: 'center', padding: '5px',
+                                    color: hasOverhead(user, crit) ? 'red' : 'black',
+                                    }
+                                } title={hasOverhead(user, crit) ?
+                                    'Суммарный балл за область превышает установленное ограничение, поэтому \n при итоговом суммировании он будет считаться с ограничением.'
+                                    : null
+                                }><span style={{borderBottom: hasOverhead(user, crit) ? '1px dashed red' : null}}>{user.Crits[crit]}</span></td>)}
                         </tr>
                         </tbody>
                     </table>

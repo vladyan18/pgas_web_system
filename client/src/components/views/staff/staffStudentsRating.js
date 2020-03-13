@@ -13,13 +13,20 @@ class StaffStudentsRating extends Component {
 
         this.state = {};
 
-        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
+        this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
+        this.toggleDetailedMode = this.toggleDetailedMode.bind(this);
     };
 
     numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
 
     columns = [
         ];
+
+    toggleDetailedMode() {
+        if (this.props.toggleDetailedModeCallback) {
+            this.props.toggleDetailedModeCallback();
+        }
+    }
 
     handleDirectionSelect(e) {
         this.setState({currentDirection: e.target.value})
@@ -139,6 +146,11 @@ class StaffStudentsRating extends Component {
                                 </p>
                             </div>
                             <div className="centered_ver" style={{"display": "flex"}}>
+                                {
+                                    this.props.toggleDetailedModeCallback &&
+                                    <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-outline-info"
+                                        value="Подробно" onClick={this.toggleDetailedMode}>Подробно</button>
+                                }
                                 <button id="DeleteButton" className="btn btn-secondary"
                                         value="Назад" onClick={() => {
                                     this.props.history.goBack()

@@ -73,7 +73,7 @@ module.exports.getCriterias = async function(req, res) {
   try {
     const criterias = await db.getCriterias(req.query.faculty);
     if (criterias) {
-      res.status(200).send(criterias.Crits);
+      res.status(200).send({Crits: criterias.Crits, Limits: criterias.Limits});
     } else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName});
   } catch (e) {
     res.status(500).send(e);
