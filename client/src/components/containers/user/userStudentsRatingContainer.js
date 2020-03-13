@@ -14,11 +14,19 @@ class UserStudentsContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    if ( userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed) {
+        this.state.isDetailedMode = true;
+    }
     this.getUsers = this.getUsers.bind(this);
+    this.toggleMode = this.toggleMode.bind(this);
   };
 
   componentDidMount() {
     this.getUsers().then();
+  }
+
+  toggleMode() {
+    this.setState({isDetailedMode: !this.state.isDetailedMode});
   }
 
   async getUsers() {
@@ -50,19 +58,25 @@ class UserStudentsContainer extends Component {
   }
 
   render() {
-    return (criteriasStore.criterias && this.state.users) && ( userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed &&
-            <UserDetailedRating
-              faculty={userPersonalStore.Faculty}
-              directions={userPersonalStore.Direction ? [userPersonalStore.Direction] : undefined}
-              userMode={true}
-              crits={criteriasStore.criterias}
-              data={this.state.users}/>
-              || <StaffStudentsRating faculty={userPersonalStore.Faculty}
-                                      directions={userPersonalStore.Direction ? [userPersonalStore.Direction] : undefined}
-                                      userMode={true}
-                                      crits={criteriasStore.criterias}
-                                      data={this.state.users}/>
-    ) || null;
+    console.log('isDEt', this.state.isDetailedMode === false);
+    if (!(criteriasStore.criterias && this.state.users)) return null;
+
+    if (this.state.isDetailedMode) {
+       return <UserDetailedRating
+           faculty={userPersonalStore.Faculty}
+           directions={userPersonalStore.Direction ? [userPersonalStore.Direction] : undefined}
+           userMode={true}
+           crits={criteriasStore.criterias}
+           data={this.state.users} toggleModeCallback={this.toggleMode}/>
+    } else {
+      return <StaffStudentsRating faculty={userPersonalStore.Faculty}
+                                  directions={userPersonalStore.Direction ? [userPersonalStore.Direction] : undefined}
+                                  userMode={true}
+                                  crits={criteriasStore.criterias}
+                                  data={this.state.users}
+                                  toggleDetailedModeCallback={(this.state.isDetailedMode === false) ? this.toggleMode : undefined}
+      />
+    }
   }
 }
 
