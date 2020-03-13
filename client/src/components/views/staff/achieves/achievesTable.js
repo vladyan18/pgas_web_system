@@ -107,13 +107,19 @@ class AchievesTable extends Component {
     ];
 
     rowClasses = (row, rowIndex) => {
+        let className = '';
+
         if (row.status === 'Отказано')
-            return 'declined-row';
+           className += 'declined-row';
         if (row.status === 'Изменено')
-            return 'edited-row';
-        if (row.status === 'Принято' || row.status === 'Принято с изменениями')
-            return 'accepted-row';
-        else return ''
+            className += 'edited-row';
+        if (row.status === 'Принято' || row.status === 'Принято с изменениями') {
+            if (this.props.systematicsConflicts && this.props.systematicsConflicts.some((x) => x.crit === row.crit)) {
+                className = 'systematicsFailed ';
+            }
+            className += 'accepted-row';
+        }
+        return className;
     };
 
     accept(e, id) {
@@ -168,7 +174,7 @@ class AchievesTable extends Component {
         let filteredAchieves;
         if (this.props.filters.hideCheckedAchieves)
         {
-            filteredAchieves = this.props.data.filter(x => (x.status != 'Принято' && x.status != 'Принято с изменениями'))
+            filteredAchieves = this.props.data.filter(x => (x.status !== 'Принято' && x.status !== 'Принято с изменениями'))
         }
         else filteredAchieves = this.props.data;
         return (

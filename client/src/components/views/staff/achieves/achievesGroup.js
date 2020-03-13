@@ -109,7 +109,7 @@ class AchievesGroup extends Component {
     return (
       <div>
         {this.state &&
-                <div className="name">
+                <div className="name" id={this.props.item.Id}>
                   <div style={{'width': '100%', 'textAlign': 'center', 'height': 'auto'}}
                     className="input-group headerContainer">
                     <div className={'nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
@@ -130,7 +130,8 @@ class AchievesGroup extends Component {
                   {!this.state.hidden && <div className="block">
 
                     <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} updater={this.props.updater}
-                      openModal={this.props.openModal} filters={this.props.filters}/>
+                      openModal={this.props.openModal} filters={this.props.filters}
+                                   systematicsConflicts={this.props.systematicsConflicts.filter((x) => x.id === this.props.item.Id)}/>
                   </div>}
                 </div>}
         <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
