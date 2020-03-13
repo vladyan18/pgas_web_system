@@ -30,8 +30,8 @@ class StaffContextStore {
     async getAnnotations() {
         let result = await fetchGet('/api/getAnnotations', {faculty: this.faculty});
         if (result) {
-            this.annotations = result.annotations
-            this.learningProfile = result.learningProfile
+            this.annotations = result.annotations;
+            this.learningProfile = result.learningProfile;
         } else console.log('ANN NOT FOUND', this.faculty)
     }
 

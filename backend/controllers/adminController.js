@@ -319,6 +319,10 @@ module.exports.balls = async function(id, faculty) {
   }
 };
 
+const trimNumber = function(num) {
+  return Number((num).toFixed(3));
+};
+
 /**
  * @return {number}
  */
@@ -333,8 +337,8 @@ const calculateBalls = function(Crit) {
       if (!Crit[ach]['balls']) continue;
       let shift = i;
       if (shift >= Crit[ach]['balls'].length) shift = Crit[ach]['balls'].length - 1;
-      if (Crit[ach]['balls'][shift] >= max) {
-        max = Crit[ach]['balls'][shift];
+      if (trimNumber(Crit[ach]['balls'][shift]) >= max) {
+        max = trimNumber(Crit[ach]['balls'][shift]);
         maxIndex = ach;
       }
     }
