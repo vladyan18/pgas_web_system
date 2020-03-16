@@ -24,7 +24,8 @@ class AchievesTable extends Component {
     }
 
     statusFormatter = (cell, row) => (
-        row.status + (row.ball !== undefined && row.ball !== null ? '('+row.ball+')': '')
+        <span>{row.status}{(row.isPendingChanges ? <span style={{color: 'blue'}} title='Пользователь догрузил документ'>*</span> : null)}
+            {(row.ball !== undefined && row.ball !== null ? '('+row.ball+')': '')}</span>
     );
 
     charsFormatter = (cell, row) =>
@@ -109,13 +110,16 @@ class AchievesTable extends Component {
     rowClasses = (row, rowIndex) => {
         let className = '';
 
+        if (row.isPendingChanges) {
+            className = 'pendingChanges ';
+        }
         if (row.status === 'Отказано')
            className += 'declined-row';
         if (row.status === 'Изменено')
             className += 'edited-row';
         if (row.status === 'Принято' || row.status === 'Принято с изменениями') {
             if (this.props.systematicsConflicts && this.props.systematicsConflicts.some((x) => x.crit === row.crit)) {
-                className = 'systematicsFailed ';
+                className += ' systematicsFailed ';
             }
             className += 'accepted-row';
         }
