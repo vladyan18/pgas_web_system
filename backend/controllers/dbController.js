@@ -221,16 +221,16 @@ exports.changeAchieveStatus = async function(id, accept = false) {
   if (accept) {
     const Ach = await AchieveModel.findById(id);
     if (Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями') {
-      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято с изменениями'}}, function(err, result) {
+      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято с изменениями', isPendingChanges: false}}, function(err, result) {
         console.log('');
       });
     } else {
-      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято'}}, function(err, result) {
+      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято', isPendingChanges: false}}, function(err, result) {
         console.log('');
       });
     }
   } else {
-    return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Отказано'}}, function(err, result) {
+    return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Отказано', isPendingChanges: false}}, function(err, result) {
       console.log('');
     });
   }

@@ -414,7 +414,9 @@ module.exports.updateAchieve = async function(req, res) {
         if (confirmsIdentical) {
           continue;
         } else {
-          achieve.isPendingChanges = true;
+          if (oldAch.status !== 'Ожидает проверки') {
+            achieve.isPendingChanges = true;
+          }
           continue;
         }
       }

@@ -106,6 +106,7 @@ module.exports.updateAchieve = async function(req, res) {
     day: 'numeric',
   };
   achieve.status = 'Изменено';
+  achieve.isPendingChanges = false;
   achieve.date = new Date().toLocaleString('ru', options);
 
   const oldAchieve = await db.findAchieveById(id);

@@ -13,16 +13,18 @@ import SystematicsInfo from "./systematicsInfo";
 class AchievesUserGroups extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {modalIsOpen: false, modalAchId: '', systematicsConflicts: []};
+    this.state = {modalIsOpen: false, modalAchId: '', systematicsConflicts: [], onlyUpdated: false};
     Modal.setAppElement('#root');
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
     this.toggleCheckedAchieve = this.toggleCheckedAchieve.bind(this);
     this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
     this.updateSystematicsCallback = this.updateSystematicsCallback.bind(this);
+    this.toggleOnlyUpdated = this.toggleOnlyUpdated.bind(this);
   };
 
   updateSystematicsCallback(systematicsConflicts) {
+    if (JSON.stringify(systematicsConflicts) !== JSON.stringify(this.state.systematicsConflicts))
     this.setState({systematicsConflicts: systematicsConflicts})
   }
 
@@ -42,6 +44,9 @@ class AchievesUserGroups extends React.PureComponent {
     this.setState({hideCheckedAchieves: !this.state.hideCheckedAchieves});
   }
 
+  toggleOnlyUpdated() {
+    this.setState({onlyUpdated: !this.state.onlyUpdated})
+  }
   handleDirectionSelect(e) {
     this.setState({currentDirection: e.target.value});
   }
@@ -58,15 +63,24 @@ class AchievesUserGroups extends React.PureComponent {
     let totalAchCount = 0;
     let checkedAchCount = 0;
 
+    let countOfUpdatedAchieves = 0;
     let filteredUsers = this.props.users;
-    if (staffContextStore.faculty === 'ВШЖиМК' && this.state.currentDirection) {
-      filteredUsers = filteredUsers.filter((x) => x.Direction === this.state.currentDirection);
+    if (this.state.onlyUpdated) {
+      filteredUsers = filteredUsers.filter((x) => x.Achievements.some((ach) => ach.isPendingChanges)).map((x) => Object.assign({}, x));
     }
 
     for (const user of filteredUsers) {
+      if (this.state.onlyUpdated) {
+        user.Achievements = user.Achievements.filter((x) => x.isPendingChanges)
+      }
       for (const ach of user.Achievements) {
-        if (ach.status !== 'Ожидает проверки' && ach.status !== 'Изменено' ) {
-          checkedAchCount += 1;
+        if (ach.status !== 'Ожидает проверки') {
+          if (ach.status !== 'Изменено') {
+            checkedAchCount += 1;
+          }
+          if (ach.isPendingChanges) {
+            countOfUpdatedAchieves += 1;
+          }
         }
         totalAchCount += 1;
       }
@@ -75,6 +89,10 @@ class AchievesUserGroups extends React.PureComponent {
     return (
       <main id="main">{filteredUsers &&
             <div id="panel" className="col list" style={{'width': '100%'}} css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
+              {countOfUpdatedAchieves && <div style={{width: '100%', textAlign: 'center'}}>
+                <span style={{color: 'blue',  borderBottom: '1px dashed blue',
+                  cursor: 'pointer'}} onClick={this.toggleOnlyUpdated}>Обновлено достижений: <b>{countOfUpdatedAchieves}</b></span>
+              </div>}
               <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <h2 style={{fontSize: '2rem'}}>
                   <b>Факультет: {staffContextStore.faculty}</b>
@@ -95,16 +113,16 @@ class AchievesUserGroups extends React.PureComponent {
                       marginLeft: '-1px',
                       marginTop: '-0.1rem',
                     }
-                  }>Проверено достижений: {checkedAchCount}/{totalAchCount}</p>
-                  <button
+                  }>{this.state.onlyUpdated ? 'Просмотр обновленных достижений' : <>Проверено достижений: {checkedAchCount}/{totalAchCount}</>}</p>
+                  {!this.state.onlyUpdated && <button
                     className={`btn btn-${this.state.hideCheckedAchieves ? 'success':'outline-info'}`}
                     onClick={this.toggleCheckedAchieve} >{this.state.hideCheckedAchieves ? 'Показать ' : 'Скрыть '}
                         проверенные достижения
-                  </button>
+                  </button>}
                 </div>
               </div>
 
-              <SystematicsInfo users={this.props.users} updateSystematicsCallback={this.updateSystematicsCallback}/>
+            <SystematicsInfo users={filteredUsers} updateSystematicsCallback={this.updateSystematicsCallback}/>
 
 
               {filteredUsers.map((item) => (
