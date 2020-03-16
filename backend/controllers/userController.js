@@ -399,7 +399,13 @@ module.exports.updateAchieve = async function(req, res) {
       day: 'numeric',
     };
     const oldAch = await db.findAchieveById(id);
-    for (const field of Object.keys(req.body.data)) {
+    achieve.comment = oldAch.comment;
+    achieve.status = oldAch.status;
+    achieve.criteriasHash = oldAch.criteriasHash;
+    achieve.isPendingChanges = oldAch.isPendingChanges;
+    achieve.ball = oldAch.ball;
+
+    for (const field of Object.keys(achieve)) {
       if (field === 'confirmations') {
         let confirmsIdentical = true;
         if (oldAch.confirmations.length !== req.body.data.confirmations.length) {
@@ -420,7 +426,9 @@ module.exports.updateAchieve = async function(req, res) {
           continue;
         }
       }
-      if (field === 'achDate') {
+      if (field === 'achDate' || field === 'isPendingChanges' ||
+          field === 'comment' || field === 'criteriasHash' ||
+          field === 'date' || field === 'isArchived') {
         continue;
       }
       if (field === 'chars') {
@@ -438,6 +446,7 @@ module.exports.updateAchieve = async function(req, res) {
       }
       if (oldAch[field] !== req.body.data[field]) {
         if (oldAch.status !== 'Ожидает проверки') {
+          console.log('Detected change in field:', field);
           return res.sendStatus(403);
         }
       }
