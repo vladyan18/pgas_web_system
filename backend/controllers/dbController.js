@@ -165,6 +165,7 @@ exports.updateAchieve = async function(id, achieve) {
     achievement: achieve.achievement, ball: achieve.ball,
     achDate: achieve.achDate, comment: achieve.comment,
     endingDate: achieve.endingDate,
+    isPendingChanges: achieve.isPendingChanges,
   };
 
   if (achieve.confirmations && achieve.confirmations.length > 0) {
