@@ -22,6 +22,7 @@ const achieveSchema = mongoose.Schema({
   ball: Number,
   isArchived: Boolean,
   criteriasHash: String,
+  isPendingChanges: Boolean,
 });
 
 const Achieve = connection.model('Achieve', achieveSchema);

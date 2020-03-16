@@ -400,7 +400,25 @@ module.exports.updateAchieve = async function(req, res) {
     };
     const oldAch = await db.findAchieveById(id);
     for (const field of Object.keys(req.body.data)) {
-      if (field === 'confirmations' || field === 'achDate') {
+      if (field === 'confirmations') {
+        let confirmsIdentical = true;
+        if (oldAch.confirmations.length !== req.body.data.confirmations.length) {
+          confirmsIdentical = false;
+        }
+        for (let i = 0; i < oldAch.confirmations.length; i++) {
+          if (oldAch.confirmations[i].id.toString() !== req.body.data.confirmations[i].id.toString()) {
+            confirmsIdentical = false;
+            break;
+          }
+        }
+        if (confirmsIdentical) {
+          continue;
+        } else {
+          achieve.isPendingChanges = true;
+          continue;
+        }
+      }
+      if (field === 'achDate') {
         continue;
       }
       if (field === 'chars') {
@@ -420,8 +438,6 @@ module.exports.updateAchieve = async function(req, res) {
         if (oldAch.status !== 'Ожидает проверки') {
           return res.sendStatus(403);
         }
-        achieve.status = 'Ожидает проверки';
-        achieve.ball = undefined;
       }
     }
 
@@ -432,7 +448,7 @@ module.exports.updateAchieve = async function(req, res) {
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
-    res.status(500).send(err);
+    res.sendStatus(500);
   }
 };
 
