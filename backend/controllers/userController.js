@@ -426,7 +426,7 @@ module.exports.updateAchieve = async function(req, res) {
           continue;
         }
       }
-      if (field === 'achDate' || field === 'isPendingChanges' ||
+      if (field === 'achDate' || field === 'endingDate' || field === 'isPendingChanges' ||
           field === 'comment' || field === 'criteriasHash' ||
           field === 'date' || field === 'isArchived') {
         continue;
@@ -446,7 +446,7 @@ module.exports.updateAchieve = async function(req, res) {
       }
       if (oldAch[field] !== req.body.data[field]) {
         if (oldAch.status !== 'Ожидает проверки') {
-          console.log('Detected change in field:', field);
+          console.log('Detected change in field:', field, oldAch[field], req.body.data[field]);
           return res.sendStatus(403);
         }
       }
