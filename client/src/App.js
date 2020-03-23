@@ -1,4 +1,3 @@
-import './style/bootstrap.min.css';
 import './style/user_main.css';
 import React, {Component, Suspense} from 'react';
 import User from "./components/user";
