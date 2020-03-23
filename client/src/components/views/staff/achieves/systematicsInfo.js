@@ -31,32 +31,35 @@ class SystematicsInfo extends Component {
         const users = this.props.users;
         const systematicsConflicts = [];
         const critNames = Object.keys(criterias);
-        for (const user of users) {
+        for (let k = 0; k < users.length; k++) {
             const counts = [];
-            for (let i = 0; i < critNames.length; i++) counts.push(0);
-            if (user.Achievements) {
-                for (const ach of user.Achievements) {
-                    console.log(ach.status);
+            for (let i = 0; i < critNames.length; i++) {
+              counts.push(0);
+            }
+
+            if (users[k].Achievements) {
+                for (const ach of users[k].Achievements) {
+			if (critNames.indexOf(ach.crit) === -1) console.log('ERROR', ach.crit);
                     if (ach.status === 'Принято' || ach.status === 'Принято с изменениями') {
                         counts[critNames.indexOf(ach.crit)] += 1;
                     }
                 }
             }
 
-            console.log(counts);
             for (let i = 0; i < counts.length; i++) {
                 if ([5, 10 + shift].includes(i) && counts[i] === 1) { //TODO
-                    systematicsConflicts.push({crit: critNames[i], username: user.user, id: user.Id});
+                    systematicsConflicts.push({crit: critNames[i], username: users[k].user, id: users[k].Id});
                 } else if (i === 6 && counts[i] > 0 && counts[i] < 3) {
-                    systematicsConflicts.push({crit: critNames[i], username: user.user, id: user.Id});
+                    systematicsConflicts.push({crit: critNames[i], username: users[k].user, id: users[k].Id});
                 }
             }
+
+        }
 
             if (this.props.updateSystematicsCallback) {
                 this.props.updateSystematicsCallback(systematicsConflicts);
             }
             return systematicsConflicts;
-        }
     }
 
     getCritsElements(conflicts) {
@@ -71,7 +74,7 @@ class SystematicsInfo extends Component {
             </span>
             {this.state.openedCrits[crit] &&
                 <div style={{marginLeft: '2rem'}}>
-                    {conflicts.filter((x) => x.crit === crit).map((conflict) => <a href={'#' + conflict.id}>{conflict.username}</a>)}
+                    {conflicts.filter((x) => x.crit === crit).map((conflict) => <div><a href={'#' + conflict.id}>{conflict.username}</a></div>)}
                 </div>
             }
             </div>

@@ -52,6 +52,7 @@ class UserDetailedRating extends Component {
 
         for (const user of sorted) {
             user.sums = [0, 0, 0, 0, 0];
+            if (user.Achievements)
             for (const ach of user.Achievements) {
                 user.sums[getAreaNum(ach.crit)] += ach.ball;
             }
