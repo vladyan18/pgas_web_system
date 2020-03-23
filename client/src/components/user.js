@@ -1,6 +1,6 @@
 import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
-import '../assets/fontawesome-free-5.12.1-web/css/all.css'
+import '../assets/fontawesome-free-5.12.1-web/css/small.css'
 import UserHeaderContainer from './containers/user/userHeaderContainer';
 import UserNavbarContainer from './containers/user/userNavbarContainer';
 import UserAchievesContainer from './containers/user/userAchievesContainer';
