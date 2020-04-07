@@ -32,7 +32,7 @@ const PrivateRoute = ({component: Component, ...rest}) => (
 class User extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {ready: CriteriasStore && userPersonalStore && !!(userPersonalStore.personal) && !!(CriteriasStore.criterias)};
   };
 
   async componentDidMount() {
