@@ -55,8 +55,10 @@ const LogoBSS = styled.img`
 
 const LogoSPbU = styled.img`
   height: 55px;
+  width: 47px;
   @media only screen and (max-device-width: 480px) {
     height: 32px;
+    width: 27px;
   }
 
 `;
