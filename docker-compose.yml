@@ -19,7 +19,7 @@
       - "27017:27017"
 
   server:
-    build: .
+    image: node
     working_dir: /opt/
     environment:
       LDAP_URL: ldap://srvdc.ad.pu.ru
