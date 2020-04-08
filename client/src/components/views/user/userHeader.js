@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
-import logo from '../../../img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
-import logoBss from '../../../assets/img/logo_bss.svg';
-import logoSPbU from '../../../assets/img/CoA_Small_whitebg.svg';
-// import userPersonalStore from '../../../stores/userPersonalStore';
+import logoBss from '../../../assets/img/logo_bss-compressed.svg';
+import logoSPbU from '../../../assets/img/CoA_Small_whitebg-compressed.svg';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
