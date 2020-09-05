@@ -3,6 +3,7 @@ import {decorate, observable} from 'mobx';
 class UserAchievesStore {
     achieves;
     confirmations;
+    archivedAchieves;
 
     getAchieves() {
         fetch("/api/getUserInfo", {
@@ -28,12 +29,21 @@ class UserAchievesStore {
                 this.achieves = data.Achs;
                 this.confirmations = data.Confirmations
             }).catch((err) => console.log(err));
+
+        fetch("/api/getArchivedAchievements", {
+            method: "GET"
+        }).then((resp) => {
+            return resp.json()
+        }).then((data) => {
+                this.archivedAchieves = data;
+            }).catch((err) => console.log(err));
     }
 }
 
 decorate(UserAchievesStore, {
     achieves: observable,
-    confirmations: observable
+    confirmations: observable,
+    archivedAchieves: observable
 });
 
 export default new UserAchievesStore();

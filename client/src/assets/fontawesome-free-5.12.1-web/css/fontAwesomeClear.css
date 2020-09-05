@@ -28,6 +28,10 @@
     content: "\f00d"
 }
 
+.fa-trash-alt:before {
+  content: "\f2ed"
+}
+
 @font-face {
     font-family: 'Font Awesome 5 Free';
     font-style: normal;

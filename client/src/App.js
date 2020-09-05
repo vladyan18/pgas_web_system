@@ -6,7 +6,6 @@ import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
-import "./setupProxy"
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));

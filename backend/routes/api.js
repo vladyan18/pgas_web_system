@@ -92,6 +92,8 @@ const auth = (req, res, next) => {
 router.get('/isAuth', userController.isAuth);
 
 router.get('/getUserInfo', auth, userController.dynamic);
+router.get('/getArchivedAchievements', auth, userController.getArchivedAchievements);
+//router.get('/cleanup', superAdminAuth, db.archiveAchievements);
 
 /**
  * Route serving user info (without achieves)
@@ -111,6 +113,9 @@ router.get('/getRights', auth, userController.getRights);
  * @auth adminAuth required
  */
 router.post('/comment', adminAuth, adminController.comment);
+
+router.get('/recalculate', superAdminAuth, adminController.recalculate);
+
 
 /**
  * Add achievement

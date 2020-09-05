@@ -33,6 +33,22 @@ module.exports.getAdmins = async function(req, res) {
   res.status(200).send({Users: users});
 };
 
+module.exports.recalculate = async function(req, res) {
+  const users = [];
+  const Users = await db.allUsers();
+  for (const user of Users) {
+        if (user.id && user.Faculty) {
+		try {
+		await module.exports.balls(user.id, user.Faculty);
+		} catch (error) {
+			console.log('Error with', user.LastName, ':  ', error);
+		}
+	}
+  }
+  res.status(200).send({Users: Users.length});
+};
+
+
 module.exports.getUsersForAdmin = async function(req, res) {
   const info = [];
   const Users = await db.getUsersWithAllInfo(req.query.faculty);

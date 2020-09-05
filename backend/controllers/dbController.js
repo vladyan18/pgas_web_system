@@ -27,6 +27,10 @@ exports.findUserByAchieve = async function(id) {
   return await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}});
 };
 
+exports.archiveAchievements = async function() {
+  await AchieveModel.updateMany({status: 'Отказано'}, {$set:{isArchived: true}});
+  console.log('UPDATED');
+}
 
 exports.migrate = async function(id) {
   const u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru', id: {$ne: id}}).lean();
@@ -83,7 +87,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: '7а'}, {crit: '1 (7а)'}]}]},
+              match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
               populate: {
                 path: 'confirmations.id',
               },
@@ -94,7 +98,7 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         .populate(
             {
               path: 'Achievement',
-              match: {$or: [{achDate: {$gte: '2019-02-1'}}, {$or: [{crit: '7а'}, {crit: '1 (7а)'}]}]},
+              match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
               populate: {
                 path: 'confirmations.id',
               },
@@ -120,26 +124,55 @@ exports.createUser = function(User) {
 
 exports.findActualAchieves = async function(userId) {
   const User = await UserModel.findOne({id: userId}, 'Achievement').lean();
-  const b = await AchieveModel.find({_id: {$in: User.Achievement}}).lean();
+  const b = await AchieveModel.find({_id: {$in: User.Achievement}, isArchived: {$ne: true} }).lean();
   const actualAchieves = [];
   for (let i = 0; i < b.length; i++) {
     if (b[i].crit === '7а' || b[i].crit === '1 (7а)') {
-      actualAchieves.push(b[i]);
+      if (b[i].achDate >= new Date(2020, 6, 1, 0, 0, 0, 0)) {
+         actualAchieves.push(b[i]);
+      }
       continue;
     }
 
-    if (b[i].achDate >= new Date(2019, 1, 1, 0, 0, 0, 0)) {
+    if (b[i].achDate >= new Date(2019, 8, 1, 0, 0, 0, 0)) {
       actualAchieves.push(b[i]);
     }
   }
   return (actualAchieves);
 };
 
+exports.findStaleAchieves = async function(userId) {
+  const User = await UserModel.findOne({id: userId}, 'Achievement').lean();
+  const b = await AchieveModel.find({_id: {$in: User.Achievement} }).lean();
+  const actualAchieves = [];
+  for (let i = 0; i < b.length; i++) {
+    if (b[i].isArchived) {
+	actualAchieves.push(b[i]);
+	continue;
+    }
+    if (b[i].crit === '7а' || b[i].crit === '1 (7а)') {
+      if (b[i].achDate < new Date(2020, 6, 1, 0, 0, 0, 0)) {
+         actualAchieves.push(b[i]);
+      }
+      continue;
+    }
+
+    if (b[i].achDate < new Date(2019, 8, 1, 0, 0, 0, 0)) {
+      actualAchieves.push(b[i]);
+    }
+  }
+  return (actualAchieves);
+};
+
+
 exports.findAchieveById = async function(id) {
   return await AchieveModel.findById(id).lean();
 };
 
 exports.createAchieve = async function(achieve) {
+  if (achieve.crit === '7а' || achieve.crit === '1 (7а)') {
+    achieve.achDate = new Date(2020, 6, 1, 0, 0, 0, 0);
+  }
   return AchieveModel.create(achieve);
 };
 
@@ -168,8 +201,8 @@ exports.updateAchieve = async function(id, achieve) {
     isPendingChanges: achieve.isPendingChanges,
   };
 
+  newAch.confirmations = achieve.confirmations;
   if (achieve.confirmations && achieve.confirmations.length > 0) {
-    newAch.confirmations = achieve.confirmations;
 
     for (let i = 0; i < achieve.confirmations.length; i++) {
       newAch.confirmations[i] = achieve.confirmations[i];
@@ -494,8 +527,8 @@ exports.validateAchievement = async function(achievement, user) {
       if (!achievement.achDate) return false;
       const achDate = new Date(achievement.achDate);
       if (!(achDate instanceof Date)) return false;
-      const minimalDate = new Date('2019-02-01');
-      const maximalDate = new Date('2020-01-31');
+      const minimalDate = new Date('2019-09-01');
+      const maximalDate = new Date('2020-08-31');
       if (achDate < minimalDate || achDate > maximalDate) return false;
       if (achievement.endingDate) {
         const achEndingDate = new Date(achievement.endingDate);

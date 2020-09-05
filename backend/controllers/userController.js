@@ -43,6 +43,33 @@ module.exports.dynamic = async function(req, res) {
   } else res.status(404).send({Error: 404});
 };
 
+module.exports.getArchivedAchievements = async function(req, res) {
+  let id;
+  if (req.user._json.email) {
+    id = req.user._json.email;
+  } else id = req.user.user_id;
+
+  const User = await db.findUserById(id); // TODO OPTIMIZE
+  if (User) {
+    await db.findStaleAchieves(id).then(async (v) => {
+      for (let i = 0; i < v.length; i++) {
+        const confirms = [];
+        if (v[i].confirmations) {
+          for (let j = 0; j < v[i].confirmations.length; j++) {
+            const confirm = await db.getConfirmByIdForUser(v[i].confirmations[j].id);
+            if (!confirm) continue;
+            confirm.additionalInfo = v[i].confirmations[j].additionalInfo;
+            confirms.push(confirm);
+          }
+        }
+        v[i].confirmations = confirms;
+      }
+      res.status(200).send(v);
+    });
+  } else res.status(404).send({Error: 404});
+};
+
+
 /**
  * Get user profile
  * @function getProfile
@@ -410,13 +437,14 @@ module.exports.updateAchieve = async function(req, res) {
         let confirmsIdentical = true;
         if (oldAch.confirmations.length !== req.body.data.confirmations.length) {
           confirmsIdentical = false;
-        }
-        for (let i = 0; i < oldAch.confirmations.length; i++) {
+        } else {
+         for (let i = 0; i < oldAch.confirmations.length; i++) {
           if (oldAch.confirmations[i].id.toString() !== req.body.data.confirmations[i].id.toString()) {
             confirmsIdentical = false;
             break;
           }
-        }
+         }
+	}
         if (confirmsIdentical) {
           continue;
         } else {

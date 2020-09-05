@@ -226,7 +226,7 @@ class EditAchievement extends Component {
                         </button>
                         <button id="DeleteButton" className="btn btn-danger"
                                 value="Удалить" onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'&&
-                        this.state.status !== 'Данные некорректны'}>Удалить
+                        this.state.status !== 'Данные некорректны' }>Удалить
                         </button>
                     </div>
                 </div>
@@ -318,7 +318,7 @@ class EditAchievement extends Component {
                             </table>}
                         </div>
                     </div>
-                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations} disabled={this.state.status != 'Ожидает проверки' &&
+                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations} disabled={this.state.status !== 'Ожидает проверки' &&
                     this.state.status !== 'Данные некорректны'}/>
                 </form>}
 

@@ -19,9 +19,9 @@ class AchievementDateInput extends Component {
       st.isValid = false;
     } else {
       const d = makeDate(value);
-      r = (d >= new Date('2019-02-01') && d <= new Date('2020-01-31'));
+      r = (d >= new Date('2019-09-01') && d <= new Date('2020-08-31'));
       if (!r) {
-        st.validMessage = 'Дата не входит в оцениваемый промежуток (01.02.2019 — 31.01.2020)';
+        st.validMessage = 'Дата не входит в оцениваемый промежуток (01.09.2019 — 31.08.2020)';
         st.isValid = false;
       } else st.isValid = true;
     }
