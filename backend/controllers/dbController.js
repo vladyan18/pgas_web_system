@@ -19,7 +19,7 @@ async function getUserWithAchievements(id, isArchived) {
   if (isArchived) {
     query = { isArchived: true }
   } else {
-    query = { isArchived: {$ne: true} }
+    query = { achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true} }
   }
   const user = await UserModel.findOne({id: id}).populate(
       {
