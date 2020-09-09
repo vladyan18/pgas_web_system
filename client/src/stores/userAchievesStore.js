@@ -11,7 +11,7 @@ class UserAchievesStore {
         }).then((resp) => {
             return resp.json()
         }).then((data) => {
-                data.Achs = data.Achs.sort(function (obj1, obj2) {
+                data.Achievement = data.Achievement.sort(function (obj1, obj2) {
                     if (obj1.crit.indexOf('(') !== -1)
                         return Number.parseInt(obj1.crit.substr(0, 2)) - Number.parseInt(obj2.crit.substr(0, 2));
                     else {
@@ -26,7 +26,7 @@ class UserAchievesStore {
                         return result
                     }
                 });
-                this.achieves = data.Achs;
+                this.achieves = data.Achievement;
                 this.confirmations = data.Confirmations
             }).catch((err) => console.log(err));
 

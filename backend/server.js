@@ -1,9 +1,3 @@
-/** Main
- * @module main
- * @requires pagesRouter
- * @requires API
- */
-
 const express = require('express');
 const compress = require('compression');
 const session = require('express-session');
@@ -12,9 +6,8 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
-// const redisClient = require('./config/redis');
-const frontendPath = path.join(__dirname, '../frontend', '/build');
 const port = 8080;
+const getUserIdMiddleware = require('./middlewares/getUserId');
 
 require('dotenv').config();
 const app = express();
@@ -49,7 +42,6 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({extended: false}));
 
 app.use(compress());
-app.use(express.static(path.join(frontendPath, '/public')));
 app.use(express.static(path.join(__dirname, '/static/confirmations')));
 
 if (process.env.ENV_T === 'production') {
@@ -61,11 +53,16 @@ app.use(session(sess));
 app.use(passport.initialize());
 app.use(passport.session());
 
-const apiRoutes = require('./routes/api.js');
-const pagesRoutes = require('./routes/pages.js');
+const apiRoutes2 = require('./api/v1/routes/user.js');
+const apiAdminRoutes2 = require('./api/v1/routes/admin.js');
+const apiCritRoutes2 = require('./api/v1/routes/criterias.js');
+const loginRoutes = require('./api/v1/routes/login.js');
 
-app.use('/', apiRoutes);
-app.use('/', pagesRoutes);
+app.use(getUserIdMiddleware);
+app.use('/', apiRoutes2);
+app.use('/', apiAdminRoutes2);
+app.use('/', apiCritRoutes2);
+app.use('/', loginRoutes);
 
 
 console.log(process.env.ENV_T);

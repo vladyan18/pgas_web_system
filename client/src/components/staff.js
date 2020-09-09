@@ -1,5 +1,6 @@
 import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
+import '../style/admin.css';
 import '../assets/fontawesome-free-5.12.1-web/css/fontAwesomeClear.css'
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
@@ -42,7 +43,8 @@ class Staff extends Component {
 
     componentDidMount() {
         userPersonalStore.update().then((result) => {
-            staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then()
+            staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then();
+            staffContextStore.getAnnotations().then();
         })
     }
 

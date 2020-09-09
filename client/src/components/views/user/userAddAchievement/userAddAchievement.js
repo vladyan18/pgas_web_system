@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
 import CriteriasForm from './criteriasForm';
-import CriteriasStore from '../../../../stores/criteriasStore';
+import CriteriasStore, {fetchSendWithoutRes} from '../../../../stores/criteriasStore';
 import {withRouter} from 'react-router-dom';
 import AchievementDateInput from '../../../AchievementDateInput';
 import ConfirmationForm from '../userConfirmation/ConfirmationForm';
@@ -180,21 +180,12 @@ class UserAddAchievement extends Component {
       }
     }
 
-    const form = document.forms.namedItem('fileinfo');
-    const oData = new FormData(form);
-    oData.append('data', JSON.stringify(res));
+   // const form = document.forms.namedItem('fileinfo');
+   // const oData = new FormData(form);
+   //  oData.append('data', JSON.stringify(res));
 
-    fetch('/api/add_achieve', {
-      method: 'post',
-      body: oData,
-    }).then((oRes) => {
-      if (oRes.status === 200) {
-        this.props.history.push('/home');
-      } else {
-        console.log(
-            'Error ' + oRes.status + ' occurred when trying to upload your file.',
-        );
-      }
+    fetchSendWithoutRes('/api/add_achieve', {data: res}).then((response) => {
+      if (response) this.props.history.push('/home')
     });
   }
 
@@ -244,7 +235,7 @@ class UserAddAchievement extends Component {
           <FormGroup id="textForm" style={{marginBottom: '0px'}}>
             <div className="form_elem_with_left_border" style={{marginTop: '20px', borderColor: getLineColor(this.state.descrInvalid)}}>
               <label className="control-label" htmlFor="comment">Название достижения:
-                <HelpButton overlay={achievementPopover} placement={'top'} />
+                <HelpButton overlay={achievementPopover} placement={"top"} />
               </label>
               <textarea className={'form-control area_text ' + (this.state.descrInvalid ? 'is-invalid' : '') +
               (this.state.descrInvalid === false ? ' is-valid' : '')} name="comment"

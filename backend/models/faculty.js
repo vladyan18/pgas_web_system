@@ -7,8 +7,14 @@ const facultySchema = mongoose.Schema({
   DirName: String,
   Directions: [String],
   AdditionStopped: Boolean,
-  CritsId: String,
-  AnnotationsToCritsId: String,
+  CritsId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Criterias',
+  },
+  AnnotationsToCritsId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Annotation',
+  },
 });
 
 const Faculty = connection.model('Faculty', facultySchema);

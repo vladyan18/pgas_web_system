@@ -23,8 +23,10 @@ class StaffContextStore {
         let Faculty = await fetchGet('/api/getFaculty', {name: newFaculty});
         this.directions = Faculty.Directions;
         let criterias = await fetchGet('/api/getCriterias', {faculty: newFaculty});
-        this.criterias = JSON.parse(criterias.Crits);
-        this.limits = criterias.Limits;
+        if (criterias) {
+            this.criterias = JSON.parse(criterias.Crits);
+            this.limits = criterias.Limits;
+        }
     }
 
     async getAnnotations() {

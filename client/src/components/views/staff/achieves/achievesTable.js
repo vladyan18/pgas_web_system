@@ -5,6 +5,9 @@ import {withRouter} from "react-router-dom";
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
 import {observer} from "mobx-react";
 import AchievesComment from "./achievesComment";
+import {OverlayTrigger, Popover} from "react-bootstrap";
+import staffContextStore from "../../../../stores/staff/staffContextStore";
+import ReactMarkdown from 'react-markdown';
 
 class AchievesTable extends Component {
 
@@ -65,10 +68,25 @@ class AchievesTable extends Component {
         </div>
     );
 
+    allowAccessPopover = (crit) => (
+        <Popover id="popover-basic" style={{width: "120rem"}}>
+            <Popover.Title as="h3">Критерий {crit}</Popover.Title>
+            <Popover.Content>
+                {staffContextStore.annotations && <ReactMarkdown linkTarget={() => '_blank'} source={staffContextStore.annotations[crit]}/>}
+            </Popover.Content>
+        </Popover>
+    );
+
     columns = [{
         dataField: 'crit',
         style: {width: "5%", textAlign: "center", verticalAlign: "middle"},
-        text: 'Крит.'
+        text: 'Крит.',
+        formatter: (cell, row) => (<>
+            <OverlayTrigger trigger={['hover', 'focus']} placement="right"
+                            overlay={this.allowAccessPopover(row.crit)} >
+            {<span style={{textDecoration:"underline", textDecorationStyle: "dotted"}}>{row.crit}</span>}
+            </OverlayTrigger>
+        </>),
     }, {
         dataField: 'achievement',
         text: 'Достижение',

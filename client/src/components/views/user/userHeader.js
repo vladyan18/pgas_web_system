@@ -130,8 +130,16 @@ class UserHeader extends Component {
                 {userPersonalStore && userPersonalStore.fio}
               </div>
             </div>
+            {(userPersonalStore.Role === 'Admin' || userPersonalStore.Role === 'SuperAdmin') &&
+            <div style={{'marginRight': '1rem'}}>
+              <button type="button" id="SubmitButton"
+                      className="btn btn-outline-primary" onClick={this.switchToStaff}>
+                Режим проверяющего
+              </button>
+            </div>
+            }
             <div>
-              <form action="/api/logout">
+              {userPersonalStore && userPersonalStore.personal && <form action="/api/logout">
                 <button type="submit"
                   className="btn btn-outline-danger"
                   css={css`
@@ -145,7 +153,7 @@ class UserHeader extends Component {
                   action="/api/logout">
                 Выход
                 </button>
-              </form>
+              </form>}
             </div>
           </div>
         </div>

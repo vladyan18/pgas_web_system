@@ -6,6 +6,7 @@ import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
 import userPersonalStore from "./stores/userPersonalStore";
+import UserHeaderContainer from "./components/containers/user/userHeaderContainer";
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));
@@ -49,12 +50,14 @@ class App extends Component {
     }
 
     render() {
-        if (!this.state.authChecked) return null;
+        if (!this.state.authChecked) return <><div className="container-fluid">
+            <UserHeaderContainer/>
+        </div></>
 
         return (
             this.state.isLogged ?
                 <Suspense fallback={
-                    <div style={{backGroundColor: "#e2e2e2", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
+                    <div style={{backGroundColor: "#e2zz0100", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
                     <div id="floatingCirclesG">
                         <div className="f_circleG" id="frotateG_01"></div>
                         <div className="f_circleG" id="frotateG_02"></div>

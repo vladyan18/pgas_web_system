@@ -122,19 +122,22 @@ class StaffStudentsRating extends Component {
         if (this.props.faculty == 'ВШЖиМК' && this.state.currentDirection) {
             filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
         }
+        let sorted = [];
 
-        let sorted = filtered.sort(function(obj1, obj2) {
-            let diff = obj2.Ball-obj1.Ball;
-            if (diff != 0)
-                return obj2.Ball-obj1.Ball;
-            else {
-                for (let crit of Object.keys(obj1.Crits)) {
-                    diff = obj2.Crits[crit] - obj1.Crits[crit];
-                    if (diff !== 0) return diff
+        if (filtered) {
+            sorted = filtered.sort(function (obj1, obj2) {
+                let diff = obj2.Ball - obj1.Ball;
+                if (diff != 0)
+                    return obj2.Ball - obj1.Ball;
+                else {
+                    for (let crit of Object.keys(obj1.Crits)) {
+                        diff = obj2.Crits[crit] - obj1.Crits[crit];
+                        if (diff !== 0) return diff
+                    }
+                    return 0
                 }
-                return 0
-            }
-        });
+            });
+        }
 
         return (
 

@@ -11,8 +11,46 @@ const AnnotationsModel = require('../models/annotation');
 const md5 = require('md5');
 
 exports.findUserById = async function(id) {
-  return await UserModel.findOne({id: id}).lean();
+  return UserModel.findOne({id: id}).lean();
 };
+
+async function getUserWithAchievements(id, isArchived) {
+  let query;
+  if (isArchived) {
+    query = { isArchived: true }
+  } else {
+    query = { isArchived: {$ne: true} }
+  }
+  const user = await UserModel.findOne({id: id}).populate(
+      {
+        path: 'Achievement',
+        match: query,
+        populate: {
+          path: 'confirmations.id',
+        },
+      },
+  ).lean();
+
+  for (let i = 0; i < user.Achievement.length; i++) {
+    for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
+      const confirmation = user.Achievement[i].confirmations[j];
+      const inner = confirmation.id;
+      confirmation.id = undefined;
+      user.Achievement[i].confirmations[j] = Object.assign(confirmation, inner);
+    }
+  }
+
+  return user;
+}
+
+exports.findUserByIdWithAchievements = async function(id) {
+  return getUserWithAchievements(id, false);
+};
+
+exports.findUserByIdWithArchivedAchievements = async function(id) {
+  return getUserWithAchievements(id, true);
+};
+
 
 exports.findUser = function(id) {
   return UserModel.findById(id).lean();
@@ -24,7 +62,7 @@ exports.getUserRights = function(id) {
 
 exports.findUserByAchieve = async function(id) {
   const ach = await AchieveModel.findById(id.toString());
-  return await UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}});
+  return UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}}).lean();
 };
 
 exports.archiveAchievements = async function() {
@@ -76,36 +114,24 @@ exports.getCurrentUsers = function(faculty) {
 };
 
 exports.getNewUsers = function(faculty) {
-  return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]);
+  return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]).lean();
 };
 
 exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false) {
-  let users;
+  const populateQuery = {
+    path: 'Achievement',
+    match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
+    populate: {
+      path: 'confirmations.id',
+    },
+  };
+  let query;
   if (!checked) {
-    users = await UserModel.find()
-        .or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}])
-        .populate(
-            {
-              path: 'Achievement',
-              match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
-              populate: {
-                path: 'confirmations.id',
-              },
-            },
-        ).lean().exec();
+    query = {$or: [{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]}
   } else {
-    users = await UserModel.find({Faculty: faculty, IsInRating: true})
-        .populate(
-            {
-              path: 'Achievement',
-              match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
-              populate: {
-                path: 'confirmations.id',
-              },
-            },
-        ).lean().exec();
+    query = {Faculty: faculty, IsInRating: true};
   }
-  return users;
+  return UserModel.find(query).populate(populateQuery).lean();
 };
 
 exports.isUser = function(token) {
@@ -123,22 +149,29 @@ exports.createUser = function(User) {
 };
 
 exports.findActualAchieves = async function(userId) {
-  const User = await UserModel.findOne({id: userId}, 'Achievement').lean();
-  const b = await AchieveModel.find({_id: {$in: User.Achievement}, isArchived: {$ne: true} }).lean();
+  const User = await UserModel.findOne({id: userId}, 'Achievement').populate(
+      {
+        path: 'Achievement',
+        match: {isArchived: {$ne: true}},
+      },
+  ).lean();
+  const b = User.Achievement;
   const actualAchieves = [];
+  const minimalDate = new Date(2019, 8, 1, 0, 0, 0, 0);
+  const minimal7aDate = new Date(2020, 6, 1, 0, 0, 0, 0);
   for (let i = 0; i < b.length; i++) {
     if (b[i].crit === '7а' || b[i].crit === '1 (7а)') {
-      if (b[i].achDate >= new Date(2020, 6, 1, 0, 0, 0, 0)) {
+      if (b[i].achDate >= minimal7aDate) {
          actualAchieves.push(b[i]);
       }
       continue;
     }
 
-    if (b[i].achDate >= new Date(2019, 8, 1, 0, 0, 0, 0)) {
+    if (b[i].achDate >= minimalDate) {
       actualAchieves.push(b[i]);
     }
   }
-  return (actualAchieves);
+  return actualAchieves;
 };
 
 exports.findStaleAchieves = async function(userId) {
@@ -166,7 +199,7 @@ exports.findStaleAchieves = async function(userId) {
 
 
 exports.findAchieveById = async function(id) {
-  return await AchieveModel.findById(id).lean();
+  return AchieveModel.findById(id).lean();
 };
 
 exports.createAchieve = async function(achieve) {
@@ -177,9 +210,8 @@ exports.createAchieve = async function(achieve) {
 };
 
 exports.deleteAchieve = async function(id) {
-  AchieveModel.findByIdAndRemove(id).then(() => {
-  });
-  const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}});
+  AchieveModel.findByIdAndRemove(id).then();
+  const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}}).lean();
   if (!u) return true;
   for (let i = u.Achievement.length - 1; i >= 0; i--) {
     if (u.Achievement[i] === id) {
@@ -187,7 +219,7 @@ exports.deleteAchieve = async function(id) {
       break;
     }
   }
-  await UserModel.findOneAndUpdate({id: u.id}, {Achievement: u.Achievement});
+  await UserModel.updateOne({id: u.id}, {Achievement: u.Achievement}).lean();
   return true;
 };
 
@@ -209,10 +241,9 @@ exports.updateAchieve = async function(id, achieve) {
     }
   }
 
-  return AchieveModel.findOneAndUpdate({_id: id}, {
+  return AchieveModel.updateOne({_id: id}, {
     $set: newAch,
-  }, function(err, result) {
-  });
+  }).lean();
 };
 
 exports.registerUser = function(userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type, settings) {
@@ -233,47 +264,40 @@ exports.registerUser = function(userId, lastname, name, patronymic, birthdate, s
 
 
 exports.addAchieveToUser = function(userId, achieveId) {
-  return UserModel.findOneAndUpdate({id: userId}, {$push: {Achievement: achieveId}});
+  return UserModel.updateOne({id: userId}, {$push: {Achievement: achieveId}}).lean();
 };
 
 exports.addUserToRating = async function(userId, Direction) {
   if (Direction) {
-    return UserModel.findOneAndUpdate({_id: userId}, {$set: {IsInRating: true, Direction: Direction}});
+    return UserModel.updateOne({_id: userId}, {$set: {IsInRating: true, Direction: Direction}}).lean();
   } else {
-    return UserModel.findOneAndUpdate({_id: userId}, {$set: {IsInRating: true}});
+    return UserModel.updateOne({_id: userId}, {$set: {IsInRating: true}}).lean();
   }
 };
 
 exports.removeUserFromRating = async function(userId) {
-  return UserModel.findOneAndUpdate({_id: userId}, {$set: {IsInRating: false}});
+  return UserModel.updateOne({_id: userId}, {$set: {IsInRating: false}}).lean();
 };
 
 exports.changeAchieveStatus = async function(id, accept = false) {
-  await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-
+  let newStatus;
   if (accept) {
-    const Ach = await AchieveModel.findById(id);
+    const Ach = await AchieveModel.findById(id, 'status');
     if (Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями') {
-      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято с изменениями', isPendingChanges: false}}, function(err, result) {
-        console.log('');
-      });
+      newStatus = 'Принято с изменениями';
     } else {
-      return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Принято', isPendingChanges: false}}, function(err, result) {
-        console.log('');
-      });
+      newStatus = 'Принято';
     }
   } else {
-    return AchieveModel.findOneAndUpdate({_id: id}, {$set: {status: 'Отказано', isPendingChanges: false}}, function(err, result) {
-      console.log('');
-    });
+    newStatus = 'Отказано';
   }
+
+  return AchieveModel.updateOne({_id: id}, {$set: {status: newStatus, isPendingChanges: false}}).lean();
 };
 
 
 exports.comment = async function(id, comment) {
-  await UserModel.findOne({Achievement: {$elemMatch: {$eq: id}}}).lean();
-  return AchieveModel.findOneAndUpdate({_id: id}, {$set: {comment: comment}}, function(err, result) {
-  });
+  return AchieveModel.updateOne({_id: id}, {$set: {comment: comment}}).lean();
 };
 
 exports.toggleHide = async function(id) {
@@ -306,11 +330,11 @@ exports.getAcceptedAchsOfUser = async function(id) {
 };
 
 exports.getFaculty = async function(Name) {
-  return FacultyModel.findOne({Name: Name});
+  return FacultyModel.findOne({Name: Name}).lean();
 };
 
 exports.getAllFaculties = async function() {
-  return await FacultyModel.find().lean();
+  return FacultyModel.find().lean();
 };
 
 exports.createFaculty = async function(faculty) {
@@ -324,24 +348,49 @@ exports.createFaculty = async function(faculty) {
   return createdFacultyObj;
 };
 
-exports.getCriterias = async function(facultyName, fullInfo) {
-  const facObject = await FacultyModel.findOne({Name: facultyName});
-  if (!fullInfo) {
-    if (facObject && facObject.CritsId) {
-      return CriteriasModel.findById(facObject.CritsId, 'Crits Limits');
-    } else return undefined;
-  } else {
-    if (facObject && facObject.CritsId) {
-      return CriteriasModel.findById(facObject.CritsId);
-    } else return undefined;
+const criteriasCache = {};
+async function getCriteriasFromCache(facultyName) {
+  const facObject = await FacultyModel.findOne({Name: facultyName}, 'CritsId').lean();
+  if (!facObject || !facObject.CritsId) {
+    return undefined;
   }
+  if (!criteriasCache[facultyName] || criteriasCache[facultyName]._id !== facObject.CritsId.toString()) {
+    const crits = await CriteriasModel.findById(facObject.CritsId);
+    criteriasCache[facultyName] = {
+      _id: facObject.CritsId.toString(),
+      rawCrits: crits.Crits,
+      Crits: JSON.parse(crits.Crits),
+      Limits: crits.Limits
+    };
+  }
+  return criteriasCache[facultyName];
+}
+
+exports.getCriterias = async function(facultyName, fullInfo) { //TODO refactor
+  const crits = await getCriteriasFromCache(facultyName);
+  if (!crits) {
+    return null;
+  }
+  const result = {Crits: crits.rawCrits, Limits: crits.Limits};
+  //if (fullInfo) {
+  //
+  //}
+  return result;
+};
+
+exports.getCriteriasObject = async function(facultyName) {
+  const crits = await getCriteriasFromCache(facultyName);
+  if (!crits) {
+    return null;
+  }
+  return crits.Crits;
 };
 
 exports.getCriteriasAndSchema = async function(facultyName) {
-  const facObject = await FacultyModel.findOne({Name: facultyName});
-  if (facObject.CritsId) {
-    return CriteriasModel.findById(facObject.CritsId, 'Crits CritsSchema Limits');
-  } else return undefined;
+  const facObject = await FacultyModel.findOne({Name: facultyName}, 'CritsId').populate(
+      'CritsId', 'Crits CritsSchema Limits'
+  ).lean();
+  return facObject.CritsId;
 };
 
 exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile, facultyName) {
@@ -353,21 +402,16 @@ exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile
 };
 
 exports.getAnnotationsForFaculty = async function(facultyName) {
-  const facObject = await FacultyModel.findOne({Name: facultyName});
-  return AnnotationsModel.findById(facObject.AnnotationsToCritsId);
+  const facObject = await FacultyModel.findOne({Name: facultyName}, 'AnnotationsToCritsId').populate(
+      'AnnotationsToCritsId'
+  ).lean();
+  return facObject.AnnotationsToCritsId;
 };
 
 
 exports.changeRole = function(id, isAdmin) {
-  if (isAdmin === true) {
-    return UserModel.findOneAndUpdate({id: id}, {$set: {Role: 'Admin'}}, function(err, result) {
-      console.log(result);
-    });
-  } else {
-    return UserModel.findOneAndUpdate({id: id}, {$set: {Role: 'User'}}, function(err, result) {
-      console.log(result);
-    });
-  }
+  const newRole = isAdmin ? 'Admin' : 'User';
+  return UserModel.updateOne({id: id}, {$set: {Role: newRole}}).lean();
 };
 
 exports.getHistoryNotes = async function() {
@@ -389,7 +433,7 @@ exports.uploadCriteriasToFaculty = async function(crits, faculty) {
   critsObject.FacultyId = facultyObject._id.toString();
 
   critsObject = await CriteriasModel.create(critsObject);
-  await FacultyModel.findOneAndUpdate({Name: faculty}, {$set: {CritsId: critsObject._id.toString()}});
+  await FacultyModel.updateOne({Name: faculty}, {$set: {CritsId: critsObject._id.toString()}}).lean();
 };
 
 exports.createConfirmation = async function(confirmation) {
@@ -405,23 +449,20 @@ exports.getConfirmations = async function(confIds) {
 };
 
 exports.addConfirmationToUser = async function(userId, confId) {
-  return UserModel.findByIdAndUpdate(userId, {$push: {Confirmations: confId}});
+  return UserModel.updateOne({_id: userId}, {$push: {Confirmations: confId}}).lean();
 };
 
 exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {
   return ConfirmationModel.findByIdAndUpdate(confirmId, {$set: {CrawlResult: crawlResult, IsCrawled: true}});
 };
 
-exports.getStatisticsForFaculty = async function(facultyName, isInRating = true) {
+exports.getStatisticsForFaculty = async function(facultyName, isInRating = true) { // TODO REFACTOR!!
   const users = await UserModel.find({Faculty: facultyName, IsInRating: isInRating})
       .populate(
           {
             path: 'Achievement',
-            populate: {
-              path: 'confirmations.id',
-            },
           },
-      ).lean().exec();
+      ).lean();
 
   let articlesIndexCol = 3;
   if (facultyName === 'Физфак') articlesIndexCol = 2;
@@ -492,13 +533,10 @@ exports.getStatisticsForFaculty = async function(facultyName, isInRating = true)
   };
 };
 
-exports.validateAchievement = async function(achievement, user) {
+exports.validateAchievement = async function(achievement, user) { // TODO refactor
   if (!achievement || !user) return false;
-  let crits = {};
-  const facObject = await FacultyModel.findOne({Name: user.Faculty});
-  if (facObject && facObject.CritsId) {
-    crits = JSON.parse( (await CriteriasModel.findById(facObject.CritsId, 'Crits')).Crits );
-  } else {
+  const crits = await exports.getCriteriasObject(user.Faculty);
+  if (!crits) {
     throw new Error('There are no criterion for faculty ' + user.Faculty);
   }
 
@@ -506,7 +544,6 @@ exports.validateAchievement = async function(achievement, user) {
     const critsTitles = Object.keys(crits);
     if (!achievement.crit || !achievement.chars || !Array.isArray(achievement.chars)) return false;
     if (!(crits[achievement.crit])) return false;
-
     // проверка характеристик
     let currentLevelOfCriterion = crits;
     for (let i = 0; i < achievement.chars.length; i++) {
@@ -516,11 +553,9 @@ exports.validateAchievement = async function(achievement, user) {
     if (isNaN(Number(Object.keys(currentLevelOfCriterion)[0]))) {
       // в старой версии критериев было допустимо опускать характеристики в 7а
       if (achievement.crit !== critsTitles[0]) return false;
-
       currentLevelOfCriterion = currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]];
       if (isNaN(Number(currentLevelOfCriterion[Object.keys(currentLevelOfCriterion)[0]]))) return false;
     }
-
     // проверка даты и описания; в 7а это не нужно
     if (achievement.crit !== critsTitles[0]) {
       if (!achievement.achievement) return false;

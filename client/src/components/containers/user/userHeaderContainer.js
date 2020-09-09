@@ -19,8 +19,14 @@ function UserHeaderContainer(props) {
     case '/profile':
       pathname = 'Мой профиль';
       break;
+    case '/rating':
+      pathname = 'Рейтинг';
+      break;
     case '/achievement/*':
       pathname = 'Достижение';
+      break;
+    case '/':
+      pathname = 'Мои достижения';
       break;
   }
   return <UserHeader pageName={pathname}/>;

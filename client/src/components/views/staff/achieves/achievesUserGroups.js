@@ -87,9 +87,9 @@ class AchievesUserGroups extends React.PureComponent {
     }
 
     return (
-      <main id="main">{filteredUsers &&
+      <main id="main">
             <div id="panel" className="col list" style={{'width': '100%'}} css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
-              {countOfUpdatedAchieves && <div style={{width: '100%', textAlign: 'center'}}>
+              {countOfUpdatedAchieves > 0 && <div style={{width: '100%', textAlign: 'center'}}>
                 <span style={{color: 'blue',  borderBottom: '1px dashed blue',
                   cursor: 'pointer'}} onClick={this.toggleOnlyUpdated}>Обновлено достижений: <b>{countOfUpdatedAchieves}</b></span>
               </div>}
@@ -125,7 +125,7 @@ class AchievesUserGroups extends React.PureComponent {
             <SystematicsInfo users={filteredUsers} updateSystematicsCallback={this.updateSystematicsCallback}/>
 
 
-              {filteredUsers.map((item) => (
+              {filteredUsers && filteredUsers.map((item) => (
                 <div key={item.Id}>
                   <AchievesGroup item={item} updater={this.props.updater}
                                  openModal={this.openEditModal}
@@ -134,7 +134,7 @@ class AchievesUserGroups extends React.PureComponent {
                   />
                 </div>
               ))}
-            </div>}
+            </div>
       <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
         isOpen={this.state.modalIsOpen}
         onRequestClose={this.closeEditModal}

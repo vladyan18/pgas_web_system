@@ -12,10 +12,19 @@ import CriteriasStore from '../stores/criteriasStore';
 import {Switch, withRouter} from 'react-router-dom';
 import {observer} from 'mobx-react';
 import UserDetailedAccessRequest from "./views/user/userDetailedAccessRequest";
+import styled from "@emotion/styled";
+import {css, jsx} from '@emotion/core';
+/** @jsx jsx */
 
 const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
 const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
 const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
+
+
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+`;
 
 const PrivateRoute = ({component: Component, ...rest}) => (
   <Route {...rest} render={(props) => (
@@ -62,7 +71,8 @@ class User extends Component {
         <div className="container main_block">
           <div className="row">
             <UserNavbarContainer/>
-            <Suspense fallback={null}>
+            <Suspense fallback={<Panel className="col-md-9 rightBlock">
+              <div className="block_main_right"></div></Panel>}>
             <Switch>
               <Route path="/home" component={UserAchievesContainer}/>
               <Route path="/achievement/:id" component={EditAchievementContainer}/>

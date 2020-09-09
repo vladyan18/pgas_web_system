@@ -88,6 +88,26 @@ export default class CriteriasForm extends Component {
 
 
     if (key < state.length) {
+      let criterion = this.props.crits;
+      for (let i = 0; i < key - 1; i++) {
+        criterion = criterion[state.values[i]];
+      }
+      criterion = criterion[e.target.value];
+      for (let i = key; i < state.values.length; i++) {
+        if (!criterion) break;
+        criterion = criterion[state.values[i]];
+      }
+      if (criterion) {
+        criterion = this.props.crits;
+        state.values[key-1] = e.target.value;
+        for (let i = 0; i < state.values.length - 1; i++) {
+          criterion = criterion[state.values[i]];
+          state.selects[i].options = Object.keys(criterion);
+        }
+        this.setState(state);
+        return;
+      }
+
       const d = state.length - key;
       for (let i = 0; i < d; i++) {
         state.values.pop();

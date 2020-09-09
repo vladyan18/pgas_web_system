@@ -58,8 +58,7 @@ class UserStudentsContainer extends Component {
   }
 
   render() {
-    console.log('isDEt', this.state.isDetailedMode === false);
-    if (!(criteriasStore.criterias && this.state.users)) return null;
+    //if (!(criteriasStore.criterias && this.state.users)) return null;
 
     if (this.state.isDetailedMode) {
        return <UserDetailedRating

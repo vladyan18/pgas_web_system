@@ -20,7 +20,6 @@ passport.use(new ActiveDirectoryStrategy({
 passport.serializeUser( async function(user, done) {
   const id = user._json.sAMAccountName;
   const isUser = await db.isUser(id);
-  console.log('SpbuID', id + '@student.spbu.ru', 'IsUser:', !!isUser);
   let isRegistered = false;
   if (!isUser) {
     await db.createUser({
@@ -45,7 +44,6 @@ passport.serializeUser( async function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  console.log('Des', user.user_id);
   done(null, user);
 });
 

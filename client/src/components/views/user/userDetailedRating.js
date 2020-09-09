@@ -25,18 +25,21 @@ class UserDetailedRating extends Component {
     render() {
         const props = this.props;
         let filtered = this.props.data;
-        let sorted = filtered.sort(function(obj1, obj2) {
-            let diff = obj2.Ball-obj1.Ball;
-            if (diff != 0)
-                return obj2.Ball-obj1.Ball;
-            else {
-                for (let crit of Object.keys(obj1.Crits)) {
-                    diff = obj2.Crits[crit] - obj1.Crits[crit];
-                    if (diff !== 0) return diff
+        let sorted = [];
+        if (filtered) {
+                sorted = filtered.sort(function (obj1, obj2) {
+                let diff = obj2.Ball - obj1.Ball;
+                if (diff != 0)
+                    return obj2.Ball - obj1.Ball;
+                else {
+                    for (let crit of Object.keys(obj1.Crits)) {
+                        diff = obj2.Crits[crit] - obj1.Crits[crit];
+                        if (diff !== 0) return diff
+                    }
+                    return 0
                 }
-                return 0
-            }
-        });
+            });
+        }
 
         function getAreaNum(critName) {
             const critNum = Object.keys(criteriasStore.criterias).indexOf(critName);
@@ -59,7 +62,7 @@ class UserDetailedRating extends Component {
         }
 
         function hasOverhead(user, crit) {
-            return user.Crits[crit] > 0 &&
+            return limits && user.Crits[crit] > 0 &&
                 (user.sums[getAreaNum(crit)] > limits[getAreaNum(crit)])
         }
 
@@ -94,6 +97,16 @@ class UserDetailedRating extends Component {
                     <option value={dir}>{dir}</option> )}
             </select>}
             <hr className="hr_blue"/>
+            {sorted.length === 0 && <div id="floatingCirclesG">
+                <div className="f_circleG" id="frotateG_01"></div>
+                <div className="f_circleG" id="frotateG_02"></div>
+                <div className="f_circleG" id="frotateG_03"></div>
+                <div className="f_circleG" id="frotateG_04"></div>
+                <div className="f_circleG" id="frotateG_05"></div>
+                <div className="f_circleG" id="frotateG_06"></div>
+                <div className="f_circleG" id="frotateG_07"></div>
+                <div className="f_circleG" id="frotateG_08"></div>
+            </div>}
             { sorted.map((user, index) =>
                 <div style={{marginBottom: '2rem'}}>
                     <h4 style={{display: 'flex',
