@@ -3,7 +3,10 @@ const passport = require('passport');
 module.exports = async function(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
-    const st = username.substring(0, username.indexOf('@'));
+    let st = username;
+    if (st.indexOf('@') !== -1) {
+        st = username.substring(0, username.indexOf('@'));
+    }
     const adUsername = st + '@ad.pu.ru';
 
     const opts = {
