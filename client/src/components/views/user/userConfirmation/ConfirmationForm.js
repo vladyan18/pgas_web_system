@@ -364,7 +364,7 @@ class ConfirmationForm extends Component {
                 </div>
 
                 <div>
-                    {this.state.confirmations.length > 0 &&
+                    {this.state.confirmations && this.state.confirmations.length > 0 &&
                     <BootstrapTable keyField='_id' data={this.state.confirmations} columns={columns}
                                     headerClasses={["hidden"]} bordered={false}/>
                     }
