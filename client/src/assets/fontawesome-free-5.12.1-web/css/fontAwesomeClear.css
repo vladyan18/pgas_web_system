@@ -20,6 +20,9 @@
     content: "\f078"
 }
 
+.fa-chevron-right:before {
+    content: "\f054"; }
+
 .fa-check:before {
     content: "\f00c"
 }

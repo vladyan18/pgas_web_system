@@ -35,8 +35,14 @@ const Panel = styled.div`
 class UserAchieves extends Component {
   constructor(props) {
     super(props);
+    this.state = {archiveHidden: true};
     this.checkConfirms = this.checkConfirms.bind(this);
+    this.toggleArchiveHide = this.toggleArchiveHide.bind(this);
   };
+
+  toggleArchiveHide() {
+    this.setState({archiveHidden: !this.state.archiveHidden});
+  }
 
   componentDidMount() {
     userAchievesStore.getAchieves();
@@ -99,13 +105,18 @@ class UserAchieves extends Component {
         <div css={css`width: 100%; min-height: 10rem;`}>
           < CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
         </div>
-        <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem;`}>
-          Архив достижений
-        </div>
-	<div css={css`width: 100%; min-height: 10rem;`}>
-          <table>
-          {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.map((x) => <tr><td css={css`width:5%; border-top: 1px solid #e3e3e3;`}>{x.crit}</td><td css={css`width:70%; border-top: 1px solid #e3e3e3;`}>{x.achievement}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(new Date(x.achDate)).toLocaleDateString('ru-RU')}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(x.status !== 'Ожидает проверки') && x.status}</td></tr>)}
-          </table>
+        <div>
+          <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem; cursor: pointer;`}
+               onClick={this.toggleArchiveHide}>
+            <i className={'fas fa-chevron-' + (!this.state.archiveHidden ? 'right' : 'down') + ' mychevron'}
+               ></i>
+            <span style={{marginLeft: '1rem'}}>Архив достижений</span>
+          </div>
+          {!this.state.archiveHidden && <div css={css`width: 100%; min-height: 10rem;`}>
+            <table>
+            {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.map((x) => <tr><td css={css`width:5%; border-top: 1px solid #e3e3e3;`}>{x.crit}</td><td css={css`width:70%; border-top: 1px solid #e3e3e3;`}>{x.achievement}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(new Date(x.achDate)).toLocaleDateString('ru-RU')}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(x.status !== 'Ожидает проверки') && x.status}</td></tr>)}
+            </table>
+          </div>}
         </div>
 
       </div>
