@@ -11,11 +11,15 @@ const horizontalLine = css`
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
 `;
 
 function UserCommonInfo(props) {
-  return (<Panel className="col-md-9 rightBlock">
-    <div className="block_main_right" css={css`margin-bottom: 2rem;`}>
+  return (<Panel className="col-md-9">
+    <div css={css`margin-bottom: 2rem;`}>
       <p className="headline">
                 Информация
       </p>

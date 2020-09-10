@@ -12,6 +12,10 @@ import {fetchSendWithoutRes} from "../../../services/fetchService";
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
 `;
 
 class UserProfile extends Component {
@@ -58,9 +62,8 @@ class UserProfile extends Component {
         </Popover>
     );
 
-    return (<Panel className="col-md-9 rightBlock">
-      <div className="block_main_right">
-        <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between'}}>
+    return (<Panel className="col-md-9">
+        <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', margin: "0"}}>
           <p className="headline" style={{'margin-bottom': 'auto'}}>
                     Мой профиль
           </p>
@@ -112,7 +115,6 @@ class UserProfile extends Component {
           </div>
         </OverlayTrigger>
         </div>
-      </div>
     </Panel>);
   }
 }

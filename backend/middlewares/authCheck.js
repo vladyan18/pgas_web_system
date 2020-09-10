@@ -9,6 +9,9 @@ module.exports.user = (req, res, next) => {
 };
 
 module.exports.admin = async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.sendStatus(401);
+    }
     let id;
     if (req.user._json && req.user._json.email) {
         id = req.user._json.email;
@@ -22,6 +25,9 @@ module.exports.admin = async (req, res, next) => {
 };
 
 module.exports.superAdmin = async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.sendStatus(401);
+    }
     let id;
     if (req.user._json && req.user._json.email) {
         id = req.user._json.email;

@@ -7,6 +7,15 @@ import {withRouter} from "react-router-dom";
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
+`;
+
 class StaffStudentsRating extends Component {
     constructor(props) {
         super(props);
@@ -141,8 +150,8 @@ class StaffStudentsRating extends Component {
 
         return (
 
-                    <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
-                        <div className="profile" style={{"display": "flex", "justify-content": "space-between"}} >
+                    <Panel className="col-md-9">
+                        <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
                             <div className="centered_ver">
                                 <p className="headline">
                                     Рейтинг студентов
@@ -171,7 +180,7 @@ class StaffStudentsRating extends Component {
                             {this.props.directions.map(dir =>
                                 <option value={dir}>{dir}</option> )}
                         </select>}
-                        <hr className="hr_blue"/>
+                        <hr className="hr_blue" style={{marginTop: '0'}}/>
                         <table className="table table-bordered" id='users'>
                             <thead>
                             <tr>
@@ -188,7 +197,7 @@ class StaffStudentsRating extends Component {
                         <BootstrapTable   keyField='_id' data={sorted} columns={this.state.columns}/>
                             </div>}
 
-                    </div>
+                    </Panel>
         )
     }
 }

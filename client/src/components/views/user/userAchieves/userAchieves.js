@@ -20,6 +20,10 @@ const mainButton = css`
     &:focus {
         box-shadow: 0 0 0 .2rem #f1c8c6;
     }
+    
+    @media only screen and (max-device-width: 480px) {
+        font-size: x-small;
+    }
 `;
 
 const Panel = styled.div`
@@ -81,6 +85,9 @@ class UserAchieves extends Component {
         margin-bottom: auto; 
         color: black;
         font-size: larger;
+            @media only screen and (max-device-width: 480px) {
+        font-size: medium;
+        }
         `}>
             <b>Текущие достижения</b>
           </div>

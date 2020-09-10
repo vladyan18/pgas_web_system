@@ -26,16 +26,6 @@ const Panel = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
 `;
 
-const PrivateRoute = ({component: Component, ...rest}) => (
-  <Route {...rest} render={(props) => (
-        Auth.isUserAuthenticated() ? (
-            <Component {...props} {...rest} />
-        ) : (
-            window.location.assign('/api/login')
-        )
-  )}/>
-);
-
 
 class User extends Component {
   constructor(props) {
@@ -46,27 +36,22 @@ class User extends Component {
   async componentDidMount() {
     const profile = await userPersonalStore.update();
     if (profile) {
-      //Promise.allSettled([CriteriasStore.getCriteriasForFaculty(profile.Faculty), CriteriasStore.getAnnotations(profile.Faculty)])
-      //  .then(() => this.setState({ready: true}));
-      await CriteriasStore.getCriteriasForFaculty(profile.Faculty);
-      if (CriteriasStore.criterias) await CriteriasStore.getAnnotations(profile.Faculty);
+      await Promise.all([
+          CriteriasStore.getCriteriasForFaculty(profile.Faculty),
+          CriteriasStore.getAnnotations(profile.Faculty)
+      ]);
       this.setState({ready: true});
     } else {
       this.props.history.push('/register');
     }
   }
 
-  async toggleAuthenticateStatus() {
-    // check authenticated status and toggle state based on that
-    await Auth.fetchAuth();
-    this.setState({authenticated: Auth.isUserAuthenticated()});
-  }
-
   render() {
     return (
 
-      <><div className="container-fluid">
+      <>
         <UserHeaderContainer/>
+        <div className="container-fluid">
         {(this.state.ready) &&
         <div className="container main_block">
           <div className="row">

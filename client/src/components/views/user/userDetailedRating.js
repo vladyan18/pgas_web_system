@@ -11,6 +11,21 @@ import staffContextStore from "../../../stores/staff/staffContextStore";
 import BootstrapTable from "react-bootstrap-table-next";
 import criteriasStore from "../../../stores/criteriasStore";
 
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
+`;
+
+const criteriasTable = css `
+    @media only screen and (max-device-width: 480px) {
+    display: none;
+  }
+`;
+
 class UserDetailedRating extends Component {
     constructor(props) {
         super(props);
@@ -67,8 +82,8 @@ class UserDetailedRating extends Component {
         }
 
         const limits = criteriasStore.limits;
-        return <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
-            <div className="profile" style={{"display": "flex", "justify-content": "space-between"}} >
+        return <Panel className="col-md-9">
+            <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
                 <div className="centered_ver">
                     <p className="headline">
                         Рейтинг студентов
@@ -96,7 +111,7 @@ class UserDetailedRating extends Component {
                 {this.props.directions.map(dir =>
                     <option value={dir}>{dir}</option> )}
             </select>}
-            <hr className="hr_blue"/>
+            <hr className="hr_blue" style={{marginTop: '0'}}/>
             {sorted.length === 0 && <div id="floatingCirclesG">
                 <div className="f_circleG" id="frotateG_01"></div>
                 <div className="f_circleG" id="frotateG_02"></div>
@@ -113,7 +128,7 @@ class UserDetailedRating extends Component {
                         justifyContent: 'space-between',
                         backgroundColor: user.Achievements ? '#42996c' : '#595959'
                     }}><div>{(index + 1) + '. ' + user.Name}</div><div>{user.Ball}</div></h4>
-                    <table className="table table-bordered" id='users'>
+                    <table className="table table-bordered" css={criteriasTable} id='users'>
                         <thead>
                         <tr style={{fontSize: 'small'}}>
                             {Object.keys(criteriasStore.criterias).map((crit) =>
@@ -163,7 +178,7 @@ class UserDetailedRating extends Component {
             )
             }
 
-        </div>
+        </Panel>
     }
 }
 

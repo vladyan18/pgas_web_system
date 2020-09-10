@@ -21,16 +21,6 @@ const AdminCreationContainer = React.lazy(() => import('./containers/staff/super
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
 const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"));
 
-const PrivateRoute = ({component: Component, ...rest}) => (
-    <Route {...rest} render={props => (
-        Auth.isUserAuthenticated() ? (
-            <Component {...props} {...rest} />
-        ) : (
-            window.location.assign('/api/login')
-        )
-    )}/>
-);
-
 
 class Staff extends Component {
     constructor(props) {
@@ -46,23 +36,6 @@ class Staff extends Component {
             staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then();
             staffContextStore.getAnnotations().then();
         })
-    }
-
-    componentWillMount() {
-        if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
-    }
-
-    componentWillUpdate(nextProps, nextState, nextContext) {
-        Auth.fetchAuth().then(() => {
-            if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
-        })
-    }
-
-    async toggleAuthenticateStatus() {
-        // check authenticated status and toggle state based on that
-        await Auth.fetchAuth();
-        this.setState({authenticated: Auth.isUserAuthenticated()});
-        console.log(this.state.authenticated)
     }
 
     render() {

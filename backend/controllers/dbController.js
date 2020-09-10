@@ -4,10 +4,13 @@
 const UserModel = require('../models/user.js');
 const AchieveModel = require('../models/achieve');
 const FacultyModel = require('../models/faculty');
+const facultyCache = require('../resources/facultyCacheInstance');
 const CriteriasModel = require('../models/criterias');
+const criteriasCache = require('../resources/criteriasCacheInstance');
 const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
+const annotationsCache = require('../resources/annotationsCacheInstance');
 const md5 = require('md5');
 
 exports.findUserById = async function(id) {
@@ -68,7 +71,7 @@ exports.findUserByAchieve = async function(id) {
 exports.archiveAchievements = async function() {
   await AchieveModel.updateMany({status: 'Отказано'}, {$set:{isArchived: true}});
   console.log('UPDATED');
-}
+};
 
 exports.migrate = async function(id) {
   const u = await UserModel.findOne({SpbuId: id + '@student.spbu.ru', id: {$ne: id}}).lean();
@@ -174,30 +177,6 @@ exports.findActualAchieves = async function(userId) {
   return actualAchieves;
 };
 
-exports.findStaleAchieves = async function(userId) {
-  const User = await UserModel.findOne({id: userId}, 'Achievement').lean();
-  const b = await AchieveModel.find({_id: {$in: User.Achievement} }).lean();
-  const actualAchieves = [];
-  for (let i = 0; i < b.length; i++) {
-    if (b[i].isArchived) {
-	actualAchieves.push(b[i]);
-	continue;
-    }
-    if (b[i].crit === '7а' || b[i].crit === '1 (7а)') {
-      if (b[i].achDate < new Date(2020, 6, 1, 0, 0, 0, 0)) {
-         actualAchieves.push(b[i]);
-      }
-      continue;
-    }
-
-    if (b[i].achDate < new Date(2019, 8, 1, 0, 0, 0, 0)) {
-      actualAchieves.push(b[i]);
-    }
-  }
-  return (actualAchieves);
-};
-
-
 exports.findAchieveById = async function(id) {
   return AchieveModel.findById(id).lean();
 };
@@ -282,7 +261,7 @@ exports.removeUserFromRating = async function(userId) {
 exports.changeAchieveStatus = async function(id, accept = false) {
   let newStatus;
   if (accept) {
-    const Ach = await AchieveModel.findById(id, 'status');
+    const Ach = await AchieveModel.findById(id, 'status').lean();
     if (Ach.status === 'Изменено' || Ach.status === 'Принято с изменениями') {
       newStatus = 'Принято с изменениями';
     } else {
@@ -306,31 +285,8 @@ exports.toggleHide = async function(id) {
   });
 };
 
-
-exports.allAchieves = function() {
-  return AchieveModel.find({}).lean();
-};
-
-exports.setBalls = function(id, balls) {
-  return UserModel.findOneAndUpdate({id: id}, {$set: {Ball: balls}}, function(err, result) {
-  });
-};
-
-exports.getAcceptedAchsOfUser = async function(id) {
-  const user = await UserModel.findOne({id: id});
-  const achs = user.Achievement;
-  const acceptedAchs = [];
-  for (const achID of achs) {
-    const ach = await AchieveModel.findById(achID);
-    if (ach && (ach.status === 'Принято' || ach.status === 'Принято с изменениями')) {
-      acceptedAchs.push(ach);
-    }
-  }
-  return acceptedAchs;
-};
-
-exports.getFaculty = async function(Name) {
-  return FacultyModel.findOne({Name: Name}).lean();
+exports.getFaculty = async function(facultyName) {
+  return facultyCache.get(facultyName);
 };
 
 exports.getAllFaculties = async function() {
@@ -348,38 +304,24 @@ exports.createFaculty = async function(faculty) {
   return createdFacultyObj;
 };
 
-const criteriasCache = {};
-async function getCriteriasFromCache(facultyName) {
-  const facObject = await FacultyModel.findOne({Name: facultyName}, 'CritsId').lean();
-  if (!facObject || !facObject.CritsId) {
-    return undefined;
-  }
-  if (!criteriasCache[facultyName] || criteriasCache[facultyName]._id !== facObject.CritsId.toString()) {
-    const crits = await CriteriasModel.findById(facObject.CritsId);
-    criteriasCache[facultyName] = {
-      _id: facObject.CritsId.toString(),
-      rawCrits: crits.Crits,
-      Crits: JSON.parse(crits.Crits),
-      Limits: crits.Limits
-    };
-  }
-  return criteriasCache[facultyName];
-}
-
-exports.getCriterias = async function(facultyName, fullInfo) { //TODO refactor
-  const crits = await getCriteriasFromCache(facultyName);
+exports.getRawCriteriasAndLimits = async function(facultyName) {
+  const crits = await criteriasCache.get(facultyName);
   if (!crits) {
     return null;
   }
-  const result = {Crits: crits.rawCrits, Limits: crits.Limits};
-  //if (fullInfo) {
-  //
-  //}
-  return result;
+  return {Crits: crits.rawCrits, Limits: crits.Limits};
+};
+
+exports.getCriteriasAndLimits = async function(facultyName) {
+  const crits = await criteriasCache.get(facultyName);
+  if (!crits) {
+    return null;
+  }
+  return {Crits: crits.Crits, Limits: crits.Limits};
 };
 
 exports.getCriteriasObject = async function(facultyName) {
-  const crits = await getCriteriasFromCache(facultyName);
+  const crits = await criteriasCache.get(facultyName);
   if (!crits) {
     return null;
   }
@@ -398,16 +340,13 @@ exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile
   let annObj = {Date: Date.now(), AnnotationsToCrits: annotations, LearningProfile: learningProfile, FacultyId: facObject._id};
   annObj = await AnnotationsModel.create(annObj);
   await FacultyModel.findByIdAndUpdate(facObject._id, {$set: {AnnotationsToCritsId: annObj._id.toString()}});
+  facultyCache.clear(facultyName);
   return annObj;
 };
 
 exports.getAnnotationsForFaculty = async function(facultyName) {
-  const facObject = await FacultyModel.findOne({Name: facultyName}, 'AnnotationsToCritsId').populate(
-      'AnnotationsToCritsId'
-  ).lean();
-  return facObject.AnnotationsToCritsId;
+  return annotationsCache.get(facultyName);
 };
-
 
 exports.changeRole = function(id, isAdmin) {
   const newRole = isAdmin ? 'Admin' : 'User';
@@ -434,6 +373,7 @@ exports.uploadCriteriasToFaculty = async function(crits, faculty) {
 
   critsObject = await CriteriasModel.create(critsObject);
   await FacultyModel.updateOne({Name: faculty}, {$set: {CritsId: critsObject._id.toString()}}).lean();
+  facultyCache.clear(faculty);
 };
 
 exports.createConfirmation = async function(confirmation) {

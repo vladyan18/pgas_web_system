@@ -21,8 +21,12 @@ async function sendObject(url, obj) {
     },
     body: JSON.stringify(obj),
   });
-  if (!response.ok) return 'error';
-  return response.json();
+  if (response.ok) {
+    return response.json();
+  } else if (response.status === 401) {
+    localStorage.removeItem('isAuthenticated');
+    window.location.href = '/login';
+  }
 }
 
 async function sendWithoutRes(url, obj) {
@@ -36,7 +40,13 @@ async function sendWithoutRes(url, obj) {
     },
     body: JSON.stringify(obj),
   });
-  return response.ok;
+  if (response.ok) {
+    return response.ok;
+  } else if (response.status === 401) {
+    localStorage.removeItem('isAuthenticated');
+    window.location.href = '/login';
+    return response.ok;
+  }
 }
 
 async function get(url, obj) {
@@ -55,9 +65,11 @@ async function get(url, obj) {
   });
   if (response.ok) {
     return response.json();
+  } else if (response.status === 401) {
+    localStorage.removeItem('isAuthenticated');
+    window.location.href = '/login';
   }
   // else throw new FetchError('Error while fetching', await response.json())
-  console.log(response);
 }
 
 

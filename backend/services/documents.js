@@ -35,10 +35,10 @@ module.exports.getAnket = async function(userId, facultyName) { //TODO refactor
         return [Buffer.from(archive, 'binary'), translitter().transform(user.LastName + '_ПГАС.zip', '_')];
 };
 
-module.exports.getResultTable = async function(facultyName) { //TODO refactor
-    const [faculty, criterias] = await Promise.all([db.getFaculty(facultyName), db.getCriterias(facultyName)]);
+module.exports.getResultTable = async function(facultyName) { //TODO refactor WTF LIMITS
+    const [faculty, criterias] = await Promise.all([db.getFaculty(facultyName), db.getCriteriasAndLimits(facultyName)]);
 
-    const kri = JSON.parse(criterias.Crits);
+    const kri = criterias.Crits;
     const limits = criterias.Limits;
     const critNames = Object.keys(kri);
     if (critNames[0] === '7а') {

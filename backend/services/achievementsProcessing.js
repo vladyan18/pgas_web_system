@@ -69,7 +69,19 @@ const calculateBallsForCriterion = function(achievements) {
     return summ;
 };
 
-module.exports.getRating = async function(facultyName, isAdmin, requestingUserId) { //TODO refactor
+function getAreaNum(critName, kri) {
+    const critNum = Object.keys(kri).indexOf(critName);
+    if (critNum === -1) return undefined;
+    const shift = Object.keys(kri).length === 12 ? 0 : 1;
+
+    if (critNum < 3) return 0;
+    if (critNum < 5) return 1;
+    if (critNum < 7) return 2;
+    if (critNum < 9 + shift) return 3;
+    return 4;
+}
+
+module.exports.getRating = async function(facultyName, isAdmin, requestingUserId) { //TODO refactor to stream
     let requestingUser;
     if (!isAdmin) {
         requestingUser = await db.findUserById(requestingUserId);
@@ -78,24 +90,11 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
         }
     }
 
-    function getAreaNum(critName) {
-        const critNum = Object.keys(kri).indexOf(critName);
-        if (critNum === -1) return undefined;
-        const shift = Object.keys(kri).length === 12 ? 0 : 1;
-
-        if (critNum < 3) return 0;
-        if (critNum < 5) return 1;
-        if (critNum < 7) return 2;
-        if (critNum < 9 + shift) return 3;
-        return 4;
-    }
-
-    const criterionObject = await db.getCriterias(facultyName);
-    const kri = JSON.parse(criterionObject.Crits);
+    const criterionObject = await db.getCriteriasAndLimits(facultyName);
+    const kri = criterionObject.Crits;
     const limits = criterionObject.Limits;
-    const users = [];
-    const Users = await db.getCurrentUsers(facultyName);
-    for (const user of Users) {
+    const Users = await db.getUsersWithAllInfo(facultyName, true);
+    let users = Users.map((user) => {
         let sumBall = 0;
         const crits = {};
         const sums = [0, 0, 0, 0, 0];
@@ -103,15 +102,14 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
         for (const key of Object.keys(kri)) {
             crits[key] = 0;
         }
-        const Achs = await db.findActualAchieves(user.id);
-        for (const ach of Achs) {
-            if (!ach) continue;
-            if (ach.ball) {
+        const Achs = user.Achievement;
+        Achs.forEach((ach) => {
+            if (ach && ach.ball) {
                 crits[ach.crit] += ach.ball;
                 sumBall += ach.ball;
-                sums[getAreaNum(ach.crit)] += ach.ball;
+                sums[getAreaNum(ach.crit, kri)] += ach.ball;
             }
-        }
+        });
 
         if (limits) {
             for (let i = 0; i < sums.length; i++) {
@@ -131,8 +129,8 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
                 newUser.Achievements = Achs;
             }
         }
-        users.push(newUser);
-    }
+        return newUser;
+    });
     return users;
 };
 

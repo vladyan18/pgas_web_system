@@ -16,6 +16,10 @@ import {css, jsx} from '@emotion/core';
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
 `;
 
 const horizontalLine = css`
@@ -212,8 +216,8 @@ class UserAddAchievement extends Component {
     };
 
     return (
-      <Panel className="col-md-9 rightBlock" id="panel">
-        <div className="block_main_right">
+      <Panel className="col-md-9" id="panel">
+        <div>
           <p className="headline">
                         Добавить достижение
           </p>

@@ -17,7 +17,7 @@ if (!fs.existsSync(uploadsPath)) {
 router.get('/getCriterias', authCheck,
     async function(req, res) {
         try {
-            const criterias = await criteriasService.getCriterias(req.query.faculty);
+            const criterias = await criteriasService.getRawCriteriasAndLimits(req.query.faculty);
             if (criterias) {
                 res.status(200).send(criterias);
             } else res.status(404).send({Error: 404, facultyRawName: req.user.facultyRawName});

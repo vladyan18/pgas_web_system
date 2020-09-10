@@ -5,8 +5,8 @@ const fs = require('fs');
 const xlsx = require('xlsx');
 const parseCriterias = require('../helpers/parseCriterias');
 
-module.exports.getCriterias = async function(facultyName) {
-    return db.getCriterias(facultyName);
+module.exports.getRawCriteriasAndLimits = async function(facultyName) {
+    return db.getRawCriteriasAndLimits(facultyName);
 };
 
 module.exports.getCriteriasAndSchema = async function(facultyName) {

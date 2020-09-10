@@ -74,6 +74,12 @@ class ConfirmationForm extends Component {
         }
     };
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.value !== this.state.confirmations) {
+            this.setState({confirmations: this.props.value});
+        }
+    }
+
     async componentDidMount() {
         let commonConfirms = await fetchGet('/api/getConfirmations', {});
 

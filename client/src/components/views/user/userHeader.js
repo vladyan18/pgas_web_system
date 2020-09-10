@@ -15,6 +15,9 @@ const pageTop = css`
     align-items: center;
     font-size: 14px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    justify-content: space-between;
+    margin-left: 0;
+    margin-right: 0;
 `;
 
 const blockHeader = css`
@@ -22,6 +25,7 @@ const blockHeader = css`
     display: flex;
     font-size: 14px;
     align-items: center;
+    margin-left: 1rem;
     @media only screen and (max-device-width: 480px) {
     max-width: 45%;
   }
@@ -75,9 +79,10 @@ const verticalAlign = css`
 `;
 
 const rightPanel = css `
+    margin-right: 1rem;
     @media only screen and (max-device-width: 480px) {
-    max-width: 55%;
-    flex: 0 0 55%;
+    max-width: 65%;
+    flex: 0 0 65%;
   }
 `;
 
@@ -107,7 +112,7 @@ class UserHeader extends Component {
     const props = this.props;
     return <header>
       <div className="row" css={pageTop}>
-        <div className="col-8" css={blockHeader}>
+        <div css={blockHeader}>
           <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
             <LogoSPbU src={logoSPbU} alt={'СПбГУ'}/>
           </a>
@@ -122,7 +127,7 @@ class UserHeader extends Component {
           </div>
         </div>
 
-        <div className="col-4" css={rightPanel}>
+        <div css={rightPanel}>
           <div css={css`display: flex; justify-content: flex-end;`}>
 
             <div css={verticalAlign}>
@@ -133,7 +138,14 @@ class UserHeader extends Component {
             {(userPersonalStore.Role === 'Admin' || userPersonalStore.Role === 'SuperAdmin') &&
             <div style={{'marginRight': '1rem'}}>
               <button type="button" id="SubmitButton"
-                      className="btn btn-outline-primary" onClick={this.switchToStaff}>
+                      className="btn btn-outline-primary"
+                      css = {css`                 
+                    @media only screen and (max-device-width: 480px) {
+                    font-size: smaller;
+                    border-color: transparent;
+                      }`
+                      }
+                      onClick={this.switchToStaff}>
                 Режим проверяющего
               </button>
             </div>

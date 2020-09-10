@@ -125,10 +125,12 @@ class StaffHeader extends Component {
                         </div>
             }
             <div>
-              <button type="button" id="logoutButton"
+              <form action="/api/logout">
+              <button type="submit" id="logoutButton"
                 className="btn btn-outline-danger">
                                 Выход
               </button>
+              </form>
             </div>
           </div>
 

@@ -14,12 +14,25 @@ class Login extends Component {
     this.doLogin = this.doLogin.bind(this);
   };
 
+  componentDidMount() {
+    let isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    if (isAuth) {
+      window.location.replace('/home');
+    }
+  }
+
   async doLogin(e) {
     e.preventDefault();
-    let result = await fetchSendWithoutRes('/login', {username: this.state.username, password: this.state.password})
+    let result = await fetchSendWithoutRes('/login', {username: this.state.username, password: this.state.password});
 
     if (result) {
-      window.location.replace('/home');
+      console.log('SET ITEM')
+      localStorage.setItem('isAuthenticated', 'true');
+      if (window.location.pathname === '/login') {
+        window.location.replace('/home');
+      } else {
+        window.location.reload();
+      }
     } else {
       this.setState({error: true})
     }

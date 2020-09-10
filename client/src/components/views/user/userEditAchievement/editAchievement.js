@@ -9,6 +9,27 @@ import userAchievesStore from "../../../../stores/userAchievesStore";
 import userPersonalStore from "../../../../stores/userPersonalStore";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import HelpButton from "../helpButton";
+import styled from '@emotion/styled';
+import {css, jsx} from '@emotion/core';
+/** @jsx jsx */
+
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
+`;
+
+const ButtonPanel = styled.div`
+   display: flex; 
+   justify-content: space-between;
+   margin: 0;
+    @media only screen and (max-device-width: 480px) {
+        display: block; 
+    }   
+`;
 
 
 class EditAchievement extends Component {
@@ -23,11 +44,13 @@ class EditAchievement extends Component {
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
         this.updateConfirmations = this.updateConfirmations.bind(this);
+        this.copyAch = this.copyAch.bind(this);
+        this.crits = Object.keys(CriteriasStore.criterias);
         if (this.props.achieves) {
             let ach = this.props.achieves.filter((x) => x._id == this.props.achId)[0];
             this.state = {
                 crits: CriteriasStore.criterias,
-                ach: ach.achievement,
+                ach: this.props.isCopying ? undefined : ach.achievement,
                 isDateValid: true,
                 isEndDateValid: !!ach.endingDate,
                 dateValidationResult: true,
@@ -37,9 +60,9 @@ class EditAchievement extends Component {
                 hasDateDiapasone: !!ach.endingDate,
                 confirmations: ach.confirmations,
                 charsInvalid: false,
-                status: ach.status,
-                ball: ach.ball,
-                comment: ach.comment
+                status: this.props.isCopying ? 'Ожидает проверки' : ach.status,
+                ball: this.props.isCopying ? undefined : ach.ball,
+                comment: this.props.isCopying ? undefined : ach.comment
             }
         }
     }
@@ -49,22 +72,22 @@ class EditAchievement extends Component {
     }
 
     updateChars = (value, isValid) => {
-        let st = this.state;
-        if (value[0] == '1 (7а)') {
-            if (userAchievesStore.achieves.some((x) => (x.chars[0] == '1 (7а)' && x._id != this.props.achId))) {
+        const st = this.state;
+        if ((this.state.status === 'Ожидает проверки' ||
+            this.state.status === 'Данные некорректны') && value[0] === this.crits[0]) {
+            if (userAchievesStore.achieves.some((x) => x.chars[0] === this.crits[0])) {
                 st.critError = true;
-                st.critErrorMessage = "Достижение за критерий 7а уже добавлено"
-            } else if (userPersonalStore.Course == 1) {
+                st.critErrorMessage = 'Достижение за критерий 7а уже добавлено';
+            } else if (userPersonalStore.Course === 1) {
                 st.critError = true;
-                st.critErrorMessage = "Первый курс не может получать баллы за 7а"
-            } else st.critError = false
+                st.critErrorMessage = 'Первый курс не может получать баллы за 7а';
+            } else st.critError = false;
         } else st.critError = false;
 
         st.chars = value;
-        console.log('CHARS', isValid);
-        if (isValid)
+        if (isValid) {
             st.charsInvalid = !isValid;
-        else st.charsInvalid = undefined;
+        } else st.charsInvalid = undefined;
         this.setState(st);
     };
 
@@ -183,7 +206,14 @@ class EditAchievement extends Component {
 
         let obj = {data: res, achId: this.props.achId};
 
-        fetchSendWithoutRes('/api/update_achieve', obj).then((response) => {
+        let endpoint;
+        if (this.props.isCopying) {
+            endpoint = '/api/add_achieve';
+        } else {
+            endpoint = '/api/update_achieve';
+        }
+
+        fetchSendWithoutRes(endpoint, obj).then((response) => {
             if (response) this.props.history.push('/home')
         })
     }
@@ -194,6 +224,33 @@ class EditAchievement extends Component {
         fetchSendWithoutRes('/api/delete_achieve', {achId: this.props.achId}).then((response) => {
             if (response) this.props.history.push('/home');
         })
+    }
+
+    copyAch() {
+        if (this.props.achieves) {
+            let ach = this.props.achieves.filter((x) => x._id == this.props.achId)[0];
+            let state = {
+                crits: CriteriasStore.criterias,
+                ach: '',
+                isDateValid: true,
+                isEndDateValid: !!ach.endingDate,
+                dateValidationResult: true,
+                endDateValidationResult: true,
+                dateValue: getDate(ach.achDate),
+                endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
+                hasDateDiapasone: !!ach.endingDate,
+                confirmations: [],
+                charsInvalid: false,
+                status: 'Ожидает проверки',
+                ball: undefined,
+                comment: '',
+            };
+            this.setState(state, () => {
+                this.updateChars(ach.chars, true);
+            });
+        }
+
+        this.props.copyAch();
     }
 
     render() {
@@ -210,13 +267,13 @@ class EditAchievement extends Component {
             </Popover>
         );
 
-        if (!CriteriasStore.criterias) return null
+        if (!CriteriasStore.criterias) return null;
 
-        return (<div className="col-md-9 rightBlock" id="panel">
-            <div className="block_main_right">
-                <div className="profile" style={{"display": "flex", "justifyContent": "space-between"}}>
+        return (<Panel className="col-md-9" id="panel">
+            <div>
+                <ButtonPanel className="profile">
                     <p className="headline" style={{"margin-bottom": "auto"}}>
-                        Достижение
+                        {this.props.isCopying ? 'Копирование достижения' : 'Изменение достижения'}
                     </p>
                     <div style={{'margin-top': 'auto'}}>
                         <button id="DeleteButton" className="btn btn-secondary" style={{marginRight: "1rem"}}
@@ -224,16 +281,21 @@ class EditAchievement extends Component {
                             this.props.history.goBack()
                         }}>Назад
                         </button>
+                        {!this.props.isCopying && <>
+                        <button id="DeleteButton" className="btn btn-warning" style={{marginRight: "1rem"}}
+                                value="Копировать" onClick={this.copyAch}>Копировать</button>
                         <button id="DeleteButton" className="btn btn-danger"
                                 value="Удалить" onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'&&
                         this.state.status !== 'Данные некорректны' }>Удалить
                         </button>
+                        </>}
                     </div>
-                </div>
+                </ButtonPanel>
 
                 <hr className="hr_blue"/>
                 <p className="desc_headline">
-                    Изменение достижения
+                    {this.props.isCopying && 'Добавление нового достижения на основании существующего'}
+
                 </p>
 
                 <div className="form_elem_with_left_border">
@@ -340,12 +402,12 @@ class EditAchievement extends Component {
                     <span className="file-input-label"></span>
                 </div>
                 <button type="button" id="SubmitButton" disabled={!this.isValid()}
-                        className="btn btn-primary btn-md button_send"
-                        data-target="#exampleModal" value="отправить" onClick={this.editKrit}>
-                    отправить
+                        className={"btn " + (this.props.isCopying ? 'btn-primary' : 'btn-success') + " btn-md button_send"}
+                        data-target="#exampleModal" value="сохранить" onClick={this.editKrit}>
+                    {this.props.isCopying ? 'Добавить достижение' : 'Сохранить'}
                 </button>
             </div>
-        </div>)
+        </Panel>)
     }
 }
 
