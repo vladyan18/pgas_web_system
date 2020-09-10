@@ -16,6 +16,9 @@ function UserHeaderContainer(props) {
     case '/documents':
       pathname = 'Информация';
       break;
+    case '/confirmations':
+      pathname = 'Мои документы';
+      break;
     case '/profile':
       pathname = 'Мой профиль';
       break;

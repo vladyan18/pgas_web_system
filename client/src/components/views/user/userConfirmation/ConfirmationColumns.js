@@ -13,7 +13,8 @@ const columns = [{
     }
     return types[row.Type];
   },
-}, {
+},
+  {
   dataField: 'Data',
   text: 'Подтверждение',
   style: {width: '40%', overflow: 'hidden'},
@@ -25,49 +26,34 @@ const columns = [{
       </div>);
     } else {
       return (<div style={{overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '18rem', fontSize: 'small'}}>
-        <a href={row.Data} onClick={(e) => e.stopPropagation()} target="_blank">{row.Name}</a>
+        <a href={row.Data} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer">{row.Name}</a>
         <br/>{row.additionalInfo}</div>);
     }
   },
 }, {
   isDummyField: true,
+  text: 'Размер',
   formatter: (cell, row) => {
     if (row.Type == 'doc') {
       return <span>{(row.Size / 1024 / 1024).toFixed(2)} Мб</span>;
     }
-    if (row.Type == 'link') {
-      if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
-        if (row.CrawlResult) {
-          return (
-            <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 'x-small'}}>
-              {row.CrawlResult.title ? <div style={{maxWidth: '10rem', fontSize: 'xx-small'}}>
-                <div>"{row.CrawlResult.title.toLowerCase()}"</div>
-                <div><i>{row.CrawlResult.magazine ? row.CrawlResult.magazine.toLowerCase() : ''}</i>
-                </div>
-              </div> : ''}
-              <div style={{width: '100%', marginLeft: '0.5rem'}}>
-                <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                  {row.CrawlResult.inRINC ?
-                                        <div className="greenText">В РИНЦе <i className="fa fa-check"/></div> :
-                                        <div className="redText">Не в РИНЦе<i className="fa fa-times"/></div>}
-                  {row.CrawlResult.isAuthor ?
-                                        <div className="greenText">Указан в авторах <i className="fa fa-check"/>
-                                        </div> :
-                                        <div className="redText">Не указан в авторах<i className="fa fa-times"/>
-                                        </div>}
-                </div>
-                {row.CrawlResult.year ? <div style={{fontSize: 'small', merginTop: '0.5rem'}}>
-                  <b>Год: {row.CrawlResult.year}</b></div> : ''}
-              </div>
-            </div>
-
-
-          );
-        } else return (<div style={{color: '#505050'}}>Нет информации из e-library</div>);
-      }
-    }
     return '';
   },
-}];
+},
+  ,
+  {
+    dataField: 'CreationDate',
+    text: 'Дата загрузки',
+    style: {},
+    formatter: (cell, row) => {
+      return getDate(row.CreationDate);
+    }
+  }];
+
+function getDate(d) {
+  if (!d) return undefined;
+  d = new Date(d);
+  return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + "." + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + "." + d.getFullYear();
+}
 
 export {columns as ConfirmationColumns};

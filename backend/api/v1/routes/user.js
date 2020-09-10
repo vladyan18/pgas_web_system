@@ -150,6 +150,7 @@ router.post('/add_file_for_confirmation', authCheck,
 router.post('/add_confirmation', authCheck,
     async function(req, res) {
         const confirmation = req.body;
+        confirmation.CreationDate = Date.now();
         const result = await userService.addConfirmation(req.userId, confirmation);
         res.status(200).send(result);
     });

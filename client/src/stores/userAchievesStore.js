@@ -1,4 +1,5 @@
 import {decorate, observable} from 'mobx';
+import {fetchGet} from "../services/fetchService";
 
 class UserAchievesStore {
     achieves;
@@ -27,7 +28,6 @@ class UserAchievesStore {
                     }
                 });
                 this.achieves = data.Achievement;
-                this.confirmations = data.Confirmations
             }).catch((err) => console.log(err));
 
         fetch("/api/getArchivedAchievements", {
@@ -38,6 +38,20 @@ class UserAchievesStore {
                 this.archivedAchieves = data;
             }).catch((err) => console.log(err));
     }
+
+    updateCommonConfirmations() {
+        fetchGet('/api/getConfirmations', {}).then((commonConfirms) => {
+            if (commonConfirms) {
+                for (let conf of commonConfirms) {
+                    if (conf.Type === 'SZ') {
+                        commonConfirms.splice(commonConfirms.indexOf(conf), 1)
+                    }
+                }
+                this.confirmations = commonConfirms;
+            }
+        });
+    }
+
 }
 
 decorate(UserAchievesStore, {

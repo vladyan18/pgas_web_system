@@ -30,6 +30,7 @@ async function getUserWithAchievements(id, isArchived) {
         match: query,
         populate: {
           path: 'confirmations.id',
+          select: '-FilePath'
         },
       },
   ).lean();
@@ -385,7 +386,7 @@ exports.getConfirmByIdForUser = async function(confirmation) {
 };
 
 exports.getConfirmations = async function(confIds) {
-  return ConfirmationModel.find({_id: {$in: confIds}}).lean();
+  return ConfirmationModel.find({_id: {$in: confIds}}, '-FilePath').lean();
 };
 
 exports.addConfirmationToUser = async function(userId, confId) {

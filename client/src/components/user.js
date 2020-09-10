@@ -19,6 +19,7 @@ import {css, jsx} from '@emotion/core';
 const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
 const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
 const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
+const UserDocumentsContainer = React.lazy(() => import('./containers/user/UserDocumentsContainer'));
 
 
 const Panel = styled.div`
@@ -65,6 +66,7 @@ class User extends Component {
               <Route path="/upload" component={UserAddAchievementContainer}/>
               <Route path="/documents" component={UserCommonInfoContainer}/>
               <Route path="/profile" component={UserProfileContainer}/>
+              <Route path="/confirmations" component={UserDocumentsContainer}/>
               <Route path="/" component={UserAchievesContainer}/>
             </Switch>
             </Suspense>

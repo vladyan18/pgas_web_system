@@ -48,6 +48,7 @@ function UserNavbar(props) {
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
+        <UserNavItem to='/confirmations'>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
       </ul>
     </div>
