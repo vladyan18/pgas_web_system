@@ -45,7 +45,8 @@
     "xlsx-style": "^0.8.13"
   },
   "scripts": {
-    "start": "set NODE_ENV=production && node --nouse-idle-notification backend/start.js"
+    "start": "set NODE_ENV=production && node --nouse-idle-notification backend/start.js",
+    "devstart": "set DB_USER=bekhterev&& set DB_PASSWORD=bekhterev&& set DB_HOST=localhost&& set DB_NAME=bekhterev&& npm start"
   },
   "author": "",
   "engines": {

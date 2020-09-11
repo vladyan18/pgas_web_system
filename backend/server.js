@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
 const passport = require('./config/passport'); // configuring passport here
-const port = 8080;
+const port = 80;
 const getUserIdMiddleware = require('./middlewares/getUserId');
 
 require('dotenv').config();

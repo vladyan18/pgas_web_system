@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 
 const UserModel = require('../models/user.js');
 const AchieveModel = require('../models/achieve');
@@ -396,6 +398,34 @@ exports.addConfirmationToUser = async function(userId, confId) {
 exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {
   return ConfirmationModel.findByIdAndUpdate(confirmId, {$set: {CrawlResult: crawlResult, IsCrawled: true}});
 };
+
+exports.getconfitmationsStatistics = async function() {
+    const filePath = path.join(__dirname, '../static/confirmations');
+    const confirmations = await ConfirmationModel.find({}).lean();
+    const usedFiles = confirmations.filter((x) => x.FilePath).map((x) => path.basename(x.FilePath));
+    const files = await fs.promises.readdir(filePath);
+    const forgottenFiles = [];
+    const missedFiles = [];
+    let totalUselessSize = 0;
+    for (let file of files) {
+        if (usedFiles.findIndex(x => x === file) === -1) {
+            forgottenFiles.push(file);
+            const stat = await fs.promises.stat(filePath + '/' + file);
+            totalUselessSize += stat.size;
+        }
+    }
+    for (let file of usedFiles) {
+        if (files.findIndex(x => x === file) === -1) {
+            missedFiles.push(file);
+        }
+    }
+
+    const stat = await fs.promises.lstat(filePath);
+    const totalSize = (stat.size / 1024 / 1024).toFixed(2) + ' Мб';
+    totalUselessSize = (totalUselessSize / 1024 / 1024).toFixed(2) + ' Мб';
+    return {totalSize, totalUselessSize, forgottenFiles, missedFiles};
+};
+
 
 exports.getStatisticsForFaculty = async function(facultyName, isInRating = true) { // TODO REFACTOR!!
   const users = await UserModel.find({Faculty: facultyName, IsInRating: isInRating})

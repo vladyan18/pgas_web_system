@@ -113,3 +113,8 @@ module.exports.getAdmins = async function() { //TODO refactor
 module.exports.getStatisticsForFaculty = async function(facultyName) {
     return db.getStatisticsForFaculty(facultyName);
 };
+
+module.exports.getconfitmationsStatistics = async function() {
+    return db.getconfitmationsStatistics();
+};
+

@@ -68,7 +68,8 @@ class EditAchievement extends Component {
     }
 
     updateConfirmations(confirms) {
-        this.setState({confirmations: confirms});
+        console.log(confirms)
+        this.setState({confirmations: [...confirms]});
     }
 
     updateChars = (value, isValid) => {
@@ -192,10 +193,9 @@ class EditAchievement extends Component {
         res.comment = this.state.comment
         if (this.state.confirmations)
             for (let i = 0; i < this.state.confirmations.length; i++) {
-                res.confirmations.push({
-                    id: this.state.confirmations[i]._id,
-                    additionalInfo: this.state.confirmations[i].additionalInfo
-                })
+                const confirm = Object.assign({}, this.state.confirmations[i]);
+                confirm.id = this.state.confirmations[i]._id;
+                res.confirmations.push(confirm);
             }
 
         if (this.state.dateValue) res.achDate = makeDate(this.state.dateValue);

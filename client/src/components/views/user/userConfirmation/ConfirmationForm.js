@@ -6,6 +6,7 @@ import Dropzone from "react-dropzone";
 import {fetchGet, fetchSendObj} from "../../../../services/fetchService";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import HelpButton from "../helpButton";
+import EditConfirmation from "./editConfirmation";
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -15,6 +16,7 @@ class ConfirmationForm extends Component {
         this.closeModal = this.closeModal.bind(this);
         this.addConfirmation = this.addConfirmation.bind(this);
         this.addExistingConfirmation = this.addExistingConfirmation.bind(this);
+        this.closeEditingModal = this.closeEditingModal.bind(this);
 
         if (props.value) {
             this.state.confirmations = props.value
@@ -186,6 +188,13 @@ class ConfirmationForm extends Component {
         this.setState(st)
     }
 
+    closeEditingModal(e) {
+        let st = this.state;
+        st.isEditing = false;
+        st.editingConfirmation = undefined;
+        this.setState(st)
+    }
+
     addExistingConfirmation(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -331,26 +340,64 @@ class ConfirmationForm extends Component {
             confirmations.splice(confirmations.indexOf(confirmation), 1)
             this.props.updateForm(confirmations);
             //this.setState({confirmations: confirmations})
+        };
+
+        const saveConfirmation = (confirmation) => {
+            if (confirmation) {
+                let confirmations = this.state.confirmations;
+                const index = confirmations.findIndex((x) => (x._id === this.state.editingConfirmation._id));
+                console.log(index, confirmations);
+                confirmations[index] = Object.assign({}, confirmations[index], confirmation);
+                console.log(confirmations[index]);
+                this.props.updateForm(confirmations);
+                this.setState({confirmations: [...confirmations]});
+            }
+            this.closeEditingModal();
         }
+
+        const editConfirmation = (e, confirmation) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.setState({isEditing: true, editingConfirmation: confirmation});
+        };
 
         let columns = this.columns.concat([
             {
                 isDummyField: true,
                 style: {textAlign: "right"},
-                formatter: (cell, row) => (<>{!this.props.disabled && <button
+                formatter: (cell, row) => (<>{!this.props.disabled &&
+                    <div style={{display: "flex", justifyContent: "right"}}>
+                        <button onClick={(e) => editConfirmation(e, row)}
+                            style={
+                                {
+                                    cursor: "pointer",
+                                    marginLeft: "0.3rem",
+                                    marginRight: "1rem",
+                                    marginTop: "0px",
+                                    border:'none',
+                                    padding: 0,
+                                    backgroundColor: 'transparent',
+                                    outline: 'none',
+                                    color: "orange",
+                                    fontSize: "1rem"
+                                }}><i className="fa fa-edit"/>
+                        </button>
+                <button
                     onClick={(e) => deleteConfirmation(e, row)}
                                                   style={
                                                       {
                                                           cursor: "pointer",
                                                           marginLeft: "0.3rem",
-                                                          marginTop: "0px",
+                                                          marginTop: "2px",
                                                           border:'none',
                                                           padding: 0,
                                                           backgroundColor: 'transparent',
                                                           outline: 'none',
                                                           color: "red",
-                                                          fontSize: "1rem"
-                                                      }}><i className="fa fa-trash-alt"/></button>}</>)
+                                                          fontSize: "1.1rem"
+                                                      }}><i className="fa fa-times"/>
+                </button>
+                    </div>}</>)
             }
         ])
 
@@ -555,6 +602,15 @@ class ConfirmationForm extends Component {
                     </>
                 </Modal>
 
+                <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+                       isOpen={this.state.isEditing}
+                       onRequestClose={this.closeEditingModal}
+                       shouldCloseOnOverlayClick={true}
+                       contentLabel="Example Modal"
+                       overlayClassName="Overlay">
+                    <EditConfirmation confirmation={this.state.editingConfirmation} save={saveConfirmation}/>
+                </Modal>
+
             </div>
 
         )
@@ -563,7 +619,6 @@ class ConfirmationForm extends Component {
     commonConfRowEvents = {
         onClick: (e, row, rowIndex) => {
             this.setState({existingConfirm: row, existingSelected: true})
-            //window.location.assign('/achievement/'+row._id.toString())
         }
     };
 }
