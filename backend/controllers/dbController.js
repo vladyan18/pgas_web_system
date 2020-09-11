@@ -124,13 +124,6 @@ exports.getNewUsers = function(faculty) {
 };
 
 exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false) {
-  const populateQuery = {
-    path: 'Achievement',
-    match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
-    populate: {
-      path: 'confirmations.id',
-    },
-  };
   let query;
   if (!checked) {
     query = {$or: [{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]}
@@ -400,9 +393,27 @@ exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {
 };
 
 exports.getconfitmationsStatistics = async function() {
-    const filePath = path.join(__dirname, '../static/confirmations');
-    const confirmations = await ConfirmationModel.find({}).lean();
-    const usedFiles = confirmations.filter((x) => x.FilePath).map((x) => path.basename(x.FilePath));
+    const filePath = path.join(__dirname, '../static/confirmations/');
+  const populateQuery = {
+    path: 'Achievement',
+    match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
+    populate: {
+      path: 'confirmations.id',
+    },
+  };
+    const confirmations = [];
+    const users = await UserModel.find({}, 'Achievement')
+        .populate(populateQuery);
+    for (let i = 0; i < users.length; i++) {
+      for (let ach of users[i].Achievement) {
+        for (let confirm of ach.confirmations) {
+          if (confirm.id && confirm.id.FilePath && !(path.basename(confirm.id.FilePath) in confirmations)) {
+            confirmations.push(path.basename(confirm.id.FilePath));
+          }
+        }
+      }
+    }
+    const usedFiles = confirmations;
     const files = await fs.promises.readdir(filePath);
     const forgottenFiles = [];
     const missedFiles = [];
@@ -410,7 +421,7 @@ exports.getconfitmationsStatistics = async function() {
     for (let file of files) {
         if (usedFiles.findIndex(x => x === file) === -1) {
             forgottenFiles.push(file);
-            const stat = await fs.promises.stat(filePath + '/' + file);
+            const stat = await fs.promises.stat(filePath + file);
             totalUselessSize += stat.size;
         }
     }
