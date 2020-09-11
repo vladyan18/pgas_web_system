@@ -470,6 +470,68 @@ exports.getconfitmationsStatistics = async function() {
     return {totalSize, totalUselessSize, forgottenFiles, missedFiles};
 };
 
+exports.purgeConfirmations = async function() {
+    const filePath = path.join(__dirname, '../static/confirmations/');
+    const populateQuery = {
+        path: 'Achievement',
+        match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
+        populate: {
+            path: 'confirmations.id',
+        },
+    };
+    const confirmations = [];
+    const users = await UserModel.find({}, 'Achievement')
+        .populate(populateQuery);
+    for (let i = 0; i < users.length; i++) {
+        for (let ach of users[i].Achievement) {
+            for (let confirm of ach.confirmations) {
+                if (confirm.id && confirm.id.FilePath && !(path.basename(confirm.id.FilePath) in confirmations)) {
+                    confirmations.push(path.basename(confirm.id.FilePath));
+                }
+            }
+        }
+    }
+    const usedFiles = confirmations;
+    const files = await fs.promises.readdir(filePath);
+    const forgottenFiles = [];
+    const missedFiles = [];
+    let totalUselessSize = 0;
+    for (let file of files) {
+        if (usedFiles.findIndex(x => x === file) === -1) {
+            forgottenFiles.push(file);
+            const stat = await fs.promises.stat(filePath + file);
+            totalUselessSize += stat.size;
+        }
+    }
+    for (let file of usedFiles) {
+        if (files.findIndex(x => x === file) === -1) {
+            missedFiles.push(file);
+        }
+    }
+
+    const stat = await fs.promises.lstat(filePath);
+    const totalSize = (stat.size / 1024 / 1024).toFixed(2) + ' Мб';
+    totalUselessSize = (totalUselessSize / 1024 / 1024).toFixed(2) + ' Мб';
+
+    const confirmationsIds = [];
+    for (let forgottenFile of forgottenFiles) {
+        const confirmation = await ConfirmationModel.findOne({FilePath: filePath + forgottenFile}).lean();
+        if (confirmation) {
+            confirmationsIds.push(confirmation._id);
+        }
+    }
+
+    for (let confId of confirmationsIds) {
+        await UserModel.updateOne({Confirmations: {$elemMatch: {id: confId}}},
+            {$pull: {Confirmations: {id: confId}}});
+        await ConfirmationModel.deleteOne({_id: confId});
+    }
+    for (let forgottenFile of forgottenFiles) {
+      await fs.promises.unlink(filePath + forgottenFile);
+    }
+    return {totalSize, ClearedSpace: totalUselessSize, RemovedIds: confirmationsIds};
+};
+
 
 exports.getStatisticsForFaculty = async function(facultyName, isInRating = true) { // TODO REFACTOR!!
   const users = await UserModel.find({Faculty: facultyName, IsInRating: isInRating})

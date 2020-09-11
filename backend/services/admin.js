@@ -118,3 +118,9 @@ module.exports.getconfitmationsStatistics = async function() {
     return db.getconfitmationsStatistics();
 };
 
+module.exports.purgeConfirmations = async function() {
+    return db.purgeConfirmations();
+};
+
+
+

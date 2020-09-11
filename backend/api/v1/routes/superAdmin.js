@@ -11,6 +11,12 @@ router.get('/confitmationsStatistics', superAdminAuthCheck,
         res.status(200).send(result);
     });
 
+router.get('/purgeConfirmations', superAdminAuthCheck,
+    async function(req, res) {
+        const result = await adminService.purgeConfirmations();
+        res.status(200).send(result);
+    });
+
 /*
 router.get('/recalculate', superAdminAuth, adminController.recalculate);
 
