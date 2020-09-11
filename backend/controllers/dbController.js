@@ -125,6 +125,13 @@ exports.getNewUsers = function(faculty) {
 
 exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false) {
   let query;
+  const populateQuery = {
+    path: 'Achievement',
+    match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
+    populate: {
+      path: 'confirmations.id',
+    },
+  };
   if (!checked) {
     query = {$or: [{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]}
   } else {
@@ -386,6 +393,32 @@ exports.getConfirmations = async function(confIds) {
 
 exports.addConfirmationToUser = async function(userId, confId) {
   return UserModel.updateOne({_id: userId}, {$push: {Confirmations: confId}}).lean();
+};
+
+exports.deleteConfirmation = async function(userId, confirmationId) {
+  const usingAchievements = await AchieveModel.find({
+    status: {$in: ['Принято', 'Принято с изменениями', 'Отклонено']},
+    confirmations: {$elemMatch: {id: confirmationId}}
+  });
+  if (usingAchievements && usingAchievements.length > 0) return;
+
+  const user = await UserModel.findOne({id: userId}).lean();
+  if (!(user.Confirmations.some(x => x === confirmationId))) return;
+
+  await UserModel.updateOne({id: userId}, {$pull: {Confirmations: confirmationId}}).lean();
+  const achieveUpdatePromise = AchieveModel.updateMany(
+      {confirmations: {$elemMatch: {id: confirmationId}}},
+      {$pull: {confirmations: {id: confirmationId}}}
+      );
+  const confirmation = await ConfirmationModel.find({_id: confirmationId}).lean();
+  const confirmDeletePromise = ConfirmationModel.deleteOne({_id: confirmationId});
+  await Promise.all([achieveUpdatePromise, confirmDeletePromise]);
+  if (confirmation.Type === 'doc') {
+    const exists = await fs.promises.access(confirmation.FilePath);
+    if (exists) {
+      fs.promises.unlink(confirmation.FilePath).then();
+    }
+  }
 };
 
 exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {

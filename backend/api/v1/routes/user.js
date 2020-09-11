@@ -155,6 +155,13 @@ router.post('/add_confirmation', authCheck,
         res.status(200).send(result);
     });
 
+router.post('/delete_confirmation', authCheck,
+    async function(req, res) {
+        const confirmationId = req.body.id;
+        const result = await userService.deleteConfirmation(req.userId, confirmationId);
+        res.status(200).send(result);
+    });
+
 router.get('/getConfirm/*', authCheck, // TODO SECURITY
     async function(req, res) {
         let filename = await req.url.slice(12);

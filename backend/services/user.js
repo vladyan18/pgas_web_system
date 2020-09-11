@@ -188,6 +188,10 @@ module.exports.addConfirmation = async function(userId, confirmation) {
     return result;
 };
 
+module.exports.deleteConfirmation = async function (userId, confirmationId) {
+    return db.deleteConfirmation(userId, confirmationId);
+}
+
 module.exports.getConfirmations = async function(userId) { //TODO refactor
     const user = await db.findUserById(userId);
     return db.getConfirmations(user.Confirmations);

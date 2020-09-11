@@ -96,12 +96,15 @@ class UserAchieves extends Component {
         }
         `}>
             <b>Текущие достижения</b>
+
           </div>
           <form action={BASE_API_URL + '/getAnket'} onSubmit={this.checkConfirms}>
             <input type="submit" id="download" className="btn" css={mainButton} value="Скачать анкету"/>
           </form>
         </div>
+
         <hr css={horizontalLine}/>
+        {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
         <div css={css`width: 100%; min-height: 10rem;`}>
           < CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
         </div>
