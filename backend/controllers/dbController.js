@@ -13,6 +13,7 @@ const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
 const annotationsCache = require('../resources/annotationsCacheInstance');
+const { BloomFilter } = require('bloom-filters');
 const md5 = require('md5');
 
 exports.findUserById = async function(id) {
@@ -379,17 +380,32 @@ exports.uploadCriteriasToFaculty = async function(crits, faculty) {
   facultyCache.clear(faculty);
 };
 
+const errorRate = 0.05;
+const filter = BloomFilter.create(10000, errorRate);
+ConfirmationModel.find({}).lean().then((hashes) => {
+    console.log('Set Bloom filter');
+    hashes = hashes.filter((x) => x.Hash).map((x) => x.Hash);
+    for (let hash of hashes) {
+        filter.add(hash);
+    }
+});
+
 exports.createConfirmation = async function(confirmation) {
     if (confirmation.Hash && confirmation.FilePath) {
-        const sameFile = await ConfirmationModel.findOne({Hash: confirmation.Hash}).lean();
-        if (sameFile && sameFile.FilePath && sameFile.Size === confirmation.Size) {
-            const confPath = path.join(__dirname, '../static/confirmations/');
-            const fileName = path.basename(sameFile.FilePath);
-            try {
-                await fs.promises.access(confPath + fileName);
-                fs.promises.unlink(confPath + path.basename(confirmation.FilePath)).then();
-                confirmation.FilePath = sameFile.FilePath;
-            } catch (e) {}
+        if (filter.has(confirmation.Hash)) {
+            const sameFile = await ConfirmationModel.findOne({Hash: confirmation.Hash}).lean();
+            if (sameFile && sameFile.FilePath && sameFile.Size === confirmation.Size) {
+                const confPath = path.join(__dirname, '../static/confirmations/');
+                const fileName = path.basename(sameFile.FilePath);
+                try {
+                    await fs.promises.access(confPath + fileName);
+                    fs.promises.unlink(confPath + path.basename(confirmation.FilePath)).then();
+                    confirmation.FilePath = sameFile.FilePath;
+                } catch (e) {
+                }
+            }
+        } else {
+            filter.add(confirmation.Hash);
         }
     }
   return ConfirmationModel.create(confirmation);
