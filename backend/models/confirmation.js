@@ -11,6 +11,7 @@ const confirmationSchema = mongoose.Schema({
   Size: Number,
   IsCrawled: Boolean,
   CrawlResult: {},
+  Hash: String,
 });
 
 const Confirmation = connection.model('Confirmation', confirmationSchema);

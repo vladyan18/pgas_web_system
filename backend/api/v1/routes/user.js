@@ -135,12 +135,12 @@ router.post('/add_file_for_confirmation', authCheck,
             if (err) {
                 return res.status(400).send('ERROR: Max file size = 15MB');
             }
-
             const confirmation = JSON.parse(req.body.data);
             confirmation.FilePath = req.file.path;
             confirmation.Data = '/api/getConfirm/' + req.file.filename;
             confirmation.CreationDate = Date.now();
             confirmation.Size = req.file.size;
+            confirmation.Hash = req.file.hash;
 
             const result = await userService.addFileForConfirmation(req.userId, confirmation);
             res.status(200).send(result);
@@ -165,27 +165,23 @@ router.post('/delete_confirmation', authCheck,
 router.get('/getConfirm/*', authCheck, // TODO SECURITY
     async function(req, res) {
         let filename = await req.url.slice(12);
-        const filePath = path.join(__dirname, '../../../static/confirmations/' + filename);
-
-        try {
-            await fs.promises.access(filePath);
-        } catch (error) {
-            res.sendStatus(404);
+        const filePath = path.join(__dirname, '../../../static/confirmations/' + path.basename(filename));
+        const fileStream = await userService.getConfirmationFileStream(filePath);
+        if (!fileStream) {
+            return res.sendStatus(404);
         }
 
         filename = filename
             .substr(filename.search('-') + 1)
             .substr(filename.search('-') + 1);
 
-        const file = fs.createReadStream(filePath);
-        const stat = await fs.promises.stat(filePath);
-        res.setHeader('Content-Length', stat.size);
+        res.setHeader('Content-Length', fileStream.stat.size);
         let contentType, contentDisposition;
         if (filename.endsWith('.pdf')) {
             contentType = 'application/pdf';
             contentDisposition = 'inline';
-        } else if (filename.endsWith('.jpg') || filename.endsWith('.png') ) {
-            const ending = filename.endsWith('.jpg') ? 'jpg' : 'png';
+        } else if (filename.endsWith('.jpg') || filename.endsWith('.png') || filename.endsWith('.jpeg') ) {
+            const ending = filename.endsWith('.jpg') ? 'jpg' : (filename.endsWith('.png') ? 'png' : 'jpeg');
             contentType = 'image/' + ending;
             contentDisposition = 'inline';
         } else {
@@ -195,7 +191,7 @@ router.get('/getConfirm/*', authCheck, // TODO SECURITY
         }
         res.setHeader('Content-Type', contentType);
         res.setHeader('Content-Disposition', contentDisposition);
-        file.pipe(res);
+        fileStream.stream.pipe(res);
     });
 
 router.get('/getConfirmations', authCheck,

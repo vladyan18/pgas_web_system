@@ -380,7 +380,42 @@ exports.uploadCriteriasToFaculty = async function(crits, faculty) {
 };
 
 exports.createConfirmation = async function(confirmation) {
+    if (confirmation.Hash && confirmation.FilePath) {
+        const sameFile = await ConfirmationModel.findOne({Hash: confirmation.Hash}).lean();
+        if (sameFile && sameFile.FilePath && sameFile.Size === confirmation.Size) {
+            const confPath = path.join(__dirname, '../static/confirmations/');
+            const fileName = path.basename(sameFile.FilePath);
+            try {
+                await fs.promises.access(confPath + fileName);
+                fs.promises.unlink(confPath + path.basename(confirmation.FilePath)).then();
+                confirmation.FilePath = sameFile.FilePath;
+            } catch (e) {}
+        }
+    }
   return ConfirmationModel.create(confirmation);
+};
+
+exports.getConfirmationFileStream = async function(filePath) {
+    const confirmPath = path.join(__dirname, '../static/confirmations/');
+    filePath = confirmPath + path.basename(filePath);
+    try {
+        await fs.promises.access(filePath);
+    } catch (error) {
+        const sameFile = await ConfirmationModel.findOne({Data: '/api/getConfirm/' + path.basename(filePath)}, 'FilePath').lean();
+        if (!sameFile) {
+            return null;
+        }
+
+        try {
+            filePath = confirmPath + path.basename(sameFile.FilePath);
+            await fs.promises.access(filePath);
+        } catch (error) {
+            return null;
+        }
+    }
+    const stream = fs.createReadStream(filePath);
+    const stat = await fs.promises.stat(filePath);
+    return {stream, stat};
 };
 
 exports.getConfirmByIdForUser = async function(confirmation) {
@@ -410,15 +445,19 @@ exports.deleteConfirmation = async function(userId, confirmationId) {
       {confirmations: {$elemMatch: {id: confirmationId}}},
       {$pull: {confirmations: {id: confirmationId}}}
       );
-  const confirmation = await ConfirmationModel.find({_id: confirmationId}).lean();
-  const confirmDeletePromise = ConfirmationModel.deleteOne({_id: confirmationId});
-  await Promise.all([achieveUpdatePromise, confirmDeletePromise]);
+  const confirmation = await ConfirmationModel.findOne({_id: confirmationId}).lean();
+  await ConfirmationModel.deleteOne({_id: confirmationId});
+  await achieveUpdatePromise;
   if (confirmation.Type === 'doc') {
-    const exists = await fs.promises.access(confirmation.FilePath);
-    if (exists) {
-      fs.promises.unlink(confirmation.FilePath).then();
+      try {
+            await fs.promises.access(confirmation.FilePath);
+            const anotherUser = await ConfirmationModel.findOne({FilePath: confirmation.FilePath}).lean();
+            if (anotherUser) {
+                return;
+            }
+            fs.promises.unlink(confirmation.FilePath).then();
+      } catch (e) {}
     }
-  }
 };
 
 exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {
@@ -426,7 +465,7 @@ exports.updateConfirmCrawlResult = async function(confirmId, crawlResult) {
 };
 
 exports.getconfitmationsStatistics = async function() {
-    const filePath = path.join(__dirname, '../static/confirmations/');
+  const filePath = path.join(__dirname, '../static/confirmations/');
   const populateQuery = {
     path: 'Achievement',
     match: {achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true}},
@@ -471,6 +510,7 @@ exports.getconfitmationsStatistics = async function() {
 };
 
 exports.purgeConfirmations = async function() {
+    return null;
     const filePath = path.join(__dirname, '../static/confirmations/');
     const populateQuery = {
         path: 'Achievement',

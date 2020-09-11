@@ -188,6 +188,10 @@ module.exports.addConfirmation = async function(userId, confirmation) {
     return result;
 };
 
+module.exports.getConfirmationFileStream = async function(filePath) {
+    return db.getConfirmationFileStream(filePath);
+};
+
 module.exports.deleteConfirmation = async function (userId, confirmationId) {
     return db.deleteConfirmation(userId, confirmationId);
 }
