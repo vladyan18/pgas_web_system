@@ -39,11 +39,13 @@ router.get('/getUsersForAdmin', moderatorAuthCheck,
         res.send({Info: usersList});
     });
 
-router.get('/user=*', moderatorAuthCheck, // TODO refactor
+router.get('/userForAdmin', moderatorAuthCheck, // TODO refactor
     async function(req, res) {
-        const userId = await req.url.slice(6);
+        const userId = await req.query.id;
         const user = await userService.getUserInfo(userId);
-        res.status(200).send(user);
+        if (user) {
+            res.status(200).send(user);
+        } else res.sendStatus(404);
     });
 
 router.get('/checked', moderatorAuthCheck,
@@ -73,7 +75,7 @@ router.post('/RemoveFromRating', moderatorAuthCheck,
 router.post('/setUserRole', adminAuthCheck,
     async function(req, res) {
         const newRole = req.body.newRole;
-        await adminService.changeUserRole(req.body.id, newRole);
+        await adminService.changeUserRole(req.userId, req.body.id, newRole, req.body.faculty);
         res.sendStatus(200);
     });
 

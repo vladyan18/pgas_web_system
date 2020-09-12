@@ -38,6 +38,8 @@ async function getUserWithAchievements(id, isArchived) {
       },
   ).lean();
 
+  if (!user) return null;
+
   for (let i = 0; i < user.Achievement.length; i++) {
     for (let j = 0; j < user.Achievement[i].confirmations.length; j++) {
       const confirmation = user.Achievement[i].confirmations[j];
@@ -357,8 +359,23 @@ exports.getAnnotationsForFaculty = async function(facultyName) {
   return annotationsCache.get(facultyName);
 };
 
-exports.changeRole = function(id, newRole) {
-  return UserModel.updateOne({id: id}, {$set: {Role: newRole}}).lean();
+exports.changeRole = async function(reqUserId, userId, newRole, faculty) { // TODO Refactor
+    const requestingUser = await UserModel.findOne({id: reqUserId}).lean();
+    if (!requestingUser.Rights.includes(faculty)) {
+        return null;
+    }
+    const user = await UserModel.findOne({id: userId}).lean();
+    if (newRole !== 'User' && user.Faculty !== faculty) {
+        return null;
+    }
+
+    if (user.Rights.includes(faculty) && newRole !== 'User') {
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}}).lean();
+    } else if (newRole !== 'User') {
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $push: {Rights: faculty}}).lean();
+    } else {
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $pull: {Rights: faculty}}).lean();
+    }
 };
 
 exports.getHistoryNotes = async function() {

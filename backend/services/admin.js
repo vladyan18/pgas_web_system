@@ -96,8 +96,8 @@ module.exports.removeUserFromRating = async function(userId) {
     await db.removeUserFromRating(userId);
 };
 
-module.exports.changeUserRole = async function(userId, newRole) {
-    await db.changeRole(userId, newRole);
+module.exports.changeUserRole = async function(reqUserId, userId, newRole, faculty) {
+    await db.changeRole(reqUserId, userId, newRole, faculty);
 };
 
 module.exports.getAdmins = async function(facultyName, userId) { //TODO security
