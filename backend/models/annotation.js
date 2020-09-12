@@ -6,6 +6,7 @@ const annotationSchema = mongoose.Schema({
   Date: Date,
   AnnotationsToCrits: {},
   LearningProfile: String,
+  LanguagesForPublications : String,
 });
 
 const Annotation = connection.model('Annotation', annotationSchema);

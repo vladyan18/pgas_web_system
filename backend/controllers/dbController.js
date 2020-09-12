@@ -339,9 +339,14 @@ exports.getCriteriasAndSchema = async function(facultyName) {
   return facObject.CritsId;
 };
 
-exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile, facultyName) {
+exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile, languagesForPublications,  facultyName) {
   const facObject = await FacultyModel.findOne({Name: facultyName});
-  let annObj = {Date: Date.now(), AnnotationsToCrits: annotations, LearningProfile: learningProfile, FacultyId: facObject._id};
+  let annObj = {
+      Date: Date.now(),
+      AnnotationsToCrits: annotations,
+      LearningProfile: learningProfile,
+      LanguagesForPublications: languagesForPublications,
+      FacultyId: facObject._id};
   annObj = await AnnotationsModel.create(annObj);
   await FacultyModel.findByIdAndUpdate(facObject._id, {$set: {AnnotationsToCritsId: annObj._id.toString()}});
   facultyCache.clear(facultyName);

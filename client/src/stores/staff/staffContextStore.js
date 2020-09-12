@@ -8,6 +8,7 @@ class StaffContextStore {
     limits;
     annotations;
     learningProfile;
+    languagesForPublications;
     directions;
 
     constructor() {
@@ -20,6 +21,7 @@ class StaffContextStore {
         this.limits = undefined;
         this.annotations = undefined;
         this.learningProfile = undefined;
+        this.languagesForPublications = undefined;
         let Faculty = await fetchGet('/api/getFaculty', {name: newFaculty});
         this.directions = Faculty.Directions;
         let criterias = await fetchGet('/api/getCriterias', {faculty: newFaculty});
@@ -34,6 +36,7 @@ class StaffContextStore {
         if (result) {
             this.annotations = result.annotations;
             this.learningProfile = result.learningProfile;
+            this.languagesForPublications = result.languagesForPublications;
         } else console.log('ANN NOT FOUND', this.faculty)
     }
 
@@ -54,6 +57,7 @@ decorate(StaffContextStore, {
     limits: observable,
     annotations: observable,
     learningProfile: observable,
+    languagesForPublications: observable,
     directions: observable,
 });
 

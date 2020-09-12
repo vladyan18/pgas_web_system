@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
 import criteriasStore from '../../../../stores/criteriasStore';
+import ReactMarkdown from 'react-markdown';
 
 export default class DescriptionToTermin extends Component {
   constructor(props) {
@@ -26,6 +27,13 @@ export default class DescriptionToTermin extends Component {
           <b>БДнСК</b> – Без Доклада на Соответствующей Конференции<br/>
         </p></div>
       );
+    } else if (values.includes('СДнК')) {
+      return (
+          <div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
+            <b>СДнК</b> – С Докладом на соответствующей Конференции <br/>
+            <b>БДнК</b> – Без Доклада на соответствующей Конференции<br/>
+          </p></div>
+      );
     } else if (values.some((o) => o == 'УД')) {
       return (<div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
         <b>УД</b> – Устный Доклад <br/>
@@ -43,6 +51,12 @@ export default class DescriptionToTermin extends Component {
                     SCOPUS </a><br/>
         <a target="_blank" href="http://www.isiknowledge.com">Узнать квартиль для WoS</a> <br/>
       </p></div>);
+    } else if (values.includes('Международные языки') && criteriasStore.languagesForPublications) {
+      return <div id="critDescr" className="blue_bg">
+        <p className="desc_selectors" id="desc_criterion_first">
+          <ReactMarkdown source={criteriasStore.languagesForPublications} linkTarget={() => '_blank'}/>
+        </p>
+      </div>
     } else return null;
   }
 }

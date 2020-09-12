@@ -9,6 +9,7 @@ class CriteriasStore {
     schema;
     limits;
     learningProfile;
+    languagesForPublications;
     facultyRawName;
 
     async getAnnotations(facultyName) {
@@ -16,6 +17,7 @@ class CriteriasStore {
         if (result) {
             this.annotations = result.annotations;
             this.learningProfile = result.learningProfile;
+            this.languagesForPublications = result.languagesForPublications;
         }
     }
 
@@ -42,6 +44,7 @@ decorate(CriteriasStore, {
     schema: observable,
     limits: observable,
     learningProfile: observable,
+    languagesForPublications: observable,
     facultyRawName: observable
 });
 

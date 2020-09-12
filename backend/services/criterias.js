@@ -34,10 +34,11 @@ module.exports.getAnnotations = async function(facultyName) {
         const result = {};
         result.annotations = annotations.AnnotationsToCrits;
         result.learningProfile = annotations.LearningProfile;
+        result.languagesForPublications = annotations.LanguagesForPublications;
         return result;
     } else return null;
 };
 
-module.exports.updateAnnotations = async function(annotations, learningProfile, facultyName) {
-    await db.uploadAnnotationsToFaculty(annotations, learningProfile, facultyName);
+module.exports.updateAnnotations = async function(annotations, learningProfile, languages, facultyName) {
+    await db.uploadAnnotationsToFaculty(annotations, learningProfile, languages, facultyName);
 };

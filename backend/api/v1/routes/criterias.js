@@ -67,7 +67,7 @@ router.get('/getAnnotations', authCheck,
 
 router.post('/updateAnnotations', authCheck,
     async function(req, res) {
-        await criteriasService.updateAnnotations(req.body.annotations, req.body.learningProfile, req.body.faculty);
+        await criteriasService.updateAnnotations(req.body.annotations, req.body.learningProfile, req.body.languagesForPublications, req.body.faculty);
         return res.sendStatus(200);
     });
 
