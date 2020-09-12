@@ -407,8 +407,7 @@ class ConfirmationForm extends Component {
                     </div>}</>)
             }
         ]);
-
-        console.log('CONF', this.state.confirmations);
+        
         return (
             <div>
                 <div style={this.headerContainerStyle}>
