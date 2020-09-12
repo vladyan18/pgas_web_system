@@ -22,7 +22,12 @@ const userSchema = mongoose.Schema({
   }],
   IsInRating: Boolean,
   IsHiddenInRating: Boolean,
-  Confirmations: [String],
+  Confirmations: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Confirmation',
+    },
+  ],
   Settings: {},
 });
 

@@ -3,7 +3,7 @@ import '../../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
-import {fetchGet, fetchSendObj} from "../../../../services/fetchService";
+import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../../services/fetchService";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import HelpButton from "../helpButton";
 import EditConfirmation from "./editConfirmation";
@@ -35,6 +35,17 @@ class ConfirmationForm extends Component {
             let st = this.state;
             st.Name = e.target.value;
             this.setState(st)
+        };
+
+        this.saveResult = (e, confirmation) => {
+            e.preventDefault();
+            e.stopPropagation();
+            let st = this.state;
+            st.confirmations.push(confirmation);
+            this.setState(st, () => {
+                this.props.updateForm(this.state.confirmations);
+                this.closeModal(null);
+            })
         };
 
         this.handleLinkChange = (e) => {
@@ -72,7 +83,7 @@ class ConfirmationForm extends Component {
         this.openExisting = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.setState({existingOpened: true})
+            this.setState({existingOpened: true, sameFilesLoaded: undefined})
         }
     };
 
@@ -185,6 +196,8 @@ class ConfirmationForm extends Component {
         st.Name = undefined;
         st.URL = undefined;
         st.isLoading = false;
+        st.sameFilesLoaded = undefined;
+        st.loadedFile = undefined;
         this.setState(st)
     }
 
@@ -199,9 +212,14 @@ class ConfirmationForm extends Component {
         e.preventDefault();
         e.stopPropagation();
 
+        if (this.state.loadedFile) {
+            fetchSendWithoutRes('/delete_confirmation', {id: this.state.loadedFile._id}).then();
+        }
         let ex = this.state.existingConfirm;
         let st = this.state;
         ex.additionalInfo = this.state.additionalInfo;
+        st.sameFilesLoaded = undefined;
+        st.loadedFile = undefined;
         st.confirmations.push(ex);
         this.setState(st, () => {
             this.props.updateForm(this.state.confirmations);
@@ -231,19 +249,22 @@ class ConfirmationForm extends Component {
 
             prom.then((oRes) => {
                 if (oRes.status === 200) {
-                    oRes.json().then((res) => {
-                        this.setState({isLoading: false});
-                        let st = this.state;
-                        res.additionalInfo = this.state.additionalInfo;
-                        if (!st.confirmations) {
-                            st.confirmations = [];
-                        }
-                            st.confirmations.push(res);
-
-                        this.setState(st, () => {
-                            this.props.updateForm(this.state.confirmations);
-                        });
-                            this.closeModal(null)
+                    oRes.json().then(({result, sameFiles}) => {
+                            this.setState({isLoading: false});
+                            result.additionalInfo = this.state.additionalInfo;
+                            if (sameFiles) {
+                                this.setState({sameFilesLoaded: sameFiles, Type: undefined, loadedFile: result});
+                            } else {
+                                let st = this.state;
+                                if (!st.confirmations) {
+                                    st.confirmations = [];
+                                }
+                                st.confirmations.push(result);
+                                this.setState(st, () => {
+                                    this.props.updateForm(this.state.confirmations);
+                                });
+                                this.closeModal(null)
+                            }
                         }
                     )
                 } else {
@@ -466,7 +487,7 @@ class ConfirmationForm extends Component {
                                 Не забудьте также приложить его к бумажной анкете
                             </p>
 
-                                {(!this.state.Type && !this.state.existingOpened) && <div>
+                                {(!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) && <div>
                                     <p>Выберите существующее подтверждение:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
                                         <button id="DocButton" className="btn btn-primary"
@@ -596,12 +617,26 @@ class ConfirmationForm extends Component {
                                     <div>{this.state.existingConfirm.Name}</div>
                                     <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}</label>
                                     <input id="AddInfo" className="form-control" type="text" required
-                                           onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
+                                           onChange={this.handleAdditionalInfoChange} defaultValue={this.state.additionalInfo} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
                                            onClick={this.addExistingConfirmation}/>
                                 </form>
-
                                 }
+                                {(this.state.sameFilesLoaded && !this.state.existingSelected) && <div>
+                                    <p style={{marginTop: "1rem"}}><b>Вы уже загружали этот документ.</b><br/><br/>
+                                    Вы можете прикрепить существующее подтверждение с этим файлом, кликнув на него:</p>
+                                    <BootstrapTable keyField='_id' data={this.state.sameFilesLoaded}
+                                                    columns={this.columns}
+                                                    rowEvents={this.commonConfRowEvents}
+                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
+                                                    bordered={false}/>
+                                                    <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
+                                    <button id="SaveButton" className="btn btn-outline-danger" style={{borderWidth: '0'}} type="button"
+                                           onClick={(e) => {this.saveResult(e, this.state.loadedFile)}}>
+                                        Нет, сохранить как {this.state.loadedFile.Name}
+                                    </button>
+                                                    </div>
+                                </div>}
                         </div>
 
                     </div>

@@ -19,7 +19,7 @@ module.exports = async function(req, res, next) {
         passport.authenticate('ActiveDirectory', opts, (err, user, info) => {
             if (err) {
                 console.log('ERROR', err);
-                return res.sendStatus(400);
+                return next()
             }
 
             if (!user) {

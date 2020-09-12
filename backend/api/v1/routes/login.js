@@ -7,6 +7,9 @@ const authenticate = require('../../../middlewares/authenticate');
 
 router.post('/login', authenticate,
     async function(req, res) {
+        if (!req.user) {
+            return res.sendStatus(400);
+        }
         req.logIn(req.user, async function(err) {
             if (err) {
                 console.log('ERR', err);

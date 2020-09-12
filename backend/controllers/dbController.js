@@ -20,6 +20,12 @@ exports.findUserById = async function(id) {
   return UserModel.findOne({id: id}).lean();
 };
 
+exports.getUserWithConfirmations = async function(id) {
+    return UserModel.findOne({id: id}).populate({
+        path: 'Confirmations'
+    }).lean();
+};
+
 async function getUserWithAchievements(id, isArchived) {
   let query;
   if (isArchived) {
@@ -412,9 +418,10 @@ ConfirmationModel.find({}).lean().then((hashes) => {
 });
 
 exports.createConfirmation = async function(confirmation) {
+    let exists = false;
     if (confirmation.Hash && confirmation.FilePath) {
         if (filter.has(confirmation.Hash)) {
-            const sameFile = await ConfirmationModel.findOne({Hash: confirmation.Hash}).lean();
+            const sameFile = await ConfirmationModel.findOne({Hash: confirmation.Hash, Size: confirmation.Size}).lean();
             if (sameFile && sameFile.FilePath && sameFile.Size === confirmation.Size) {
                 const confPath = path.join(__dirname, '../static/confirmations/');
                 const fileName = path.basename(sameFile.FilePath);
@@ -422,6 +429,7 @@ exports.createConfirmation = async function(confirmation) {
                     await fs.promises.access(confPath + fileName);
                     fs.promises.unlink(confPath + path.basename(confirmation.FilePath)).then();
                     confirmation.FilePath = sameFile.FilePath;
+                    exists = true;
                 } catch (e) {
                 }
             }
@@ -429,7 +437,7 @@ exports.createConfirmation = async function(confirmation) {
             filter.add(confirmation.Hash);
         }
     }
-  return ConfirmationModel.create(confirmation);
+  return [ConfirmationModel.create(confirmation), exists];
 };
 
 exports.getConfirmationFileStream = async function(filePath) {
@@ -475,7 +483,7 @@ exports.deleteConfirmation = async function(userId, confirmationId) {
   if (usingAchievements && usingAchievements.length > 0) return;
 
   const user = await UserModel.findOne({id: userId}).lean();
-  if (!(user.Confirmations.some(x => x === confirmationId))) return;
+  if (!(user.Confirmations.some(x => x.toString() === confirmationId))) return;
 
   await UserModel.updateOne({id: userId}, {$pull: {Confirmations: confirmationId}}).lean();
   const achieveUpdatePromise = AchieveModel.updateMany(

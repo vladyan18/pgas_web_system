@@ -158,15 +158,21 @@ module.exports.getAchievement = async function(achId) { //TODO what is it?
 };
 
 module.exports.addFileForConfirmation = async function(userId, confirmationFile) {
-    const userPromise = db.findUserById(userId);
-    const resultPromise = db.createConfirmation(confirmationFile);
+    const userPromise = db.getUserWithConfirmations(userId);
+    const [resultPromise, exists] = await db.createConfirmation(confirmationFile);
     const [user, result] = await Promise.all([userPromise, resultPromise]);
     result.FilePath = undefined;
 
-    if (!user.Confirmations || !user.Confirmations.some((x) => x === result._id.toString())) {
+    let sameFiles;
+    if (user.Confirmations.some((x) => (x.Hash === confirmationFile.Hash && x.Size === confirmationFile.Size))) {
+        sameFiles = user.Confirmations.filter((x) => (x.Hash === confirmationFile.Hash && x.Size === confirmationFile.Size));
+        sameFiles.forEach((x) => x.FilePath = undefined);
+    }
+
+    if (!user.Confirmations || !user.Confirmations.some((x) => x._id.toString() === result._id.toString())) {
         await db.addConfirmationToUser(user._id, result._id)
     }
-    return result;
+    return {result, sameFiles};
 };
 
 module.exports.addConfirmation = async function(userId, confirmation) {
@@ -178,7 +184,7 @@ module.exports.addConfirmation = async function(userId, confirmation) {
     }
 
     const userPromise = db.findUserById(userId);
-    const resultPromise = db.createConfirmation(confirmation);
+    const [resultPromise, exists] = await db.createConfirmation(confirmation);
     const [user, result] = await Promise.all([userPromise, resultPromise]);
 
     if (!user.Confirmations || !user.Confirmations.some((x) => x === result._id.toString())) {
