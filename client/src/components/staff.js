@@ -11,6 +11,7 @@ import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
 import {observer} from "mobx-react";
 
+const AdminsListContainer = React.lazy(() => import("./containers/staff/adminsListContainer"));
 const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"));
 const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"));
 const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"));
@@ -20,6 +21,7 @@ const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
 const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"));
+
 
 
 class Staff extends Component {
@@ -65,6 +67,7 @@ class Staff extends Component {
                         <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
                         <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
                         <Route path="/staff/statistics" component={StaffStatistics}/>
+                        <Route path="/staff/adminsList" component={AdminsListContainer}/>
                         <Route path="/staff/" component={StaffMenu}/>
                     </Switch>
                 </Suspense>

@@ -112,8 +112,8 @@ exports.isRegistered = async function(id) {
 };
 
 
-exports.allUsers = function() {
-  return UserModel.find({}).lean();
+exports.getAdminsForFaculty = function(facultyName) {
+  return UserModel.find({Role: {$in: ['Admin', 'Moderator']}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
 };
 
 exports.getCurrentUsers = function(faculty) {
@@ -357,8 +357,7 @@ exports.getAnnotationsForFaculty = async function(facultyName) {
   return annotationsCache.get(facultyName);
 };
 
-exports.changeRole = function(id, isAdmin) {
-  const newRole = isAdmin ? 'Admin' : 'User';
+exports.changeRole = function(id, newRole) {
   return UserModel.updateOne({id: id}, {$set: {Role: newRole}}).lean();
 };
 

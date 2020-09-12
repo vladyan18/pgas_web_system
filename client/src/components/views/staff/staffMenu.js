@@ -17,6 +17,7 @@ class StaffMenu extends Component {
     this.openCurrentContest = this.openCurrentContest.bind(this);
     this.openCurrentContestRating = this.openCurrentContestRating.bind(this);
     this.openCriteriasMenu = this.openCriteriasMenu.bind(this);
+    this.openAdminsList = this.openAdminsList.bind(this);
     this.exportExcel = this.exportExcel.bind(this);
   };
 
@@ -42,6 +43,10 @@ class StaffMenu extends Component {
 
   openCriteriasMenu() {
     this.props.history.push('/staff/criteriasMenu');
+  }
+
+  openAdminsList() {
+    this.props.history.push('/staff/adminsList');
   }
 
   render() {
@@ -118,9 +123,21 @@ class StaffMenu extends Component {
                   </div>
                 </div>
 
-                <div className="w-100"></div>
+                {['SuperAdmin', 'Admin'].includes(userPersonalStore.Role) &&
+                  <><div className="w-100"/>
+                <div className="col-4">
+                  <div className="centered menuButtonContainer">
+                    <button type="button" id="SubmitButton"
+                            className="btn btn-success menuButton"
+                            value="Панель сотрудника"
+                            onClick={this.openAdminsList}>
+                      Список администраторов
+                    </button>
+                  </div>
+                </div></>}
+                <div className="w-100"/>
                 {
-                  userPersonalStore.Role == 'SuperAdmin' &&
+                  userPersonalStore.Role === 'SuperAdmin' &&
                                     <>
                                       <div className="col">
                                         <div className="centered menuButtonContainer">

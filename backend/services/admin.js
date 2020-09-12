@@ -96,18 +96,16 @@ module.exports.removeUserFromRating = async function(userId) {
     await db.removeUserFromRating(userId);
 };
 
-module.exports.changeUserRole = async function(userId, toAdmin) {
-    await db.changeRole(userId, toAdmin);
+module.exports.changeUserRole = async function(userId, newRole) {
+    await db.changeRole(userId, newRole);
 };
 
-module.exports.getAdmins = async function() { //TODO refactor
-    const users = [];
-    const Users = await db.allUsers();
-    for (const user of Users) {
-        const str = user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic;
-        users.push({Name: str, Role: user.Role, Id: user.id});
-    }
-    return users;
+module.exports.getAdmins = async function(facultyName, userId) { //TODO security
+    const admins = await db.getAdminsForFaculty(facultyName);
+    return admins.map((x) => {
+        const str = x.LastName + ' ' + x.FirstName + ' ' + x.Patronymic;
+        return {Name: str, Role: x.Role, id: x.id};
+    });
 };
 
 module.exports.getStatisticsForFaculty = async function(facultyName) {
