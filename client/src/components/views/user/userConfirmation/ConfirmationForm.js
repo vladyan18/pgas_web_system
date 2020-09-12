@@ -77,7 +77,7 @@ class ConfirmationForm extends Component {
     };
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.props.value !== this.state.confirmations) {
+        if (this.props.value && this.props.value !== this.state.confirmations) {
             this.setState({confirmations: this.props.value});
         }
     }
@@ -233,8 +233,11 @@ class ConfirmationForm extends Component {
                 if (oRes.status === 200) {
                     oRes.json().then((res) => {
                         this.setState({isLoading: false});
-                            let st = this.state;
+                        let st = this.state;
                         res.additionalInfo = this.state.additionalInfo;
+                        if (!st.confirmations) {
+                            st.confirmations = [];
+                        }
                             st.confirmations.push(res);
 
                         this.setState(st, () => {
@@ -258,6 +261,9 @@ class ConfirmationForm extends Component {
             let newConf = {Name: this.state.Name, Type: this.state.Type, Data: this.state.URL};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
+                if (!st.confirmations) {
+                    st.confirmations = [];
+                }
                 result.additionalInfo = this.state.additionalInfo;
                 st.confirmations.push(result);
                 this.setState(st, () => {
@@ -276,13 +282,14 @@ class ConfirmationForm extends Component {
             newConf.SZ = {Appendix: this.state.SZAppendix, Paragraph: this.state.SZParagraph};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
+                if (!st.confirmations) {
+                    st.confirmations = [];
+                }
                 st.confirmations.push(result);
                 this.props.updateForm(this.state.confirmations);
                 this.closeModal(null)
             })))
         }
-
-
     }
 
     chooseType(type) {
@@ -336,7 +343,7 @@ class ConfirmationForm extends Component {
             <HelpButton  overlay={AddInfoPopover} placement={"top"} />);
 
         const deleteConfirmation = (e, confirmation) => {
-            let confirmations = this.state.confirmations
+            let confirmations = this.state.confirmations;
             confirmations.splice(confirmations.indexOf(confirmation), 1)
             this.props.updateForm(confirmations);
             //this.setState({confirmations: confirmations})
@@ -399,8 +406,9 @@ class ConfirmationForm extends Component {
                 </button>
                     </div>}</>)
             }
-        ])
+        ]);
 
+        console.log('CONF', this.state.confirmations);
         return (
             <div>
                 <div style={this.headerContainerStyle}>

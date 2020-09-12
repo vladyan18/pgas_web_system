@@ -61,7 +61,7 @@ class UserAddAchievement extends Component {
 
   updateConfirmations(confirms) {
     const st = this.state;
-    st.confirmations = confirms;
+    st.confirmations = [...confirms];
     this.setState(st);
   }
 
