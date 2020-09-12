@@ -40,8 +40,10 @@ class ConfirmationForm extends Component {
         this.saveResult = (e, confirmation) => {
             e.preventDefault();
             e.stopPropagation();
-            let st = this.state;
+            let st = {...this.state};
             st.confirmations.push(confirmation);
+            st.loadedFile = undefined;
+            st.sameFiles = undefined;
             this.setState(st, () => {
                 this.props.updateForm(this.state.confirmations);
                 this.closeModal(null);
@@ -185,6 +187,9 @@ class ConfirmationForm extends Component {
     }
 
     closeModal(e) {
+        if (this.state.loadedFile) {
+            fetchSendWithoutRes('/delete_confirmation', {id: this.state.loadedFile._id}).then();
+        }
         let st = this.state;
         st.modalIsOpen = false;
         st.existingOpened = false;
@@ -633,7 +638,7 @@ class ConfirmationForm extends Component {
                                                     <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
                                     <button id="SaveButton" className="btn btn-outline-danger" style={{borderWidth: '0'}} type="button"
                                            onClick={(e) => {this.saveResult(e, this.state.loadedFile)}}>
-                                        Нет, сохранить как {this.state.loadedFile.Name}
+                                        Нет, сохранить как {this.state.loadedFile && this.state.loadedFile.Name}
                                     </button>
                                                     </div>
                                 </div>}
