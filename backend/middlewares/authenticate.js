@@ -15,20 +15,24 @@ module.exports = async function(req, res, next) {
             baseDN: 'dc=ad,dc=pu,dc=ru', username: adUsername, password: password,
         },
     };
-    passport.authenticate('ActiveDirectory', opts, (err, user, info) => {
-        if (err) {
-            console.log('ERROR', err);
-            res.sendStatus(400);
-        }
+    try {
+        passport.authenticate('ActiveDirectory', opts, (err, user, info) => {
+            if (err) {
+                console.log('ERROR', err);
+                return res.sendStatus(400);
+            }
 
-        if (!user) {
-            user = {};
-            user._json = {};
-            user._json.sAMAccountName = st;
-        }
+            if (!user) {
+                user = {};
+                user._json = {};
+                user._json.sAMAccountName = st;
+            }
 
-        req.user = user;
-        next();
-    })(req, res);
-
+            req.user = user;
+            next();
+        })(req, res);
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(400);
+    }
 };
