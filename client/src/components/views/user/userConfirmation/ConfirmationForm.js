@@ -445,7 +445,7 @@ class ConfirmationForm extends Component {
                             </div>
                         </div>}
                         {(this.state.modalIsOpen && !this.state.isLoading) &&
-                        <div className="modalContentWrapper" style={{maxHeight: "40rem"}}>
+                        <div className="modalContentWrapper" style={{maxHeight: "40rem", maxWidth: "100vw",}}>
 
                             <div className="block"
                                  style={{maxHeight: "inherit", maxWidth: "inherit", overflow: "auto"}}>

@@ -70,6 +70,10 @@ router.post('/registerUser', regCheck,
         try {
             const userData = req.body;
             console.log('New registration: ', userData);
+            if (!userData.settings) {
+                userData.settings = {};
+            }
+            userData.settings.notifiedAboutUpdate = true;
             await userService.registerUser(req.userId, userData, req.session);
             res.sendStatus(200);
         } catch (err) {

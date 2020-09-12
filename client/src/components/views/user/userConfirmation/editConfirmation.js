@@ -105,7 +105,7 @@ function EditConfirmation(props) {
         props.save(object);
     }
 
-    return (<div className="modalContentWrapper" style={{display: "flex", justifyContent: "center"}}>
+    return (<div className="modalContentWrapper" style={{display: "flex", justifyContent: "center", maxWidth: "100vw"}}>
         <div className="block"
              style={{maxHeight: "inherit", width: "25rem", overflow: "auto"}}>
             <p className="headline">Редактирование подтверждения</p>

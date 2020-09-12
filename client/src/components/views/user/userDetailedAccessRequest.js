@@ -35,7 +35,11 @@ class UserDetailedAccessRequest extends Component {
         user.type = userOld.Type;
         user.course = userOld.Course;
 
-        user.settings = { detailedAccessAllowed: true };
+        user.settings = userOld.Settings;
+        if (!user.settings) {
+            user.settings = {};
+        }
+        user.settings.detailedAccessAllowed = true;
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();
@@ -54,7 +58,11 @@ class UserDetailedAccessRequest extends Component {
         user.type = userOld.Type;
         user.course = userOld.Course;
 
-        user.settings = { detailedAccessAllowed: false};
+        user.settings = userOld.Settings;
+        if (!user.settings) {
+            user.settings = {};
+        }
+        user.settings.detailedAccessAllowed = false;
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();

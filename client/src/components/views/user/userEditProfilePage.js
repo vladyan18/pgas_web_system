@@ -17,6 +17,11 @@ class UserEditProfilePage extends Component {
     this.state.Faculty = props.personal.Faculty;
     this.state.Type = props.personal.Type;
     this.state.Course = props.personal.Course;
+    this.state.Settings = props.personal.Settings;
+
+    if (this.state.Settings) {
+        this.state.Settings.detailedAccessAllowed = undefined;
+    }
 
     this.handleChange = (e, field) => {
       const st = this.state;
@@ -33,6 +38,7 @@ class UserEditProfilePage extends Component {
       user.faculty = this.state.Faculty;
       user.type = this.state.Type;
       user.course = this.state.Course;
+      user.settings = this.state.Settings;
 
       fetchSendWithoutRes('/api/registerUser', user).then((result) => {
         if (result) this.props.history.push('/');

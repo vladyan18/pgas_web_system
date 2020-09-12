@@ -14,6 +14,7 @@ import {observer} from 'mobx-react';
 import UserDetailedAccessRequest from "./views/user/userDetailedAccessRequest";
 import styled from "@emotion/styled";
 import {css, jsx} from '@emotion/core';
+import UserUpdateProfileRemainder from "./views/user/userUpdateProfileRemainder";
 /** @jsx jsx */
 
 const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
@@ -74,6 +75,7 @@ class User extends Component {
           </div>
       }
       <UserDetailedAccessRequest />
+      <UserUpdateProfileRemainder />
       </div>
       </>);
   }
