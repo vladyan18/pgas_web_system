@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Panel, HorizontalLine} from "../user/style";
 import {css} from "@emotion/core";
 import withRouter from "react-router/modules/withRouter";
@@ -23,12 +23,13 @@ const selectorStyle = css`
 function RoleSelector(props) {
     const [role, setRole] = useState(props.role);
     const [result, setResult] = useState();
+
     function handleSelect(e) {
         e.preventDefault();
         e.stopPropagation();
         const newRole = e.target.value;
 
-        fetchSendWithoutRes('/setUserRole', {id: props.id, newRole, faculty: staffContextStore.faculty}).then((res) => {
+        fetchSendWithoutRes('/setUserRole', {id: props.uid, newRole, faculty: staffContextStore.faculty}).then((res) => {
             if (res) {
                 setRole(newRole);
             }
@@ -37,7 +38,7 @@ function RoleSelector(props) {
         });
     }
 
-    return <select onChange={handleSelect} onClick={() => setResult(undefined)} value={role} defaultValue={props.role}
+    return <select id={props.uid} onChange={handleSelect} onClick={() => setResult(undefined)} value={role}
                    className={'form-control selectors' + (result === undefined ? '' : (result ? ' is-valid' : ' is-invalid'))}
                    css={selectorStyle}>
         {
@@ -147,9 +148,9 @@ function AdminsList(props) {
                 </thead>
                 <tbody>
                 {
-                    props.admins.map((x) => <tr>
+                    props.admins.map((x) => <tr key={x.id}>
                         <td css={css`padding-right: 2rem; text-align: center; vertical-align: middle !important;`}>{x.Name}</td>
-                        <td><RoleSelector role={x.Role} id={x.id} refreshCb={props.refreshCb}/></td>
+                        <td><RoleSelector role={x.Role} uid={x.id} refreshCb={props.refreshCb}/></td>
                     </tr>)
                 }
                 </tbody>
