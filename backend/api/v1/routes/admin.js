@@ -70,21 +70,10 @@ router.post('/RemoveFromRating', moderatorAuthCheck,
         res.sendStatus(200);
     });
 
-router.post('/setUser', adminAuthCheck,
+router.post('/setUserRole', adminAuthCheck,
     async function(req, res) {
-        await adminService.changeUserRole(req.body.Id, 'User');
-        res.sendStatus(200);
-    });
-
-router.post('/setAdmin', adminAuthCheck,
-    async function(req, res) {
-        await adminService.changeUserRole(req.body.Id, 'Admin');
-        res.sendStatus(200);
-    });
-
-router.post('/setModerator', adminAuthCheck,
-    async function(req, res) {
-        await adminService.changeUserRole(req.body.Id, 'Moderator');
+        const newRole = req.body.newRole;
+        await adminService.changeUserRole(req.body.id, newRole);
         res.sendStatus(200);
     });
 

@@ -26,26 +26,31 @@ async function sendObject(url, obj) {
   } else if (response.status === 401) {
     localStorage.removeItem('isAuthenticated');
     window.location.href = '/login';
-  }
+  } else return false;
 }
 
 async function sendWithoutRes(url, obj) {
   if (url.startsWith('/api/')) {
     url = url.replace('/api/', '/');
   }
-  const response = await fetch(BASE_API_URL + url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(obj),
-  });
-  if (response.ok) {
-    return response.ok;
-  } else if (response.status === 401) {
-    localStorage.removeItem('isAuthenticated');
-    window.location.href = '/login';
-    return response.ok;
+  try {
+    const response = await fetch(BASE_API_URL + url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj),
+    });
+    if (response.ok) {
+      return response.ok;
+    } else if (response.status === 401) {
+      localStorage.removeItem('isAuthenticated');
+      window.location.href = '/login';
+      return response.ok;
+    } else return false;
+  } catch (e) {
+    console.error(e);
+    return false;
   }
 }
 
@@ -68,7 +73,7 @@ async function get(url, obj) {
   } else if (response.status === 401) {
     localStorage.removeItem('isAuthenticated');
     window.location.href = '/login';
-  }
+  } else return false;
   // else throw new FetchError('Error while fetching', await response.json())
 }
 
