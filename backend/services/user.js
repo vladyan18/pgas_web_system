@@ -136,7 +136,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
 module.exports.deleteAchievement = async function(userId, achId) {
     let user = await db.findUserById(userId);
 
-    if (user.Role !== 'Admin' && user.Role !== 'SuperAdmin' && !user.Achievement.some((o) => (o && o === achId))) {
+    if (!user.Achievement.some((o) => (o && o.toString() === achId))) {
         return null;
     }
 

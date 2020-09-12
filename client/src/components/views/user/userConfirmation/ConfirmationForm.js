@@ -407,7 +407,7 @@ class ConfirmationForm extends Component {
                     </div>}</>)
             }
         ]);
-        
+
         return (
             <div>
                 <div style={this.headerContainerStyle}>
