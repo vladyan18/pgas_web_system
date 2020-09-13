@@ -20,6 +20,7 @@ const achieveSchema = mongoose.Schema({
   achievement: String,
   comment: String,
   ball: Number,
+  preliminaryBall: Number,
   isArchived: Boolean,
   criteriasHash: String,
   isPendingChanges: Boolean,

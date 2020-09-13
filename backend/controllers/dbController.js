@@ -201,16 +201,16 @@ exports.createAchieve = async function(achieve) {
 };
 
 exports.deleteAchieve = async function(id) {
-  AchieveModel.findByIdAndRemove(id).then();
   const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}}).lean();
   if (!u) return true;
   for (let i = u.Achievement.length - 1; i >= 0; i--) {
-    if (u.Achievement[i] === id) {
+    if (u.Achievement[i].toString() === id) {
       u.Achievement.splice(i, 1);
       break;
     }
   }
   await UserModel.updateOne({id: u.id}, {Achievement: u.Achievement}).lean();
+  await AchieveModel.findByIdAndRemove(id);
   return true;
 };
 
@@ -222,6 +222,7 @@ exports.updateAchieve = async function(id, achieve) {
     achDate: achieve.achDate, comment: achieve.comment,
     endingDate: achieve.endingDate,
     isPendingChanges: achieve.isPendingChanges,
+    preliminaryBall: achieve.preliminaryBall,
   };
 
   newAch.confirmations = achieve.confirmations;
@@ -254,7 +255,7 @@ exports.registerUser = function(userId, lastname, name, patronymic, birthdate, s
 };
 
 
-exports.addAchieveToUser = function(userId, achieveId) {
+exports.addAchieveToUser = async function(userId, achieveId) {
   return UserModel.updateOne({id: userId}, {$push: {Achievement: achieveId}}).lean();
 };
 

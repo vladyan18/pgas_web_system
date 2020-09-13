@@ -493,11 +493,11 @@ class ConfirmationForm extends Component {
                             </p>
 
                                 {(!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) && <div>
-                                    <p>Выберите существующее подтверждение:</p>
+                                    <p>Выберите из уже добавленных:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
                                         <button id="DocButton" className="btn btn-primary"
                                                 style={{margin: "0", width: "50%"}}
-                                                value="Назад" onClick={this.openExisting}>Открыть
+                                                value="Назад" onClick={this.openExisting}>Выбрать
                                         </button>
                                     </div>
                                     <p style={{marginTop: "1rem"}}>Или, если Вы еще не добавляли его, создайте новое:</p>

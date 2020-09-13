@@ -1,7 +1,7 @@
 const db = require('./../controllers/dbController');
 const isAchievementAccepted = require('../helpers/isAchievementAccepted');
 
-module.exports.calculateBallsForUser = async function(id, faculty) {
+module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary) {
     const achievementsPromise = db.findActualAchieves(id);
     const criteriasPromise = db.getCriteriasObject(faculty);
     const [criterias, achievements] = await Promise.all([criteriasPromise, achievementsPromise]);
@@ -13,11 +13,23 @@ module.exports.calculateBallsForUser = async function(id, faculty) {
 
     for (const achievement of achievements) {
         if (!achievement) continue;
-        if (!isAchievementAccepted(achievement)) {
-            achievement.ball = undefined;
+        if (isPreliminary && achievement.status === 'Отказано') {
+            achievement.preliminaryBall = undefined;
             db.updateAchieve(achievement._id, achievement).then();
             continue;
         }
+
+        if (!isAchievementAccepted(achievement)) {
+                if (achievement.status === 'Отказано') {
+                    achievement.preliminaryBall = undefined;
+                }
+                achievement.ball = undefined;
+                db.updateAchieve(achievement._id, achievement).then();
+                if (!isPreliminary) {
+                    continue;
+                }
+        }
+
 
         let currentLevel = criterias;
         if (!Array.isArray(currentLevel)) {
@@ -31,12 +43,16 @@ module.exports.calculateBallsForUser = async function(id, faculty) {
         achievementsForCriterion[achievement.crit].push({'ach': achievement, 'balls': currentLevel, 'chars': achievement.chars});
     }
 
+    const promises = [];
     for (const key of Object.keys(criterias)) {
-        calculateBallsForCriterion(achievementsForCriterion[key]);
+        calculateBallsForCriterion(achievementsForCriterion[key], isPreliminary);
         for (const curAch of achievementsForCriterion[key]) {
             if (!curAch) continue;
-            db.updateAchieve(curAch['ach']._id, curAch['ach']).then();
+            promises.push(db.updateAchieve(curAch['ach']._id, curAch['ach']));
         }
+    }
+    if (promises.length > 0) {
+        await Promise.all(promises);
     }
 };
 
@@ -44,7 +60,7 @@ const trimNumber = function(num) {
     return Number((num).toFixed(3));
 };
 
-const calculateBallsForCriterion = function(achievements) {
+const calculateBallsForCriterion = function(achievements, isPreliminary) {
     let summ = 0;
     let max = 0;
 
@@ -56,12 +72,20 @@ const calculateBallsForCriterion = function(achievements) {
             if (!achievementBalls) continue;
             let shift = i;
             if (shift >= achievementBalls.length) shift = achievementBalls.length - 1;
-            if (trimNumber(achievementBalls[shift]) >= max) {
+            if (trimNumber(achievementBalls[shift]) > max ||
+                (isPreliminary &&
+                    trimNumber(achievementBalls[shift]) >= max &&
+                    isAchievementAccepted(achievements[achNum]['ach'])
+                )) {
                 max = trimNumber(achievementBalls[shift]);
                 maxIndex = achNum;
             }
         }
-        achievements[maxIndex]['ach'].ball = max;
+        if (isPreliminary) {
+            achievements[maxIndex]['ach'].preliminaryBall = max;
+        } else {
+            achievements[maxIndex]['ach'].ball = max;
+        }
         achievements[maxIndex]['balls'] = undefined;
         summ += max;
         max = 0;

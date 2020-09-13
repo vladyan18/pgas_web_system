@@ -74,10 +74,14 @@ class UserAchieves extends Component {
 
   render() {
     let summaryBall = 0;
+    let summaryPreliminaryBall = 0;
     if (userAchievesStore.achieves) {
       for (const ach of userAchievesStore.achieves) {
         if (ach.status == 'Принято' || ach.status == 'Принято с изменениями') {
           summaryBall += ach.ball;
+        }
+        if (ach.preliminaryBall) {
+          summaryPreliminaryBall += ach.preliminaryBall;
         }
       }
     }
@@ -104,9 +108,13 @@ class UserAchieves extends Component {
         </div>
 
         <hr css={horizontalLine}/>
+        <div style={{display:'flex'}}>
         {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
+        {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
+        <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>Предварительный балл: {summaryPreliminaryBall}</div>}
+        </div>
         <div css={css`width: 100%; min-height: 10rem;`}>
-          < CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
+          <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
         </div>
         <div>
           <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem; cursor: pointer;`}

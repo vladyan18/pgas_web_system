@@ -26,6 +26,14 @@ const columns = [{
   text: 'Балл',
   style: {width: '10%', textAlign: 'right', verticalAlign: 'middle'},
   headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
+    formatter: (cell, row) => {
+      if (row.ball !== undefined && row.ball !== null) {
+          return <b>{row.ball}</b>;
+      }
+      if (row.preliminaryBall) {
+          return <i><span style={{color: 'grey'}} title="Предварительный балл, может измениться">{row.preliminaryBall}</span></i>
+      }
+    }
 }, {
   dataField: 'comment',
   text: 'Комментарий',

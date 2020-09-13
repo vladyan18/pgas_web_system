@@ -26,6 +26,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
     args.to = createdAchieve;
     //await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -81,6 +82,7 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
     }
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
 };
 

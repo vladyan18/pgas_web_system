@@ -61,6 +61,7 @@ module.exports.addAchievement = async function(userId, achievement) {
     achievement.comment = '';
     const createdAchieve = await db.createAchieve(achievement);
     await db.addAchieveToUser(userId, createdAchieve._id);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {
@@ -131,6 +132,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
     }
 
     await db.updateAchieve(achId, achievement);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
 };
 
 module.exports.deleteAchievement = async function(userId, achId) {
@@ -141,6 +143,7 @@ module.exports.deleteAchievement = async function(userId, achId) {
     }
 
     await db.deleteAchieve(achId);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     return true;
 };
 
