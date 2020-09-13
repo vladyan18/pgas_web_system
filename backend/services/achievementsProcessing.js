@@ -81,12 +81,14 @@ const calculateBallsForCriterion = function(achievements, isPreliminary) {
                 maxIndex = achNum;
             }
         }
-        if (isPreliminary) {
-            achievements[maxIndex]['ach'].preliminaryBall = max;
-        } else {
-            achievements[maxIndex]['ach'].ball = max;
+        if (achievements[maxIndex]) {
+            if (isPreliminary) {
+                achievements[maxIndex]['ach'].preliminaryBall = max;
+            } else {
+                achievements[maxIndex]['ach'].ball = max;
+            }
+            achievements[maxIndex]['balls'] = undefined;
         }
-        achievements[maxIndex]['balls'] = undefined;
         summ += max;
         max = 0;
     }
