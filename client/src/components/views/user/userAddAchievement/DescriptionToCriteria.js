@@ -4,6 +4,7 @@ import '../../../../style/add_portfolio.css';
 export default class DescriptionToCriteria extends Component {
   constructor(props) {
     super(props);
+    this.state = {isHidden: false};
   }
 
   renderSwitch(crit) {
@@ -108,6 +109,7 @@ export default class DescriptionToCriteria extends Component {
   render() {
     return (
       <div id="critDescr" className="blue_bg">
+          <i className="fa fa-compress" title="свернуть"/>
         <p className="desc_selectors" id="desc_criterion_first">
 
           {this.renderSwitch(this.props.crit)}

@@ -439,7 +439,7 @@ class ConfirmationForm extends Component {
                 <div style={this.headerContainerStyle}>
                     <p>Подтверждения: </p>
                     { <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
-                        добавить
+                        <i className="fa fa-paperclip"/> прикрепить
                     </b>}
                 </div>
 
@@ -478,7 +478,7 @@ class ConfirmationForm extends Component {
                             <div className="profile"
                                  style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
                                 <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
-                                    Добавление подтверждения
+                                    {this.state.Type ? 'Добавление подтверждения' : 'Прикрепление подтверждения'}
                                 </p>
                                 <div style={{'margin-top': 'auto'}}>
                                     <button id="DeleteButton" className="btn btn-secondary"
@@ -500,7 +500,7 @@ class ConfirmationForm extends Component {
                                                 value="Назад" onClick={this.openExisting}>Открыть
                                         </button>
                                     </div>
-                                    <p style={{marginTop: "1rem"}}>Или создайте новое:</p>
+                                    <p style={{marginTop: "1rem"}}>Или, если Вы еще не добавляли его, создайте новое:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
                                 <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ

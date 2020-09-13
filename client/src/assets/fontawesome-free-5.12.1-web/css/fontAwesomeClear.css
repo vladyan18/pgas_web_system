@@ -35,6 +35,27 @@
   content: "\f2ed"
 }
 
+.fa-paperclip:before {
+    content: "\f0c6"; }
+
+.fa-compress:before {
+    content: "\f066"; }
+
+.fa-expand:before {
+    content: "\f065"; }
+
+.fa-expand-arrows-alt:before {
+    content: "\f31e"; }
+
+.fa-compress-arrows-alt:before {
+    content: "\f78c"; }
+
+.fa-compress-alt:before {
+    content: "\f422"; }
+
+.fa-expand-alt:before {
+    content: "\f424"; }
+
 @font-face {
     font-family: 'Font Awesome 5 Free';
     font-style: normal;

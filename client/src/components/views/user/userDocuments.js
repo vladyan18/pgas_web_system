@@ -25,7 +25,21 @@ function UserDocuments(props) {
         }
     );
   }
-  const columns = ConfirmationColumns.concat([
+  let columns = [
+    {
+      isDummyField: true,
+      formatter: (cell, row) => {
+        if (!props.achievements) {
+          return null;
+        }
+        if (props.achievements
+            .some((x) => x.confirmations.some((conf) => conf._id === row._id))) {
+          return <i style={{color: 'grey'}} className="fa fa-paperclip" title="Приложено к достижению"/>;
+        }
+      }
+    }
+  ].concat(ConfirmationColumns);
+  columns = columns.concat([
     {
       isDummyField: true,
       style: {textAlign: "right"},

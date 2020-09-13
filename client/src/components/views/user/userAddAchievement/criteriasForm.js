@@ -211,10 +211,20 @@ export default class CriteriasForm extends Component {
       {(this.props.critError && this.props.critErrorMessage) &&
             <span className="redText">{this.props.critErrorMessage}</span>}
       {(!this.props.supressDescription && criteriasStore.annotations && criteriasStore.annotations[this.state.crit]) &&
-            <div id="critDescr" className="blue_bg">
-              <p className="desc_selectors" id="desc_criterion_first">
+            <div id="critDescr" className="desc_selectors blue_bg" style={{width: '100%', paddingTop: '0.4rem'}}>
+              <div style={{marginLeft: 'auto', marginRight: '-0.5rem', width: '1rem', paddingTop: '0', cursor: 'pointer', color: 'darkcyan'}}
+              onClick={() => this.setState({critDescrHidden: !this.state.critDescrHidden})}>
+                <i className={"fa " + (this.state.critDescrHidden ? "fa-expand" : "fa-compress")} title="свернуть"/>
+              </div>
+              <p style={ this.state.critDescrHidden ?
+                {paddingTop: '0', maxHeight: '1.5rem', overflow: 'hidden', textOverflow: 'ellipse', marginBottom: '0px'} :
+                  {paddingTop: '0'}
+              }  id="desc_criterion_first">
                 <ReactMarkdown source={criteriasStore.annotations[this.state.crit]} linkTarget={() => '_blank'}/>
               </p>
+              {this.state.critDescrHidden && <div style={{textAlign: 'center', fontSize:'large', color:'darkcyan', cursor: 'pointer'}}
+                                                  onClick={() => this.setState({critDescrHidden: !this.state.critDescrHidden})}
+              ><b>...</b></div>}
             </div>}
       {this.state.selects.map((item) => {
         return (
