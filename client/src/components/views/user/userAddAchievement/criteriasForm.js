@@ -78,10 +78,10 @@ export default class CriteriasForm extends Component {
   handleSelect(e) {
     e.preventDefault();
     e.stopPropagation();
-
+    
     const state = {...this.state};
     const key = Number(e.target.id);
-    if (key == state.length && key == (state.values.length)) {
+    if (key === state.length && key === (state.values.length)) {
       state.values.pop();
       state.length -= 1;
     }
@@ -93,6 +93,7 @@ export default class CriteriasForm extends Component {
         criterion = criterion[state.values[i]];
       }
       criterion = criterion[e.target.value];
+
       for (let i = key; i < state.values.length; i++) {
         if (!criterion) break;
         criterion = criterion[state.values[i]];
@@ -100,15 +101,17 @@ export default class CriteriasForm extends Component {
       if (criterion) {
         criterion = this.props.crits;
         state.values[key-1] = e.target.value;
-        for (let i = 0; i < state.values.length - 1; i++) {
-          criterion = criterion[state.values[i]];
-          state.selects[i].options = Object.keys(criterion);
+        for (let i = 0; i < state.values.length; i++) {
+          if (state.selects[i]) {
+            criterion = criterion[state.values[i]];
+            state.selects[i].options = Object.keys(criterion);
+          }
         }
         this.setState(state);
         return;
       }
 
-      const d = state.length - key;
+      const d = state.values.length - key;
       for (let i = 0; i < d; i++) {
         state.values.pop();
         state.selects.pop();
@@ -126,7 +129,7 @@ export default class CriteriasForm extends Component {
     // this.setState(state)
 
     state.values.push(e.target.value);
-    if (state.selects.length >= state.values.length) {
+    while (state.selects.length >= state.values.length) {
       state.selects.pop();
     }
 
@@ -135,20 +138,19 @@ export default class CriteriasForm extends Component {
     let crit = this.props.crits;
     let id = '';
     const val = {...state.values};
-    console.log(state.length, val);
-    for (let i = 0; i < state.length; i++) {
+    for (let i = 0; i < state.values.length; i++) {
       id += state.values[i];
       crit = crit[state.values[i]];
     }
     const keys = Object.keys(crit);
     const critsTitles = Object.keys(this.props.crits);
-    console.log('T', critsTitles[0] === '7а' && isNaN(Number(crit[0])));
     if (isNaN(Number(keys[0])) || (critsTitles[0] === '7а' && isNaN(Number(crit[0])))) {
       this.props.valuesCallback(state.values, false);
-      state.selects.push({id: id + e.target.value, num: state.length + 1, value: '', options: keys});
+      state.selects.push({id: id + e.target.value + key, num: state.length + 1, value: '', options: keys, uniq: Math.random()});
     } else {
       this.props.valuesCallback(state.values, true);
     }
+
     this.setState(state);
   }
 
@@ -226,14 +228,14 @@ export default class CriteriasForm extends Component {
                                                   onClick={() => this.setState({critDescrHidden: !this.state.critDescrHidden})}
               ><b>...</b></div>}
             </div>}
-      {this.state.selects.map((item) => {
+      {this.state.selects.map((item, index) => {
         return (
           <div key={item.id}>
             <DescriptionToTermin values={item.options}/>
             <select className={'form-control selectors' + getSelectColorClass(item)} required
-              id={item.num.toString()}
-              defaultValue={item.value} onChange={this.handleSelect} disabled={this.props.disabled}
-              style={{cursor: 'pointer'}}>
+              id={item.num.toString()} key={item.uniq}
+              defaultValue={item.value || ''} onChange={this.handleSelect} disabled={this.props.disabled}
+              style={{cursor: 'pointer'}} placeholder='Выберите характеристику'>
               <option disabled value="">Выберите характеристику</option>
               {item.options.map((option) => (
                 <option key={option + item.id} value={option} style={{wordWrap: 'break-word', cursor: 'pointer'}}>
