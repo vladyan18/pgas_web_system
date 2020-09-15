@@ -128,7 +128,7 @@ class UserRegistrationPage extends Component {
                                         onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue=""
                                         style={{cursor: "pointer"}}>
                                     <option disabled value="">Выберите факультет/институт</option>
-                                    {this.props.faculties.map((fac) => {
+                                    {this.props.faculties.filter((x) => x !== 'Биологический').map((fac) => {
                                         return (<option value={fac}>{fac}</option>)
                                     })}
                                 </select><br/>
