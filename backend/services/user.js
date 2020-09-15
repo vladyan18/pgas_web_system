@@ -46,6 +46,56 @@ module.exports.registerUser = async function(userId, userData, session) {
     });
 };
 
+const natural = require('natural');
+const plainEK3Crits = [];
+const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
+function getCrit(crits, arr) {
+    let critNames = Object.keys(crits);
+
+    if (!isNaN(crits[critNames[0]])) {
+        plainEK3Crits.push(arr);
+        return;
+    }
+
+    for (let key of critNames) {
+        getCrit(crits[key], [...arr, key]);
+    }
+}
+
+async function initClassifier() {
+    const crit = await db.getCriteriasObject('ПМ-ПУ');
+    getCrit(crit, []);
+
+    const plainCrits = plainEK3Crits.map(x => {
+        let str = '';
+        for (let i = 0; i < x.length; i++) {
+            str += ' ' + x[i];
+        }
+        return str;
+    });
+    plainCrits.forEach((x, index) => classifier.addDocument(x, index));
+
+    const users = await db.getUsersWithAllInfo('ПМ-ПУ');
+    let count = 0;
+    for (let user of users) {
+        if (!user.Achievement) continue;
+        for (let ach of user.Achievement) {
+            let str = '';
+            for (let i = 0; i < ach.chars.length; i++) {
+                str += ' ' + ach.chars[i];
+            }
+            let id = plainCrits.indexOf(str);
+            if (id === -1 || ! ach.achievement || ach.achievement.length === 0) continue;
+            count += 1;
+            classifier.addDocument(ach.achievement, id);
+        }
+    }
+
+    console.log('COUNT:', count);
+    classifier.train();
+}
+initClassifier().then();
+
 module.exports.addAchievement = async function(userId, achievement) {
     const user = await db.findUserById(userId);
     let validationResult = false;
@@ -55,6 +105,10 @@ module.exports.addAchievement = async function(userId, achievement) {
         console.log('Ach validation outer error');
     }
     if (!validationResult) throw new TypeError();
+
+    if (user.LastName === 'Волосников') {
+        console.log('VV', plainEK3Crits[Number(classifier.classify(achievement.achievement))]);
+    }
 
     achievement.status = 'Ожидает проверки';
     achievement.date = getCurrentDate();
