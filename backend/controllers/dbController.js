@@ -133,6 +133,13 @@ exports.getNewUsers = function(faculty) {
   return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]).lean();
 };
 
+exports.getCompletelyAllUsersAchievements = async function(faculty) {
+    const populateQuery = {
+        path: 'Achievement'
+    };
+    return UserModel.find({Faculty: faculty}).populate(populateQuery).lean();
+}
+
 exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false) {
   let query;
   const populateQuery = {

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../../style/add_portfolio.css';
 import CriteriasForm from './criteriasForm';
-import CriteriasStore, {fetchSendWithoutRes} from '../../../../stores/criteriasStore';
+import CriteriasStore, {fetchSendObj, fetchSendWithoutRes} from '../../../../stores/criteriasStore';
 import {withRouter} from 'react-router-dom';
 import AchievementDateInput from '../../../AchievementDateInput';
 import ConfirmationForm from '../userConfirmation/ConfirmationForm';
@@ -22,9 +22,33 @@ const Panel = styled.div`
     }
 `;
 
+const recommendation = css`
+  color: blue;
+  cursor: pointer;
+  font-weight: lighter;
+  
+  :hover {
+  color: #7c969e;
+  }
+`;
+
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
 `;
+
+function debounce(func, wait) {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    const later = function() {
+      timeout = null;
+      func.apply(context, args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 class UserAddAchievement extends Component {
   constructor(props) {
@@ -38,6 +62,12 @@ class UserAddAchievement extends Component {
     this.updateChars = this.updateChars.bind(this);
     this.updateConfirmations = this.updateConfirmations.bind(this);
     this.crits = Object.keys(CriteriasStore.criterias);
+
+    this.classify = debounce((descr) => {
+        if (!descr) return;
+        fetchSendObj('/classifyDescription', {data: descr}).then(res => {
+          this.setState({recommendation: res});
+        })}, 300);
   }
 
   updateChars(value, isValid) {
@@ -67,6 +97,9 @@ class UserAddAchievement extends Component {
 
   updateDescr(e) {
     const st = this.state;
+    if (userPersonalStore.LastName === 'Testov' || userPersonalStore.LastName === 'Волосников') {
+      this.classify(e.target.value);
+    }
     st.ach = e.target.value;
     if (e.target.value && e.target.value !== '') {
       st.descrInvalid = false;
@@ -214,6 +247,9 @@ class UserAddAchievement extends Component {
       return undefined;
     };
 
+
+
+
     return (
       <Panel className="col-md-9" id="panel">
         <div>
@@ -227,9 +263,11 @@ class UserAddAchievement extends Component {
 
           <div className="form_elem_with_left_border" style={{borderColor: getLineColor(this.state.charsInvalid)}}>
             <label htmlFor="check2" className="label">Характеристики: </label>
-            <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
+            {CriteriasStore.criterias && <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
               critErrorMessage={this.state.critErrorMessage}
-              isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}/>
+              isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}
+              values={this.state.chars}
+            />}
           </div>
 
           <div className="show_hide_c11">
@@ -245,6 +283,14 @@ class UserAddAchievement extends Component {
               placeholder={'Введите название достижения (однозначно определяющее его среди других)'}
               id="comment"
               required onChange={this.updateDescr} value={this.state.ach} style={{marginTop: '0', width: '100%'}}/>
+              {this.state.recommendation && <div>
+                <div><span><i>Возможно, это:</i></span></div>
+                <div css={recommendation} onClick={() => {
+                  this.setState({recommendation: undefined, chars: this.state.recommendation});
+                }}>
+                  {this.state.recommendation.toString().replace(/,/g, ', ')}
+                </div>
+              </div>}
             </div>
 
 

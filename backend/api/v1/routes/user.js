@@ -134,6 +134,12 @@ router.get('/getAch/', authCheck,
         res.status(200).send(ach);
     });
 
+router.post('/classifyDescription', authCheck,
+    async function(req, res) {
+        const ach = await userService.classifyDescription(req.body.data);
+        res.status(200).send(ach);
+    });
+
 router.post('/add_file_for_confirmation', authCheck,
     async function(req, res) {
         uploadConfirmation(req, res, async function(err) {

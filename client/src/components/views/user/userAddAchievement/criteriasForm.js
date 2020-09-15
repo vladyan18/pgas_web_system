@@ -55,7 +55,44 @@ export default class CriteriasForm extends Component {
     // this.state = {selects: [{value:'', options: []}]}
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('UPDATE', this.props.values, prevProps.values)
+    if (this.props.values && this.props.values.length > 1
+        && prevProps.values !== this.props.values && this.props.values !== this.state.values) {
+      console.log(this.props.values, prevProps.values)
+      const sel = [];
+      let globalCrit = this.props.crits;
+      for (let i = 1; i < this.props.values.length; i++) {
+        let crit = this.props.crits;
+        globalCrit = globalCrit[this.props.values[i-1]];
+        let id = '';
+        for (let j = 0; j < i; j++) {
+          id += this.props.values[j];
+          crit = crit[this.props.values[j]];
+        }
+
+        sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
+      }
+      globalCrit = globalCrit[this.props.values[this.props.values.length-1]];
+      if (globalCrit && isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
+        sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+      } else if (globalCrit && this.critsTitles[0] === '7а') {
+        if (isNaN(globalCrit[0])) {
+          sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+        }
+      }
+
+      this.setState({
+        selects: sel,
+        length: this.props.values.length,
+        crit: this.props.values[0],
+        values: this.props.values.slice(),
+      }, () => this.checkValidity());
+    }
+  }
+
   checkValidity() {
+    console.log('CHECK', this.state.values);
     const state = {...this.state};
     let crit = this.props.crits;
     let id = '';
@@ -166,7 +203,7 @@ export default class CriteriasForm extends Component {
         className={'form-control selectors firstCourse unique7a' + +(this.props.critError ? ' is-invalid' : '') +
         (this.props.isInvalid === false ? ' is-valid' : '')}
         required name="check2" style={{marginTop: '0', cursor: 'pointer'}}
-        onChange={this.handleSelect} defaultValue={this.state.crit} disabled={this.props.disabled}>
+        onChange={this.handleSelect} value={this.state.crit} disabled={this.props.disabled}>
         <option disabled>Критерий</option>
         <option value={this.critsTitles[0]} id="7a">
                     7а (оценки)

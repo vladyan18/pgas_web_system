@@ -75,7 +75,8 @@ async function initClassifier() {
     });
     plainCrits.forEach((x, index) => classifier.addDocument(x, index));
 
-    const users = await db.getUsersWithAllInfo('ПМ-ПУ');
+    const users = await db.getCompletelyAllUsersAchievements('ПМ-ПУ');
+
     let count = 0;
     for (let user of users) {
         if (!user.Achievement) continue;
@@ -106,16 +107,16 @@ module.exports.addAchievement = async function(userId, achievement) {
     }
     if (!validationResult) throw new TypeError();
 
-    if (user.LastName === 'Волосников') {
-        console.log('VV', plainEK3Crits[Number(classifier.classify(achievement.achievement))]);
-    }
-
     achievement.status = 'Ожидает проверки';
     achievement.date = getCurrentDate();
     achievement.comment = '';
     const createdAchieve = await db.createAchieve(achievement);
     await db.addAchieveToUser(userId, createdAchieve._id);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
+};
+
+module.exports.classifyDescription = async function(description) {
+    return plainEK3Crits[Number(classifier.classify(description))];
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {
