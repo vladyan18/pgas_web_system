@@ -127,7 +127,7 @@ class UserHeader extends Component {
           </div>
         </div>
 
-        <div css={rightPanel}>
+        {!props.clear &&  <div css={rightPanel}>
           <div css={css`display: flex; justify-content: flex-end;`}>
 
             <div css={verticalAlign}>
@@ -168,7 +168,7 @@ class UserHeader extends Component {
               </form>}
             </div>
           </div>
-        </div>
+        </div>}
       </div>
     </header>;
   }

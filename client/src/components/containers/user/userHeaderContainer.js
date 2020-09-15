@@ -25,6 +25,9 @@ function UserHeaderContainer(props) {
     case '/rating':
       pathname = 'Рейтинг';
       break;
+    case '/login':
+      pathname = 'Система учета достижений';
+      break;
     case '/achievement/*':
       pathname = 'Достижение';
       break;
@@ -32,7 +35,7 @@ function UserHeaderContainer(props) {
       pathname = 'Мои достижения';
       break;
   }
-  return <UserHeader pageName={pathname}/>;
+  return <UserHeader pageName={pathname} clear={props.clear}/>;
 }
 
 UserHeaderContainer = withRouter(UserHeaderContainer);

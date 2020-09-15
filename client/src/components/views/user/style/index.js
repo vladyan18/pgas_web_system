@@ -11,6 +11,17 @@ export const Panel = styled.div`
     }
 `;
 
+export const LoginPanel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    border-radius: 4px;
+    padding: 2rem;
+    margin-top: 3rem;
+    @media only screen and (max-device-width: 480px) {
+        border-radius: unset;
+    }
+`;
+
 export const HorizontalLine = styled.hr`
     border-top: 1px solid #9F2D20;
 `;
