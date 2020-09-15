@@ -68,7 +68,6 @@ function DocConfirmation(props) {
 }
 
 function SZConfirmation(props) {
-    console.log(props.confirmation)
     const [SZAppendix, setSZAppendix] = useState(props.confirmation.SZ.Appendix);
     const [SZParagraph, setSZParagraph] = useState(props.confirmation.SZ.Paragraph);
     const [Name, setName] = useState(props.confirmation.Name);

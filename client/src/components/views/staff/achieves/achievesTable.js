@@ -184,7 +184,6 @@ class AchievesTable extends Component {
 
     handleCommentChange(e, id) {
         document.getElementById(id).defaultValue = this.newComments[id];
-        console.log(this.newComments[id]);
         fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then( () => {
                 this.props.updater()
             }

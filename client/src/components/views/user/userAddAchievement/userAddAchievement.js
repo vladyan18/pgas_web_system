@@ -162,7 +162,6 @@ class UserAddAchievement extends Component {
     res.crit = this.state.chars[0];
 
     res.chars = this.state.chars;
-    console.log(this.state.dateValue);
 
     if (this.state.dateValue && this.state.dateValue != '') {
       res.achDate = makeDate(this.state.dateValue);

@@ -68,7 +68,6 @@ class EditAchievement extends Component {
     }
 
     updateConfirmations(confirms) {
-        console.log(confirms)
         this.setState({confirmations: [...confirms]});
     }
 
@@ -150,28 +149,23 @@ class EditAchievement extends Component {
 
         if (this.state.chars[0] != '1 (7а)') {
             if (this.state.charsInvalid === undefined) {
-                console.log('1');
                 this.setState({charsInvalid: true});
                 return false;
             } else if (this.state.charsInvalid) return false;
             if (!this.state.isDateValid) {
-                console.log('2');
                 let st = this.state;
                 st.dateValidationResult = false;
                 this.setState(st);
                 return false
             }
             if (this.state.hasDateDiapasone && !this.state.isEndDateValid) {
-                console.log('3');
                 this.setState({endDateValidationResult: false});
                 return false
             }
             if (this.state.hasDateDiapasone && (!this.state.endDateValidationResult || !this.state.dateValidationResult)) {
-                console.log('4');
                 return false
             }
             if (!this.state.ach) return false;
-            console.log('5')
         } else if (this.state.critError) return false;
 
         return true

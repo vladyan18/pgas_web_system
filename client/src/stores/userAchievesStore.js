@@ -29,6 +29,7 @@ class UserAchievesStore {
                     }
                 });
                 this.achieves = data.Achievement;
+                localStorage.setItem('achievements', JSON.stringify(data.Achievement));
             }).catch((err) => console.log(err));
 
         fetch("/api/getArchivedAchievements", {
@@ -61,4 +62,14 @@ decorate(UserAchievesStore, {
     archivedAchieves: observable
 });
 
-export default new UserAchievesStore();
+const store = new UserAchievesStore();
+
+if (localStorage.getItem('achievements') !== '') {
+    try {
+        store.achieves = JSON.parse(localStorage.getItem('achievements'));
+    } catch (e) {
+        localStorage.removeItem('achievements');
+    }
+}
+
+export default store;

@@ -6,7 +6,6 @@ import UserAchievesContainer from './containers/user/userAchievesContainer';
 import {Route} from 'react-router-dom';
 import UserCommonInfoContainer from './containers/user/UserCommonInfoContainer';
 import UserProfileContainer from './containers/user/userProfileContainer';
-import Auth from '../modules/Auth';
 import userPersonalStore from '../stores/userPersonalStore';
 import CriteriasStore from '../stores/criteriasStore';
 import {Switch, withRouter} from 'react-router-dom';
@@ -50,7 +49,6 @@ class User extends Component {
 
   render() {
     return (
-
       <>
         <UserHeaderContainer/>
         <div className="container-fluid">

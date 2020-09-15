@@ -1,5 +1,6 @@
 import {computed, decorate, observable} from 'mobx';
 import {fetchGet} from "../services/fetchService";
+import store from "./criteriasStore";
 
 class UserPersonalStore {
     personal;
@@ -11,6 +12,7 @@ class UserPersonalStore {
         try {
             let result = await fetchGet('/getProfile', {});
             this.personal = result;
+            localStorage.setItem('personal', JSON.stringify(result));
             if (result)
                 await fetchGet('/getRights', {id: result.id}).then((res2) => {
                     this.Role = res2.Role;
@@ -110,4 +112,14 @@ decorate(UserPersonalStore, {
     IsInRating: computed
 });
 
-export default new UserPersonalStore();
+const storage = new UserPersonalStore();
+
+if (localStorage.getItem('personal') !== '') {
+    try {
+        store.personal = JSON.parse(localStorage.getItem('personal'));
+    }  catch (e) {
+        localStorage.removeItem('personal');
+    }
+}
+
+export default storage;

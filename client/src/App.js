@@ -1,12 +1,9 @@
 import './style/user_main.css';
 import React, {Component, Suspense} from 'react';
 import User from "./components/user";
-import Auth from "./modules/Auth";
 import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
-import userPersonalStore from "./stores/userPersonalStore";
-import UserHeaderContainer from "./components/containers/user/userHeaderContainer";
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));
@@ -21,10 +18,8 @@ class App extends Component {
     }
 
     componentDidMount() {
-        console.log('DID MOUNT')
         window.onstorage = event => {
-            console.log('EVENT', event);
-            if (event.key != 'isAuthenticated') return;
+            if (event.key !== 'isAuthenticated') return;
             const isAuth = localStorage.getItem('isAuthenticated') === 'true';
             this.setState({isAuth: isAuth});
         };

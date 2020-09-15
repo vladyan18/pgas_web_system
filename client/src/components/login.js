@@ -31,7 +31,6 @@ class Login extends Component {
     let result = await fetchSendWithoutRes('/login', {username: this.state.username, password: this.state.password});
 
     if (result) {
-      console.log('SET ITEM')
       localStorage.setItem('isAuthenticated', 'true');
       if (window.location.pathname === '/login') {
         window.location.replace('/home');

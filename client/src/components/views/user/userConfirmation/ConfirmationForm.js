@@ -25,6 +25,11 @@ class ConfirmationForm extends Component {
 
         this.onDrop = (file) => {
             let st = this.state;
+            const extension = file[0].name.split('.').pop();
+            console.log(extension);
+            if (extension && ['doc', 'docx', 'exe'].includes(extension.toLowerCase())) {
+                return;
+            }
             st.file = file[0];
             this.setState(st)
         };
@@ -379,9 +384,7 @@ class ConfirmationForm extends Component {
             if (confirmation) {
                 let confirmations = this.state.confirmations;
                 const index = confirmations.findIndex((x) => (x._id === this.state.editingConfirmation._id));
-                console.log(index, confirmations);
                 confirmations[index] = Object.assign({}, confirmations[index], confirmation);
-                console.log(confirmations[index]);
                 this.props.updateForm(confirmations);
                 this.setState({confirmations: [...confirmations]});
             }

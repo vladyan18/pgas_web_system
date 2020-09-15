@@ -3,11 +3,10 @@ import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
-import logoBss from '../../../assets/img/logo_bss-compressed.svg';
-import logoSPbU from '../../../assets/img/CoA_Small_whitebg-compressed.svg';
+import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compressed-medium.svg';
+import { ReactComponent as LogoBSS } from '../../../assets/img/logo_bss-compressed-medium.svg';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
-import styled from '@emotion/styled';
 
 const pageTop = css`
     background-color: white;
@@ -46,7 +45,7 @@ const logoBackground = css`
   
 `;
 
-const LogoBSS = styled.img`
+const logoBSS = css`
   height: 55px;
   align-self: center;
   padding-right: 10px;
@@ -55,7 +54,13 @@ const LogoBSS = styled.img`
   }
 `;
 
-const LogoSPbU = styled.img`
+const logoSpbuBackground = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  `
+
+const logoSPbU = css`
   height: 55px;
   width: 47px;
   @media only screen and (max-device-width: 480px) {
@@ -63,13 +68,6 @@ const LogoSPbU = styled.img`
     width: 27px;
   }
 
-`;
-
-const ButtonsBlock = styled.div`
-       width: 80%;
-       flex: none;
-       max-width: none;
-       -webkit-flex: none;
 `;
 
 const verticalAlign = css`
@@ -114,11 +112,13 @@ class UserHeader extends Component {
       <div className="row" css={pageTop}>
         <div css={blockHeader}>
           <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
-            <LogoSPbU src={logoSPbU} alt={'СПбГУ'}/>
+            <div css={logoSpbuBackground}>
+            <LogoSPbU css={logoSPbU}/>
+            </div>
           </a>
           <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
             <div css={logoBackground}>
-              <LogoBSS src={logoBss} alt={'БСС'}/>
+                <LogoBSS css={logoBSS}/>
             </div>
           </a>
           <div className="p_header">

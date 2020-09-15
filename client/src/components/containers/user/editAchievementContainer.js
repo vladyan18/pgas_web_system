@@ -20,7 +20,6 @@ class EditAchievementContainer extends Component {
   }
 
   render() {
-    console.log(userAchievesStore.achieves);
     return (<>{(userAchievesStore.achieves) &&
         <EditAchievement achieves={userAchievesStore.achieves}
                          achId={this.state.achId}
