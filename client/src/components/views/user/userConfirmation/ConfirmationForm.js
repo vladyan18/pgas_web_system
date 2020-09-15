@@ -27,7 +27,8 @@ class ConfirmationForm extends Component {
             let st = this.state;
             const extension = file[0].name.split('.').pop();
             console.log(extension);
-            if (extension && ['doc', 'docx', 'exe'].includes(extension.toLowerCase())) {
+            if (extension && ['doc', 'docx', 'exe', 'pages', 'odt', 'pptx', 'ppt', 'xls', 'xlsx'].includes(extension.toLowerCase())) {
+                this.setState({forbiddenExtensionUsed: extension});
                 return;
             }
             st.file = file[0];
@@ -208,6 +209,7 @@ class ConfirmationForm extends Component {
         st.isLoading = false;
         st.sameFilesLoaded = undefined;
         st.loadedFile = undefined;
+        st.forbiddenExtensionUsed = undefined;
         this.setState(st)
     }
 
@@ -571,9 +573,16 @@ class ConfirmationForm extends Component {
                                             <section>
                                                 {!this.state.file &&
                                                 <div {...getRootProps({className: 'dropzone'})}
-                                                     style={{"backgroundColor": "white"}}>
+                                                     style={this.state.forbiddenExtensionUsed ?
+                                                         {"backgroundColor": "white", borderColor: 'red'} :
+                                                         {"backgroundColor": "white"}
+                                                     }>
                                                     <input {...getInputProps()} />
                                                     <p>Нажмите, либо перетащите файл</p>
+                                                    {this.state.forbiddenExtensionUsed &&
+                                                    <p style={{color: 'red', fontSize: 'small'}}>
+                                                        Формат {this.state.forbiddenExtensionUsed} не поддерживается. <br/> Преобразуйте в pdf.
+                                                    </p>}
                                                     <p style={{fontSize: "small", color: "#4f4f4f"}}>Максимальный
                                                         размер: 15 Мб</p>
                                                 </div>}

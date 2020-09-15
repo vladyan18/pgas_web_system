@@ -178,7 +178,7 @@ router.get('/getConfirm/*', authCheck, // TODO SECURITY
 
         filename = filename
             .substr(filename.search('-') + 1)
-            .substr(filename.search('-') + 1);
+            .substr(filename.search('-') + 1).toLowerCase();
 
         res.setHeader('Content-Length', fileStream.stat.size);
         let contentType, contentDisposition;
