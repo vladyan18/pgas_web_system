@@ -13,6 +13,7 @@ const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
 const annotationsCache = require('../resources/annotationsCacheInstance');
+const achievementsProcessing = require('../services/achievementsProcessing');
 const { BloomFilter } = require('bloom-filters');
 const md5 = require('md5');
 
@@ -216,7 +217,7 @@ exports.deleteAchieve = async function(id) {
 
 exports.updateAchieve = async function(id, achieve) {
   const newAch = {
-    crit: achieve.crit,
+    crit: achieve.chars ? achieve.chars[0] : null,
     chars: achieve.chars, status: achieve.status,
     achievement: achieve.achievement, ball: achieve.ball,
     achDate: achieve.achDate, comment: achieve.comment,
@@ -238,20 +239,33 @@ exports.updateAchieve = async function(id, achieve) {
   }).lean();
 };
 
-exports.registerUser = function(userId, lastname, name, patronymic, birthdate, spbuId, faculty, course, type, settings) {
-  return UserModel.findOneAndUpdate({id: userId}, {
-    $set: {
-      LastName: lastname,
-      FirstName: name,
-      Patronymic: patronymic,
-      Birthdate: birthdate,
-      Faculty: faculty,
-      Course: course,
-      Type: type,
-      Registered: true,
-      Settings: settings,
-    },
-  });
+exports.registerUser = async function(userId, lastname, name, patronymic, birthdate, spbuId, newFaculty, course, type, settings) {
+    const {Faculty} = await UserModel.findOne({id: userId}, 'Faculty').lean();
+    await UserModel.findOneAndUpdate({id: userId}, {
+        $set: {
+            LastName: lastname,
+            FirstName: name,
+            Patronymic: patronymic,
+            Birthdate: birthdate,
+            Faculty: newFaculty,
+            Course: course,
+            Type: type,
+            Registered: true,
+            Settings: settings,
+        },
+    });
+    if (Faculty !== newFaculty && Faculty) {
+        const userObject = await exports.findUserByIdWithAchievements(userId);
+        const criterias = await exports.getCriteriasObject(newFaculty);
+        if (!userObject.Achievement) {
+            return;
+        }
+        for (let ach of userObject.Achievement) {
+            //await exports.checkActualityOfAchievementCharacteristics(ach, criterias);
+        }
+        await achievementsProcessing.calculateBallsForUser(userId, newFaculty);
+        await achievementsProcessing.calculateBallsForUser(userId, newFaculty, true);
+    }
 };
 
 
@@ -734,7 +748,6 @@ exports.validateAchievement = async function(achievement, user) { // TODO refact
         if (achEndingDate < achDate) return false;
       }
     }
-
     return true;
   } catch (e) {
     console.error('Ach validation error | User: ' + user.id, e);
@@ -742,12 +755,12 @@ exports.validateAchievement = async function(achievement, user) { // TODO refact
 };
 
 exports.checkActualityOfAchievementCharacteristics = async function(achievement, criterias) {
-  if (achievement.criteriasHash === criterias.Hash) return;
+  if (achievement.criteriasHash && achievement.criteriasHash === criterias.Hash) return;
 
   const correctChars = [];
   const incorrectChars = [];
-  let currentLevel = JSON.parse(criterias.Crits);
-
+  let currentLevel = criterias;
+  console.log(achievement)
   if (Object.keys(criterias)[0].indexOf('(') === -1) {
     if (achievement.crit.indexOf('(') !== -1) {
       achievement.crit = achievement.crit.substring(
@@ -787,6 +800,7 @@ exports.checkActualityOfAchievementCharacteristics = async function(achievement,
     achievement.status = 'Данные некорректны';
     achievement.criteriasHash = criterias.Hash;
     achievement.ball = undefined;
+    achievement.preliminaryBall = undefined;
     await this.updateAchieve(achievement._id, achievement);
   }
 };

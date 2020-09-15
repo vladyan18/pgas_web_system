@@ -13,6 +13,7 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
 
     for (const achievement of achievements) {
         if (!achievement) continue;
+
         if (isPreliminary && achievement.status === 'Отказано') {
             achievement.preliminaryBall = undefined;
             db.updateAchieve(achievement._id, achievement).then();
@@ -24,22 +25,37 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
                     achievement.preliminaryBall = undefined;
                 }
                 achievement.ball = undefined;
-                db.updateAchieve(achievement._id, achievement).then();
+                await db.updateAchieve(achievement._id, achievement);
                 if (!isPreliminary) {
                     continue;
                 }
         }
 
-
         let currentLevel = criterias;
         if (!Array.isArray(currentLevel)) {
+            const correctChars = [];
             for (const ch of achievement.chars) {
-                currentLevel = currentLevel[ch];
+                currentLevel = currentLevel[ch]; // TODO
+                if (!currentLevel) {
+                    break;
+                }
+                correctChars.push(ch);
+            }
+            if (!currentLevel) {
+                console.log('ERROR', achievement.chars);
+                achievement.preliminaryBall = undefined;
+                achievement.ball = undefined;
+                achievement.status = 'Данные некорректны';
+                achievement.chars = correctChars;
+                achievement.crit = correctChars[0];
+                await db.updateAchieve(achievement._id, achievement);
+                continue;
             }
             while (!Array.isArray(currentLevel) && !!currentLevel) {
                 currentLevel = currentLevel[Object.keys(currentLevel)[0]];
             }
         }
+        if (!achievement.crit) continue;
         achievementsForCriterion[achievement.crit].push({'ach': achievement, 'balls': currentLevel, 'chars': achievement.chars});
     }
 
@@ -161,19 +177,19 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
 };
 
 module.exports.checkActualityOfUsersAchievements = async function(faculty) { // TODO refactor!!
-    const currentUsersPromise = db.getCurrentUsers(faculty);
-    const newUsersPromise = db.getNewUsers(faculty);
+    const currentUsersPromise = db.getUsersWithAllInfo(faculty, true);
+    const newUsersPromise = db.getUsersWithAllInfo(faculty, false);
     const [currentUsers, newUsers] = await Promise.all([currentUsersPromise, newUsersPromise]);
     const users = currentUsers.concat(newUsers);
 
-    // const crits = await db.getCriterias(faculty, true);
+    const crits = await db.getCriteriasObject(faculty);
 
-    console.log(faculty);
-    //console.log(Object.keys(crits));
+    console.log(faculty, 'is changing criterias...');
     for (const user of users) {
-        // for (const achievement of user.Achievement) {
-        // await db.checkActualityOfAchievementCharacteristics(achievement, crits);
-        // }
+        for (const achievement of user.Achievement) {
+            await db.checkActualityOfAchievementCharacteristics(achievement, crits);
+        }
         await module.exports.calculateBallsForUser(user.id, faculty);
+        await module.exports.calculateBallsForUser(user.id, faculty, true);
     }
 };

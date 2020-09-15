@@ -105,7 +105,8 @@ router.post('/update_achieve', authCheck,
             await userService.updateAchievement(req.userId, achId, achievement);
         } catch (error) {
             if (error.name === 'TypeError') {
-                res.sendStatus(400);
+                console.log(error);
+                return res.sendStatus(400);
             } else throw error;
         }
         res.sendStatus(200);

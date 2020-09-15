@@ -13,6 +13,7 @@ class UserAchievesStore {
             return resp.json()
         }).then((data) => {
                 data.Achievement = data.Achievement.sort(function (obj1, obj2) {
+                    if (!obj1.crit || !obj2.crit) return 0;
                     if (obj1.crit.indexOf('(') !== -1)
                         return Number.parseInt(obj1.crit.substr(0, 2)) - Number.parseInt(obj2.crit.substr(0, 2));
                     else {

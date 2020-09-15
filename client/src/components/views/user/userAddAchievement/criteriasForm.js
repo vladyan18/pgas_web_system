@@ -34,9 +34,9 @@ export default class CriteriasForm extends Component {
         sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
       }
       globalCrit = globalCrit[this.props.values[this.props.values.length-1]];
-      if (isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
+      if (globalCrit && isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
         sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
-      } else if (this.critsTitles[0] === '7а') {
+      } else if (globalCrit && this.critsTitles[0] === '7а') {
         if (isNaN(globalCrit[0])) {
           sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
         }
@@ -78,7 +78,7 @@ export default class CriteriasForm extends Component {
   handleSelect(e) {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const state = {...this.state};
     const key = Number(e.target.id);
     if (key === state.length && key === (state.values.length)) {

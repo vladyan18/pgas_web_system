@@ -78,7 +78,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
 
     const oldAch = await db.findAchieveById(achId);
     achievement.comment = oldAch.comment;
-    achievement.status = oldAch.status;
+    achievement.status = 'Ожидает проверки'//oldAch.status;
     achievement.criteriasHash = oldAch.criteriasHash;
     achievement.isPendingChanges = oldAch.isPendingChanges;
     achievement.ball = oldAch.ball;
@@ -124,7 +124,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
             if (!changeDetected) continue;
         }
         if (oldAch[field] !== achievement[field]) {
-            if (oldAch.status !== 'Ожидает проверки') {
+            if (oldAch.status !== 'Ожидает проверки' && oldAch.status !== 'Данные некорректны') {
                 console.log('Detected change in field:', field, oldAch[field], achievement[field]);
                 throw new TypeError();
             }
@@ -132,7 +132,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
     }
 
     await db.updateAchieve(achId, achievement);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
+    await achievementsProcessing.calculateBallsForUser(userId, user.Faculty, true);
 };
 
 module.exports.deleteAchievement = async function(userId, achId) {
