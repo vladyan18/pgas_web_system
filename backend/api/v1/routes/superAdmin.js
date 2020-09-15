@@ -3,6 +3,7 @@ const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
 const adminService = require('../../../services/admin');
+const facultyService = require('../../../services/faculty');
 const superAdminAuthCheck = require('../../../middlewares/authCheck').superAdmin;
 
 router.get('/confitmationsStatistics', superAdminAuthCheck,
@@ -17,12 +18,17 @@ router.get('/purgeConfirmations', superAdminAuthCheck,
         res.status(200).send(result);
     });
 
+router.post('/createFaculty', superAdminAuthCheck,
+    async function(req, res) {
+        const result = await facultyService.createFaculty(req.body);
+        res.status(200).send(result);
+    });
+
 /*
 router.get('/recalculate', superAdminAuth, adminController.recalculate);
 
 router.post('/createAdmin', superAdminAuth, adminController.createAdmin);
 
-router.post('/createFaculty', superAdminAuth, facultyController.createFaculty);
 */
 
 module.exports = router;
