@@ -98,7 +98,7 @@ const CriterionSelector = React.memo((props) => {
         <div css={
             !props.disabled ? css`
             td {
-            :before { display: inline; margin-right: 1rem; font-family: 'Font Awesome 5 Free'; font-weight: 900; content: '\\f00c' }
+            :before { display: inline; margin-right: 1rem; font-family: 'Font Awesome 5 Free'; font-weight: 900; content: '\\f0c9' }
             :hover {
                     color: grey;
                     :before  { display: inline; margin-right: 1rem; font-family: 'Font Awesome 5 Free'; font-weight: 900; content: '\\f00d' }

@@ -59,6 +59,9 @@
 .fa-plus:before {
     content: "\f067"; }
 
+.fa-bars:before {
+    content: "\f0c9"; }
+
 @font-face {
     font-family: 'Font Awesome 5 Free';
     font-style: normal;
