@@ -74,8 +74,8 @@ class AchievesUserGroups extends React.PureComponent {
         user.Achievements = user.Achievements.filter((x) => x.isPendingChanges)
       }
       for (const ach of user.Achievements) {
-        if (ach.status !== 'Ожидает проверки') {
-          if (ach.status !== 'Изменено') {
+        if (ach.status !== 'Ожидает проверки' ) {
+          if (ach.status !== 'Изменено' && ach.status !== 'Данные некорректны') {
             checkedAchCount += 1;
           }
           if (ach.isPendingChanges) {
