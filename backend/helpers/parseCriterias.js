@@ -144,7 +144,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     if (lastCritInfo) {
         if (lastCritInfo.row !== globalCategoryRowIndex) {
             const critName = getCellValue(globalCategoryRowIndex, 1, sheet);
-            if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ') !== critName.toString().replace(/\s+/g, ' '))) {
+            if (!lastCritInfo.crit || (lastCritInfo.crit.toString().replace(/\s+/g, ' ').trim() !== critName.toString().replace(/\s+/g, ' ').trim())) {
                 lastCritInfo.row = globalCategoryRowIndex;
                 lastCritInfo.crit = critName;
                 lastCritInfo.lastHeadRow = undefined;
@@ -152,20 +152,21 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
                 globalCategoryRowIndex = lastCritInfo.row;
             }
         }
-    } else lastCritInfo = {row: globalCategoryRowIndex, crit: getCellValue(globalCategoryRowIndex, 1, sheet)};
+    } else lastCritInfo = {row: globalCategoryRowIndex, crit: getCellValue(globalCategoryRowIndex, 1, sheet).trim()};
 
     let currentColumnIndex = 1;
     let globalCategoryLastIndex = lastCritInfo.row;
-    let globalCategoryLastName = lastCritInfo.crit.toString().replace(/\s+/g, ' ');
+    let globalCategoryLastName = lastCritInfo.crit.toString().replace(/\s+/g, ' ').trim();
     let leftColumnIndex = columnIndex;
     while (currentColumnIndex < (columnIndex - 1)) { // поиск критериев горизонтали
         let mergedRowIndex = rowIndex;
         while (mergedRowIndex > globalCategoryLastIndex && isCellUndefined(mergedRowIndex, currentColumnIndex, sheet)) {
             mergedRowIndex -= 1;
         }
-        const critName = getCellValue(mergedRowIndex, currentColumnIndex, sheet);
+        let critName = getCellValue(mergedRowIndex, currentColumnIndex, sheet);
+        if (critName) critName = critName.trim();
 
-        if (globalCategoryLastIndex < mergedRowIndex && (globalCategoryLastName !== critName.toString().replace(/\s+/g, ' '))) {
+        if (globalCategoryLastIndex < mergedRowIndex && (globalCategoryLastName !== critName.toString().replace(/\s+/g, ' ').trim())) {
             if (mergedRowIndex > globalCategoryLastIndex && mergedRowIndex > 247 && mergedRowIndex < 259) {
                 globalCategoryLastName = critName;
             }
@@ -173,7 +174,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
         } else if (globalCategoryLastIndex > mergedRowIndex) mergedRowIndex = globalCategoryLastIndex;
 
         if (!isCellUndefined(mergedRowIndex, currentColumnIndex, sheet) && !isValue(getCellValue(mergedRowIndex, currentColumnIndex, sheet))) {
-            const text = getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' ');
+            const text = getCellValue(mergedRowIndex, currentColumnIndex, sheet).toString().replace(/\s+/g, ' ').trim();
             categoryList.push(text);
             typesList.push({type: 'r'});
             numberOfRowCategories += 1;
@@ -192,7 +193,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
             mergedColumnIndex -= 1;
         }
         if (!isCellUndefined(currentRowIndex, mergedColumnIndex, sheet) && !isValue(getCellValue(currentRowIndex, mergedColumnIndex, sheet))) {
-            categoryList.splice(numberOfRowCategories, 0, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' '));
+            categoryList.splice(numberOfRowCategories, 0, getCellValue(currentRowIndex, mergedColumnIndex, sheet).toString().replace(/\s+/g, ' ').trim());
             if (!lastCritInfo.lastHeadRow) lastCritInfo.lastHeadRow = currentRowIndex;
             typesList.push({type: 'c'});
             if (lastCritInfo.lastHeadRow < currentRowIndex) {
