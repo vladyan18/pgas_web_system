@@ -12,17 +12,17 @@ const LeftNavbar = css`
   padding: 10px 10px 10px 10px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-  
+  border-radius: 2px;
   & > ul {
     margin-left: 0;
     padding-left: 0;
   };
    & > ul > li {
-          @media only screen and (max-device-width: 480px) {
+          @media only screen and (max-device-width: 768px) {
       font-size: medium;
       }
    };
-   @media only screen and (max-device-width: 480px) {
+   @media only screen and (max-device-width: 765px) {
       width:100%;
    }
 `;
@@ -34,6 +34,7 @@ const leftBlock = css`
 `;
 
 const ulNav = css`
+   padding-bottom: 0px;
    @media only screen and (max-device-width: 480px) {
       margin-bottom: 0px;
       padding-bottom: 0px;

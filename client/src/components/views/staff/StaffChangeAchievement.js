@@ -193,7 +193,7 @@ class StaffChangeAchievement extends Component {
                   </div>
                   <div>
                     <CriteriasForm crits={staffContextStore.criterias} values={this.state.chars}
-                      valuesCallback={this.updateNewChars} supressDescription={true}/>
+                      valuesCallback={this.updateNewChars} supressDescription={true} forceEnabled={true}/>
                   </div>
                   <button className="btn btn-success" onClick={this.updateChars}>Сохранить характеристики</button>
                 </div>}

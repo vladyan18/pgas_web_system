@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import CurrentAchievesTable from './currentAchievesTable';
 import userAchievesStore from '../../../../stores/userAchievesStore';
+import userPersonalStore from '../../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
 import {BASE_API_URL} from '../../../../common/constants';
+import {withRouter} from "react-router-dom";
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
 `;
@@ -29,6 +31,7 @@ const mainButton = css`
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    border-radius: 2px;
 `;
 
 
@@ -131,8 +134,22 @@ class UserAchieves extends Component {
         </div>
 
       </div>
+      {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <div css={css`
+      width: 50px; height: 50px; background-color: #129b41; border-radius: 50%; box-shadow: 0 5px 4px rgba(0, 0, 0, .6);
+      position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
+        display: none;
+        @media only screen and (max-device-width: 768px) {
+            display: block;
+        }
+      `}
+      onClick={() => this.props.history.push('/upload')}>
+        <i className="fa fa-plus" aria-hidden="true"></i>
+      </div>}
     </Panel>);
   }
 }
 
-export default observer(UserAchieves);
+//#9b1818
+//#129b41
+
+export default withRouter(observer(UserAchieves));

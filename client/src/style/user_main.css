@@ -96,12 +96,14 @@ label {
     margin-right:auto;
     margin-left:auto
 }
-@media (min-width:576px) {
-    .container {
-        max-width:540px;
-        min-width: 540px;
+
+@media (max-width:768px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }
+
 @media (min-width:768px) {
     .container {
         max-width:720px;
@@ -466,6 +468,24 @@ block_2 {
 
     .logo_img {
         margin-left: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+        .p_header {
+            font-size: x-small;
+        }
+
+        .hideInMobile {
+            display: none
+        }
+
+        textarea::placeholder {
+            font-size: small;
+        }
+
+        textarea::-moz-placeholder {
+            font-size: small;
+        }
     }
 
     @media screen and (max-width: 700px) {

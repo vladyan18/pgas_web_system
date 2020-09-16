@@ -1,22 +1,13 @@
 import React, {Component} from 'react';
 import '../../../style/add_portfolio.css';
 import {withRouter} from 'react-router-dom';
-
+import {Panel} from './style'
 import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import userPersonalStore from "../../../stores/userPersonalStore";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
 /** @jsx jsx */
-
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-    padding: 0 2rem;
-    @media only screen and (max-device-width: 480px) {
-        padding: 0 1rem;
-    }
-`;
 
 class UserProfile extends Component {
   constructor(props) {

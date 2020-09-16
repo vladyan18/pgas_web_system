@@ -3,6 +3,15 @@ import '../../../../style/add_portfolio.css';
 import DescriptionToTermin from './DescriptionToTermin';
 import ReactMarkdown from 'react-markdown';
 import criteriasStore from '../../../../stores/criteriasStore';
+import DescriptionToCriterion from "./DescriptionToCriterion";
+import {css, jsx} from '@emotion/core';
+/** @jsx jsx */
+
+const selectorCss = css`
+        > * {
+            width: 50px !important;
+        }
+  `
 
 export default class CriteriasForm extends Component {
   constructor(props) {
@@ -14,11 +23,11 @@ export default class CriteriasForm extends Component {
     this.critsOffset = this.critsTitles.length == 13 ? 1 : 0;
     if (!this.props.values) {
       if (this.critsTitles[0] === '7а') {
-        this.state = {selects: [{id: '7a', num: 2, value: '', options: Object.keys(this.props.crits['7а'])}], length: 1, crit: this.critsTitles[0], values: ['7а']};
+        this.state = {selects: [{id: '7a', num: 2, value: '', options: Object.keys(this.props.crits['7а'])}], length: 1, crit: undefined, values: []};
       } else {
-        this.state = {selects: [], length: 1, crit: this.critsTitles[0], values: []};
+        this.state = {selects: [], length: 1, crit: undefined, values: []};
       }
-      this.props.valuesCallback([this.critsTitles[0]]);
+      //this.props.valuesCallback([this.critsTitles[0]]);
     } else {
       const sel = [];
       let globalCrit = this.props.crits;
@@ -56,8 +65,15 @@ export default class CriteriasForm extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('UPDATE', this.props.values, prevProps.values)
-    if (this.props.values && this.props.values.length > 1
+    console.log('UPDATE', this.props.values, prevProps.values, this.state.values)
+      if (!this.props.values && prevProps.values !== this.props.values) {
+          this.setState({
+              length: 0,
+              crit: undefined,
+              values: [],
+          }, () => this.checkValidity());
+      }
+    if (this.props.values
         && prevProps.values !== this.props.values && this.props.values !== this.state.values) {
       console.log(this.props.values, prevProps.values)
       const sel = [];
@@ -73,13 +89,15 @@ export default class CriteriasForm extends Component {
 
         sel.push({id: id, num: i + 1, value: this.props.values[i], options: Object.keys(crit)});
       }
-      globalCrit = globalCrit[this.props.values[this.props.values.length-1]];
-      if (globalCrit && isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
-        sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
-      } else if (globalCrit && this.critsTitles[0] === '7а') {
-        if (isNaN(globalCrit[0])) {
-          sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
-        }
+      if (this.props.values.length > 0) {
+          globalCrit = globalCrit[this.props.values[this.props.values.length - 1]];
+          if (globalCrit && isNaN(globalCrit[Object.keys(globalCrit)[0]])) {
+              sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+          } else if (globalCrit && this.critsTitles[0] === '7а') {
+              if (isNaN(globalCrit[0])) {
+                  sel.push({id: 'new', num: this.props.values.length + 1, value: '', options: Object.keys(globalCrit)});
+              }
+          }
       }
 
       this.setState({
@@ -115,6 +133,9 @@ export default class CriteriasForm extends Component {
   handleSelect(e) {
     e.preventDefault();
     e.stopPropagation();
+    try {
+      e.target.blur();
+    } catch(error) {}
 
     const state = {...this.state};
     const key = Number(e.target.id);
@@ -188,10 +209,18 @@ export default class CriteriasForm extends Component {
       this.props.valuesCallback(state.values, true);
     }
 
-    this.setState(state);
+    this.setState(state, () => {
+      if (this.lastSelectRef) {
+        try {
+          this.lastSelectRef.scrollIntoView({ block: 'nearest'})
+          //this.lastSelectRef.focus();
+        } catch (e) {}
+      }
+    });
   }
 
   render() {
+      console.log('VAL', this.state.crit)
     const getSelectColorClass = (item) => {
       if (this.props.isInvalid && (item.num === this.state.length + 1)) return ' is-invalid';
       if (this.props.isInvalid === false) return ' is-valid';
@@ -199,12 +228,13 @@ export default class CriteriasForm extends Component {
       return '';
     };
     return (<form id="critForm">
-      <select id='1'
-        className={'form-control selectors firstCourse unique7a' + +(this.props.critError ? ' is-invalid' : '') +
+      {this.props.forceEnabled && <select id='1' key="criterionSelector"
+        className={'form-control selectors firstCourse unique7a' + (this.props.critError || this.props.isInvalid ? ' is-invalid' : '') +
         (this.props.isInvalid === false ? ' is-valid' : '')}
         required name="check2" style={{marginTop: '0', cursor: 'pointer'}}
-        onChange={this.handleSelect} value={this.state.crit} disabled={this.props.disabled}>
-        <option disabled>Критерий</option>
+        onChange={this.handleSelect} value={this.state.crit || null}
+              disabled={!this.props.forceEnabled && (this.props.disabled || !!this.state.crit)}>
+        <option disabled={this.state.crit} value={null}>Выберите критерий</option>
         <option value={this.critsTitles[0]} id="7a">
                     7а (оценки)
         </option>
@@ -246,33 +276,20 @@ export default class CriteriasForm extends Component {
         <option value={this.critsTitles[11 + this.critsOffset]}>
                     11в (ГТО)
         </option>
-      </select>
+      </select>}
       {(this.props.critError && this.props.critErrorMessage) &&
             <span className="redText">{this.props.critErrorMessage}</span>}
-      {(!this.props.supressDescription && criteriasStore.annotations && criteriasStore.annotations[this.state.crit]) &&
-            <div id="critDescr" className="desc_selectors blue_bg" style={{width: '100%', paddingTop: '0.4rem'}}>
-              <div style={{marginLeft: 'auto', marginRight: '-0.5rem', width: '1rem', paddingTop: '0', cursor: 'pointer', color: 'darkcyan'}}
-              onClick={() => this.setState({critDescrHidden: !this.state.critDescrHidden})}>
-                <i className={"fa " + (this.state.critDescrHidden ? "fa-expand" : "fa-compress")} title="свернуть"/>
-              </div>
-              <p style={ this.state.critDescrHidden ?
-                {paddingTop: '0', maxHeight: '1.5rem', overflow: 'hidden', textOverflow: 'ellipse', marginBottom: '0px'} :
-                  {paddingTop: '0'}
-              }  id="desc_criterion_first">
-                <ReactMarkdown source={criteriasStore.annotations[this.state.crit]} linkTarget={() => '_blank'}/>
-              </p>
-              {this.state.critDescrHidden && <div style={{textAlign: 'center', fontSize:'large', color:'darkcyan', cursor: 'pointer'}}
-                                                  onClick={() => this.setState({critDescrHidden: !this.state.critDescrHidden})}
-              ><b>...</b></div>}
-            </div>}
+      <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
       {this.state.selects.map((item, index) => {
         return (
           <div key={item.id}>
             <DescriptionToTermin values={item.options}/>
-            <select className={'form-control selectors' + getSelectColorClass(item)} required
-              id={item.num.toString()} key={item.uniq}
+            <select
+                ref={(x) => {if (item.num === this.state.length + 1) this.lastSelectRef = x;}}
+                className={'form-control selectors' + getSelectColorClass(item)} required
+              id={item.num.toString()} css={selectorCss} key={item.uniq}
               defaultValue={item.value || ''} onChange={this.handleSelect} disabled={this.props.disabled}
-              style={{cursor: 'pointer'}} placeholder='Выберите характеристику'>
+              style={{cursor: 'pointer', marginTop: item.num === 2 ? '0rem' : '0.5rem'}} placeholder='Выберите характеристику'>
               <option disabled value="">Выберите характеристику</option>
               {item.options.map((option) => (
                 <option key={option + item.id} value={option} style={{wordWrap: 'break-word', cursor: 'pointer'}}>

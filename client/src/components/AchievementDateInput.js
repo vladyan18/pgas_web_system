@@ -32,7 +32,7 @@ class AchievementDateInput extends Component {
 
   render() {
     return (<>
-      <DateInput isValid={(this.state.isValid === true) && this.props.isValid} updater={this.handleChange}
+      <DateInput dateRef={this.props.dateRef} isValid={(this.state.isValid === true) && this.props.isValid} updater={this.handleChange}
         defaultValue={this.props.defaultValue} disabled={this.props.disabled}/>
       {(!this.state.isValid || !this.props.isValid) &&
             <span className="redText">{this.state.validMessage}</span>}</>);

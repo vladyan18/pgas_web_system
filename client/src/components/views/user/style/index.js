@@ -6,6 +6,7 @@ export const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
     padding: 0 2rem;
+    border-radius: 2px;
     @media only screen and (max-device-width: 480px) {
         padding: 0 1rem;
     }

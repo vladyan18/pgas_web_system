@@ -32,7 +32,11 @@ class ConfirmationForm extends Component {
                 return;
             }
             st.file = file[0];
-            this.setState(st)
+            this.setState(st, () => {
+                if (this.nameRef) {
+                    this.nameRef.focus();
+                }
+            })
         };
 
         this.handleNameChange = (e) => {
@@ -181,7 +185,7 @@ class ConfirmationForm extends Component {
 
     headerContainerStyle = {
         display: "flex",
-        width: "70%"
+        width: "100%"
     };
 
     openModal(e) {
@@ -561,7 +565,7 @@ class ConfirmationForm extends Component {
                                     e.preventDefault();
                                 }}>
                                     <label htmlFor="Name"><span className="redText">*</span>Название:</label>
-                                    <input id="Name" className="form-control" type="text" required autoFocus={true}
+                                    <input ref={(x) => {this.nameRef = x}} id="Name" className="form-control" type="text" required autoFocus={true}
                                            onChange={this.handleNameChange} autoComplete={'off'}/>
                                     <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}
                                     </label>

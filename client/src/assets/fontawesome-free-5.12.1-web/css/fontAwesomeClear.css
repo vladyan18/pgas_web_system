@@ -56,6 +56,9 @@
 .fa-expand-alt:before {
     content: "\f424"; }
 
+.fa-plus:before {
+    content: "\f067"; }
+
 @font-face {
     font-family: 'Font Awesome 5 Free';
     font-style: normal;

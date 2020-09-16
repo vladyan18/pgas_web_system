@@ -11,12 +11,17 @@ import {OverlayTrigger, Popover} from "react-bootstrap";
 import HelpButton from "../helpButton";
 import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
+import DescriptionField from "../userAddAchievement/descriptionField";
+import DateField from "../userAddAchievement/dateField";
+import CriterionSelector from "../userAddAchievement/criterionSelector";
+import DescriptionToCriterion from "../userAddAchievement/DescriptionToCriterion";
 /** @jsx jsx */
 
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
     padding: 0 2rem;
+    border-radius: 2px;
     @media only screen and (max-device-width: 480px) {
         padding: 0 1rem;
     }
@@ -41,23 +46,19 @@ class EditAchievement extends Component {
         this.editKrit = this.editKrit.bind(this);
         this.deleteAch = this.deleteAch.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
-        this.handleStartDateChange = this.handleStartDateChange.bind(this);
-        this.handleEndDateChange = this.handleEndDateChange.bind(this);
+        this.onDateValidityChange = this.onDateValidityChange.bind(this);
         this.updateConfirmations = this.updateConfirmations.bind(this);
         this.copyAch = this.copyAch.bind(this);
         this.crits = Object.keys(CriteriasStore.criterias);
         if (this.props.achieves) {
-            let ach = this.props.achieves.filter((x) => x._id == this.props.achId)[0];
+            let ach = this.props.achieves.filter((x) => x._id === this.props.achId)[0];
             this.state = {
                 crits: CriteriasStore.criterias,
                 ach: this.props.isCopying ? undefined : ach.achievement,
+                chars: ach.chars,
                 isDateValid: true,
-                isEndDateValid: !!ach.endingDate,
-                dateValidationResult: true,
-                endDateValidationResult: true,
                 dateValue: getDate(ach.achDate),
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
-                hasDateDiapasone: !!ach.endingDate,
                 confirmations: ach.confirmations,
                 charsInvalid: false,
                 status: this.props.isCopying ? 'Ожидает проверки' : ach.status,
@@ -91,9 +92,12 @@ class EditAchievement extends Component {
         this.setState(st);
     };
 
-    updateDescr(e) {
-        let st = this.state;
-        st.ach = e.target.value;
+    updateDescr(newValue) {
+        const st = {}
+        st.ach = newValue;
+        if (newValue && newValue !== '') {
+            st.descrInvalid = false;
+        } else st.descrInvalid = undefined;
         this.setState(st);
     }
 
@@ -103,46 +107,16 @@ class EditAchievement extends Component {
         else return false
     }
 
-    handleDateChange(isValid, value) {
-        let st = this.state;
-        st.isDateValid = isValid;
-        st.dateValidationResult = isValid;
-        st.dateValue = value;
+    handleDateChange(hasDiapasone, {startDate, endDate}) {
+        const st = {...this.state};
+        st.dateValue = startDate;
+        st.endDateValue = hasDiapasone ? endDate : undefined;
         this.setState(st);
     }
 
-    handleStartDateChange(isValid, value) {
-        let st = this.state;
-        st.isDateValid = isValid;
-        st.dateValidationResult = isValid;
-        st.dateValue = value;
-        if (isValid && st.isEndDateValid) {
-            if (makeDate(value) > makeDate(st.endDateValue)) {
-                st.dateValidationResult = false;
-                st.dateDiapErrorMess = "Начальная дата не может быть после конечной"
-            } else {
-                st.dateDiapErrorMess = undefined;
-                st.endDateValidationResult = true
-            }
-        }
-        this.setState(st);
-    }
-
-    handleEndDateChange(isValid, value) {
-        let st = this.state;
-        st.isEndDateValid = isValid;
-        st.endDateValidationResult = isValid;
-        st.endDateValue = value;
-        if (isValid && st.isDateValid) {
-            if (makeDate(value) < makeDate(st.dateValue)) {
-                st.endDateValidationResult = false;
-                st.dateDiapErrorMess = "Начальная дата не может быть после конечной"
-            } else {
-                st.dateDiapErrorMess = undefined;
-                st.dateValidationResult = true
-            }
-        }
-        this.setState(st);
+    onDateValidityChange(isValid) {
+        console.log('ON D CHANGE', isValid)
+        this.setState({isDateValid: isValid});
     }
 
     checkValidityBeforeSend() {
@@ -153,16 +127,6 @@ class EditAchievement extends Component {
                 return false;
             } else if (this.state.charsInvalid) return false;
             if (!this.state.isDateValid) {
-                let st = this.state;
-                st.dateValidationResult = false;
-                this.setState(st);
-                return false
-            }
-            if (this.state.hasDateDiapasone && !this.state.isEndDateValid) {
-                this.setState({endDateValidationResult: false});
-                return false
-            }
-            if (this.state.hasDateDiapasone && (!this.state.endDateValidationResult || !this.state.dateValidationResult)) {
                 return false
             }
             if (!this.state.ach) return false;
@@ -193,9 +157,7 @@ class EditAchievement extends Component {
             }
 
         if (this.state.dateValue) res.achDate = makeDate(this.state.dateValue);
-
-        if (this.state.hasDateDiapasone)
-            res.endingDate = makeDate(this.state.endDateValue);
+        if (this.state.endDateValue) res.endingDate = makeDate(this.state.endDateValue);
         else res.endingDate = undefined;
 
         let obj = {data: res, achId: this.props.achId};
@@ -227,12 +189,8 @@ class EditAchievement extends Component {
                 crits: CriteriasStore.criterias,
                 ach: '',
                 isDateValid: true,
-                isEndDateValid: !!ach.endingDate,
-                dateValidationResult: true,
-                endDateValidationResult: true,
                 dateValue: getDate(ach.achDate),
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
-                hasDateDiapasone: !!ach.endingDate,
                 confirmations: [],
                 charsInvalid: false,
                 status: 'Ожидает проверки',
@@ -248,21 +206,9 @@ class EditAchievement extends Component {
     }
 
     render() {
-        const achievementPopover = (
-            <Popover id="popover-basic">
-                <Popover.Content style={{backgroundColor: "rgb(243, 243, 255)"}}>
-                    Название достижения должно позволить однозначно понять, что это за достижение. <br/>
-                    <span style={{color: "#4d4d4d"}}>
-                    Примеры:<br/>
-                    <i>- Статья *название* с докладом на конференции *название*</i> <br/>
-                    <i>- Победа в олимпиаде *название*</i>
-                    </span>
-                </Popover.Content>
-            </Popover>
-        );
 
         if (!CriteriasStore.criterias) return null;
-
+        const isDisabled = ['Принято', 'Принято с изменениями', 'Отказано'].includes(this.state.status);
         return (<Panel className="col-md-9" id="panel">
             <div>
                 <ButtonPanel className="profile">
@@ -292,109 +238,56 @@ class EditAchievement extends Component {
 
                 </p>
 
-                <div className="form_elem_with_left_border">
-                    <label htmlFor="check2" className="label">Характеристики: </label>
-                    <CriteriasForm crits={this.state.crits} valuesCallback={this.updateChars} disabled={this.state.status !== 'Ожидает проверки' &&
-                    this.state.status !== 'Данные некорректны'}
-                                   isInvalid={this.state.charsInvalid}
-                               critError={this.state.critError}
-                               critErrorMessage={this.state.critErrorMessage}
-                               values={this.props.achieves.filter((x) => x._id == this.props.achId)[0].chars}/>
-                </div>
-
                 <form id="form">
                 </form>
                 <div className="show_hide_c11">
                 </div>
-                {(this.state.chars && this.state.chars[0] !== '1 (7а)' && this.state.chars[0] !== '7а') && <form id="textForm">
-                    <div className="form_elem_with_left_border" style={{marginTop: "20px"}}>
-                        <label className="control-label" htmlFor="comment">Название достижения:
-                            <HelpButton  overlay={achievementPopover} placement={"top"} />
-                        </label>
-                        <textarea className="form-control area_text" name="comment" disabled={this.state.status !== 'Ожидает проверки' &&
-                        this.state.status !== 'Данные некорректны'}
-                                  placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
-                                  required onChange={this.updateDescr} value={this.state.ach} style={{marginTop: "0"}}/>
-                    </div>
 
+                {this.crits && <CriterionSelector
+                    crits={this.crits}
+                    descriptionRef={() => this.descriptionInputRef}
+                    chars={this.state.chars}
+                    updateCharsCb={(state) => this.setState(state)}
+                    disabled={isDisabled}
+                />}
+                <DescriptionToCriterion crit={this.state.chars ? this.state.chars[0] : undefined}/>
 
-                    <div className="form-group form_elem_with_left_border" style={{"marginTop": "1rem"}}>
-                        <div style={{display: "flex"}}>
-                            <div>
-                                <label
-                                    style={{"marginTop": "auto"}}
-                                    className="form-check-label">Дата достижения: </label>
-                            </div>
-                            <div style={{marginLeft: "3rem"}}>
-                                <input className="form-check-input" type="checkbox" id="defaultCheck1" onChange={(e) =>
-                                    this.setState({hasDateDiapasone: !this.state.hasDateDiapasone})}
-                                       checked={this.state.hasDateDiapasone}
-                                       style={{cursor: "pointer"}} disabled={this.state.status !== 'Ожидает проверки' &&
-                                this.state.status !== 'Данные некорректны'}/>
-                                <label className="form-check-label" htmlFor="defaultCheck1"
-                                       style={{cursor: "pointer", color: "#595959"}}>
-                                    диапазон дат
-                                </label>
-                            </div>
-                        </div>
+                {(!this.state.chars || this.state.chars[0] !== this.crits[0]) &&<><DescriptionField
+                    value={this.state.ach}
+                    descrInvalid={this.state.descrInvalid}
+                    descriptionRef={(input) => { this.descriptionInputRef = input; }}
+                    dateRef={() => this.dateRef}
+                    updateDescr={this.updateDescr}
+                    updateChars={(newValue) => this.setState(newValue)}
+                    disabled={isDisabled}
+                />
 
-                        {(this.state.hasDateDiapasone && this.state.dateDiapErrorMess) &&
-                        <span className="redText">{this.state.dateDiapErrorMess}</span>}
-                        <div id="Date" style={{
-                            "display": "flex",
-                            "align-items": "center",
-                            "marginTop": "auto",
-                            "margin-bottom": "auto"
-                        }}>
+                    <DateField
+                        defaultValue={{startDate: this.state.dateValue, endDate: this.state.endDateValue}}
+                        onValidityChange={this.onDateValidityChange}
+                        onDateChange={this.handleDateChange}
+                        dateRef={(input) => { this.dateRef = input; }}
+                        disabled={isDisabled}
+                    /></>}
 
+                <div className="form_elem_with_left_border">
+                    <label htmlFor="check2" className="label">Характеристики: </label>
+                    <CriteriasForm crits={this.state.crits} valuesCallback={this.updateChars}
+                                   disabled={isDisabled}
+                                   isInvalid={this.state.charsInvalid}
+                                   critError={this.state.critError}
+                                   supressDescription={true}
+                                   critErrorMessage={this.state.critErrorMessage}
+                                   values={this.state.chars}/>
+                </div>
 
-                            {!this.state.hasDateDiapasone &&
-                            <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult} disabled={this.state.status != 'Ожидает проверки' &&
-                            this.state.status !== 'Данные некорректны'}
-                                                  updater={this.handleDateChange} defaultValue={this.state.dateValue}/>}
-                            {this.state.hasDateDiapasone && <table>
-                                <tbody>
-                                <tr>
-                                    <td>С:</td>
-                                    <td><AchievementDateInput className="form-control" disabled={this.state.status != 'Ожидает проверки' &&
-                                    this.state.status !== 'Данные некорректны'}
-                                                              isValid={this.state.dateValidationResult}
-                                                              updater={this.handleStartDateChange}
-                                                              defaultValue={this.state.dateValue}/></td>
-                                </tr>
-                                <tr>
-                                    <td>По:</td>
-                                    <td><AchievementDateInput className="form-control" disabled={this.state.status != 'Ожидает проверки' &&
-                                    this.state.status !== 'Данные некорректны'}
-                                                              isValid={this.state.endDateValidationResult}
-                                                              updater={this.handleEndDateChange}
-                                                              defaultValue={this.state.endDateValue}/></td>
-                                </tr>
-                                </tbody>
-                            </table>}
-                        </div>
-                    </div>
+                {(this.state.chars && this.state.chars[0] !== '1 (7а)' && this.state.chars[0] !== '7а') &&
+                <div style={{marginTop: '2rem'}}>
                     <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations} disabled={this.state.status !== 'Ожидает проверки' &&
                     this.state.status !== 'Данные некорректны'}/>
-                </form>}
-
+                </div>}
 
                 <br/>
-
-                <div className="input-group" style={{'display': 'none'}}>
-                            <span className="input-group-btn">
-                                <form encType="multipart/form-data" method="post" name="fileinfo">
-                                    <label className="btn btn-info btn-file" htmlFor="multiple_input_group">
-                                        <div className="input required">
-
-                                            <input id="multiple_input_group" type="file" name="files" multiple/>
-
-                                        </div> подтверждающий документ
-                                    </label>
-                                </form>
-                            </span>
-                    <span className="file-input-label"></span>
-                </div>
                 <button type="button" id="SubmitButton" disabled={!this.isValid()}
                         className={"btn " + (this.props.isCopying ? 'btn-primary' : 'btn-success') + " btn-md button_send"}
                         data-target="#exampleModal" value="сохранить" onClick={this.editKrit}>

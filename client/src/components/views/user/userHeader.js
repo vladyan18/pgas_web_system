@@ -25,7 +25,7 @@ const blockHeader = css`
     font-size: 14px;
     align-items: center;
     margin-left: 1rem;
-    @media only screen and (max-device-width: 480px) {
+    @media only screen and (max-device-width: 768px) {
     max-width: 45%;
   }
 `;
@@ -38,7 +38,7 @@ const logoBackground = css`
   flex-direction: column;
   justify-content: center;
   clip-path: polygon(0 0, 60% 0, 100% 100%, 40% 100%);
-  @media only screen and (max-device-width: 480px) {
+  @media only screen and (max-device-width: 768px) {
     height: 35px;
     width: 40px;
   }
@@ -49,7 +49,7 @@ const logoBSS = css`
   height: 55px;
   align-self: center;
   padding-right: 10px;
-  @media only screen and (max-device-width: 480px) {
+  @media only screen and (max-device-width: 768px) {
     height: 35px;
   }
 `;
@@ -63,7 +63,7 @@ const logoSpbuBackground = css`
 const logoSPbU = css`
   height: 55px;
   width: 47px;
-  @media only screen and (max-device-width: 480px) {
+  @media only screen and (max-device-width: 768px) {
     height: 32px;
     width: 27px;
   }
@@ -78,7 +78,7 @@ const verticalAlign = css`
 
 const rightPanel = css `
     margin-right: 1rem;
-    @media only screen and (max-device-width: 480px) {
+    @media only screen and (max-device-width: 768px) {
     max-width: 65%;
     flex: 0 0 65%;
   }
@@ -140,7 +140,7 @@ class UserHeader extends Component {
               <button type="button" id="SubmitButton"
                       className="btn btn-outline-primary"
                       css = {css`                 
-                    @media only screen and (max-device-width: 480px) {
+                    @media only screen and (max-device-width: 768px) {
                     font-size: smaller;
                     border-color: transparent;
                       }`
@@ -157,7 +157,7 @@ class UserHeader extends Component {
                   css={css`
                 border-color: #9F2D20;
                 color: #9F2D20;
-                  @media only screen and (max-device-width: 480px) {
+                  @media only screen and (max-device-width: 768px) {
                     font-size: smaller;
                     border-color: transparent;
                  }
