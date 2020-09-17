@@ -817,7 +817,7 @@ function checkAchievement(achievement, criterias, user) {
                 let dspoInd = achievement.chars.indexOf('ДСПО');
                 if (dspoInd === -1) dspoInd = achievement.chars.indexOf('ДнСПО');
                 if (!haveBdnsk) {
-                    achievement.chars.splice(dspoInd - 1, 0, 'БДнК');
+                    achievement.chars.splice(dspoInd, 0, 'БДнК');
                     notSure = true;
                 }
             } else if (achievement.crit === '9б') {
