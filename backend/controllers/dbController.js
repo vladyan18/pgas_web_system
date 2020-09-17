@@ -781,6 +781,7 @@ function checkAchievement(achievement, criterias, user) {
                     } else {
                         newChar = 'Студентом магистратуры';
                     }
+                    notSure = true;
                     achievement.chars.push(newChar);
                 }
             }
@@ -801,6 +802,9 @@ function checkAchievement(achievement, criterias, user) {
                     if (achievement.chars[i] === 'СДнСК') {
                         achievement.chars[i] = 'СДнК';
                         haveBdnsk = true;
+                    }
+                    if (achievement.chars[i] === 'Q4' || achievement.chars[i] === 'Иное') {
+                        achievement.chars[i] = 'Q4 и иное';
                     }
                     if (achievement.chars[i] === 'БДнСК') {
                         achievement.chars[i] = 'БДнК';
