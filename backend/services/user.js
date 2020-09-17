@@ -118,7 +118,7 @@ module.exports.addAchievement = async function(userId, achievement) {
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
 };
 
-module.exports.classifyDescription = async function(description, faculty) {
+module.exports.classifyDescription = async function(description, faculty = 'ПМ-ПУ') {
     if (!classifiers[faculty]) return undefined;
     return plainEK3Crits[Number(classifiers[faculty].classify(description))];
 };
