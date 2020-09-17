@@ -32,6 +32,7 @@ class CriteriasMenu extends Component {
           const st = {};
           st.criterias = success.criterias;
           st.differences = success.differences;
+          st.notSure = success.notSure;
           st.incorrectAchievements = success.incorrectAchievements;
           console.log(st.criterias.schema);
           this.setState(st);
@@ -114,6 +115,8 @@ class CriteriasMenu extends Component {
                 <td style={{textAlign: 'right'}}><span style={{fontSize: 'small'}}>{x.path}</span></td></tr>)}
               </tbody>
             </table></div>}
+
+              {!!this.state.notSure && <div style={{marginTop: '3rem'}}><h2>Нужно дополнительно проверить: <span style={{color: 'yellow'}}>{this.state.notSure}</span></h2></div>}
 
             {this.state.incorrectAchievements && <div style={{marginTop: '3rem'}}>
               <h2>Некорректные достижения у пользователей: {this.state.incorrectAchievements.length}</h2>

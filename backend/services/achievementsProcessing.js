@@ -201,13 +201,18 @@ module.exports.checkCorrectnessInNewCriterias = async function(faculty, newCrite
 
     console.log(faculty, 'is validating criterias...');
     const incorrectAchievements = [];
+    let notSure = 0;
     for (const user of users) {
         for (const achievement of user.Achievement) {
             const res = await db.checkCorrectnessInNewCriterias(achievement, newCriterias, user);
-            if (res) {
+            if (res && !res.ok) {
                 incorrectAchievements.push({user: user.LastName + ' ' + user.FirstName, oldChars: res.oldChars, incorrectChars: res.incorrectChars})
+            }
+
+            if (res && res.notSure) {
+                notSure += 1;
             }
         }
     }
-    return incorrectAchievements;
+    return {incorrectAchievements, notSure};
 };

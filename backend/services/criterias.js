@@ -18,12 +18,12 @@ module.exports.uploadCriterias = async function(filePath, facultyName) {
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const result = await parseCriterias(worksheet);
     const differences = await checkCriteriasDifference(result.crits, facultyName);
-    const incorrectAchievements = await achievementsProcessing.checkCorrectnessInNewCriterias(facultyName, result.crits);
+    const {incorrectAchievements, notSure} = await achievementsProcessing.checkCorrectnessInNewCriterias(facultyName, result.crits);
 
     fs.unlink(filePath, (err) => {
         if (err) console.log(err);
     });
-    return {criterias: result, differences: differences, incorrectAchievements: incorrectAchievements};
+    return {criterias: result, differences: differences, incorrectAchievements: incorrectAchievements, notSure: notSure};
 };
 
 const checkCriteriasDifference = async function(newCriterias, facultyName) {

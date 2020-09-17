@@ -897,7 +897,7 @@ exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, 
     achievement = migratedAchievement;
 
     if (!isNaN(Number(currentLevel[0]))) {
-        return undefined;
+        return {ok: true, notSure: notSure};
     } else {
         return {oldChars: achievement.chars, incorrectChars: incorrectChars, notSure: notSure};
     }
