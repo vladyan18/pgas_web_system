@@ -48,7 +48,6 @@ module.exports.registerUser = async function(userId, userData, session) {
 
 const natural = require('natural');
 const plainEK3Crits = [];
-const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
 function getCrit(crits, arr) {
     let critNames = Object.keys(crits);
 
@@ -61,22 +60,11 @@ function getCrit(crits, arr) {
         getCrit(crits[key], [...arr, key]);
     }
 }
-
-async function initClassifier() {
-    const crit = await db.getCriteriasObject('ПМ-ПУ');
-    getCrit(crit, []);
-
-    const plainCrits = plainEK3Crits.map(x => {
-        let str = '';
-        for (let i = 0; i < x.length; i++) {
-            str += ' ' + x[i];
-        }
-        return str;
-    });
+const classifiers = {};
+async function initClassifier(plainCrits, facultyName) {
+    const users = await db.getCompletelyAllUsersAchievements(facultyName);
+    const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     plainCrits.forEach((x, index) => classifier.addDocument(x, index));
-
-    const users = await db.getCompletelyAllUsersAchievements('ПМ-ПУ');
-
     let count = 0;
     for (let user of users) {
         if (!user.Achievement) continue;
@@ -92,10 +80,25 @@ async function initClassifier() {
         }
     }
 
-    console.log('COUNT:', count);
+    console.log(facultyName, 'COUNT:', count);
     classifier.train();
+    classifiers[facultyName] = classifier;
 }
-initClassifier().then();
+
+async function initAllClassifiers(facultiesList) {
+    const crit = await db.getCriteriasObject('ПМ-ПУ');
+    getCrit(crit, []);
+    const plainCrits = plainEK3Crits.map(x => {
+        let str = '';
+        for (let i = 0; i < x.length; i++) {
+            str += ' ' + x[i];
+        }
+        return str;
+    });
+    facultiesList.forEach((fac) => initClassifier(plainCrits, fac).then());
+}
+
+initAllClassifiers(['ПМ-ПУ', 'Юридический', 'Социологический', 'Политологии', 'МКН', 'Исторический', 'Психологии', 'ВШМ']).then();
 
 module.exports.addAchievement = async function(userId, achievement) {
     const user = await db.findUserById(userId);
@@ -115,8 +118,9 @@ module.exports.addAchievement = async function(userId, achievement) {
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
 };
 
-module.exports.classifyDescription = async function(description) {
-    return plainEK3Crits[Number(classifier.classify(description))];
+module.exports.classifyDescription = async function(description, faculty) {
+    if (!classifiers[faculty]) return undefined;
+    return plainEK3Crits[Number(classifiers[faculty].classify(description))];
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {

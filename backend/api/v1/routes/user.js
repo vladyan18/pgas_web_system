@@ -136,7 +136,7 @@ router.get('/getAch/', authCheck,
 
 router.post('/classifyDescription', authCheck,
     async function(req, res) {
-        const ach = await userService.classifyDescription(req.body.data);
+        const ach = await userService.classifyDescription(req.body.data, req.body.faculty);
         res.status(200).send(ach);
     });
 

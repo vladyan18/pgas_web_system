@@ -112,7 +112,7 @@ function DescriptionField(props) {
             setRecommendation(undefined);
             return;
         }
-        fetchSendObj('/classifyDescription', {data: descr}).then(res => {
+        fetchSendObj('/classifyDescription', {data: descr, faculty: userPersonalStore.Faculty}).then(res => {
             setRecommendation(res);
         })}, 1000);
 
