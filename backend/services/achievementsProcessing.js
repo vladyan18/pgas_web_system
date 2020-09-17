@@ -186,7 +186,7 @@ module.exports.checkActualityOfUsersAchievements = async function(faculty) { // 
     console.log(faculty, 'is changing criterias...');
     for (const user of users) {
         for (const achievement of user.Achievement) {
-            await db.checkActualityOfAchievementCharacteristics(achievement, crits);
+            await db.checkActualityOfAchievementCharacteristics(achievement, crits, user);
         }
         await module.exports.calculateBallsForUser(user.id, faculty);
         await module.exports.calculateBallsForUser(user.id, faculty, true);
@@ -203,7 +203,7 @@ module.exports.checkCorrectnessInNewCriterias = async function(faculty, newCrite
     const incorrectAchievements = [];
     for (const user of users) {
         for (const achievement of user.Achievement) {
-            const res = await db.checkCorrectnessInNewCriterias(achievement, newCriterias);
+            const res = await db.checkCorrectnessInNewCriterias(achievement, newCriterias, user);
             if (res) {
                 incorrectAchievements.push({user: user.LastName + ' ' + user.FirstName, oldChars: res.oldChars, incorrectChars: res.incorrectChars})
             }
