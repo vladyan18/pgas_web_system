@@ -793,12 +793,19 @@ function checkAchievement(achievement, criterias, user) {
 
             } else if (achievement.crit === '8б') {
                 achievement.chars.splice(2, 1);
+                let haveBdnsk = false;
                 for (let i = 0; i < achievement.chars.length; i++) {
-                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
+                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '').trim();
                     if (achievement.chars[i] === 'Тезисы и (или) научные телеграммы') achievement.chars[i] = 'Тезисы';
                     if (achievement.chars[i] === 'Публикация (кроме тезисов и научных телеграмм)') achievement.chars[i] = 'Публикация (кроме тезисов)';
-                    if (achievement.chars[i] === 'СДнСК') achievement.chars[i] = 'СДнК';
-                    if (achievement.chars[i] === 'БДнСК') achievement.chars[i] = 'БДнК';
+                    if (achievement.chars[i] === 'СДнСК') {
+                        achievement.chars[i] = 'СДнК';
+                        haveBdnsk = true;
+                    }
+                    if (achievement.chars[i] === 'БДнСК') {
+                        achievement.chars[i] = 'БДнК';
+                        haveBdnsk = true;
+                    }
                     if (achievement.chars[i] === 'Русский язык') achievement.chars[i] = 'Иные языки';
                     if (achievement.chars[i] === 'Иностранный язык') {
                         achievement.chars[i] = 'Международные языки';
@@ -806,9 +813,16 @@ function checkAchievement(achievement, criterias, user) {
                     }
                     if (achievement.chars[i] === 'Неиндексируемое') achievement.chars[i] = 'Не индексируемое';
                 }
+
+                let dspoInd = achievement.chars.indexOf('ДСПО');
+                if (dspoInd === -1) dspoInd = achievement.chars.indexOf('ДнСПО');
+                if (!haveBdnsk) {
+                    achievement.chars.splice(dspoInd - 1, 0, 'БДнК');
+                    notSure = true;
+                }
             } else if (achievement.crit === '9б') {
                 for (let i = 0; i < achievement.chars.length; i++) {
-                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
+                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '').trim();
                     if (achievement.chars[i] === 'Периодика (печать)') achievement.chars[i] = 'Печатные издания и интернет-медиа';
                 }
             } else if (achievement.crit === '11а') {
@@ -817,6 +831,19 @@ function checkAchievement(achievement, criterias, user) {
                     if (achievement.chars[i] === 'Заочн. уч.') achievement.chars[i] = 'Заочно';
                 }
             }
+
+            for (let i = 0; i < achievement.chars.length; i++) {
+                achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '').trim();
+                if (achievement.chars[i] === 'На уровне СНГ') {
+                    achievement.chars[i] = 'На международном уровне';
+                    notSure = true;
+                }
+                if (achievement.chars[i] === 'На уровне федерального округа') {
+                    achievement.chars[i] = 'На всероссийском уровне';
+                    notSure = true;
+                }
+            }
+
             achievement.chars[0] = achievement.crit;
         }
     }
