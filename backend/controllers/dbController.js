@@ -773,7 +773,7 @@ function checkAchievement(achievement, criterias, user) {
                 achievement.crit.indexOf(')'),
             );
 
-            if (achievement.crit === '7а') {
+            if (achievement.crit === '7а' || achievement.chars[0] === '1 (7а)') {
                 if (user) {
                     let newChar;
                     if (user.Type === 'Бакалавриат' || user.Type === 'Специалитет') {
