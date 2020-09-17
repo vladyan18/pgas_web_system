@@ -28,10 +28,10 @@ function DateFieldLabel(props) {
     const mainColor = '#595959';
     return <div style={{display: 'flex'}}>
         <div>
-            <label style={{'marginTop': 'auto'}} className="form-check-label">
+            <label style={{'marginTop': 'auto', width: '10rem'}} className="form-check-label">
                 Дата достижения:
             </label>
-            <label className="checkbox-inline" style={{cursor: 'pointer', color: '#595959', marginLeft: '1rem'}}>
+            <label style={{cursor: 'pointer', color: '#595959', marginLeft: 0, marginBottom: 0}}>
                 <input type="checkbox" id="defaultCheck1" onChange={(e) => props.switchDiapasone()}
                        style={{cursor: 'pointer', color: mainColor}} checked={props.hasDiapasone}
                        disabled={props.disabled}
@@ -124,13 +124,13 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
             }
         />
 
+
         {(hasDiapasone && isDiapasoneValid === false) &&
         <span className="redText">Начальная дата не может быть после конечной</span>}
         <div id="Date" style={{
             'display': 'flex',
             'alignItems': 'center',
-            'marginTop': 'auto',
-            'marginBottom': 'auto',
+            margin: '0.7rem 0 0.2rem 0'
         }}>
             {!hasDiapasone &&
             <AchievementDateInput dateRef={dateRef} className="form-control" isValid={validity[0]}
@@ -161,6 +161,7 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
                 </tbody>
             </table>}
         </div>
+        <div style={{fontSize: 'small', color: 'grey', textAlign: 'center', width: '10rem'}}>01.09.2019 — 31.08.2020</div>
     </div>
 }
 

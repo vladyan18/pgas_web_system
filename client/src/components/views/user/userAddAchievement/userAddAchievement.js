@@ -15,17 +15,8 @@ import CriterionSelector from "./criterionSelector";
 import DescriptionToCriterion from "./DescriptionToCriterion";
 import DescriptionField from "./descriptionField";
 import DateField from "./dateField";
+import {Panel} from "../style";
 /** @jsx jsx */
-
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-    padding: 0 2rem;
-    border-radius: 2px;
-    @media only screen and (max-device-width: 480px) {
-        padding: 0 1rem;
-    }
-`;
 
 const recommendation = css`
   color: blue;
@@ -190,7 +181,7 @@ class UserAddAchievement extends Component {
       <Panel className="col-md-9" id="panel">
         <div>
           <p className="headline">
-                        Добавить достижение
+                        Добавление достижения
           </p>
           <hr css={horizontalLine}/>
           {!this.state.chars && <p className="desc_headline" style={{fontWeight: '350'}}>

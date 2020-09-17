@@ -447,6 +447,14 @@ block_2 {
     color: #727272;
 }
 
+textarea::placeholder {
+    font-weight: 350;
+}
+
+textarea::-moz-placeholder {
+    font-weight: 350;
+}
+
 @media (max-width: 768px) {
     #check1,
     #check2 {
