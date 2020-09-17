@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import Dropzone from 'react-dropzone';
 import CriteriasTableViewer from './criteriasTableViewer';
-import {fetchSendObj} from '../../../../services/fetchService';
+import {fetchSendObj, fetchSendWithoutRes} from '../../../../services/fetchService';
 import staffContextStore from '../../../../stores/staff/staffContextStore';
 
 class CriteriasMenu extends Component {
@@ -42,10 +42,10 @@ class CriteriasMenu extends Component {
   }
 
   saveCrits() {
-    fetchSendObj('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
+    fetchSendWithoutRes('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
         .then((success) => {
           console.log('SAVE CR', success);
-          // Do something with the successful response
+          this.props.history.goBack()
         })
         .catch((error) => console.log(error),
         );
