@@ -761,7 +761,8 @@ exports.validateAchievement = async function(achievement, user) { // TODO refact
   }
 };
 
-function checkAchievement(achievement, criterias) {
+function checkAchievement(achievement, criterias, user) {
+    let notSure = false;
     const correctChars = [];
     const incorrectChars = [];
     let currentLevel = criterias;
@@ -771,6 +772,19 @@ function checkAchievement(achievement, criterias) {
                 achievement.crit.indexOf('(')+1,
                 achievement.crit.indexOf(')'),
             );
+
+            if (achievement.crit === '7а') {
+                if (user) {
+                    let newChar;
+                    if (user.Type === 'Бакалавриат' || user.Type === 'Специалитет') {
+                        newChar = 'Студентом бакалавриата или специалитета';
+                    } else {
+                        newChar = 'Студентом магистратуры';
+                    }
+                    achievement.chars.push(newChar);
+                }
+            }
+
             if (achievement.crit === '10в') {
                 achievement.crit = '9а';
                 achievement.chars.splice(1, 0, 'Организация прочих мероприятий');
@@ -786,6 +800,10 @@ function checkAchievement(achievement, criterias) {
                     if (achievement.chars[i] === 'СДнСК') achievement.chars[i] = 'СДнК';
                     if (achievement.chars[i] === 'БДнСК') achievement.chars[i] = 'БДнК';
                     if (achievement.chars[i] === 'Русский язык') achievement.chars[i] = 'Иные языки';
+                    if (achievement.chars[i] === 'Иностранный язык') {
+                        achievement.chars[i] = 'Международные языки';
+                        notSure = true;
+                    }
                     if (achievement.chars[i] === 'Неиндексируемое') achievement.chars[i] = 'Не индексируемое';
                 }
             } else if (achievement.crit === '9б') {
@@ -815,19 +833,22 @@ function checkAchievement(achievement, criterias) {
             incorrectChars.push(achievement.chars[i]);
         }
     }
-    return [achievement, currentLevel, correctChars, incorrectChars];
+    return [achievement, currentLevel, correctChars, incorrectChars, notSure];
 }
 
-exports.checkActualityOfAchievementCharacteristics = async function(achievement, criterias) {
+exports.checkActualityOfAchievementCharacteristics = async function(achievement, criterias, user) {
   if (achievement.criteriasHash && achievement.criteriasHash === criterias.Hash) return;
 
-  const [migratedAchievement, currentLevel, correctChars, incorrectChars] = checkAchievement(achievement, criterias);
+  const [migratedAchievement, currentLevel, correctChars, incorrectChars, notSure] = checkAchievement(achievement, criterias, user);
   achievement = migratedAchievement;
 
   if (!isNaN(Number(currentLevel[0]))) {
     console.log(Number(currentLevel[0]));
     console.log('CORRECT MIGRATION');
     achievement.chars = correctChars;
+    if (notSure) {
+        achievement.status = 'Ожидает проверки';
+    }
     achievement.criteriasHash = criterias.Hash;
     await this.updateAchieve(achievement._id, achievement);
   } else {
@@ -840,13 +861,13 @@ exports.checkActualityOfAchievementCharacteristics = async function(achievement,
   }
 };
 
-exports.checkCorrectnessInNewCriterias = async function(achievement, criterias) {
-    const [migratedAchievement, currentLevel, correctChars, incorrectChars] = checkAchievement(achievement, criterias);
+exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, user) {
+    const [migratedAchievement, currentLevel, correctChars, incorrectChars, notSure] = checkAchievement(achievement, criterias, user);
     achievement = migratedAchievement;
 
     if (!isNaN(Number(currentLevel[0]))) {
         return undefined;
     } else {
-        return {oldChars: achievement.chars, incorrectChars: incorrectChars};
+        return {oldChars: achievement.chars, incorrectChars: incorrectChars, notSure: notSure};
     }
 };
