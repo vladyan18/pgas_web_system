@@ -133,7 +133,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
 
     const oldAch = await db.findAchieveById(achId);
     achievement.comment = oldAch.comment;
-    achievement.status = oldAch.status;
+    achievement.status = oldAch.status === 'Данные некорректны' ? 'Ожидает проверки' : oldAch.status;
     achievement.criteriasHash = oldAch.criteriasHash;
     achievement.isPendingChanges = oldAch.isPendingChanges;
     achievement.ball = oldAch.ball;

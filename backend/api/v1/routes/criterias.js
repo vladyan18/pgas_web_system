@@ -46,7 +46,7 @@ router.post('/uploadCriterias', superAuthCheck,
                 return res.status(400).send('ERROR: Max file size = 15MB');
             }
 
-            const result = await criteriasService.uploadCriterias(req.file.path);
+            const result = await criteriasService.uploadCriterias(req.file.path, req.body.faculty);
             res.status(200).send(result);
         });
     });

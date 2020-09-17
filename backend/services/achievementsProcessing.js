@@ -5,7 +5,6 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
     const achievementsPromise = db.findActualAchieves(id);
     const criteriasPromise = db.getCriteriasObject(faculty);
     const [criterias, achievements] = await Promise.all([criteriasPromise, achievementsPromise]);
-
     const achievementsForCriterion = {};
     for (const key of Object.keys(criterias)) {
         achievementsForCriterion[key] = [];
@@ -14,9 +13,9 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
     for (const achievement of achievements) {
         if (!achievement) continue;
 
-        if (isPreliminary && achievement.status === 'Отказано') {
+        if (isPreliminary && (achievement.status === 'Отказано' || achievement.status === 'Данные некорректны')) {
             achievement.preliminaryBall = undefined;
-            db.updateAchieve(achievement._id, achievement).then();
+            await db.updateAchieve(achievement._id, achievement);;
             continue;
         }
 
@@ -192,4 +191,23 @@ module.exports.checkActualityOfUsersAchievements = async function(faculty) { // 
         await module.exports.calculateBallsForUser(user.id, faculty);
         await module.exports.calculateBallsForUser(user.id, faculty, true);
     }
+};
+
+module.exports.checkCorrectnessInNewCriterias = async function(faculty, newCriterias) { // TODO refactor!!
+    const currentUsersPromise = db.getUsersWithAllInfo(faculty, true);
+    const newUsersPromise = db.getUsersWithAllInfo(faculty, false);
+    const [currentUsers, newUsers] = await Promise.all([currentUsersPromise, newUsersPromise]);
+    const users = currentUsers.concat(newUsers);
+
+    console.log(faculty, 'is validating criterias...');
+    const incorrectAchievements = [];
+    for (const user of users) {
+        for (const achievement of user.Achievement) {
+            const res = await db.checkCorrectnessInNewCriterias(achievement, newCriterias);
+            if (res) {
+                incorrectAchievements.push({user: user.LastName + ' ' + user.FirstName, oldChars: res.oldChars, incorrectChars: res.incorrectChars})
+            }
+        }
+    }
+    return incorrectAchievements;
 };

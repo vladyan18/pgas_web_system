@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import criteriasStore from '../../../../stores/criteriasStore';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
@@ -59,6 +59,7 @@ const critsNames = [
 
 const critsCellFactory = (outputFormatter, isDisabled, isSelected, callback) => {
     return (num) => {
+        if (!critsNames[num]) return null;
         return <td key={num} css={[cellStyle, !isDisabled ? cellActiveStyle : '']} onClick={() => {
             if (!isDisabled) {
                 callback(outputFormatter(num));
@@ -78,13 +79,17 @@ const CriterionSelector = React.memo((props) => {
             if (ref) ref.focus();
         }
     };
-    if (criteriasStore.criterias && Object.keys(criteriasStore.criterias).length === 13 && critsNames.length === 12) {
-        critsNames[5][1] = 'активизм и организация в СПбГУ';
-        critsNames.splice(9, 0, ['10в', 'обществ. деят. не в СПбГУ'])
-    }
+    useEffect(() => {
+        if (criteriasStore.criterias && Object.keys(criteriasStore.criterias).length === 13 && critsNames.length === 12) {
+            critsNames[5][1] = 'активизм и организация в СПбГУ';
+            critsNames.splice(9, 0, ['10в', 'обществ. деят. не в СПбГУ'])
+        }
+    }, []);
+
     const critsCell = critsCellFactory((num) => ({chars: [props.crits[num]]}), props.disabled, false, cb);
     const selectedCell = critsCellFactory(() => ({}), props.disabled, true, () => props.updateCharsCb({chars: undefined}));
 
+    console.log(props.chars);
     return ((!props.chars) || props.chars.length === 0) && <div>
         <table style={{width: '100%'}} css={tableStyle}>
             <tr>{critsCell(0)}{critsCell(4)}{critsCell(8)}</tr>
@@ -107,7 +112,7 @@ const CriterionSelector = React.memo((props) => {
             ` : ''
         }><table style={{width: '100%'}}>{selectedCell(props.crits.indexOf(props.chars[0]))}</table></div>;
 }, (prevProps, nextProps) => {
-    return prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
+    return false; //prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
 })
 
 export default CriterionSelector;
