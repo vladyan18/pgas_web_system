@@ -101,7 +101,7 @@ function DescriptionField(props) {
 
     const changeCb = (e) => {
         const newValue = e.target.value;
-        if (['ПМ-ПУ', 'Юридический'].includes(userPersonalStore.Faculty)) {
+        if (['ПМ-ПУ'].includes(userPersonalStore.Faculty)) {
             classify(newValue);
         }
         props.updateDescr(newValue);
