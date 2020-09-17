@@ -774,8 +774,9 @@ function checkAchievement(achievement, criterias) {
             if (achievement.crit === '10в') {
                 achievement.crit = '9а';
                 achievement.chars.splice(1, 0, 'Организация прочих мероприятий');
-            } else if (achievement.crit === '9а' && achievement.chars.length > 3) {
-                achievement.chars.splice(1, 0, 'Организация мероприятий при участии СПбГУ');
+            } else if (achievement.crit === '9а' && achievement.chars.length > 4) {
+                achievement.chars.splice(1, 1, 'Организация мероприятий при участии СПбГУ');
+
             } else if (achievement.crit === '8б') {
                 achievement.chars.splice(2, 1);
                 for (let i = 0; i < achievement.chars.length; i++) {
@@ -783,7 +784,19 @@ function checkAchievement(achievement, criterias) {
                     if (achievement.chars[i] === 'Публикация (кроме тезисов и научных телеграмм)') achievement.chars[i] = 'Публикация (кроме тезисов)';
                     if (achievement.chars[i] === 'СДнСК') achievement.chars[i] = 'СДнК';
                     if (achievement.chars[i] === 'БДнСК') achievement.chars[i] = 'БДнК';
+
+                    if (achievement.chars[i] === 'Русский язык') achievement.chars[i] = 'Иные языки';
+                    if (achievement.chars[i] === 'Неиндексируемое') achievement.chars[i] = 'Не индексируемое';
                     achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
+                }
+            } else if (achievement.crit === '9б') {
+                for (let i = 0; i < achievement.chars.length; i++) {
+                    if (achievement.chars[i] === 'Периодика (печать)') achievement.chars[i] = 'Печатные издания и интернет-медиа';
+                }
+            } else if (achievement.crit === '11а') {
+                for (let i = 0; i < achievement.chars.length; i++) {
+                    if (achievement.chars[i] === 'Очн. уч.') achievement.chars[i] = 'Очно';
+                    if (achievement.chars[i] === 'Заочн. уч.') achievement.chars[i] = 'Заочно';
                 }
             }
             achievement.chars[0] = achievement.crit;
