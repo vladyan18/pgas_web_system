@@ -780,17 +780,17 @@ function checkAchievement(achievement, criterias) {
             } else if (achievement.crit === '8б') {
                 achievement.chars.splice(2, 1);
                 for (let i = 0; i < achievement.chars.length; i++) {
+                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
                     if (achievement.chars[i] === 'Тезисы и (или) научные телеграммы') achievement.chars[i] = 'Тезисы';
                     if (achievement.chars[i] === 'Публикация (кроме тезисов и научных телеграмм)') achievement.chars[i] = 'Публикация (кроме тезисов)';
                     if (achievement.chars[i] === 'СДнСК') achievement.chars[i] = 'СДнК';
                     if (achievement.chars[i] === 'БДнСК') achievement.chars[i] = 'БДнК';
-
                     if (achievement.chars[i] === 'Русский язык') achievement.chars[i] = 'Иные языки';
                     if (achievement.chars[i] === 'Неиндексируемое') achievement.chars[i] = 'Не индексируемое';
-                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
                 }
             } else if (achievement.crit === '9б') {
                 for (let i = 0; i < achievement.chars.length; i++) {
+                    achievement.chars[i] = achievement.chars[i].replace(/ \(\d+\)$/, '');
                     if (achievement.chars[i] === 'Периодика (печать)') achievement.chars[i] = 'Печатные издания и интернет-медиа';
                 }
             } else if (achievement.crit === '11а') {
