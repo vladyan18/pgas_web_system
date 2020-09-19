@@ -62,19 +62,13 @@ function RecommendationBlock(props) {
     </div>
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function() {
-        const context = this;
-        const args = arguments;
-        const later = function() {
-            timeout = null;
-            func.apply(context, args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+let timer;
+const debounce = (callback, wait = 250) => {
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => callback(...args), wait);
     };
-}
+};
 
 function getValidityClass(val) {
     if  (val) {
@@ -116,7 +110,7 @@ function DescriptionField(props) {
             if (userPersonalStore.LastName === 'Волосников')
                 console.log(res.root);
             setRecommendation(res.classifier);
-        })}, 2000);
+        })}, 300);
 
     useEffect(() => {
         if (textRef) {
