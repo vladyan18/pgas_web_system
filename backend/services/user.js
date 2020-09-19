@@ -48,6 +48,7 @@ module.exports.registerUser = async function(userId, userData, session) {
 
 const natural = require('natural');
 const plainEK3Crits = [];
+let roots = [];
 function getCrit(crits, arr) {
     let critNames = Object.keys(crits);
 
@@ -63,6 +64,7 @@ function getCrit(crits, arr) {
 const classifiers = {};
 async function initClassifier(plainCrits, facultyName) {
     const users = await db.getCompletelyAllUsersAchievements(facultyName);
+    const critClassifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     plainCrits.forEach((x, index) => classifier.addDocument(x, index));
     let count = 0;
@@ -77,16 +79,19 @@ async function initClassifier(plainCrits, facultyName) {
             if (id === -1 || ! ach.achievement || ach.achievement.length === 0) continue;
             count += 1;
             classifier.addDocument(ach.achievement, id);
+            critClassifier.addDocument(ach.achievement, ach.chars[0]);
         }
     }
 
     console.log(facultyName, 'COUNT:', count);
     classifier.train();
-    classifiers[facultyName] = classifier;
+    critClassifier.train();
+    classifiers[facultyName] = [critClassifier, classifier];
 }
 
 async function initAllClassifiers(facultiesList) {
     const crit = await db.getCriteriasObject('ПМ-ПУ');
+    roots = Object.keys(crit);
     getCrit(crit, []);
     const plainCrits = plainEK3Crits.map(x => {
         let str = '';
@@ -120,7 +125,7 @@ module.exports.addAchievement = async function(userId, achievement) {
 
 module.exports.classifyDescription = async function(description, faculty = 'ПМ-ПУ') {
     if (!classifiers[faculty]) return undefined;
-    return plainEK3Crits[Number(classifiers[faculty].classify(description))];
+    return {root: classifiers[faculty][0].getClassifications(description), classifier: plainEK3Crits[Number(classifiers[faculty][1].classify(description))]};
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {

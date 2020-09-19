@@ -113,8 +113,10 @@ function DescriptionField(props) {
             return;
         }
         fetchSendObj('/classifyDescription', {data: descr, faculty: userPersonalStore.Faculty}).then(res => {
-            setRecommendation(res);
-        })}, 1000);
+            if (userPersonalStore.LastName === 'Волосников')
+                console.log(res.root);
+            setRecommendation(res.classifier);
+        })}, 2000);
 
     useEffect(() => {
         if (textRef) {
