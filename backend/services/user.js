@@ -64,7 +64,7 @@ function getCrit(crits, arr) {
 const classifiers = {};
 async function initClassifier(plainCrits, facultyName) {
     const users = await db.getCompletelyAllUsersAchievements(facultyName);
-    const critClassifier = new natural.BayesClassifier(natural.LogisticRegressionClassifier);
+    const critClassifier = new natural.LogisticRegressionClassifier(natural.PorterStemmerRu);
     const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     plainCrits.forEach((x, index) => classifier.addDocument(x, index));
     let count = 0;
