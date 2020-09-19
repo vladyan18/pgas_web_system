@@ -12,37 +12,17 @@ export default class DescriptionToTermin extends Component {
     const values = this.props.values;
     const need = false;
 
-    if (values.some((o) => o == 'ММК')) {
-      return (
-        <div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
-          <b>Заруб. изд.</b> – зарубежное издание <br/>
-          <b>ММК</b> – Материалы Международной Конференции<br/>
-          <b>Росс. изд</b> – российское издание<br/>
-        </p></div>
-      );
-    } else if (values.some((o) => o == 'СДнСК')) {
+    if (values.some((o) => o == 'СДнСК')) {
       return (
         <div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
           <b>СДнСК</b> – С Докладом на Соответствующей Конференции <br/>
           <b>БДнСК</b> – Без Доклада на Соответствующей Конференции<br/>
         </p></div>
       );
-    } else if (values.includes('СДнК')) {
-      return (
-          <div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
-            <b>СДнК</b> – С Докладом на соответствующей Конференции <br/>
-            <b>БДнК</b> – Без Доклада на соответствующей Конференции<br/>
-          </p></div>
-      );
-    } else if (values.some((o) => o == 'УД')) {
+    } else if (values.some((o) => o == 'ДСПО') && criteriasStore.learningProfile) {
       return (<div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
-        <b>УД</b> – Устный Доклад <br/>
-        <b>СД</b> – Стендовый Доклад<br/>
-      </p></div>);
-    } else if (values.some((o) => o == 'ДСПО')) {
-      return (<div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">
-        <b>ДСПО</b> – Достижение Соответствующее Профилю Обучения (<b>{criteriasStore.learningProfile}</b>) <br/>
-        <b>ДнСПО</b> – Достижение <b>не</b> Соответствующее Профилю Обучения<br/>
+        Под профилем обучения понимается: <b>{criteriasStore.learningProfile}</b><br/>
+        <span style={{fontSize: 'small', fontWeight: 350}}><i>В тексте критериев используются сокращения ДСПО и ДнСПО</i></span>
       </p></div>);
     } else if (values.some((o) => o.search('Q1') > -1)) {
       return (<div id="descr_'+n+'" className="blue_bg"><p className="desc_selectors" id="desc_criterion_first">

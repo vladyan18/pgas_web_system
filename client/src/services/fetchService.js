@@ -49,7 +49,7 @@ async function sendWithoutRes(url, obj) {
       return response.ok;
     } else return false;
   } catch (e) {
-    console.error(e);
+    console.error('catched', e);
     return false;
   }
 }

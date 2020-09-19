@@ -14,6 +14,7 @@ import UserDetailedAccessRequest from "./views/user/userDetailedAccessRequest";
 import styled from "@emotion/styled";
 import {css, jsx} from '@emotion/core';
 import UserUpdateProfileRemainder from "./views/user/userUpdateProfileRemainder";
+import { ToastProvider } from 'react-toast-notifications'
 /** @jsx jsx */
 
 const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
@@ -49,7 +50,7 @@ class User extends Component {
 
   render() {
     return (
-      <>
+      <ToastProvider placement={'bottom-left'}>
         <UserHeaderContainer/>
         <div className="container-fluid">
         {(this.state.ready) &&
@@ -75,7 +76,7 @@ class User extends Component {
       <UserDetailedAccessRequest />
       <UserUpdateProfileRemainder />
       </div>
-      </>);
+      </ToastProvider>);
   }
 }
 

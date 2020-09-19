@@ -15,6 +15,8 @@ import DescriptionField from "../userAddAchievement/descriptionField";
 import DateField from "../userAddAchievement/dateField";
 import CriterionSelector from "../userAddAchievement/criterionSelector";
 import DescriptionToCriterion from "../userAddAchievement/DescriptionToCriterion";
+import SaveButton from "../userAddAchievement/saveButton";
+import DeleteButton from "./deleteButton";
 /** @jsx jsx */
 
 const Panel = styled.div`
@@ -57,10 +59,11 @@ class EditAchievement extends Component {
                 ach: this.props.isCopying ? undefined : ach.achievement,
                 chars: ach.chars,
                 isDateValid: true,
+                descrInvalid: !ach.achievement,
+                charsInvalid: ach.status === 'Данные некорректны' ? true : false,
                 dateValue: getDate(ach.achDate),
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
                 confirmations: ach.confirmations,
-                charsInvalid: false,
                 status: this.props.isCopying ? 'Ожидает проверки' : ach.status,
                 ball: this.props.isCopying ? undefined : ach.ball,
                 comment: this.props.isCopying ? undefined : ach.comment
@@ -135,7 +138,7 @@ class EditAchievement extends Component {
         return true
     }
 
-    editKrit(e) {
+    async editKrit(e) {
         e.preventDefault();
         if (!this.checkValidityBeforeSend()) return;
 
@@ -169,17 +172,20 @@ class EditAchievement extends Component {
             endpoint = '/api/update_achieve';
         }
 
-        fetchSendWithoutRes(endpoint, obj).then((response) => {
-            if (response) this.props.history.push('/home')
-        })
+        const response = await fetchSendWithoutRes(endpoint, obj);
+        if (response) {
+            this.props.history.push('/home');
+            return true;
+        }
     }
 
-    deleteAch() {
+    async deleteAch() {
         if (!window.confirm('Вы уверены? Удаление достижения необратимо.')) return false;
-
-        fetchSendWithoutRes('/api/delete_achieve', {achId: this.props.achId}).then((response) => {
-            if (response) this.props.history.push('/home');
-        })
+        const response = await fetchSendWithoutRes('/api/delete_achieve', {achId: this.props.achId});
+        if (response) {
+            this.props.history.push('/home');
+            return true;
+        }
     }
 
     copyAch() {
@@ -189,6 +195,7 @@ class EditAchievement extends Component {
                 crits: CriteriasStore.criterias,
                 ach: '',
                 isDateValid: true,
+                descrInvalid: undefined,
                 dateValue: getDate(ach.achDate),
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
                 confirmations: [],
@@ -207,6 +214,12 @@ class EditAchievement extends Component {
 
     render() {
 
+        const getLineColor = function(isInvalid) {
+            if (isInvalid === false) return '#19b319';
+            if (isInvalid === true) return '#dc3545';
+            return undefined;
+        };
+
         if (!CriteriasStore.criterias) return null;
         const isDisabled = ['Принято', 'Принято с изменениями', 'Отказано'].includes(this.state.status);
         return (<Panel className="col-md-9" id="panel">
@@ -224,10 +237,8 @@ class EditAchievement extends Component {
                         {!this.props.isCopying && <>
                         <button id="DeleteButton" className="btn btn-warning" style={{marginRight: "1rem"}}
                                 value="Копировать" onClick={this.copyAch}>Копировать</button>
-                        <button id="DeleteButton" className="btn btn-danger"
-                                value="Удалить" onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'&&
-                        this.state.status !== 'Данные некорректны' }>Удалить
-                        </button>
+                            <DeleteButton onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'&&
+                            this.state.status !== 'Данные некорректны'}/>
                         </>}
                     </div>
                 </ButtonPanel>
@@ -270,7 +281,7 @@ class EditAchievement extends Component {
                         disabled={isDisabled}
                     /></>}
 
-                <div className="form_elem_with_left_border">
+                <div className="form_elem_with_left_border" style={{borderColor: getLineColor(this.state.charsInvalid)}}>
                     <label htmlFor="check2" className="label">Характеристики: </label>
                     <CriteriasForm crits={this.state.crits} valuesCallback={this.updateChars}
                                    disabled={isDisabled}
@@ -283,16 +294,21 @@ class EditAchievement extends Component {
 
                 {(this.state.chars && this.state.chars[0] !== '1 (7а)' && this.state.chars[0] !== '7а') &&
                 <div style={{marginTop: '2rem'}}>
-                    <ConfirmationForm value={this.state.confirmations} updateForm={this.updateConfirmations} disabled={this.state.status !== 'Ожидает проверки' &&
+                    <ConfirmationForm value={this.state.confirmations}
+                                      updateForm={this.updateConfirmations} disabled={this.state.status !== 'Ожидает проверки' &&
                     this.state.status !== 'Данные некорректны'}/>
                 </div>}
 
                 <br/>
-                <button type="button" id="SubmitButton" disabled={!this.isValid()}
-                        className={"btn " + (this.props.isCopying ? 'btn-primary' : 'btn-success') + " btn-md button_send"}
-                        data-target="#exampleModal" value="сохранить" onClick={this.editKrit}>
-                    {this.props.isCopying ? 'Добавить достижение' : 'Сохранить'}
-                </button>
+                <SaveButton
+                    sendKrit={this.editKrit}
+                    chars={this.state.chars}
+                    charsInvalid={this.state.charsInvalid}
+                    descrInvalid={this.state.descrInvalid}
+                    isDateValid={this.state.isDateValid}
+                    crits={this.state.crits}
+                    type={this.props.isCopying ? 'add' : 'save'}
+                />
             </div>
         </Panel>)
     }

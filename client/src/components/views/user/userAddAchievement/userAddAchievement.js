@@ -16,6 +16,7 @@ import DescriptionToCriterion from "./DescriptionToCriterion";
 import DescriptionField from "./descriptionField";
 import DateField from "./dateField";
 import {Panel} from "../style";
+import SaveButton from "./saveButton";
 /** @jsx jsx */
 
 const recommendation = css`
@@ -124,7 +125,7 @@ class UserAddAchievement extends Component {
     return isValid;
   }
 
-  sendKrit() {
+  async sendKrit() {
     if (!this.checkValidityBeforeSend()) return;
 
     const res = {};
@@ -156,9 +157,11 @@ class UserAddAchievement extends Component {
    // const oData = new FormData(form);
    //  oData.append('data', JSON.stringify(res));
 
-    fetchSendWithoutRes('/api/add_achieve', {data: res}).then((response) => {
-      if (response) this.props.history.push('/home')
-    });
+    const response = await fetchSendWithoutRes('/api/add_achieve', {data: res});
+    if (response) {
+          this.props.history.push('/home');
+          return true;
+    }
   }
 
   componentDidMount() {
@@ -214,6 +217,7 @@ class UserAddAchievement extends Component {
                 dateRef={() => this.dateRef}
                 updateDescr={this.updateDescr}
                 updateChars={(newValue) => this.setState(newValue)}
+                disableRecommend={this.state.charsInvalid === false && this.state.chars}
             />
 
             <DateField
@@ -228,20 +232,14 @@ class UserAddAchievement extends Component {
 
           <div style={{marginTop: '2rem'}}><ConfirmationForm updateForm={this.updateConfirmations}/></div>}
 
-          <div style={{width: '100%'}}>
-            <button type="button" id="SubmitButton"
-              className="btn btn-primary btn-md button_send"
-              data-target="#exampleModal" value="отправить" onClick={this.sendKrit}
-                    disabled={
-                        !this.state.chars ||
-                        (this.state.charsInvalid !== false ||
-                        this.state.descrInvalid !== false || !this.state.isDateValid) && this.state.chars[0] !== this.state.crits[0]
-                    }
-
-            >
-                        Отправить
-            </button>
-          </div>
+          <SaveButton
+              sendKrit={this.sendKrit}
+            chars={this.state.chars}
+            charsInvalid={this.state.charsInvalid}
+            descrInvalid={this.state.descrInvalid}
+            isDateValid={this.state.isDateValid}
+            crits={this.state.crits}
+          />
         </div>
       </Panel>);
   }

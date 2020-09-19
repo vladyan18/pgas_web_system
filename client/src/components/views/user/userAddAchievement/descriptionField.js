@@ -101,7 +101,7 @@ function DescriptionField(props) {
 
     const changeCb = (e) => {
         const newValue = e.target.value;
-        if (['ПМ-ПУ'].includes(userPersonalStore.Faculty)) {
+        if (!props.disableRecommend && ['ПМ-ПУ'].includes(userPersonalStore.Faculty)) {
             classify(newValue);
         }
         props.updateDescr(newValue);
@@ -146,7 +146,7 @@ function DescriptionField(props) {
             required onChange={changeCb} value={props.value} style={{marginTop: '0', width: '100%', minHeight: '3rem'}}
         />
 
-        {!recommendationHidden && <RecommendationBlock value={recommendation} cb={recommendationCb}/>}
+        {!props.disableRecommend && <RecommendationBlock value={recommendation} cb={recommendationCb}/>}
     </div>
 }
 

@@ -8,10 +8,35 @@ import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 
 const selectorCss = css`
+        :focus {
+        box-shadow: unset;
+        }
         > * {
             width: 50px !important;
         }
   `
+
+const animateFadeIn = css`
+animation: fade-in .2s ease;
+`
+
+const charsDictionary = {
+  'ДСПО': 'Соответствует профилю обучения',
+  'ДнСПО': 'Не соответствует профилю обучения',
+  'БДнК': 'Без доклада на конференции',
+  'СДнК': 'С докладом на конференции',
+  'УД': 'Устный доклад',
+  'СД': 'Стендовый доклад',
+  'Заочн. уч.': 'Заочное участие',
+  'Очн. уч.': 'Очное участие',
+  'Заруб. изд.': 'Зарубежное издание',
+  'Росс. изд.': 'Российское издание',
+  'ММК': 'Материалы международной конференции'
+};
+function getCharacteristicName(char) {
+  if (charsDictionary[char]) return charsDictionary[char];
+  return char;
+}
 
 export default class CriteriasForm extends Component {
   constructor(props) {
@@ -67,11 +92,15 @@ export default class CriteriasForm extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     console.log('UPDATE', this.props.values, prevProps.values, this.state.values)
       if (!this.props.values && prevProps.values !== this.props.values) {
+        if (this.state) {
           this.setState({
-              length: 0,
-              crit: undefined,
-              values: [],
-          }, () => this.checkValidity());
+            length: 0,
+            crit: undefined,
+            values: [],
+          }, () => {
+            this.checkValidity();
+          });
+        }
       }
     if (this.props.values
         && prevProps.values !== this.props.values && this.props.values !== this.state.values) {
@@ -100,12 +129,28 @@ export default class CriteriasForm extends Component {
           }
       }
 
-      this.setState({
+      const newState = {
         selects: sel,
         length: this.props.values.length,
         crit: this.props.values[0],
         values: this.props.values.slice(),
-      }, () => this.checkValidity());
+      };
+      if (this.state) {
+        this.setState(newState, () => {
+          //this.lastSelectRef.focus();
+          this.checkValidity();
+        });
+      } else {
+        this.state = newState;
+        const keys = Object.keys(globalCrit);
+        console.log('HERE', keys);
+        if (isNaN(Number(keys[0])) && keys.length === 1) {
+          this.handleSelect({target: {value: keys[0], id: this.props.values.length}})
+        }
+        //this.lastSelectRef.focus();
+        this.checkValidity();
+
+      }
     }
   }
 
@@ -128,6 +173,23 @@ export default class CriteriasForm extends Component {
       this.props.valuesCallback(state.values, true);
     }
     this.setState(state);
+  }
+
+  componentDidMount() {
+    console.log('DID MOUNT')
+    let crits = this.props.crits;
+    if (this.state.values && crits) {
+      for (let i = 0; i < this.state.values.length; i++) {
+        crits = crits[this.state.values[i]];
+        if (!crits) return;
+      }
+      const keys = Object.keys(crits);
+      if (isNaN(Number(keys[0])) && Object.keys(crits).length === 1 && this.state.values[0] !== Object.keys(this.props.crits)[0]) {
+        this.props.valuesCallback([...this.state.values, keys[0]]);
+        //this.setState({values: [...this.state.values, keys[0]]}, () => this.props.valuesCallback(this.state.values, false));
+        //this.handleSelect({target: {value: keys[0], id: this.state.values.length}})
+      }
+    }
   }
 
   handleSelect(e) {
@@ -213,6 +275,10 @@ export default class CriteriasForm extends Component {
       if (this.lastSelectRef) {
         try {
           this.lastSelectRef.scrollIntoView({ block: 'nearest'})
+          if (isNaN(Number(keys[0])) && keys.length === 1) {
+            this.lastSelectRef.value = keys[0];
+            this.lastSelectRef.dispatchEvent(new Event('change'));
+          }
           //this.lastSelectRef.focus();
         } catch (e) {}
       }
@@ -282,7 +348,7 @@ export default class CriteriasForm extends Component {
       <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
       {this.state.selects.map((item, index) => {
         return (
-          <div key={item.id}>
+          <div key={item.id} css={animateFadeIn}>
             <DescriptionToTermin values={item.options}/>
             <select
                 ref={(x) => {if (item.num === this.state.length + 1) this.lastSelectRef = x;}}
@@ -293,7 +359,7 @@ export default class CriteriasForm extends Component {
               <option disabled value="">Выберите характеристику</option>
               {item.options.map((option) => (
                 <option key={option + item.id} value={option} style={{wordWrap: 'break-word', cursor: 'pointer'}}>
-                  {option}
+                  {getCharacteristicName(option)}
                 </option>
               ))}
             </select>
