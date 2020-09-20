@@ -6,6 +6,7 @@ import {observer} from 'mobx-react';
 
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
+import userAchievesStore from "../../../stores/userAchievesStore";
 
 const LeftNavbar = css`
   width: 90%;
@@ -41,6 +42,14 @@ const ulNav = css`
    }
 `;
 
+let preloaded = false;
+function preloadDocuments() {
+  if (!preloaded && !userAchievesStore.confirmations) {
+    preloaded = true;
+    userAchievesStore.updateCommonConfirmations();
+  }
+}
+
 function UserNavbar(props) {
   return <div className="col-md-3 leftBlock" css={leftBlock}>
     <div css={LeftNavbar}>
@@ -49,7 +58,7 @@ function UserNavbar(props) {
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
-        <UserNavItem to='/confirmations'>Мои документы</UserNavItem>
+        <UserNavItem to='/confirmations' onHover={preloadDocuments}>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
       </ul>
     </div>

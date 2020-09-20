@@ -54,7 +54,7 @@ class Login extends Component {
               <td style={{verticalAlign: 'middle', paddingTop: '0.2rem', maxWidth: '15rem'}}><b style={{fontSize: '2rem', 'lineHeight': '1.6rem'}}>Вход в систему ПГАС</b></td>
             </tr>
             <div className="header_logo_text"
-                 style={{fontWeight: 'lighter', fontSize: '1rem', marginTop: '1rem', maxWidth: '20rem'}}>Для входа необходимо использовать единый логин (st******)</div>
+                 style={{fontWeight: 350, fontSize: '1rem', marginTop: '1rem', maxWidth: '20rem'}}>Для входа необходимо использовать единый логин (st******)</div>
 
             <form id = 'login' method ='post' onSubmit={this.doLogin}>
               <label id='name'><b>Имя пользователя</b></label><br/>

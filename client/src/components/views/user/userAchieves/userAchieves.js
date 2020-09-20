@@ -118,25 +118,33 @@ class UserAchieves extends Component {
         <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>Предварительный балл: {summaryPreliminaryBall}</div>}
         </div>
         <div css={css`width: 100%; min-height: 10rem;`}>
-          <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
+            {userAchievesStore.achieves && <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>}
+            {userAchievesStore.achieves.length === 0 && <div style={{width: '100%', paddingTop: '2rem'}}>
+                <div style={{width: '100%', textAlign: 'center', fontWeight: 350}}>Пока что Вы ничего не внесли</div>
+                <div style={{width: '100%', textAlign: 'center'}}>
+                    <button className='btn' style={{color: '#007bff', backgroundColor: 'unset', fontSize: 'large'}}
+                            onClick={() => this.props.history.push('/upload')}
+                    >Добавить достижение</button>
+                </div>
+            </div>}
         </div>
-        <div>
+        {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.length > 0 && <div>
           <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem; cursor: pointer;`}
                onClick={this.toggleArchiveHide}>
             <i className={'fas fa-chevron-' + (!this.state.archiveHidden ? 'right' : 'down') + ' mychevron'}
                ></i>
-            <span style={{marginLeft: '1rem'}}>Архив достижений</span>
+             <span style={{marginLeft: '1rem'}}>Архив достижений</span>
           </div>
           {!this.state.archiveHidden && <div css={css`width: 100%; min-height: 10rem;`}>
             <table>
             {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.map((x) => <tr><td css={css`width:5%; border-top: 1px solid #e3e3e3;`}>{x.crit}</td><td css={css`width:70%; border-top: 1px solid #e3e3e3;`}>{x.achievement}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(new Date(x.achDate)).toLocaleDateString('ru-RU')}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(x.status !== 'Ожидает проверки') && x.status}</td></tr>)}
             </table>
           </div>}
-        </div>
+        </div>}
 
       </div>
       {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <div css={css`
-      width: 50px; height: 50px; background-color: #129b41; border-radius: 50%; box-shadow: 0 5px 4px rgba(0, 0, 0, .6);
+      width: 50px; height: 50px; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
       position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
         display: none;
         @media only screen and (max-device-width: 768px) {
@@ -144,7 +152,7 @@ class UserAchieves extends Component {
         }
       `}
       onClick={() => this.props.history.push('/upload')}>
-        <i className="fa fa-plus" aria-hidden="true"></i>
+        <i className="fa fa-plus" aria-hidden="true" style={{margin: 'auto'}}></i>
       </div>}
     </Panel>);
   }

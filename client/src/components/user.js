@@ -17,7 +17,14 @@ import UserUpdateProfileRemainder from "./views/user/userUpdateProfileRemainder"
 import { ToastProvider } from 'react-toast-notifications'
 /** @jsx jsx */
 
-const UserAddAchievementContainer = React.lazy(() => import('./containers/user/userAddAchievementContainer'));
+const ReactLazyPreload = importStatement => {
+  const Component = React.lazy(importStatement);
+  Component.preload = importStatement;
+  return Component;
+};
+
+const preloadContainer = () => import('./containers/user/userAddAchievementContainer');
+const UserAddAchievementContainer = React.lazy(preloadContainer);
 const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
 const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
 const UserDocumentsContainer = React.lazy(() => import('./containers/user/UserDocumentsContainer'));
@@ -36,6 +43,7 @@ class User extends Component {
   };
 
   async componentDidMount() {
+    preloadContainer();
     const profile = await userPersonalStore.update();
     if (profile) {
       await Promise.all([
