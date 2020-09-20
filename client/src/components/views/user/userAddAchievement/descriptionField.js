@@ -131,7 +131,7 @@ function DescriptionField(props) {
                 setTextRef(textRef);
                 props.descriptionRef(textRef);
             }}
-            autoFocus={!!localStorage.getItem('descriptionsHidden')}
+            autoFocus={false}
             disabled={props.disabled}
             className={'form-control area_text' + getValidityClass(props.descrInvalid)}
             name="comment"
