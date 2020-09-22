@@ -3,7 +3,7 @@ import '../assets/fontawesome-free-5.12.1-web/css/fontAwesomeClear.css'
 import UserHeaderContainer from './containers/user/userHeaderContainer';
 import UserNavbarContainer from './containers/user/userNavbarContainer';
 import UserAchievesContainer from './containers/user/userAchievesContainer';
-import {Route} from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import UserCommonInfoContainer from './containers/user/UserCommonInfoContainer';
 import UserProfileContainer from './containers/user/userProfileContainer';
 import userPersonalStore from '../stores/userPersonalStore';
@@ -27,7 +27,7 @@ const preloadContainer = () => import('./containers/user/userAddAchievementConta
 const UserAddAchievementContainer = React.lazy(preloadContainer);
 const EditAchievementContainer = React.lazy(() => import('./containers/user/editAchievementContainer'));
 const UserStudentsContainer  = React.lazy(() => import('./containers/user/userStudentsRatingContainer'));
-const UserDocumentsContainer = React.lazy(() => import('./containers/user/UserDocumentsContainer'));
+const UserDocumentsContainer = ReactLazyPreload(() => import('./containers/user/UserDocumentsContainer'));
 
 
 const Panel = styled.div`
@@ -64,7 +64,7 @@ class User extends Component {
         {(this.state.ready) &&
         <div className="container main_block">
           <div className="row">
-            <UserNavbarContainer/>
+            <UserNavbarContainer preloads={{"/confirmations": () => UserDocumentsContainer.preload()}}/>
             <Suspense fallback={<Panel className="col-md-9 rightBlock">
               <div className="block_main_right"></div></Panel>}>
             <Switch>

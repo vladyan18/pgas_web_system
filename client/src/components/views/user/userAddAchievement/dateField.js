@@ -29,7 +29,7 @@ function DateFieldLabel(props) {
     return <div style={{display: 'flex'}}>
         <div>
             <label style={{'marginTop': 'auto', width: '10rem'}} className="form-check-label">
-                Дата достижения:
+                <b>Дата достижения:</b>
             </label>
             <label style={{cursor: 'pointer', color: '#595959', marginLeft: 0, marginBottom: 0}}>
                 <input type="checkbox" id="defaultCheck1" onChange={(e) => props.switchDiapasone()}

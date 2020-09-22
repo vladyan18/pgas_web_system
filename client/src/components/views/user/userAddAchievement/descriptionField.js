@@ -123,7 +123,7 @@ function DescriptionField(props) {
         }
     }, [textRef, props.value]);
     return <div className="form_elem_with_left_border" style={{marginTop: '20px', borderColor: getLineColor(props.descrInvalid)}}>
-        <label className="control-label" htmlFor="comment">Название достижения:
+        <label className="control-label" htmlFor="comment"><b>Название достижения:</b>
             <HelpButton overlay={achievementPopover} placement={"top"} />
         </label>
         <textarea

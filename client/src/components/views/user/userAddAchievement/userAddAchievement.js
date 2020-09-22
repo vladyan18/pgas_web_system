@@ -187,8 +187,8 @@ class UserAddAchievement extends Component {
                         Добавление достижения
           </p>
           <hr css={horizontalLine}/>
-          {!this.state.chars && <p className="desc_headline" style={{fontWeight: '350'}}>
-                        Выберите критерий:
+          {!this.state.chars && <p className="" style={{fontWeight: '350'}}>
+            <b>Выберите критерий:</b>
           </p>}
 
             {this.state.crits && <CriterionSelector
@@ -199,13 +199,13 @@ class UserAddAchievement extends Component {
             <DescriptionToCriterion crit={this.state.chars ? this.state.chars[0] : undefined}/>
 
             {this.state.chars && <div className="form_elem_with_left_border" style={{borderColor: getLineColor(this.state.charsInvalid)}}>
-                <label htmlFor="critForm" className="label">Характеристики: </label>
+              <label htmlFor="critForm" className="label" style={{marginBottom: this.state.experimental ? '1.5rem' : ''}} onClick={() => this.setState({experimental: !this.state.experimental})}><b>Характеристики: </b></label>
                 {CriteriasStore.criterias &&
                 <CriteriasForm crits={CriteriasStore.criterias} critError={this.state.critError}
                                supressDescription={true}
                                critErrorMessage={this.state.critErrorMessage}
                                isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}
-                               values={this.state.chars}
+                               values={this.state.chars} experimental={this.state.experimental}
                 />}
 
             </div>}

@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import criteriasStore from '../../../../stores/criteriasStore';
 import DescriptionToCriterion from "./DescriptionToCriterion";
 import {css, jsx} from '@emotion/core';
+import CriteriasOptionsSelector from "./criteriasOptionSelector";
 /** @jsx jsx */
 
 const selectorCss = css`
@@ -350,7 +351,14 @@ export default class CriteriasForm extends Component {
         return (
           <div key={item.id} css={animateFadeIn}>
             <DescriptionToTermin values={item.options}/>
-            <select
+            {this.props.experimental &&
+            <CriteriasOptionsSelector
+                options={item.options}
+                value={item.value}
+                disabled={this.props.disabled}
+                onChange={this.handleSelect}
+                id={item.num.toString()}/>}
+            {!this.props.experimental && <select
                 ref={(x) => {if (item.num === this.state.length + 1) this.lastSelectRef = x;}}
                 className={'form-control selectors' + getSelectColorClass(item)} required
               id={item.num.toString()} css={selectorCss} key={item.uniq}
@@ -362,7 +370,7 @@ export default class CriteriasForm extends Component {
                   {getCharacteristicName(option)}
                 </option>
               ))}
-            </select>
+            </select> }
           </div>
         );
       })}

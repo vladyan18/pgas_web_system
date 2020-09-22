@@ -43,9 +43,10 @@ const ulNav = css`
 `;
 
 let preloaded = false;
-function preloadDocuments() {
+function preloadDocuments(preloads) {
   if (!preloaded && !userAchievesStore.confirmations) {
     preloaded = true;
+    preloads['/confirmations']();
     userAchievesStore.updateCommonConfirmations();
   }
 }
@@ -58,7 +59,7 @@ function UserNavbar(props) {
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
-        <UserNavItem to='/confirmations' onHover={preloadDocuments}>Мои документы</UserNavItem>
+        <UserNavItem to='/confirmations' onHover={() => preloadDocuments(props.preloads)}>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
       </ul>
     </div>

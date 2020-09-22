@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import {Panel, HorizontalLine} from "./style";
