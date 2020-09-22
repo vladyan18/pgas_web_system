@@ -349,7 +349,7 @@ export default class CriteriasForm extends Component {
       <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
       {this.state.selects.map((item, index) => {
         return (
-          <div key={item.id} css={animateFadeIn}>
+          <><div key={item.id} css={animateFadeIn}  style={this.props.experimental && {marginTop: '1rem', marginBottom: '1rem'}}>
             <DescriptionToTermin values={item.options}/>
             {this.props.experimental &&
             <CriteriasOptionsSelector
@@ -372,6 +372,8 @@ export default class CriteriasForm extends Component {
               ))}
             </select> }
           </div>
+          {this.props.experimental && (item.num !== this.state.selects.length + 1) && <hr/>}
+          </>
         );
       })}
     </form>);

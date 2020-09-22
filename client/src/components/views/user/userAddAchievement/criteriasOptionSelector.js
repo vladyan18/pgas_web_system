@@ -14,7 +14,8 @@ const charsDictionary = {
     'Очн. уч.': 'Очное участие',
     'Заруб. изд.': 'Зарубежное издание',
     'Росс. изд.': 'Российское издание',
-    'ММК': 'Материалы международной конференции'
+    'ММК': 'Материалы международной конференции',
+    'Документ, удостоверяющий исключительное право студента на достигнутый им научный (научно-методический, научно-технический, научно-творческий) результат интеллектуальной деятельности (патент, свидетельство)': 'Исключительное право на достигнутый научный результат интеллектуальной деятельности (патент, свидетельство)'
 };
 
 function getCharacteristicName(char) {
@@ -33,13 +34,17 @@ const CriteriasOptionsSelector = React.memo(({options, value, disabled, onChange
         result.stopPropagation = () => {};
         onChange(result);
     }
-    return <div style={{marginBottom: '2.5rem'}}>
-        {options.map((option) => <div style={{display: 'flex', marginBottom: '0.6rem', cursor: !disabled && 'pointer'}} css={css`:hover {color: #90c290 !important;};`} onClick={() => onCheck({target: { value: option }})}>
-            <input type='radio' disabled={disabled} id={option} value={option} style={{cursor: !disabled && 'pointer', display: 'block', margin: 'auto 0 auto 0'}} checked={selected === option} onChange={onCheck}/>
+    return <><div>
+        {options.map((option) => <div className='form_radio' style={{display: 'flex', marginBottom: '0.8rem', cursor: !disabled && 'pointer'}} css={css`:hover {color: #90c290 !important;};`} onClick={() => onCheck({target: { value: option }})}>
+            <input type='radio' disabled={disabled} id={option} value={option}
+                   style={{cursor: !disabled && 'pointer', display: 'block', margin: 'auto 0 auto 0', minWidth: '1rem'}}
+                   checked={selected === option} onChange={onCheck}/>
             <label htmlFor={option} style={{margin: '0 0 0 1rem', display: 'block', cursor: !disabled && 'pointer',
-            color: (selected === option) ? 'green' : (selected ? 'grey' : 'inherit')}}>{getCharacteristicName(option)}</label>
+            color: (selected === option) ? 'green' : (selected ? '#999' : 'inherit')}}>{getCharacteristicName(option)}</label>
             </div>)}
     </div>
+
+    </>
 }, (prevProps, nextProps) => {
     return prevProps.options === nextProps.options && prevProps.value === nextProps.value && prevProps.disabled === nextProps.disabled;
 })
