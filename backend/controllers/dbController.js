@@ -369,6 +369,10 @@ exports.getCriteriasAndSchema = async function(facultyName) {
   return facObject.CritsId;
 };
 
+exports.getAllCriterias = async function() {
+    return await FacultyModel.find({}).populate('CritsId').lean();
+};
+
 exports.uploadAnnotationsToFaculty = async function(annotations, learningProfile, languagesForPublications,  facultyName) {
   const facObject = await FacultyModel.findOne({Name: facultyName});
   let annObj = {

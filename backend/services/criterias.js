@@ -13,6 +13,10 @@ module.exports.getCriteriasAndSchema = async function(facultyName) {
     return db.getCriteriasAndSchema(facultyName);
 };
 
+module.exports.getAllCriterias = async function() {
+    return db.getAllCriterias();
+};
+
 module.exports.uploadCriterias = async function(filePath, facultyName) {
     const workbook = xlsx.readFile(filePath);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];

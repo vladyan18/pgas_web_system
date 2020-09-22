@@ -14,6 +14,18 @@ if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath);
 }
 
+router.get('/getAllCriterias', superAuthCheck,
+    async function(req, res) {
+        try {
+            const criterias = await criteriasService.getAllCriterias();
+            if (criterias) {
+                res.status(200).send(criterias);
+            } else res.status(404).send({Error: 404});
+        } catch (e) {
+            res.status(500).send(e);
+        }
+    });
+
 router.get('/getCriterias', authCheck,
     async function(req, res) {
         try {
