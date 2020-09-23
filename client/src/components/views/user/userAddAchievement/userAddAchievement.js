@@ -205,7 +205,7 @@ class UserAddAchievement extends Component {
                                supressDescription={true}
                                critErrorMessage={this.state.critErrorMessage}
                                isInvalid={this.state.charsInvalid} valuesCallback={this.updateChars}
-                               values={this.state.chars} experimental={this.state.experimental}
+                               values={this.state.chars} experimental={true}
                 />}
 
             </div>}

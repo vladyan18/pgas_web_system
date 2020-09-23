@@ -89,7 +89,6 @@ const CriterionSelector = React.memo((props) => {
     const critsCell = critsCellFactory((num) => ({chars: [props.crits[num]]}), props.disabled, false, cb);
     const selectedCell = critsCellFactory(() => ({}), props.disabled, true, () => props.updateCharsCb({chars: undefined}));
 
-    console.log(props.chars);
     return ((!props.chars) || props.chars.length === 0) && <div>
         <table style={{width: '100%'}} css={tableStyle}>
             <tr>{critsCell(0)}{critsCell(4)}{critsCell(8)}</tr>

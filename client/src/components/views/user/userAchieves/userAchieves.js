@@ -89,6 +89,7 @@ class UserAchieves extends Component {
         }
       }
     }
+    if (!userAchievesStore.achieves) return null;
     return (<Panel css={css`padding: 1rem;`} className="col-md-9">
 
       <div>

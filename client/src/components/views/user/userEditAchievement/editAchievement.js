@@ -289,6 +289,7 @@ class EditAchievement extends Component {
                                    critError={this.state.critError}
                                    supressDescription={true}
                                    critErrorMessage={this.state.critErrorMessage}
+                                   experimental={true}
                                    values={this.state.chars}/>
                 </div>
 

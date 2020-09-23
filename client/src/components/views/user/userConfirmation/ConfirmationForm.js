@@ -26,7 +26,6 @@ class ConfirmationForm extends Component {
         this.onDrop = (file) => {
             let st = this.state;
             const extension = file[0].name.split('.').pop();
-            console.log(extension);
             if (extension && ['doc', 'docx', 'exe', 'pages', 'odt', 'pptx', 'ppt', 'xls', 'xlsx'].includes(extension.toLowerCase())) {
                 this.setState({forbiddenExtensionUsed: extension});
                 return;
@@ -446,7 +445,7 @@ class ConfirmationForm extends Component {
         return (
             <div>
                 <div style={this.headerContainerStyle}>
-                    <p>Подтверждения: </p>
+                    <p><b>Подтверждения:</b> </p>
                     { <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
                         <i className="fa fa-paperclip"/> прикрепить
                     </b>}
@@ -480,45 +479,51 @@ class ConfirmationForm extends Component {
                             </div>
                         </div>}
                         {(this.state.modalIsOpen && !this.state.isLoading) &&
-                        <div className="modalContentWrapper" style={{maxHeight: "40rem", maxWidth: "100vw",}}>
+                        <div className="modalContentWrapper" style={{maxHeight: "40rem", maxWidth: "100vw", margin:'auto'}}>
 
                             <div className="block"
-                                 style={{maxHeight: "inherit", maxWidth: "inherit", overflow: "auto"}}>
+                                 style={{maxHeight: "inherit",
+                                     maxWidth: "inherit",
+                                     overflow: "auto",
+                                     borderRadius: '4px',
+                                     padding: (!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) ? '1rem 2rem 2rem 2rem' : '1rem 1rem 2rem 1rem',
+                                     fontFamily: 'sans-serif'
+                                 }}>
                             <div className="profile"
                                  style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
-                                <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
+                                <p style={{marginTop: "auto", "margin-bottom": "auto", "margin-right": "1rem", fontWeight: 'bold', fontSize: '1.2rem'}}>
                                     {this.state.Type ? 'Добавление подтверждения' : 'Прикрепление подтверждения'}
                                 </p>
-                                <div style={{'margin-top': 'auto'}}>
-                                    <button id="DeleteButton" className="btn btn-secondary"
+                                <div style={{'margin-top': 'auto', "margin-bottom": "auto"}}>
+                                    <button id="DeleteButton" className="btn btn-secondary" style={{backgroundColor: 'transparent', color: '#666', border: 'none'}}
                                             value="Назад" onClick={this.closeModal}>Закрыть
                                     </button>
                                 </div>
                             </div>
 
-                            <hr className="hr_blue"/>
+                            <hr style={{borderTop: '2px solid #c1c1c1'}}/>
                             <p className="desc_headline">
                                 Не забудьте также приложить его к бумажной анкете
                             </p>
 
-                                {(!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) && <div>
+                                {(!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) && <div style={{marginTop: "2rem"}}>
                                     <p>Выберите из уже добавленных:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
                                         <button id="DocButton" className="btn btn-primary"
-                                                style={{margin: "0", width: "50%"}}
+                                                style={{margin: "0", width: "100%"}}
                                                 value="Назад" onClick={this.openExisting}>Выбрать
                                         </button>
                                     </div>
-                                    <p style={{marginTop: "1rem"}}>Или, если Вы еще не добавляли его, создайте новое:</p>
+                                    <p style={{marginTop: "2rem"}}>Или, если Вы еще не добавляли его, создайте новое:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
-                                <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
+                                <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem", width: '30%'}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ
                                 </button>
-                                <button id="LinkButton" className="btn btn-success" style={{marginRight: "1rem"}}
+                                <button id="LinkButton" className="btn btn-success" style={{marginRight: "1rem", width: '30%'}}
                                         value="Назад" onClick={() => this.chooseType('link')}>Ссылка
                                 </button>
-                                <button id="LinkButton" className="btn btn-success"
-                                        value="Назад" onClick={() => this.chooseType('SZ')}>Служ. записка
+                                <button id="LinkButton" className="btn btn-success" style={{ width: '30%'}}
+                                        value="Назад" onClick={() => this.chooseType('SZ') }>СЗ
                                 </button>
                                     </div>
                             </div>}
@@ -538,7 +543,7 @@ class ConfirmationForm extends Component {
                                     <input id="AddInfo" className="form-control" type="text" required
                                            onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                                           onClick={this.addConfirmation}
+                                           onClick={this.addConfirmation} style={{marginTop: '1rem'}}
                                            disabled={!(this.state.URL && this.state.Name)}/>
                                 </form>
                             }
@@ -556,7 +561,7 @@ class ConfirmationForm extends Component {
                                     <input id="SZPar" className="form-control" type="text" required
                                            onChange={this.handleSZParagraphChange}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                                           onClick={this.addConfirmation}
+                                           onClick={this.addConfirmation} style={{marginTop: '1rem'}}
                                            disabled={!(this.state.Name)}/>
                                 </form>
                             }
@@ -618,6 +623,7 @@ class ConfirmationForm extends Component {
                                         )}
                                     </Dropzone>
                                     <button id="SaveButton" className="btn btn-success"
+                                            style={{marginTop: '1rem'}}
                                             disabled={!(this.state.Name && this.state.file) ||
                                             Math.ceil(this.state.file.size / 1024 / 1024) > 15}
                                             value="Назад" onClick={this.addConfirmation}>Сохранить

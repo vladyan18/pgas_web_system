@@ -91,7 +91,6 @@ export default class CriteriasForm extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('UPDATE', this.props.values, prevProps.values, this.state.values)
       if (!this.props.values && prevProps.values !== this.props.values) {
         if (this.state) {
           this.setState({
@@ -105,7 +104,6 @@ export default class CriteriasForm extends Component {
       }
     if (this.props.values
         && prevProps.values !== this.props.values && this.props.values !== this.state.values) {
-      console.log(this.props.values, prevProps.values)
       const sel = [];
       let globalCrit = this.props.crits;
       for (let i = 1; i < this.props.values.length; i++) {
@@ -144,7 +142,6 @@ export default class CriteriasForm extends Component {
       } else {
         this.state = newState;
         const keys = Object.keys(globalCrit);
-        console.log('HERE', keys);
         if (isNaN(Number(keys[0])) && keys.length === 1) {
           this.handleSelect({target: {value: keys[0], id: this.props.values.length}})
         }
@@ -156,11 +153,9 @@ export default class CriteriasForm extends Component {
   }
 
   checkValidity() {
-    console.log('CHECK', this.state.values);
     const state = {...this.state};
     let crit = this.props.crits;
     let id = '';
-    const val = {...state.values};
     for (let i = 0; i < state.length; i++) {
       id += state.values[i];
       crit = crit[state.values[i]];
@@ -177,7 +172,6 @@ export default class CriteriasForm extends Component {
   }
 
   componentDidMount() {
-    console.log('DID MOUNT')
     let crits = this.props.crits;
     if (this.state.values && crits) {
       for (let i = 0; i < this.state.values.length; i++) {
@@ -201,13 +195,13 @@ export default class CriteriasForm extends Component {
     } catch(error) {}
 
     const state = {...this.state};
-    const key = Number(e.target.id);
+    let key = Number(e.target.id);
     if (key === state.length && key === (state.values.length)) {
       state.values.pop();
       state.length -= 1;
     }
 
-
+    let deep = 0;
     if (key < state.length) {
       let criterion = this.props.crits;
       for (let i = 0; i < key - 1; i++) {
@@ -215,8 +209,10 @@ export default class CriteriasForm extends Component {
       }
       criterion = criterion[e.target.value];
 
+
       for (let i = key; i < state.values.length; i++) {
         if (!criterion) break;
+        deep += 1;
         criterion = criterion[state.values[i]];
       }
       if (criterion) {
@@ -228,28 +224,37 @@ export default class CriteriasForm extends Component {
             state.selects[i].options = Object.keys(criterion);
           }
         }
-        this.setState(state);
+        this.setState(state, () => {this.props.valuesCallback(state.values, false);});
         return;
+      } else {
+        if (deep > 1) {
+          state.values[key - 1] = e.target.value;
+          key += deep - 1
+        }
       }
 
       const d = state.values.length - key;
       for (let i = 0; i < d; i++) {
-        state.values.pop();
+        let val = state.values.pop();
         state.selects.pop();
         state.length -= 1;
       }
 
-      state.values.pop();
-      state.length -= 1;
+      if (!deep || deep === 1) {
+        let val = state.values.pop();
+        state.length -= 1;
+      }
     }
 
     if (key == 1) {
       state.crit = e.target.value;
       state.length = 1;
-    } else state.length += 1;
+    } else if (!deep || deep === 1) {
+      state.length += 1;
+    }
     // this.setState(state)
 
-    state.values.push(e.target.value);
+    if (!deep || deep === 1) state.values.push(e.target.value);
     while (state.selects.length >= state.values.length) {
       state.selects.pop();
     }
@@ -258,7 +263,6 @@ export default class CriteriasForm extends Component {
 
     let crit = this.props.crits;
     let id = '';
-    const val = {...state.values};
     for (let i = 0; i < state.values.length; i++) {
       id += state.values[i];
       crit = crit[state.values[i]];
@@ -287,7 +291,6 @@ export default class CriteriasForm extends Component {
   }
 
   render() {
-      console.log('VAL', this.state.crit)
     const getSelectColorClass = (item) => {
       if (this.props.isInvalid && (item.num === this.state.length + 1)) return ' is-invalid';
       if (this.props.isInvalid === false) return ' is-valid';
@@ -349,7 +352,7 @@ export default class CriteriasForm extends Component {
       <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
       {this.state.selects.map((item, index) => {
         return (
-          <><div key={item.id} css={animateFadeIn}  style={this.props.experimental ? {marginTop: '1rem', marginBottom: '1rem'} : {}}>
+          <><div key={item.id} css={animateFadeIn}  style={this.props.experimental ? {marginTop: index !== 0 ? '1rem': 0, marginBottom: '1rem'} : {}}>
             <DescriptionToTermin values={item.options}/>
             {this.props.experimental &&
             <CriteriasOptionsSelector
