@@ -168,7 +168,7 @@ export default class CriteriasForm extends Component {
     } else {
       this.props.valuesCallback(state.values, true);
     }
-    this.setState(state);
+    //this.setState(state);
   }
 
   componentDidMount() {
@@ -224,7 +224,7 @@ export default class CriteriasForm extends Component {
             state.selects[i].options = Object.keys(criterion);
           }
         }
-        this.setState(state, () => {this.props.valuesCallback(state.values, false);});
+        this.setState(state, () => {this.checkValidity();});
         return;
       } else {
         if (deep > 1) {
