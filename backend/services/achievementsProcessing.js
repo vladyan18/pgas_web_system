@@ -15,7 +15,7 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
 
         if (isPreliminary && (achievement.status === 'Отказано' || achievement.status === 'Данные некорректны')) {
             achievement.preliminaryBall = undefined;
-            await db.updateAchieve(achievement._id, achievement);;
+            await db.updateAchieve(achievement._id, achievement);
             continue;
         }
 
@@ -87,7 +87,7 @@ const calculateBallsForCriterion = function(achievements, isPreliminary) {
             if (!achievementBalls) continue;
             let shift = i;
             if (shift >= achievementBalls.length) shift = achievementBalls.length - 1;
-            if (trimNumber(achievementBalls[shift]) > max ||
+            if (trimNumber(achievementBalls[shift]) > max || (trimNumber(achievementBalls[shift]) === 0 && max === 0) ||
                 (isPreliminary &&
                     trimNumber(achievementBalls[shift]) >= max &&
                     isAchievementAccepted(achievements[achNum]['ach'])

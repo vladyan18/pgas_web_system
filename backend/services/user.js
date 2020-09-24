@@ -64,7 +64,6 @@ function getCrit(crits, arr) {
 const classifiers = {};
 async function initClassifier(plainCrits, facultyName) {
     const users = await db.getCompletelyAllUsersAchievements(facultyName);
-    const critClassifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
     plainCrits.forEach((x, index) => classifier.addDocument(x, index));
     let count = 0;
@@ -79,14 +78,12 @@ async function initClassifier(plainCrits, facultyName) {
             if (id === -1 || !ach.achievement || ach.achievement.length === 0) continue;
             count += 1;
             classifier.addDocument(ach.achievement, id);
-            critClassifier.addDocument(ach.achievement, ach.chars[0]);
         }
     }
 
     console.log(facultyName, 'COUNT:', count);
     classifier.train();
-    critClassifier.train();
-    classifiers[facultyName] = [critClassifier, classifier];
+    classifiers[facultyName] = [null, classifier];
 }
 
 async function initAllClassifiers(facultiesList) {
@@ -125,7 +122,7 @@ module.exports.addAchievement = async function(userId, achievement) {
 
 module.exports.classifyDescription = async function(description, faculty = 'ПМ-ПУ') {
     if (!classifiers[faculty]) return undefined;
-    return {root: classifiers[faculty][0].getClassifications(description), classifier: plainEK3Crits[Number(classifiers[faculty][1].classify(description))]};
+    return {root: null, classifier: plainEK3Crits[Number(classifiers[faculty][1].classify(description))]};
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {
