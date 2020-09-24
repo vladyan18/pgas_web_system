@@ -13,7 +13,6 @@ class StaffChangeAchievement extends Component {
     const user = this.props.users.find((x) => x.Achievements.find((ach) => ach._id.toString() == this.props.achId));
     const achieve = user.Achievements.find((ach) => ach._id.toString() == this.props.achId);
 
-    console.log(achieve.confirmations);
     this.state = {
       user: user.user,
       achId: achieve._id,
@@ -25,8 +24,8 @@ class StaffChangeAchievement extends Component {
       achDate: achieve.achDate,
       confirmations: achieve.confirmations,
       isDateValid: true,
+      hasChanges: false
     };
-    console.log(achieve.confirmations);
     this.updateDescr = this.updateDescr.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.updateNewChars = this.updateNewChars.bind(this);
@@ -34,6 +33,12 @@ class StaffChangeAchievement extends Component {
     this.updateComment = this.updateComment.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
   };
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (!prevState.hasChanges) {
+      this.setState({hasChanges: true});
+    }
+  }
 
   updateDescr(e) {
     this.setState({ach: e.target.value});
@@ -175,7 +180,7 @@ class StaffChangeAchievement extends Component {
 
 
         <button id="DeleteButton" className="btn btn-warning" style={{marginTop: '3rem'}}
-          value="Назад" onClick={this.saveChanges}>Сохранить
+          value="Назад" disabled={!this.state.hasChanges} onClick={this.saveChanges}>Сохранить
         </button>
 
       </div>
@@ -188,7 +193,7 @@ class StaffChangeAchievement extends Component {
                   </div>
                   <div>
                     <CriteriasForm crits={staffContextStore.criterias} values={this.state.chars}
-                      valuesCallback={this.updateNewChars} supressDescription={true}/>
+                      valuesCallback={this.updateNewChars} supressDescription={true} forceEnabled={true}/>
                   </div>
                   <button className="btn btn-success" onClick={this.updateChars}>Сохранить характеристики</button>
                 </div>}

@@ -1,6 +1,7 @@
 import React, {Component, Suspense} from 'react';
 import '../style/user_main.css';
-import '../assets/fontawesome-free-5.12.1-web/css/all.css'
+import '../style/admin.css';
+import '../assets/fontawesome-free-5.12.1-web/css/fontAwesomeClear.css'
 import {Route} from "react-router-dom";
 import Auth from "../modules/Auth";
 import {Switch} from "react-router-dom";
@@ -10,25 +11,17 @@ import userPersonalStore from "../stores/userPersonalStore";
 import staffContextStore from "../stores/staff/staffContextStore";
 import {observer} from "mobx-react";
 
-const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"))
-const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"))
-const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"))
-const StaffCriteriasPage = React.lazy(() => import("./views/staff/staffCriteriasPage"))
-const StaffAnnotationsPage = React.lazy(() => import("./views/staff/staffAnnotationsPage"))
+const AdminsListContainer = React.lazy(() => import("./containers/staff/adminsListContainer"));
+const NewAchievesContainer = React.lazy(() => import("./containers/staff/newAchievesContainer"));
+const CurrentContestAchievementsContainer = React.lazy(() => import("./containers/staff/currentContestAchievementsContainer"));
+const StaffStudentsRatingContainer = React.lazy(() => import("./containers/staff/staffStudentsRatingContainer"));
+const StaffCriteriasPage = React.lazy(() => import("./views/staff/staffCriteriasPage"));
+const StaffAnnotationsPage = React.lazy(() => import("./views/staff/staffAnnotationsPage"));
 const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage/CriteriasMenu'));
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
-const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"))
+const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"));
 
-const PrivateRoute = ({component: Component, ...rest}) => (
-    <Route {...rest} render={props => (
-        Auth.isUserAuthenticated() ? (
-            <Component {...props} {...rest} />
-        ) : (
-            window.location.assign('/api/login')
-        )
-    )}/>
-);
 
 
 class Staff extends Component {
@@ -42,25 +35,9 @@ class Staff extends Component {
 
     componentDidMount() {
         userPersonalStore.update().then((result) => {
-            staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then()
+            staffContextStore.changeFaculty(userPersonalStore.Rights[0]).then();
+            staffContextStore.getAnnotations().then();
         })
-    }
-
-    componentWillMount() {
-        if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
-    }
-
-    componentWillUpdate(nextProps, nextState, nextContext) {
-        Auth.fetchAuth().then(() => {
-            if (!Auth.isUserAuthenticated()) window.location.assign('/api/login')
-        })
-    }
-
-    async toggleAuthenticateStatus() {
-        // check authenticated status and toggle state based on that
-        await Auth.fetchAuth();
-        this.setState({authenticated: Auth.isUserAuthenticated()});
-        console.log(this.state.authenticated)
     }
 
     render() {
@@ -90,6 +67,7 @@ class Staff extends Component {
                         <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
                         <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
                         <Route path="/staff/statistics" component={StaffStatistics}/>
+                        <Route path="/staff/adminsList" component={AdminsListContainer}/>
                         <Route path="/staff/" component={StaffMenu}/>
                     </Switch>
                 </Suspense>

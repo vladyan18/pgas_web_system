@@ -18,7 +18,7 @@ const achievementFormatter = function(cell, row) {
 const columns = [{
   dataField: 'achievement',
   text: 'Достижение',
-  style: {width: '60%', textAlign: 'left', verticalAlign: 'middle'},
+  style: {width: '50%', textAlign: 'left', verticalAlign: 'middle'},
   headerStyle: {verticalAlign: 'middle', textAlign: 'left'},
   formatter: achievementFormatter,
 }, {
@@ -26,11 +26,19 @@ const columns = [{
   text: 'Балл',
   style: {width: '10%', textAlign: 'right', verticalAlign: 'middle'},
   headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
+    formatter: (cell, row) => {
+      if (row.ball !== undefined && row.ball !== null) {
+          return <b>{row.ball}</b>;
+      }
+      if (row.preliminaryBall) {
+          return <i><span style={{color: 'grey'}} title="Предварительный балл, может измениться">{row.preliminaryBall}</span></i>
+      }
+    }
 }, {
   dataField: 'comment',
   text: 'Комментарий',
-  style: {textAlign: 'right', verticalAlign: 'middle'},
-  headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
+  style: {maxWidth: '40%', textAlign: 'right', verticalAlign: 'middle', wordBreak: 'break-word'},
+  headerStyle: {maxWidth: '30%', verticalAlign: 'middle', textAlign: 'right'},
 }];
 
 class CurrentAchievesTable extends Component {

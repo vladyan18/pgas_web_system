@@ -18,12 +18,17 @@ const userSchema = mongoose.Schema({
   Ball: Number,
   Achievement: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Achieve'
+    ref: 'Achieve',
   }],
-    IsInRating: Boolean,
-    IsHiddenInRating: Boolean,
-    Confirmations: [String],
-    Settings: {}
+  IsInRating: Boolean,
+  IsHiddenInRating: Boolean,
+  Confirmations: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Confirmation',
+    },
+  ],
+  Settings: {},
 });
 
 const User = connection.model('User', userSchema);

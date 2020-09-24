@@ -3,19 +3,15 @@ import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
+import {Panel} from './style'
 
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
 `;
 
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-`;
-
 function UserCommonInfo(props) {
-  return (<Panel className="col-md-9 rightBlock">
-    <div className="block_main_right" css={css`margin-bottom: 2rem;`}>
+  return (<Panel className="col-md-9">
+    <div css={css`margin-bottom: 2rem;`}>
       <p className="headline">
                 Информация
       </p>
@@ -32,7 +28,7 @@ function UserCommonInfo(props) {
             </span>
           </a>
           <br/>
-          <a target="_blank" href="https://students.spbu.ru/files/412_12022020.PDF">
+          <a target="_blank" href="https://students.spbu.ru/files/2953_11092020.pdf">
             <span className="name_doc">
                                                 Распоряжение об организации работы по назначению ПГАС
             </span>
@@ -54,7 +50,7 @@ function UserCommonInfo(props) {
         <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
                     Уважаемые студенты!
           <br/>
-                    Сотрудники учебных отделов по направлениям в срок до 17:45 2 марта 2020 года принимают от
+                    Сотрудники учебных отделов по направлениям в срок до 17:45 2 октября 2020 года принимают от
                     студентов Университета, получающих академическую стипендию, заявления-анкеты на повышенную
                     государственную академическую стипендию, заполненные только в электронном виде и распечатанные в
                     соответствии с установленной формой.

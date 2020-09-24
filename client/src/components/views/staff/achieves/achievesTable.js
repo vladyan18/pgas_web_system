@@ -3,52 +3,49 @@ import '../../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
+import {observer} from "mobx-react";
+import AchievesComment from "./achievesComment";
+import {OverlayTrigger, Popover} from "react-bootstrap";
+import staffContextStore from "../../../../stores/staff/staffContextStore";
+import ReactMarkdown from 'react-markdown';
 
 class AchievesTable extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {};
         this.accept = this.accept.bind(this);
         this.decline = this.decline.bind(this);
         this.edit = this.edit.bind(this);
-        this.handleCommentChange = this.handleCommentChange.bind(this)
+        this.handleCommentChange = this.handleCommentChange.bind(this);
+        this.auto_grow = this.auto_grow.bind(this);
     };
 
+    auto_grow(e) {
+        e.target.style.height = "5px";
+        e.target.style.height = (e.target.scrollHeight)+"px";
+    }
+
     statusFormatter = (cell, row) => (
-        row.status + (row.ball ? '('+row.ball+')': '')
-    )
+        <span>{row.status}{(row.isPendingChanges ? <span style={{color: 'blue'}} title='Пользователь догрузил документ'>*</span> : null)}
+            {(row.ball !== undefined && row.ball !== null ? '('+row.ball+')': '')}</span>
+    );
 
     charsFormatter = (cell, row) =>
         (
-            <div style={{"display": "flex", 'flex-wrap': "wrap", "max-width": "20rem"}}>
+            <div style={{"display": "flex", 'flexWrap': "wrap", "maxWidth": "20rem"}}>
                 {row.chars.map((x) => {
                     let str = x;
                     if (str.length > 35) {
                         str = x.substr(0, 15) + '...' + x.substr(x.length - 15, 15)
                     }
-                    return (<div className="charsItem">{str}</div>)
+                    return (<div key={row._id.toString() + x} className="charsItem">{str}</div>)
                 })}
             </div>
         );
 
     newComments = {};
-    commentsFormatter = (cell, row) =>
-        (
-            <div className="input-group commentContainer" onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget))
-                    document.getElementById(row._id).value = document.getElementById(row._id).defaultValue
-            }}>
-            <textarea id={row._id} className={"form-control" + (row.comment ? " commentSended" : "")}
-    defaultValue={row.comment}
-    onChange={(e) => this.newComments[row._id] = e.target.value} style={{height: "8.2rem"}}/>
-                <div className="input-group-append" style={{"marginRight": "0px"}}>
-                    <button class="btn btn-info" style={{"font-size": "x-small", "margin": "0px", backgroundColor: "#3d5c61"}} onClick={(e) => {
-                        this.handleCommentChange(e, row._id)
-                    }}>Ок
-                    </button>
-                </div>
-            </div>
-        );
+    commentsFormatter = (cell, row) => <AchievesComment row={row} updater={this.props.updater}/>;
 
     actionsFormatter = (cell, row) => (
         <div style={{"display": "block"}}>
@@ -71,10 +68,25 @@ class AchievesTable extends Component {
         </div>
     );
 
+    allowAccessPopover = (crit) => (
+        <Popover id="popover-basic" style={{width: "120rem"}}>
+            <Popover.Title as="h3">Критерий {crit}</Popover.Title>
+            <Popover.Content>
+                {staffContextStore.annotations && <ReactMarkdown linkTarget={() => '_blank'} source={staffContextStore.annotations[crit]}/>}
+            </Popover.Content>
+        </Popover>
+    );
+
     columns = [{
         dataField: 'crit',
         style: {width: "5%", textAlign: "center", verticalAlign: "middle"},
-        text: 'Крит.'
+        text: 'Крит.',
+        formatter: (cell, row) => (<>
+            <OverlayTrigger trigger={['hover', 'focus']} placement="right"
+                            overlay={this.allowAccessPopover(row.crit)} >
+            {<span style={{textDecoration:"underline", textDecorationStyle: "dotted"}}>{row.crit}</span>}
+            </OverlayTrigger>
+        </>),
     }, {
         dataField: 'achievement',
         text: 'Достижение',
@@ -114,13 +126,22 @@ class AchievesTable extends Component {
     ];
 
     rowClasses = (row, rowIndex) => {
-        if (row.status == 'Отказано')
-            return 'declined-row';
-        if (row.status == 'Изменено')
-            return 'edited-row';
-        if (row.status == 'Принято' || row.status == 'Принято с изменениями')
-            return 'accepted-row';
-        else return ''
+        let className = '';
+
+        if (row.isPendingChanges) {
+            className = 'pendingChanges ';
+        }
+        if (row.status === 'Отказано')
+           className += 'declined-row';
+        if (row.status === 'Изменено')
+            className += 'edited-row';
+        if (row.status === 'Принято' || row.status === 'Принято с изменениями') {
+            if (this.props.systematicsConflicts && this.props.systematicsConflicts.some((x) => x.crit === row.crit)) {
+                className += ' systematicsFailed ';
+            }
+            className += 'accepted-row';
+        }
+        return className;
     };
 
     accept(e, id) {
@@ -163,20 +184,20 @@ class AchievesTable extends Component {
 
     handleCommentChange(e, id) {
         document.getElementById(id).defaultValue = this.newComments[id];
-        console.log(this.newComments[id]);
-        fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then(
-            this.props.updater()
+        fetchSendWithoutRes('/api/comment', {Id: id, comment: this.newComments[id]}).then( () => {
+                this.props.updater()
+            }
         );
         e.preventDefault()
     }
 
     render() {
-        let filteredAchieves
+        let filteredAchieves;
         if (this.props.filters.hideCheckedAchieves)
         {
-            filteredAchieves = this.props.data.filter(x => (x.status != 'Принято' && x.status != 'Принято с изменениями'))
+            filteredAchieves = this.props.data.filter(x => (x.status !== 'Принято' && x.status !== 'Принято с изменениями'))
         }
-        else filteredAchieves = this.props.data
+        else filteredAchieves = this.props.data;
         return (
             <div className="adminAchievesTableContainer">
                 <BootstrapTable keyField='_id' data={filteredAchieves} columns={this.columns}

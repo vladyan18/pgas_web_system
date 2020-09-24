@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import Dropzone from 'react-dropzone';
 import CriteriasTableViewer from './criteriasTableViewer';
-import {fetchSendObj} from '../../../../services/fetchService';
+import {fetchSendObj, fetchSendWithoutRes} from '../../../../services/fetchService';
 import staffContextStore from '../../../../stores/staff/staffContextStore';
 
 class CriteriasMenu extends Component {
@@ -21,7 +21,7 @@ class CriteriasMenu extends Component {
   uploadCrits() {
     const data = new FormData();
     data.append('file', this.state.file, this.state.file.name);
-    data.append('faculty', 'ПМ-ПУ');
+    data.append('faculty', staffContextStore.faculty);
 
     fetch('/api/uploadCriterias', {
       method: 'POST',
@@ -29,9 +29,11 @@ class CriteriasMenu extends Component {
       body: data,
     }).then((response) => response.json())
         .then((success) => {
-          console.log('CR', success);
-          const st = this.state;
-          st.criterias = success;
+          const st = {};
+          st.criterias = success.criterias;
+          st.differences = success.differences;
+          st.notSure = success.notSure;
+          st.incorrectAchievements = success.incorrectAchievements;
           console.log(st.criterias.schema);
           this.setState(st);
           // Do something with the successful response
@@ -41,10 +43,10 @@ class CriteriasMenu extends Component {
   }
 
   saveCrits() {
-    fetchSendObj('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
+    fetchSendWithoutRes('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
         .then((success) => {
           console.log('SAVE CR', success);
-          // Do something with the successful response
+          this.props.history.goBack()
         })
         .catch((error) => console.log(error),
         );
@@ -69,7 +71,7 @@ class CriteriasMenu extends Component {
             </div>
           </div>
           <hr className="hr_blue"/>
-          <div style={{'display': 'flex'}}>
+          <div>
             <div style={{'width': '30%'}}>
               <Dropzone onDrop={this.onDrop} multiple={false}>
                 {({getRootProps, getInputProps}) => (
@@ -91,9 +93,7 @@ class CriteriasMenu extends Component {
                       }}>
                         <button className="btn btn-warning" onClick={this.uploadCrits}>загрузить
                         </button>
-                        {this.state.criterias &&
-                                            <button className="btn btn-success"
-                                              onClick={this.saveCrits}>сохранить</button>}
+
                       </div>
 
                     </aside>
@@ -102,11 +102,58 @@ class CriteriasMenu extends Component {
                 )}
               </Dropzone>
             </div>
-            <div style={{'width': '70%', 'height': '100%'}}>
+            {this.state.differences && <div style={{marginTop: '3rem'}}>
+            <h2>Несовпадения в критериях: {this.state.differences.length}</h2>
+            <table className="table table-light">
+              <thead>
+              <tr><th>Ключ</th><th>Причина</th><th style={{textAlign: 'right'}}>Путь</th></tr>
+              </thead>
+              <tbody>
+              {this.state.differences.map(x => <tr style={{width: '100%'}}>
+                <td>'{x.key}'</td>
+                <td style={{textAlign: 'center', color: x.reason === 'added' ? 'green' : 'red'}}>{x.reason}</td>
+                <td style={{textAlign: 'right'}}><span style={{fontSize: 'small'}}>{x.path}</span></td></tr>)}
+              </tbody>
+            </table></div>}
+
+              {!!this.state.notSure && <div style={{marginTop: '3rem'}}><h2>Нужно дополнительно проверить: <span style={{color: 'yellow'}}>{this.state.notSure}</span></h2></div>}
+
+            {this.state.incorrectAchievements && <div style={{marginTop: '3rem'}}>
+              <h2>Некорректные достижения у пользователей: {this.state.incorrectAchievements.length}</h2>
+              <table className="table table-light">
+                <thead>
+                <tr><th>Студент</th><th>Некорректно:</th></tr>
+                </thead>
+                <tbody>
+                {this.state.incorrectAchievements.map(x => <tr style={{width: '100%'}}>
+                  <td>{x.user}</td>
+                  <td style={{textAlign: 'left'}}>{(() => {
+                    let str = '';
+                    for (let i = 0; i < x.oldChars.length; i++) {
+                        if (x.incorrectChars.includes(x.oldChars[i])) break;
+                        str += "'" + x.oldChars[i] + "'" + ', ';
+                    }
+                    return str;
+                  })()
+                  } {(() => {
+                    let str = '';
+                    for (let i = 0; i < x.incorrectChars.length; i++) {
+                      str += "'" +  x.incorrectChars[i]  + "'" + ', ';
+                    }
+                    return <span style={{color: 'red'}}>{str}</span>
+                  })()}</td></tr>)}
+                </tbody>
+              </table></div>}
+
+
+            <div style={{'width': '70%', 'height': '100%', marginTop:'3rem'}}>
               {this.state.criterias &&
                                 <CriteriasTableViewer criterias={this.state.criterias.crits}
-                                  schema={this.state.criterias.schema}/>}
+                                  schema={this.state.criterias.schema} limits={this.state.criterias.limits}/>}
             </div>
+            {this.state.criterias &&
+            <button className="btn btn-success"
+                    onClick={this.saveCrits}>Сохранить</button>}
           </div>
         </div>
       </div>

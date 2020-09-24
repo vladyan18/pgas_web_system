@@ -6,6 +6,9 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 import {fetchGet} from '../../../services/fetchService';
 import {makeExportUsersTable} from '../../../services/exportXLSX';
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 
 class StaffMenu extends Component {
   constructor(props) {
@@ -14,6 +17,7 @@ class StaffMenu extends Component {
     this.openCurrentContest = this.openCurrentContest.bind(this);
     this.openCurrentContestRating = this.openCurrentContestRating.bind(this);
     this.openCriteriasMenu = this.openCriteriasMenu.bind(this);
+    this.openAdminsList = this.openAdminsList.bind(this);
     this.exportExcel = this.exportExcel.bind(this);
   };
 
@@ -41,12 +45,16 @@ class StaffMenu extends Component {
     this.props.history.push('/staff/criteriasMenu');
   }
 
+  openAdminsList() {
+    this.props.history.push('/staff/adminsList');
+  }
+
   render() {
     return (
       <main>
         <div id="panel" className="row" style={{'justifyContent': 'center', 'display': 'flex'}}>
 
-          <div className="menu">
+          <div className="menu" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
             <p className="headline">
                             Меню сотрудника
             </p>
@@ -115,9 +123,21 @@ class StaffMenu extends Component {
                   </div>
                 </div>
 
-                <div className="w-100"></div>
+                {['SuperAdmin', 'Admin'].includes(userPersonalStore.Role) &&
+                  <><div className="w-100"/>
+                <div className="col-4">
+                  <div className="centered menuButtonContainer">
+                    <button type="button" id="SubmitButton"
+                            className="btn btn-success menuButton"
+                            value="Панель сотрудника"
+                            onClick={this.openAdminsList}>
+                      Список администраторов
+                    </button>
+                  </div>
+                </div></>}
+                <div className="w-100"/>
                 {
-                  userPersonalStore.Role == 'SuperAdmin' &&
+                  userPersonalStore.Role === 'SuperAdmin' &&
                                     <>
                                       <div className="col">
                                         <div className="centered menuButtonContainer">

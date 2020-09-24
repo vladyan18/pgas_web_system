@@ -12,6 +12,7 @@ class StaffAnnotationsPage extends Component {
     this.state = {annotations: {}, criterias: {}};
     if (staffContextStore.annotations) this.state.annotation = staffContextStore.annotations;
     if (staffContextStore.learningProfile) this.state.learningProfile = staffContextStore.learningProfile;
+    if (staffContextStore.languagesForPublications) this.state.languagesForPublications = staffContextStore.languagesForPublications;
   };
 
   async componentDidMount() {
@@ -23,6 +24,7 @@ class StaffAnnotationsPage extends Component {
     const st = this.state;
     if (staffContextStore.annotations) st.annotations = staffContextStore.annotations;
     if (staffContextStore.learningProfile) st.learningProfile = staffContextStore.learningProfile;
+    if (staffContextStore.languagesForPublications) st.languagesForPublications = staffContextStore.languagesForPublications;
     this.setState(st);
   }
 
@@ -32,6 +34,7 @@ class StaffAnnotationsPage extends Component {
       faculty: staffContextStore.faculty,
       annotations: this.state.annotations,
       learningProfile: this.state.learningProfile,
+      languagesForPublications: this.state.languagesForPublications,
     }).then((res) => {
       if (res) {
         staffContextStore.getAnnotations().then();
@@ -77,6 +80,15 @@ class StaffAnnotationsPage extends Component {
                 this.setState(st);
               }}
               value={this.state.learningProfile} style={{margin: '0'}}/>
+
+            <h5>Напишите описание того, что считается международными языками, а что иными (если нужно):</h5>
+            <textarea className="form-control area_text"
+                      placeholder="Введите описание для международных языков" onChange={(e) => {
+              const st = this.state;
+              st.languagesForPublications = e.target.value;
+              this.setState(st);
+            }}
+                      value={this.state.languagesForPublications} style={{margin: '0'}}/>
 
             {
               staffContextStore.criterias &&

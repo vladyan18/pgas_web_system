@@ -10,9 +10,7 @@ class UserRegistrationContainer extends Component {
   };
 
   componentDidMount() {
-    console.log('MOUNTED');
     fetchGet('/api/getFacultiesList', {}).then((facultiesList) => {
-      console.log(facultiesList);
       this.setState({faculties: facultiesList.list});
     });
   }

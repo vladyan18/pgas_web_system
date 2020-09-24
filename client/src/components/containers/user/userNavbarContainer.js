@@ -3,7 +3,7 @@ import '../../../style/user_main.css';
 import UserNavbar from '../../views/user/userNavbar';
 
 function UserNavbarContainer(props) {
-  return <UserNavbar/>;
+  return <UserNavbar {...props}/>;
 }
 
 export default UserNavbarContainer;

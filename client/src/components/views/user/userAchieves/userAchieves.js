@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import '../../../../style/user_main.css';
 import CurrentAchievesTable from './currentAchievesTable';
 import userAchievesStore from '../../../../stores/userAchievesStore';
+import userPersonalStore from '../../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
 import {BASE_API_URL} from '../../../../common/constants';
+import {withRouter} from "react-router-dom";
 const horizontalLine = css`
     border-top: 1px solid #9F2D20;
 `;
@@ -20,36 +22,34 @@ const mainButton = css`
     &:focus {
         box-shadow: 0 0 0 .2rem #f1c8c6;
     }
+    
+    @media only screen and (max-device-width: 480px) {
+        font-size: x-small;
+    }
 `;
 
 const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    margin-bottom: 2rem;
+    border-radius: 2px;
 `;
 
 
 class UserAchieves extends Component {
   constructor(props) {
     super(props);
+    this.state = {archiveHidden: true};
     this.checkConfirms = this.checkConfirms.bind(this);
+    this.toggleArchiveHide = this.toggleArchiveHide.bind(this);
   };
 
-  componentDidMount() {
-    this.getAchieves();
+  toggleArchiveHide() {
+    this.setState({archiveHidden: !this.state.archiveHidden});
   }
 
-  getAchieves() {
-    fetch(BASE_API_URL + '/getUserInfo', {
-      method: 'GET',
-    }).then((resp) => {
-      return resp.json();
-    })
-        .then((data) => {
-          data.Achs = data.Achs.sort(function(obj1, obj2) {
-            return Number.parseInt(obj1.crit.substr(0, 2)) > Number.parseInt(obj2.crit.substr(0, 2));
-          });
-          userAchievesStore.achieves = data.Achs;
-        });
+  componentDidMount() {
+    userAchievesStore.getAchieves();
   }
 
   checkConfirms(e) {
@@ -78,13 +78,18 @@ class UserAchieves extends Component {
 
   render() {
     let summaryBall = 0;
+    let summaryPreliminaryBall = 0;
     if (userAchievesStore.achieves) {
       for (const ach of userAchievesStore.achieves) {
         if (ach.status == 'Принято' || ach.status == 'Принято с изменениями') {
           summaryBall += ach.ball;
         }
+        if (ach.preliminaryBall) {
+          summaryPreliminaryBall += ach.preliminaryBall;
+        }
       }
     }
+    if (!userAchievesStore.achieves) return null;
     return (<Panel css={css`padding: 1rem;`} className="col-md-9">
 
       <div>
@@ -95,23 +100,66 @@ class UserAchieves extends Component {
         margin-bottom: auto; 
         color: black;
         font-size: larger;
+            @media only screen and (max-device-width: 480px) {
+        font-size: medium;
+        }
         `}>
             <b>Текущие достижения</b>
+
           </div>
           <form action={BASE_API_URL + '/getAnket'} onSubmit={this.checkConfirms}>
             <input type="submit" id="download" className="btn" css={mainButton} value="Скачать анкету"/>
           </form>
         </div>
+
         <hr css={horizontalLine}/>
+        <div style={{display:'flex'}}>
+        {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
+        {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
+        <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>Предварительный балл: {summaryPreliminaryBall}</div>}
+        </div>
         <div css={css`width: 100%; min-height: 10rem;`}>
-          < CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>
+            {userAchievesStore.achieves && <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>}
+            {userAchievesStore.achieves.length === 0 && <div style={{width: '100%', paddingTop: '2rem'}}>
+                <div style={{width: '100%', textAlign: 'center', fontWeight: 350}}>Пока что Вы ничего не внесли</div>
+                <div style={{width: '100%', textAlign: 'center'}}>
+                    <button className='btn' style={{color: '#007bff', backgroundColor: 'unset', fontSize: 'large'}}
+                            onClick={() => this.props.history.push('/upload')}
+                    >Добавить достижение</button>
+                </div>
+            </div>}
         </div>
-        <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem;`}>
-          Архив достижений
-        </div>
+        {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.length > 0 && <div>
+          <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem; cursor: pointer;`}
+               onClick={this.toggleArchiveHide}>
+            <i className={'fas fa-chevron-' + (!this.state.archiveHidden ? 'right' : 'down') + ' mychevron'}
+               ></i>
+             <span style={{marginLeft: '1rem'}}>Архив достижений</span>
+          </div>
+          {!this.state.archiveHidden && <div css={css`width: 100%; min-height: 10rem;`}>
+            <table>
+            {userAchievesStore.archivedAchieves && userAchievesStore.archivedAchieves.map((x) => <tr><td css={css`width:5%; border-top: 1px solid #e3e3e3;`}>{x.crit}</td><td css={css`width:70%; border-top: 1px solid #e3e3e3;`}>{x.achievement}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(new Date(x.achDate)).toLocaleDateString('ru-RU')}</td><td css={css`border-top: 1px solid #e3e3e3;`}>{(x.status !== 'Ожидает проверки') && x.status}</td></tr>)}
+            </table>
+          </div>}
+        </div>}
+
       </div>
+      {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <div css={css`
+      width: 50px; height: 50px; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
+      position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
+        display: none;
+        @media only screen and (max-device-width: 768px) {
+            display: block;
+        }
+      `}
+      onClick={() => this.props.history.push('/upload')}>
+        <i className="fa fa-plus" aria-hidden="true" style={{margin: 'auto'}}></i>
+      </div>}
     </Panel>);
   }
 }
 
-export default observer(UserAchieves);
+//#9b1818
+//#129b41
+
+export default withRouter(observer(UserAchieves));

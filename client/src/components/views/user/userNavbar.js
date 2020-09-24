@@ -6,23 +6,24 @@ import {observer} from 'mobx-react';
 
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
+import userAchievesStore from "../../../stores/userAchievesStore";
 
 const LeftNavbar = css`
   width: 90%;
   padding: 10px 10px 10px 10px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-  
+  border-radius: 2px;
   & > ul {
     margin-left: 0;
     padding-left: 0;
   };
    & > ul > li {
-          @media only screen and (max-device-width: 480px) {
+          @media only screen and (max-device-width: 768px) {
       font-size: medium;
       }
    };
-   @media only screen and (max-device-width: 480px) {
+   @media only screen and (max-device-width: 765px) {
       width:100%;
    }
 `;
@@ -34,11 +35,21 @@ const leftBlock = css`
 `;
 
 const ulNav = css`
+   padding-bottom: 0px;
    @media only screen and (max-device-width: 480px) {
       margin-bottom: 0px;
       padding-bottom: 0px;
    }
 `;
+
+let preloaded = false;
+function preloadDocuments(preloads) {
+  if (!preloaded && !userAchievesStore.confirmations) {
+    preloaded = true;
+    preloads['/confirmations']();
+    userAchievesStore.updateCommonConfirmations();
+  }
+}
 
 function UserNavbar(props) {
   return <div className="col-md-3 leftBlock" css={leftBlock}>
@@ -48,6 +59,7 @@ function UserNavbar(props) {
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
+        <UserNavItem to='/confirmations' onHover={() => preloadDocuments(props.preloads)}>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
       </ul>
     </div>

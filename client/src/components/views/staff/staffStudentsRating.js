@@ -3,20 +3,39 @@ import '../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {withRouter} from "react-router-dom";
+/** @jsx jsx */
+import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
+
+const Panel = styled.div`
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    padding: 0 2rem;
+    @media only screen and (max-device-width: 480px) {
+        padding: 0 1rem;
+    }
+`;
 
 class StaffStudentsRating extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {}
+        this.state = {};
 
-        this.handleDirectionSelect = this.handleDirectionSelect.bind(this)
+        this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
+        this.toggleDetailedMode = this.toggleDetailedMode.bind(this);
     };
 
     numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
 
     columns = [
         ];
+
+    toggleDetailedMode() {
+        if (this.props.toggleDetailedModeCallback) {
+            this.props.toggleDetailedModeCallback();
+        }
+    }
 
     handleDirectionSelect(e) {
         this.setState({currentDirection: e.target.value})
@@ -44,7 +63,7 @@ class StaffStudentsRating extends Component {
             },
             {
                 dataField: 'Type',
-                text: 'М/Б',
+                text: 'Ст. об.',
                 headerClasses: 'text-center',
                 headerStyle: {width: '10px', fontSize:'smaller'},
                 style: {'vertical-align': 'middle', fontSize: 'small', overflow: 'hidden', width: '10px'},
@@ -60,8 +79,11 @@ class StaffStudentsRating extends Component {
                 classes: 'text-center'
             }]
 
-        let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '10в', '11а', '11б', '11в'];
-        let crits = Object.keys(this.props.crits)
+        let critsNames = ['7а', '7б', '7в', '8а', '8б', '9а', '9б', '10а', '10б', '11а', '11б', '11в'];
+        let crits = Object.keys(this.props.crits);
+        if (crits[0] !== '7а') {
+            critsNames.splice(9, 0, '10в')
+        }
         if (this.props.userMode)
             this.columns.push({
                 dataField: 'Ball',
@@ -70,9 +92,11 @@ class StaffStudentsRating extends Component {
                 headerStyle: {borderRight: '3px dotted black', fontSize:'smaller'},
                 style: {'vertical-align': 'middle', borderRight: '3px dotted black', fontWeight: 'bold', fontSize:'smaller'},
                 classes: 'text-center'
-            })
+            });
+
 
         for (let i = 0; i < crits.length; i++) {
+            console.log(crits[i])
             this.columns.push({
                 dataField: "Crits." + crits[i] + "",
                 text: critsNames[i],
@@ -103,34 +127,42 @@ class StaffStudentsRating extends Component {
     }
 
     render() {
-        let filtered = this.props.data
+        let filtered = this.props.data;
         if (this.props.faculty == 'ВШЖиМК' && this.state.currentDirection) {
             filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
         }
+        let sorted = [];
 
-        let sorted = filtered.sort(function(obj1, obj2) {
-            let diff = obj2.Ball-obj1.Ball;
-            if (diff != 0)
-                return obj2.Ball-obj1.Ball;
-            else {
-                for (let crit of Object.keys(obj1.Crits)) {
-                    diff = obj2.Crits[crit] - obj1.Crits[crit];
-                    if (diff != 0) return diff
+        if (filtered) {
+            sorted = filtered.sort(function (obj1, obj2) {
+                let diff = obj2.Ball - obj1.Ball;
+                if (diff != 0)
+                    return obj2.Ball - obj1.Ball;
+                else {
+                    for (let crit of Object.keys(obj1.Crits)) {
+                        diff = obj2.Crits[crit] - obj1.Crits[crit];
+                        if (diff !== 0) return diff
+                    }
+                    return 0
                 }
-                return 0
-            }
-        });
+            });
+        }
 
         return (
 
-                    <div className="col-9 general">
-                        <div className="profile" style={{"display": "flex", "justify-content": "space-between"}}>
+                    <Panel className="col-md-9">
+                        <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
                             <div className="centered_ver">
                                 <p className="headline">
                                     Рейтинг студентов
                                 </p>
                             </div>
                             <div className="centered_ver" style={{"display": "flex"}}>
+                                {
+                                    this.props.toggleDetailedModeCallback &&
+                                    <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-outline-info"
+                                        value="Подробно" onClick={this.toggleDetailedMode}>Подробно</button>
+                                }
                                 <button id="DeleteButton" className="btn btn-secondary"
                                         value="Назад" onClick={() => {
                                     this.props.history.goBack()
@@ -148,7 +180,7 @@ class StaffStudentsRating extends Component {
                             {this.props.directions.map(dir =>
                                 <option value={dir}>{dir}</option> )}
                         </select>}
-                        <hr className="hr_blue"/>
+                        <hr className="hr_blue" style={{marginTop: '0'}}/>
                         <table className="table table-bordered" id='users'>
                             <thead>
                             <tr>
@@ -165,7 +197,7 @@ class StaffStudentsRating extends Component {
                         <BootstrapTable   keyField='_id' data={sorted} columns={this.state.columns}/>
                             </div>}
 
-                    </div>
+                    </Panel>
         )
     }
 }

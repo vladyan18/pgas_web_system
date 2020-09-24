@@ -21,6 +21,7 @@ class HelpButton extends Component {
               padding: 0,
               backgroundColor: 'transparent',
               outline: 'none',
+                color: '#727272'
             }}
           onClick={(e) => {
             e.preventDefault();

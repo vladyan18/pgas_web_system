@@ -19,9 +19,9 @@ class AchievementDateInput extends Component {
       st.isValid = false;
     } else {
       const d = makeDate(value);
-      r = (d >= new Date('2019-02-01') && d <= new Date('2020-01-31'));
+      r = (d >= new Date('2019-09-01') && d <= new Date('2020-08-31'));
       if (!r) {
-        st.validMessage = 'Дата не входит в оцениваемый промежуток (01.02.2019 — 31.01.2020)';
+        st.validMessage = 'Дата не входит в оцениваемый промежуток (01.09.2019 — 31.08.2020)';
         st.isValid = false;
       } else st.isValid = true;
     }
@@ -32,7 +32,7 @@ class AchievementDateInput extends Component {
 
   render() {
     return (<>
-      <DateInput isValid={(this.state.isValid === true) && this.props.isValid} updater={this.handleChange}
+      <DateInput dateRef={this.props.dateRef} isValid={(this.state.isValid === true) && this.props.isValid} updater={this.handleChange}
         defaultValue={this.props.defaultValue} disabled={this.props.disabled}/>
       {(!this.state.isValid || !this.props.isValid) &&
             <span className="redText">{this.state.validMessage}</span>}</>);

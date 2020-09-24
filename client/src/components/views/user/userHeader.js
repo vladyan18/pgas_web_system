@@ -1,15 +1,12 @@
 import React, {Component} from 'react';
-import logo from '../../../img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
-import logoBss from '../../../assets/img/logo_bss.svg';
-import logoSPbU from '../../../assets/img/CoA_Small_whitebg.svg';
-// import userPersonalStore from '../../../stores/userPersonalStore';
+import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compressed-medium.svg';
+import { ReactComponent as LogoBSS } from '../../../assets/img/logo_bss-compressed-medium.svg';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
-import styled from '@emotion/styled';
 
 const pageTop = css`
     background-color: white;
@@ -17,6 +14,9 @@ const pageTop = css`
     align-items: center;
     font-size: 14px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    justify-content: space-between;
+    margin-left: 0;
+    margin-right: 0;
 `;
 
 const blockHeader = css`
@@ -24,7 +24,8 @@ const blockHeader = css`
     display: flex;
     font-size: 14px;
     align-items: center;
-    @media only screen and (max-device-width: 480px) {
+    margin-left: 1rem;
+    @media only screen and (max-device-width: 768px) {
     max-width: 45%;
   }
 `;
@@ -37,35 +38,36 @@ const logoBackground = css`
   flex-direction: column;
   justify-content: center;
   clip-path: polygon(0 0, 60% 0, 100% 100%, 40% 100%);
-  @media only screen and (max-device-width: 480px) {
+  @media only screen and (max-device-width: 768px) {
     height: 35px;
     width: 40px;
   }
   
 `;
 
-const LogoBSS = styled.img`
+const logoBSS = css`
   height: 55px;
   align-self: center;
   padding-right: 10px;
-  @media only screen and (max-device-width: 480px) {
+  @media only screen and (max-device-width: 768px) {
     height: 35px;
   }
 `;
 
-const LogoSPbU = styled.img`
+const logoSpbuBackground = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  `
+
+const logoSPbU = css`
   height: 55px;
-  @media only screen and (max-device-width: 480px) {
+  width: 47px;
+  @media only screen and (max-device-width: 768px) {
     height: 32px;
+    width: 27px;
   }
 
-`;
-
-const ButtonsBlock = styled.div`
-       width: 80%;
-       flex: none;
-       max-width: none;
-       -webkit-flex: none;
 `;
 
 const verticalAlign = css`
@@ -75,9 +77,10 @@ const verticalAlign = css`
 `;
 
 const rightPanel = css `
-    @media only screen and (max-device-width: 480px) {
-    max-width: 55%;
-    flex: 0 0 55%;
+    margin-right: 1rem;
+    @media only screen and (max-device-width: 768px) {
+    max-width: 65%;
+    flex: 0 0 65%;
   }
 `;
 
@@ -107,13 +110,15 @@ class UserHeader extends Component {
     const props = this.props;
     return <header>
       <div className="row" css={pageTop}>
-        <div className="col-8" css={blockHeader}>
+        <div css={blockHeader}>
           <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
-            <LogoSPbU src={logoSPbU} alt={'СПбГУ'}/>
+            <div css={logoSpbuBackground}>
+            <LogoSPbU css={logoSPbU}/>
+            </div>
           </a>
           <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
             <div css={logoBackground}>
-              <LogoBSS src={logoBss} alt={'БСС'}/>
+                <LogoBSS css={logoBSS}/>
             </div>
           </a>
           <div className="p_header">
@@ -122,7 +127,7 @@ class UserHeader extends Component {
           </div>
         </div>
 
-        <div className="col-4" css={rightPanel}>
+        {!props.clear &&  <div css={rightPanel}>
           <div css={css`display: flex; justify-content: flex-end;`}>
 
             <div css={verticalAlign}>
@@ -130,14 +135,29 @@ class UserHeader extends Component {
                 {userPersonalStore && userPersonalStore.fio}
               </div>
             </div>
+            {(userPersonalStore.Role === 'Admin' || userPersonalStore.Role === 'SuperAdmin') &&
+            <div style={{'marginRight': '1rem'}}>
+              <button type="button" id="SubmitButton"
+                      className="btn btn-outline-primary"
+                      css = {css`                 
+                    @media only screen and (max-device-width: 768px) {
+                    font-size: smaller;
+                    border-color: transparent;
+                      }`
+                      }
+                      onClick={this.switchToStaff}>
+                Режим проверяющего
+              </button>
+            </div>
+            }
             <div>
-              <form action="/api/logout">
+              {userPersonalStore && userPersonalStore.personal && <form action="/api/logout">
                 <button type="submit"
                   className="btn btn-outline-danger"
                   css={css`
                 border-color: #9F2D20;
                 color: #9F2D20;
-                  @media only screen and (max-device-width: 480px) {
+                  @media only screen and (max-device-width: 768px) {
                     font-size: smaller;
                     border-color: transparent;
                  }
@@ -145,10 +165,10 @@ class UserHeader extends Component {
                   action="/api/logout">
                 Выход
                 </button>
-              </form>
+              </form>}
             </div>
           </div>
-        </div>
+        </div>}
       </div>
     </header>;
   }

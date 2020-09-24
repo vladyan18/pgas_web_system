@@ -7,7 +7,6 @@ class DateInput extends Component {
     super(props);
     this.state = {isValid: true, value: ''};
     if (props.defaultValue) this.state.value = props.defaultValue;
-    console.log(props.defaultValue);
     this.handleDateChange = this.handleDateChange.bind(this);
   };
 
@@ -30,7 +29,7 @@ class DateInput extends Component {
   render() {
     return (
       <MaskedInput style={{
-        'width': '8rem',
+        'maxWidth': '10rem',
         'marginRight': '0.5rem',
         'textAlign': 'center',
         'marginTop': 'auto',
@@ -39,7 +38,8 @@ class DateInput extends Component {
       mask={[/[0-3]/, /\d/, '.', /[0-1]/, /\d/, '.', /\d/, /\d/, /\d/, /\d/]}
       className={'form-control date achDate' + (this.props.isValid === false ? ' is-invalid' : '') +
       (this.props.isValid ? ' is-valid' : '')} type="text"
-      placeholder='дд.мм.гггг' onChange={this.handleDateChange} value={this.state.value}
+      placeholder='дд.мм.гггг' inputmode="numeric" onChange={this.handleDateChange} value={this.state.value}
+                   ref={this.props.dateRef}
       disabled={this.props.disabled}/>
 
     );

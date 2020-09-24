@@ -5,8 +5,10 @@ class StaffContextStore {
     faculty;
     criterias;
     schema;
+    limits;
     annotations;
     learningProfile;
+    languagesForPublications;
     directions;
 
     constructor() {
@@ -16,20 +18,25 @@ class StaffContextStore {
     async changeFaculty(newFaculty) {
         this.faculty = newFaculty;
         this.schema = undefined;
+        this.limits = undefined;
         this.annotations = undefined;
         this.learningProfile = undefined;
+        this.languagesForPublications = undefined;
         let Faculty = await fetchGet('/api/getFaculty', {name: newFaculty});
-        this.directions = Faculty.Directions
+        this.directions = Faculty.Directions;
         let criterias = await fetchGet('/api/getCriterias', {faculty: newFaculty});
-        this.criterias = criterias;
-
+        if (criterias) {
+            this.criterias = JSON.parse(criterias.Crits);
+            this.limits = criterias.Limits;
+        }
     }
 
     async getAnnotations() {
         let result = await fetchGet('/api/getAnnotations', {faculty: this.faculty});
         if (result) {
-            this.annotations = result.annotations
-            this.learningProfile = result.learningProfile
+            this.annotations = result.annotations;
+            this.learningProfile = result.learningProfile;
+            this.languagesForPublications = result.languagesForPublications;
         } else console.log('ANN NOT FOUND', this.faculty)
     }
 
@@ -37,7 +44,8 @@ class StaffContextStore {
         let result = await fetchGet('/api/getCriteriasAndSchema', {faculty: this.faculty});
         if (result) {
             this.criterias = JSON.parse(result.Crits);
-            this.schema = JSON.parse(result.CritsSchema)
+            this.schema = JSON.parse(result.CritsSchema);
+            this.limits = result.Limits;
         }
     }
 }
@@ -46,8 +54,10 @@ decorate(StaffContextStore, {
     faculty: observable,
     criterias: observable,
     schema: observable,
+    limits: observable,
     annotations: observable,
     learningProfile: observable,
+    languagesForPublications: observable,
     directions: observable,
 });
 

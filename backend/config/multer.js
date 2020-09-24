@@ -6,13 +6,13 @@ const uploadsPath = path.join(__dirname, '../docs');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsPath)
+    cb(null, uploadsPath);
   },
   filename: (req, file, cb) => {
-    cb(null, 'crits-' + randomstring.generate(16) + path.extname(file.originalname))
-  }
+    cb(null, 'crits-' + randomstring.generate(16) + path.extname(file.originalname));
+  },
 });
 
-var upload = multer({storage: storage}).single('file');
+const upload = multer({storage: storage}).single('file');
 
 module.exports = upload;

@@ -1,13 +1,9 @@
-import './style/bootstrap.min.css';
 import './style/user_main.css';
 import React, {Component, Suspense} from 'react';
 import User from "./components/user";
-import Auth from "./modules/Auth";
 import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
-import userPersonalStore from "./stores/userPersonalStore";
-import "./setupProxy"
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));
@@ -16,47 +12,24 @@ const Staff = React.lazy(() => import('./components/staff'));
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {isRegistered: 'unknown', isLogged: false, authChecked: false};
-
-        /*fetch("api/getProfile", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((profile) => {
-                userPersonalStore.personal = profile
-            });*/
+        this.state = {
+            isAuth: localStorage.getItem('isAuthenticated') === 'true'
+        }
     }
 
     componentDidMount() {
-        fetch("api/getProfile", {
-            method: "GET"
-        }).then((resp) => {
-            return resp.json()
-        })
-            .then((profile) => {
-                userPersonalStore.personal = profile
-            });
-
-        Auth.isUserAuthenticated().then((status) => {
-            this.setState({isLogged: status})
-        })
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        Auth.isUserAuthenticated().then((status) => {
-            if (status !== this.state.isLogged || !this.state.authChecked)
-            this.setState({isLogged: status, authChecked: true})
-        })
+        window.onstorage = event => {
+            if (event.key !== 'isAuthenticated') return;
+            const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+            this.setState({isAuth: isAuth});
+        };
     }
 
     render() {
-        if (!this.state.authChecked) return null;
-
         return (
-            this.state.isLogged ?
+            this.state.isAuth ?
                 <Suspense fallback={
-                    <div style={{backGroundColor: "#e2e2e2", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
+                    <div style={{backGroundColor: "#e2zz0100", padding: "3rem", marginTop:'auto', marginBottom:'auto'}}>
                     <div id="floatingCirclesG">
                         <div className="f_circleG" id="frotateG_01"></div>
                         <div className="f_circleG" id="frotateG_02"></div>
@@ -79,6 +52,7 @@ class App extends Component {
                             window.location.href = 'http://localhost/getConfirm/' + id;
                             return null;
                         }}/>
+                        <Route path="/login" component={Login}/>
                         <Route path="/" component={User}/>
                     </Switch>
                 </Suspense>

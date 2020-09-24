@@ -96,12 +96,14 @@ label {
     margin-right:auto;
     margin-left:auto
 }
-@media (min-width:576px) {
-    .container {
-        max-width:540px;
-        min-width: 540px;
+
+@media (max-width:768px) {
+    .container-fluid {
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }
+
 @media (min-width:768px) {
     .container {
         max-width:720px;
@@ -154,6 +156,24 @@ label {
 
 .accepted-row {
     background-color: #91db8b;
+}
+
+.systematicsFailed td:first-of-type{
+    border-left: 5px solid #ff0000;
+}
+
+.systematicsFailed td:last-of-type{
+    border-right: 5px solid #ff0000;
+}
+
+.systematicsFailed td:nth-last-of-type(3)::after{
+    color: red;
+    font-size: small;
+    content: ' систематика?';
+}
+
+.pendingChanges td:nth-last-of-type(2) {
+    border-right: 10px solid #0f8eff;
 }
 
 .left_navbar li {
@@ -368,7 +388,10 @@ label {
 
 .pic_lock {
     width: 50px;
+    height: 50px;
 }
+
+
 
 .title_text {
     color: black;
@@ -427,6 +450,25 @@ block_2 {
     color: #727272;
 }
 
+textarea::placeholder {
+    font-weight: 350;
+}
+
+textarea::-moz-placeholder {
+    font-weight: 350;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+
 @media (max-width: 768px) {
     #check1,
     #check2 {
@@ -448,6 +490,24 @@ block_2 {
 
     .logo_img {
         margin-left: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+        .p_header {
+            font-size: x-small;
+        }
+
+        .hideInMobile {
+            display: none
+        }
+
+        textarea::placeholder {
+            font-size: small;
+        }
+
+        textarea::-moz-placeholder {
+            font-size: small;
+        }
     }
 
     @media screen and (max-width: 700px) {

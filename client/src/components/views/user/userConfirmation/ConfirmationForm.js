@@ -3,9 +3,10 @@ import '../../../../style/user_main.css';
 import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
-import {fetchGet, fetchSendObj} from "../../../../services/fetchService";
+import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../../services/fetchService";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import HelpButton from "../helpButton";
+import EditConfirmation from "./editConfirmation";
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -15,6 +16,7 @@ class ConfirmationForm extends Component {
         this.closeModal = this.closeModal.bind(this);
         this.addConfirmation = this.addConfirmation.bind(this);
         this.addExistingConfirmation = this.addExistingConfirmation.bind(this);
+        this.closeEditingModal = this.closeEditingModal.bind(this);
 
         if (props.value) {
             this.state.confirmations = props.value
@@ -23,8 +25,17 @@ class ConfirmationForm extends Component {
 
         this.onDrop = (file) => {
             let st = this.state;
+            const extension = file[0].name.split('.').pop();
+            if (extension && ['doc', 'docx', 'exe', 'pages', 'odt', 'pptx', 'ppt', 'xls', 'xlsx'].includes(extension.toLowerCase())) {
+                this.setState({forbiddenExtensionUsed: extension});
+                return;
+            }
             st.file = file[0];
-            this.setState(st)
+            this.setState(st, () => {
+                if (this.nameRef) {
+                    this.nameRef.focus();
+                }
+            })
         };
 
         this.handleNameChange = (e) => {
@@ -33,6 +44,19 @@ class ConfirmationForm extends Component {
             let st = this.state;
             st.Name = e.target.value;
             this.setState(st)
+        };
+
+        this.saveResult = (e, confirmation) => {
+            e.preventDefault();
+            e.stopPropagation();
+            let st = {...this.state};
+            st.confirmations.push(confirmation);
+            st.loadedFile = undefined;
+            st.sameFiles = undefined;
+            this.setState(st, () => {
+                this.props.updateForm(this.state.confirmations);
+                this.closeModal(null);
+            })
         };
 
         this.handleLinkChange = (e) => {
@@ -70,9 +94,15 @@ class ConfirmationForm extends Component {
         this.openExisting = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.setState({existingOpened: true})
+            this.setState({existingOpened: true, sameFilesLoaded: undefined})
         }
     };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.value && this.props.value !== this.state.confirmations) {
+            this.setState({confirmations: this.props.value});
+        }
+    }
 
     async componentDidMount() {
         let commonConfirms = await fetchGet('/api/getConfirmations', {});
@@ -154,7 +184,7 @@ class ConfirmationForm extends Component {
 
     headerContainerStyle = {
         display: "flex",
-        width: "70%"
+        width: "100%"
     };
 
     openModal(e) {
@@ -166,6 +196,9 @@ class ConfirmationForm extends Component {
     }
 
     closeModal(e) {
+        if (this.state.loadedFile) {
+            fetchSendWithoutRes('/delete_confirmation', {id: this.state.loadedFile._id}).then();
+        }
         let st = this.state;
         st.modalIsOpen = false;
         st.existingOpened = false;
@@ -177,6 +210,16 @@ class ConfirmationForm extends Component {
         st.Name = undefined;
         st.URL = undefined;
         st.isLoading = false;
+        st.sameFilesLoaded = undefined;
+        st.loadedFile = undefined;
+        st.forbiddenExtensionUsed = undefined;
+        this.setState(st)
+    }
+
+    closeEditingModal(e) {
+        let st = this.state;
+        st.isEditing = false;
+        st.editingConfirmation = undefined;
         this.setState(st)
     }
 
@@ -184,9 +227,14 @@ class ConfirmationForm extends Component {
         e.preventDefault();
         e.stopPropagation();
 
+        if (this.state.loadedFile) {
+            fetchSendWithoutRes('/delete_confirmation', {id: this.state.loadedFile._id}).then();
+        }
         let ex = this.state.existingConfirm;
         let st = this.state;
         ex.additionalInfo = this.state.additionalInfo;
+        st.sameFilesLoaded = undefined;
+        st.loadedFile = undefined;
         st.confirmations.push(ex);
         this.setState(st, () => {
             this.props.updateForm(this.state.confirmations);
@@ -216,16 +264,22 @@ class ConfirmationForm extends Component {
 
             prom.then((oRes) => {
                 if (oRes.status === 200) {
-                    oRes.json().then((res) => {
-                        this.setState({isLoading: false});
-                            let st = this.state;
-                        res.additionalInfo = this.state.additionalInfo;
-                            st.confirmations.push(res);
-
-                        this.setState(st, () => {
-                            this.props.updateForm(this.state.confirmations);
-                        });
-                            this.closeModal(null)
+                    oRes.json().then(({result, sameFiles}) => {
+                            this.setState({isLoading: false});
+                            result.additionalInfo = this.state.additionalInfo;
+                            if (sameFiles) {
+                                this.setState({sameFilesLoaded: sameFiles, Type: undefined, loadedFile: result});
+                            } else {
+                                let st = this.state;
+                                if (!st.confirmations) {
+                                    st.confirmations = [];
+                                }
+                                st.confirmations.push(result);
+                                this.setState(st, () => {
+                                    this.props.updateForm(this.state.confirmations);
+                                });
+                                this.closeModal(null)
+                            }
                         }
                     )
                 } else {
@@ -243,6 +297,9 @@ class ConfirmationForm extends Component {
             let newConf = {Name: this.state.Name, Type: this.state.Type, Data: this.state.URL};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
+                if (!st.confirmations) {
+                    st.confirmations = [];
+                }
                 result.additionalInfo = this.state.additionalInfo;
                 st.confirmations.push(result);
                 this.setState(st, () => {
@@ -261,13 +318,14 @@ class ConfirmationForm extends Component {
             newConf.SZ = {Appendix: this.state.SZAppendix, Paragraph: this.state.SZParagraph};
             fetchSendObj('/api/add_confirmation', newConf).then(((result => {
                 let st = this.state;
+                if (!st.confirmations) {
+                    st.confirmations = [];
+                }
                 st.confirmations.push(result);
                 this.props.updateForm(this.state.confirmations);
                 this.closeModal(null)
             })))
         }
-
-
     }
 
     chooseType(type) {
@@ -321,44 +379,80 @@ class ConfirmationForm extends Component {
             <HelpButton  overlay={AddInfoPopover} placement={"top"} />);
 
         const deleteConfirmation = (e, confirmation) => {
-            let confirmations = this.state.confirmations
+            let confirmations = this.state.confirmations;
             confirmations.splice(confirmations.indexOf(confirmation), 1)
             this.props.updateForm(confirmations);
             //this.setState({confirmations: confirmations})
+        };
+
+        const saveConfirmation = (confirmation) => {
+            if (confirmation) {
+                let confirmations = this.state.confirmations;
+                const index = confirmations.findIndex((x) => (x._id === this.state.editingConfirmation._id));
+                confirmations[index] = Object.assign({}, confirmations[index], confirmation);
+                this.props.updateForm(confirmations);
+                this.setState({confirmations: [...confirmations]});
+            }
+            this.closeEditingModal();
         }
+
+        const editConfirmation = (e, confirmation) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.setState({isEditing: true, editingConfirmation: confirmation});
+        };
 
         let columns = this.columns.concat([
             {
                 isDummyField: true,
                 style: {textAlign: "right"},
-                formatter: (cell, row) => (<>{!this.props.disabled && <button
+                formatter: (cell, row) => (<>{!this.props.disabled &&
+                    <div style={{display: "flex", justifyContent: "right"}}>
+                        <button onClick={(e) => editConfirmation(e, row)}
+                            style={
+                                {
+                                    cursor: "pointer",
+                                    marginLeft: "0.3rem",
+                                    marginRight: "1rem",
+                                    marginTop: "0px",
+                                    border:'none',
+                                    padding: 0,
+                                    backgroundColor: 'transparent',
+                                    outline: 'none',
+                                    color: "orange",
+                                    fontSize: "1rem"
+                                }}><i className="fa fa-edit"/>
+                        </button>
+                <button
                     onClick={(e) => deleteConfirmation(e, row)}
                                                   style={
                                                       {
                                                           cursor: "pointer",
                                                           marginLeft: "0.3rem",
-                                                          marginTop: "0px",
+                                                          marginTop: "2px",
                                                           border:'none',
                                                           padding: 0,
                                                           backgroundColor: 'transparent',
                                                           outline: 'none',
                                                           color: "red",
-                                                          fontSize: "1rem"
-                                                      }}><i className="fa fa-trash-alt"/></button>}</>)
+                                                          fontSize: "1.1rem"
+                                                      }}><i className="fa fa-times"/>
+                </button>
+                    </div>}</>)
             }
-        ])
+        ]);
 
         return (
             <div>
                 <div style={this.headerContainerStyle}>
-                    <p>Подтверждения: </p>
+                    <p><b>Подтверждения:</b> </p>
                     { <b style={{marginLeft: "2rem", color: "green", cursor: "pointer"}} onClick={this.openModal} >
-                        добавить
+                        <i className="fa fa-paperclip"/> прикрепить
                     </b>}
                 </div>
 
                 <div>
-                    {this.state.confirmations.length > 0 &&
+                    {this.state.confirmations && this.state.confirmations.length > 0 &&
                     <BootstrapTable keyField='_id' data={this.state.confirmations} columns={columns}
                                     headerClasses={["hidden"]} bordered={false}/>
                     }
@@ -385,45 +479,51 @@ class ConfirmationForm extends Component {
                             </div>
                         </div>}
                         {(this.state.modalIsOpen && !this.state.isLoading) &&
-                        <div className="modalContentWrapper" style={{maxHeight: "40rem"}}>
+                        <div className="modalContentWrapper" style={{maxHeight: "40rem", maxWidth: "100vw", margin:'auto'}}>
 
                             <div className="block"
-                                 style={{maxHeight: "inherit", maxWidth: "inherit", overflow: "auto"}}>
+                                 style={{maxHeight: "inherit",
+                                     maxWidth: "inherit",
+                                     overflow: "auto",
+                                     borderRadius: '4px',
+                                     padding: (!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) ? '1rem 2rem 2rem 2rem' : '1rem 1rem 2rem 1rem',
+                                     fontFamily: 'sans-serif'
+                                 }}>
                             <div className="profile"
                                  style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
-                                <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
-                                    Добавление подтверждения
+                                <p style={{marginTop: "auto", "margin-bottom": "auto", "margin-right": "1rem", fontWeight: 'bold', fontSize: '1.2rem'}}>
+                                    {this.state.Type ? 'Добавление подтверждения' : 'Прикрепление подтверждения'}
                                 </p>
-                                <div style={{'margin-top': 'auto'}}>
-                                    <button id="DeleteButton" className="btn btn-secondary"
+                                <div style={{'margin-top': 'auto', "margin-bottom": "auto"}}>
+                                    <button id="DeleteButton" className="btn btn-secondary" style={{backgroundColor: 'transparent', color: '#666', border: 'none'}}
                                             value="Назад" onClick={this.closeModal}>Закрыть
                                     </button>
                                 </div>
                             </div>
 
-                            <hr className="hr_blue"/>
+                            <hr style={{borderTop: '2px solid #c1c1c1'}}/>
                             <p className="desc_headline">
                                 Не забудьте также приложить его к бумажной анкете
                             </p>
 
-                                {(!this.state.Type && !this.state.existingOpened) && <div>
-                                    <p>Выберите существующее подтверждение:</p>
+                                {(!this.state.Type && !this.state.existingOpened && !this.state.sameFilesLoaded) && <div style={{marginTop: "2rem"}}>
+                                    <p>Выберите из уже добавленных:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
                                         <button id="DocButton" className="btn btn-primary"
-                                                style={{margin: "0", width: "50%"}}
-                                                value="Назад" onClick={this.openExisting}>Открыть
+                                                style={{margin: "0", width: "100%"}}
+                                                value="Назад" onClick={this.openExisting}>Выбрать
                                         </button>
                                     </div>
-                                    <p style={{marginTop: "1rem"}}>Или создайте новое:</p>
+                                    <p style={{marginTop: "2rem"}}>Или, если Вы еще не добавляли его, создайте новое:</p>
                                     <div style={{display: "flex", justifyContent: "center"}}>
-                                <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem"}}
+                                <button id="DocButton" className="btn btn-success" style={{marginRight: "1rem", width: '30%'}}
                                         value="Назад" onClick={() => this.chooseType('doc')}>Документ
                                 </button>
-                                <button id="LinkButton" className="btn btn-success" style={{marginRight: "1rem"}}
+                                <button id="LinkButton" className="btn btn-success" style={{marginRight: "1rem", width: '30%'}}
                                         value="Назад" onClick={() => this.chooseType('link')}>Ссылка
                                 </button>
-                                <button id="LinkButton" className="btn btn-success"
-                                        value="Назад" onClick={() => this.chooseType('SZ')}>Служ. записка
+                                <button id="LinkButton" className="btn btn-success" style={{ width: '30%'}}
+                                        value="Назад" onClick={() => this.chooseType('SZ') }>СЗ
                                 </button>
                                     </div>
                             </div>}
@@ -443,7 +543,7 @@ class ConfirmationForm extends Component {
                                     <input id="AddInfo" className="form-control" type="text" required
                                            onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                                           onClick={this.addConfirmation}
+                                           onClick={this.addConfirmation} style={{marginTop: '1rem'}}
                                            disabled={!(this.state.URL && this.state.Name)}/>
                                 </form>
                             }
@@ -461,7 +561,7 @@ class ConfirmationForm extends Component {
                                     <input id="SZPar" className="form-control" type="text" required
                                            onChange={this.handleSZParagraphChange}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                                           onClick={this.addConfirmation}
+                                           onClick={this.addConfirmation} style={{marginTop: '1rem'}}
                                            disabled={!(this.state.Name)}/>
                                 </form>
                             }
@@ -470,7 +570,7 @@ class ConfirmationForm extends Component {
                                     e.preventDefault();
                                 }}>
                                     <label htmlFor="Name"><span className="redText">*</span>Название:</label>
-                                    <input id="Name" className="form-control" type="text" required autoFocus={true}
+                                    <input ref={(x) => {this.nameRef = x}} id="Name" className="form-control" type="text" required autoFocus={true}
                                            onChange={this.handleNameChange} autoComplete={'off'}/>
                                     <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}
                                     </label>
@@ -482,9 +582,16 @@ class ConfirmationForm extends Component {
                                             <section>
                                                 {!this.state.file &&
                                                 <div {...getRootProps({className: 'dropzone'})}
-                                                     style={{"backgroundColor": "white"}}>
+                                                     style={this.state.forbiddenExtensionUsed ?
+                                                         {"backgroundColor": "white", borderColor: 'red'} :
+                                                         {"backgroundColor": "white"}
+                                                     }>
                                                     <input {...getInputProps()} />
                                                     <p>Нажмите, либо перетащите файл</p>
+                                                    {this.state.forbiddenExtensionUsed &&
+                                                    <p style={{color: 'red', fontSize: 'small'}}>
+                                                        Формат {this.state.forbiddenExtensionUsed} не поддерживается. <br/> Преобразуйте в pdf.
+                                                    </p>}
                                                     <p style={{fontSize: "small", color: "#4f4f4f"}}>Максимальный
                                                         размер: 15 Мб</p>
                                                 </div>}
@@ -516,6 +623,7 @@ class ConfirmationForm extends Component {
                                         )}
                                     </Dropzone>
                                     <button id="SaveButton" className="btn btn-success"
+                                            style={{marginTop: '1rem'}}
                                             disabled={!(this.state.Name && this.state.file) ||
                                             Math.ceil(this.state.file.size / 1024 / 1024) > 15}
                                             value="Назад" onClick={this.addConfirmation}>Сохранить
@@ -536,17 +644,40 @@ class ConfirmationForm extends Component {
                                     <div>{this.state.existingConfirm.Name}</div>
                                     <label htmlFor="AddInfo">Дополнительная информация: {AddInfoHelp}</label>
                                     <input id="AddInfo" className="form-control" type="text" required
-                                           onChange={this.handleAdditionalInfoChange} autoComplete={'off'}/>
+                                           onChange={this.handleAdditionalInfoChange} defaultValue={this.state.additionalInfo} autoComplete={'off'}/>
                                     <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
                                            onClick={this.addExistingConfirmation}/>
                                 </form>
-
                                 }
+                                {(this.state.sameFilesLoaded && !this.state.existingSelected) && <div>
+                                    <p style={{marginTop: "1rem"}}><b>Вы уже загружали этот документ.</b><br/><br/>
+                                    Вы можете прикрепить существующее подтверждение с этим файлом, кликнув на него:</p>
+                                    <BootstrapTable keyField='_id' data={this.state.sameFilesLoaded}
+                                                    columns={this.columns}
+                                                    rowEvents={this.commonConfRowEvents}
+                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
+                                                    bordered={false}/>
+                                                    <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
+                                    <button id="SaveButton" className="btn btn-outline-danger" style={{borderWidth: '0'}} type="button"
+                                           onClick={(e) => {this.saveResult(e, this.state.loadedFile)}}>
+                                        Нет, сохранить как {this.state.loadedFile && this.state.loadedFile.Name}
+                                    </button>
+                                                    </div>
+                                </div>}
                         </div>
 
                     </div>
                     }
                     </>
+                </Modal>
+
+                <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+                       isOpen={this.state.isEditing}
+                       onRequestClose={this.closeEditingModal}
+                       shouldCloseOnOverlayClick={true}
+                       contentLabel="Example Modal"
+                       overlayClassName="Overlay">
+                    <EditConfirmation confirmation={this.state.editingConfirmation} save={saveConfirmation}/>
                 </Modal>
 
             </div>
@@ -557,7 +688,6 @@ class ConfirmationForm extends Component {
     commonConfRowEvents = {
         onClick: (e, row, rowIndex) => {
             this.setState({existingConfirm: row, existingSelected: true})
-            //window.location.assign('/achievement/'+row._id.toString())
         }
     };
 }

@@ -31,7 +31,6 @@ class AchievesGroup extends Component {
         if (this.state.choosedDirection) {
           resolve(this.state.choosedDirection);
         } else if (this.state.choosedDirection === false) {
-          console.log('NULL');
           reject('null');
         } else {
           setTimeout(() => waitForAnswer(resolve, reject), 30);
@@ -107,20 +106,19 @@ class AchievesGroup extends Component {
   }
 
   render() {
-    if (this.state) console.log('STATE', this.props.item.user, this.state.hidden);
     return (
       <div>
         {this.state &&
-                <div className="name">
-                  <div style={{'width': '100%', 'text-align': 'center', 'height': 'auto'}}
+                <div className="name" id={this.props.item.Id}>
+                  <div style={{'width': '100%', 'textAlign': 'center', 'height': 'auto'}}
                     className="input-group headerContainer">
                     <div className={'nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
-                      style={{'text-align': 'center'}}>
+                      style={{'textAlign': 'center'}}>
                       <i className={'fas fa-chevron-' + (this.state.hidden ? 'right' : 'down') + ' mychevron'}
                         onClick={this.toggleHide}></i>
                     </div>
                     <h3 className={'form-control nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
-                      style={{'border': '0', 'box-shadow': 'none'}}>
+                      style={{'border': '0', 'boxShadow': 'none'}}>
                       <a style={{'color': 'white'}} target="_blank" href="/">{this.props.item.user}</a>
                     </h3>
                     <div className="input-group-append">
@@ -132,7 +130,8 @@ class AchievesGroup extends Component {
                   {!this.state.hidden && <div className="block">
 
                     <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} updater={this.props.updater}
-                      openModal={this.props.openModal} filters={this.props.filters}/>
+                      openModal={this.props.openModal} filters={this.props.filters}
+                                   systematicsConflicts={this.props.systematicsConflicts.filter((x) => x.id === this.props.item.Id)}/>
                   </div>}
                 </div>}
         <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
