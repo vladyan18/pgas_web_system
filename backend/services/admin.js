@@ -6,6 +6,15 @@ module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
 };
 
+module.exports.getData = async function() {
+    const faculties = await db.getAllFaculties();
+    const result = {};
+    for (let fac of faculties) {
+        result[fac] = await db.getCompletelyAllUsersAchievements(fac);
+    }
+    return result;
+};
+
 module.exports.changeAchievement = async function(achievement, userId) {
     const id = achievement._id;
     const user = await db.findUserById(userId);
