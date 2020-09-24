@@ -21,7 +21,7 @@ router.get('/purgeConfirmations', superAdminAuthCheck,
 router.get('/getData', superAdminAuthCheck,
     async function(req, res) {
         const result = await adminService.getData();
-        res.status(200).send(result);
+        res.status(200).send(JSON.stringify(result));
     });
 
 router.post('/createFaculty', superAdminAuthCheck,
