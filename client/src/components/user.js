@@ -13,9 +13,16 @@ import {observer} from 'mobx-react';
 import UserDetailedAccessRequest from "./views/user/userDetailedAccessRequest";
 import styled from "@emotion/styled";
 import {css, jsx} from '@emotion/core';
+import * as serviceWorker from '../serviceWorker';
 import UserUpdateProfileRemainder from "./views/user/userUpdateProfileRemainder";
 import { ToastProvider } from 'react-toast-notifications'
 /** @jsx jsx */
+
+try {
+  serviceWorker.unregister();
+} catch (err) {
+  console.log(err);
+}
 
 const ReactLazyPreload = importStatement => {
   const Component = React.lazy(importStatement);
