@@ -5,7 +5,6 @@ import {observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
 import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compressed-medium.svg';
 import { ReactComponent as LogoBSS } from '../../../assets/img/logo_bss-compressed-medium.svg';
-import { slide as Menu } from 'react-burger-menu'
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import UserNavItem from "./userNavItem";
