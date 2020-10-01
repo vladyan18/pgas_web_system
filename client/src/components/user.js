@@ -50,6 +50,12 @@ class User extends Component {
   };
 
   async componentDidMount() {
+    try {
+      serviceWorker.unregister();
+      console.log('UNREGISTERED SW')
+    } catch (err) {
+      console.log(err);
+    }
     preloadContainer();
     const profile = await userPersonalStore.update();
     if (profile) {

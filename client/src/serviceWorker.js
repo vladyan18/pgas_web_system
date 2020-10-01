@@ -26,7 +26,7 @@ export function register(config) {
   console.log('Starting registration...')
   return;
   if ( 'serviceWorker' in navigator) {
-    console.log('REgistering SW')
+    console.log('Registering SW')
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
