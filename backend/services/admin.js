@@ -1,6 +1,7 @@
 const db = require('./../controllers/dbController');
 const getCurrentDate = require('../helpers/getCurrentDate');
 const achievementsProcessing = require('./achievementsProcessing');
+const notifyService = require('./notifyService');
 
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
@@ -36,6 +37,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
     //await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
+
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -84,15 +86,22 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
             throw new TypeError();
         }
         await db.changeAchieveStatus(achId, action === 'Accept');
+        notifyService.sendNotify(user.id, '✔ Достижение принято!️', achievement.achievement).then();
     } else {
         const changePromise = db.changeAchieveStatus(achId, action === 'Accept');
         const [userInner, changeResult] = await Promise.all([userPromise, changePromise]);
         user = userInner;
+        db.findAchieveById(achId).then((ach) => {
+            notifyService.sendNotify(user.id, '❌ Достижение отклонено', ach.achievement).then();
+        })
+
     }
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
+
+
 };
 
 module.exports.getRating = async function(faculty) {

@@ -23,6 +23,14 @@ const navElement = css`
     & > a:focus {
     outline: none;
     };
+    
+        @media only screen and (max-device-width: 768px) {
+    font-size: small;
+    padding: 0.2rem;
+    :not(:last-child) {
+    border-bottom: 1px solid #f4f4f4;
+    }
+  }
 `;
 
 const activeElement = css`
@@ -36,12 +44,20 @@ const activeElement = css`
     & > a {
       color: white;
     };
+    
+    @media only screen and (max-device-width: 768px) {
+    background-color: unset;
+    & > a {
+      font-weight: bold;
+      color: black;
+    };
+  }
 `;
 
 
 class UserNavItem extends Component {
   render() {
-    const {location, onHover} = this.props;
+    const {location, onHover, onClick} = this.props;
     const {index, to, children, ...props} = this.props;
 
     const isActive = location.pathname == to || (location.pathname == '/' && to == '/home');
@@ -49,7 +65,7 @@ class UserNavItem extends Component {
 
     return (
       <li css={[navElement, isActive && activeElement]}>
-        <LinkComponent css={css`margin-left: 0.25rem;`} to={to} {...props} onMouseEnter={onHover}>{children}</LinkComponent>
+        <LinkComponent css={css`margin-left: 0.25rem;`} to={to} {...props} onMouseEnter={onHover} onClick={onClick}>{children}</LinkComponent>
       </li>
     );
   }

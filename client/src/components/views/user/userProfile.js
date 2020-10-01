@@ -6,13 +6,23 @@ import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import userPersonalStore from "../../../stores/userPersonalStore";
-import {fetchSendWithoutRes} from "../../../services/fetchService";
+import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
 /** @jsx jsx */
 
 class UserProfile extends Component {
   constructor(props) {
     super(props);
     this.handlePrivacyChange = this.handlePrivacyChange.bind(this);
+    this.state = {};
+    this.checkSubscription = function () {
+      checkNotificationSubscription().then((result) => {
+        this.setState({subscribedToNotification: result});
+      });
+    }
+
+    this.removeSubscription = function () {
+      fetchSendWithoutRes('/notifications_unsubscribe', {}).then();
+    }
   };
 
   handlePrivacyChange(e) {
@@ -31,6 +41,10 @@ class UserProfile extends Component {
     fetchSendWithoutRes('/api/registerUser', user).then((result) => {
       userPersonalStore.update().then();
     });
+  }
+
+  componentDidMount() {
+    this.checkSubscription();
   }
 
   render() {
@@ -105,15 +119,92 @@ class UserProfile extends Component {
             <label htmlFor="checkbox_1" style={{cursor: 'pointer'}}>Открыть участникам доступ к моим достижениям</label>
           </div>
         </OverlayTrigger>
+          {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <button className="btn btn-primary" onClick={() => {
+            if (this.state.subscribedToNotification) {
+              askUserPermission()
+              this.removeSubscription();
+            } else {
+              subscribeUser()
+            }
+          }}>{this.state.subscribedToNotification ? 'Отписаться от уведомлений' : 'Подписаться на уведомления'}</button>}
         </div>
     </Panel>);
   }
 }
 
+async function checkNotificationSubscription() {
+  const result = await fetchGet('/notifications_subscribtions', {});
+  if (!result || result.subscriptions.length === 0) return;
+
+  if (result.subscriptions.findIndex((x) => x.sessionId === result.sessionId) > -1) {
+    return true;
+  }
+}
+
+
 function getDate(d) {
   if (!d) return undefined;
   d = new Date(d);
   return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + '.' + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '.' + d.getFullYear();
+}
+
+async function askUserPermission() {
+  return await Notification.requestPermission();
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4)
+  // eslint-disable-next-line
+  const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/")
+
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+function sendSubscription(subscription) {
+  return fetchSendObj('/notifications_subscribe', subscription);
+}
+const convertedVapidKey = urlBase64ToUint8Array("BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730");
+
+function subscribeUser() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function(registration) {
+      if (!registration.pushManager) {
+        console.log('Push manager unavailable.');
+        return
+      }
+
+      registration.pushManager.getSubscription().then(function(existedSubscription) {
+        if (existedSubscription === null) {
+          console.log('No subscription detected, make a request.')
+          registration.pushManager.subscribe({
+            applicationServerKey: convertedVapidKey,
+            userVisibleOnly: true,
+          }).then(function(newSubscription) {
+            console.log('New subscription added.')
+            sendSubscription(newSubscription)
+          }).catch(function(e) {
+            if (Notification.permission !== 'granted') {
+              console.log('Permission was not granted.')
+            } else {
+              console.error('An error ocurred during the subscription process.', e)
+            }
+          })
+        } else {
+          console.log('Existed subscription detected.')
+          sendSubscription(existedSubscription)
+        }
+      })
+    })
+        .catch(function(e) {
+          console.error('An error ocurred during Service Worker registration.', e)
+        })
+  }
 }
 
 export default withRouter(UserProfile);

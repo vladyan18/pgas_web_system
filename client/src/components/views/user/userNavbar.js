@@ -26,12 +26,18 @@ const LeftNavbar = css`
    @media only screen and (max-device-width: 765px) {
       width:100%;
    }
+      @media only screen and (max-device-width: 480px) {
+      display: none;
+   }
 `;
 
 const leftBlock = css`
                   @media only screen and (max-device-width: 480px) {
                     margin-bottom: 1rem;
                  }
+                       @media only screen and (max-device-width: 768px) {
+      display: none;
+   }
 `;
 
 const ulNav = css`
@@ -66,4 +72,4 @@ function UserNavbar(props) {
   </div>;
 }
 
-export default observer(UserNavbar);
+export default observer(UserNavbar)

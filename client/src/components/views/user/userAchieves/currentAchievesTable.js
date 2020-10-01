@@ -83,7 +83,9 @@ class CurrentAchievesTable extends Component {
                     <div id="row_docs">
                         <BootstrapTable keyField='_id' data={this.props.currentAchieves} columns={columns}
                                         rowEvents={this.rowEvents}
-                                        rowClasses={this.rowClasses} columnClasses={this.columnClasses}
+                                        headerClasses={"withoutTopBorder"}
+                                        rowClasses={this.rowClasses}
+                                        columnClasses={this.columnClasses}
 bordered={false}
 />
                     </div>

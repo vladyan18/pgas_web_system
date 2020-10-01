@@ -75,6 +75,7 @@ function UserDocuments(props) {
       <HorizontalLine/>
       <div>
           {props.confirmations && <BootstrapTable keyField='_id' data={props.confirmations}
+                                                  headerClasses={"withoutTopBorder"}
                             columns={columns}
                             bordered={false}/>}
       </div>

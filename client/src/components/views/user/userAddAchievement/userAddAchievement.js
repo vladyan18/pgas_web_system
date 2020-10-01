@@ -15,7 +15,7 @@ import CriterionSelector from "./criterionSelector";
 import DescriptionToCriterion from "./DescriptionToCriterion";
 import DescriptionField from "./descriptionField";
 import DateField from "./dateField";
-import {Panel} from "../style";
+import {Panel, HorizontalLine} from "../style";
 import SaveButton from "./saveButton";
 /** @jsx jsx */
 
@@ -27,10 +27,6 @@ const recommendation = css`
   :hover {
   color: #7c969e;
   }
-`;
-
-const horizontalLine = css`
-    border-top: 1px solid #9F2D20;
 `;
 
 class UserAddAchievement extends Component {
@@ -186,7 +182,7 @@ class UserAddAchievement extends Component {
           <p className="headline">
                         Добавление достижения
           </p>
-          <hr css={horizontalLine}/>
+          <HorizontalLine/>
           {!this.state.chars && <p className="" style={{fontWeight: '350'}}>
             <b>Выберите критерий:</b>
           </p>}

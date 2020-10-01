@@ -12,6 +12,8 @@ const criteriasCache = require('../resources/criteriasCacheInstance');
 const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
+const NotificationsSettingsModel = require('../models/notificationsSettings');
+const SessionsModel = require('../models/sessions');
 const annotationsCache = require('../resources/annotationsCacheInstance');
 const achievementsProcessing = require('../services/achievementsProcessing');
 const { BloomFilter } = require('bloom-filters');
@@ -209,6 +211,11 @@ exports.createAchieve = async function(achieve) {
 };
 
 exports.deleteAchieve = async function(id) {
+  const ach = await AchieveModel.findOne({_id: id}).lean();
+  if (['Принято', 'Принято с изменениями', 'Отказано'].includes(ach.status)) {
+      await AchieveModel.updateOne({_id: id}, {$set: {isArchived: true}});
+      return true;
+  }
   const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}}).lean();
   if (!u) return true;
   for (let i = u.Achievement.length - 1; i >= 0; i--) {
@@ -905,4 +912,46 @@ exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, 
     } else {
         return {oldChars: achievement.chars, incorrectChars: incorrectChars, notSure: notSure};
     }
+};
+
+exports.saveNotificationEndpoint = async function(userId, sessionId, notificationEndpoint) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+    if (!notifSettings) {
+        notifSettings = { userId };
+        notifSettings = await NotificationsSettingsModel.create(notifSettings);
+        UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean().then();
+    }
+
+    const endpoint = {
+        endpointType: 'webpush',
+        endpoint: notificationEndpoint,
+        sessionId: sessionId,
+    };
+
+    return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+        {$push: {endpoints: endpoint}}
+        ).lean();
+};
+
+exports.removeNotificationEndpoint = async function(userId, sessionId) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+
+    return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+        {$pull: {endpoints: {sessionId: sessionId}}}
+    ).lean();
+};
+
+exports.getNotificationEndpoints = async function(userId) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+    if (!notifSettings) return [];
+    return notifSettings.endpoints;
+};
+
+exports.checkSessionValidity = async function(sessionId) {
+    let session = await SessionsModel.findOne({_id: sessionId}).lean();
+    return !!session;
+
 };

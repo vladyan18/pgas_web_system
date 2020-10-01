@@ -274,3 +274,15 @@ module.exports.getConfirmations = async function(userId) { //TODO refactor
 module.exports.getRating = async function(userId, facultyName) { //TODO refactor
    return achievementsProcessing.getRating(facultyName, false, userId);
 };
+
+module.exports.registerForNotifications = async function(userId, sessionId, notificationEndpoint) {
+    return db.saveNotificationEndpoint(userId, sessionId, notificationEndpoint);
+};
+
+module.exports.unregisterForNotifications = async function(userId, sessionId) {
+    return db.removeNotificationEndpoint(userId, sessionId);
+};
+
+module.exports.getNotificationsSubscriptions = async function(userId) {
+    return db.getNotificationEndpoints(userId);
+};
