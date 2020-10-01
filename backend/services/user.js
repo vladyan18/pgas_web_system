@@ -204,6 +204,7 @@ module.exports.deleteAchievement = async function(userId, achId) {
     }
 
     await db.deleteAchieve(achId);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     return true;
 };
