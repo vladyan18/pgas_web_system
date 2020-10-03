@@ -2,6 +2,8 @@
 const db = require('./../controllers/dbController');
 const getCurrentDate = require('../helpers/getCurrentDate');
 const achievementsProcessing = require('./achievementsProcessing');
+const fs = require('fs');
+const path = require('path');
 
 module.exports.getUserRights = async function(id) {
     return db.getUserRights(id);
@@ -300,3 +302,51 @@ module.exports.unsubscribeEmail = async function(userId, email) {
     if (!settings || settings.email !== email) return false;
     return db.changeNotificationEmail(user.id, undefined);
 };
+
+
+const getDateFromStr = require('../helpers/getDateFromStr');
+module.exports.getPortfolio = async function(userId) {
+    function createTable(achievements) {
+        let accum = '';
+        for (let ach of achievements) {
+            accum += `<tr>
+            <td style="color: grey; width: 10%; vertical-align: top;">${getDateFromStr(ach.achDate)}</td>
+            <td style="padding-left: 2rem; vertical-align: top;">${ach.achievement}</td>  
+            </tr>`
+        }
+        return `<table><tbody>${accum}</tbody></table>`;
+    }
+
+    function getFieldOfWork(fieldName, crits, user) {
+        const achievements = user.Achievement.filter((x) => crits.includes(x.crit));
+        if (achievements.length === 0) return '';
+        let block = createTable(achievements);
+        return `<h2 class="subheader">${fieldName}</h2><hr/>` + block;
+    }
+
+    const user = await db.findUserByIdWithAchievements(userId);
+    let template = await fs.promises.readFile('./client/public/portfolio.html', {encoding: 'utf-8'});
+    template = template.replace('$FIO$', user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic)
+        .replace('$FACULTY$', user.Faculty)
+        .replace('$TYPE$', user.Type)
+        .replace('$COURSE$', user.Course);
+
+    let achievementsBlock = '';
+
+    const fields = [
+        ['Олимпиады', ['7в']],
+        ['Проекты', ['7б']],
+        ['Публикации', ['8б']],
+        ['Гранты и призы за научную деятельность', ['8а']],
+        ['Творчество', ['10а', '10б']],
+        ['Ощественная деятельность', ['9а', '9б']],
+        ['Спорт', ['11а', '11б', '11в']],
+    ];
+
+    for (let [fieldName, crits] of fields) {
+        achievementsBlock += getFieldOfWork(fieldName, crits, user);
+    }
+
+    template = template.replace('$ACHIEVEMENTS$', achievementsBlock);
+    return template;
+}

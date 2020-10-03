@@ -295,4 +295,9 @@ router.get('/notifications_subscribtions', authCheck, async (req, res) => {
     res.status(200).json({subscriptions, sessionId: req.session.id});
 });
 
+router.get('/portfolio', authCheck, async (req, res) => {
+    const html = await userService.getPortfolio(req.userId);
+    res.status(200).send(html);
+});
+
 module.exports = router;
