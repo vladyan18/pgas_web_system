@@ -1,3 +1,5 @@
+'use strict';
+
 const db = require('./../controllers/dbController');
 const nodemailer = require("nodemailer");
 
@@ -15,9 +17,10 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
     for (let i = 0; i < chars.length; i++) {
         charsString += chars[i] + (i !== chars.length - 1 ? ', ' : '');
     }
-    const unsubscribeLink = `<a style="color: grey" href="https://achieve.spbu.ru/api/unsubscribe_email?key=${_id}&email=${email}">Отписаться</a>`;
+    const unsubscribeUrl = `https://achieve.spbu.ru/api/unsubscribe_email?key=${_id}&email=${email}`;
+    const unsubscribeLink = `<a style="color: grey" href="${unsubscribeUrl}">Отписаться</a>`;
 
-    message.headers = {"List-Unsubscribe": "<https://achieve.spbu.ru/api/unsubscribe_email>"};
+    message.headers = {"List-Unsubscribe": `<${unsubscribeUrl}>`};
     if (status === 'Принято') {
         message.subject = 'Достижение принято! ✔';
         message.html = `<div>

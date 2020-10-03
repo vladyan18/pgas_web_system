@@ -1,3 +1,4 @@
+'use strict';
 const db = require('./../controllers/dbController');
 const getCurrentDate = require('../helpers/getCurrentDate');
 const achievementsProcessing = require('./achievementsProcessing');
