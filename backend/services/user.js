@@ -310,8 +310,8 @@ module.exports.getPortfolio = async function(userId) {
         let accum = '';
         for (let ach of achievements) {
             accum += `<tr>
-            <td style="color: grey; width: 10%; vertical-align: top;">${getDateFromStr(ach.achDate)}</td>
-            <td style="padding-left: 2rem; vertical-align: top;">${ach.achievement}</td>  
+            <td style="color: grey; width: 10%; vertical-align: top; padding-bottom: 1rem;">${getDateFromStr(ach.achDate)}</td>
+            <td style="padding-left: 2rem; vertical-align: top; padding-bottom: 1rem;">${ach.achievement}</td>  
             </tr>`
         }
         return `<table><tbody>${accum}</tbody></table>`;
