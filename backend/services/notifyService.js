@@ -21,13 +21,14 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
     if (status === 'Принято') {
         message.subject = 'Достижение принято! ✔';
         message.html = `<div>
-        Достижение <b>${achievement}</b> было принято. 
+        Достижение было <b>принято</b>. 
         <br/>
         <br/>
-        Новый статус: ${status}
+        <b>Достижение: </b> ${achievement ? achievement : ''}
         <br/>
+        <b>Новый статус: </b> ${status}
         <br/>
-        Характеристики: <i>${charsString}</i>
+        <b>Характеристики: </b> <i>${charsString}</i>
         <br/>
         <br/>
         <a href="https://achieve.spbu.ru">Перейти в систему</a>
@@ -48,17 +49,16 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
     } else if (status === 'Отказано') {
         message.subject = 'Достижение отклонено ❌';
         message.html = `<div>
-        Достижение <b>${achievement}</b> было отклонено. 
+        Достижение было <b>отклонено</b>. 
         <br/>
         <br/>
-        Новый статус: ${status}
+        <b>Достижение: </b> ${achievement ? achievement : ''}
         <br/>
+        <b>Новый статус: </b> ${status}
         <br/>
-        Комментарий: ${comment}
+        <b>Характеристики: </b> <i>${charsString}</i>
         <br/>
-        <br/>
-        Характеристики: <i>${charsString}</i>
-        <br/>
+        <b>Комментарий: </b> ${comment}
         <br/>
         <a href="https://achieve.spbu.ru">Перейти в систему</a>
         <br/>

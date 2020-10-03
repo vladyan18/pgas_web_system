@@ -144,7 +144,7 @@ class UserProfile extends Component {
         </table>
 
 
-      {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && this.state.notificationSettings &&
+      { this.state.notificationSettings &&
       <div style={{margin: '3rem 0 1rem 0'}}>
         <b>Управление уведомлениями</b>
         <SubscriptionForm defaultValue={this.state.notificationSettings.email}/>
