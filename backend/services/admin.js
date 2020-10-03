@@ -86,22 +86,16 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
             throw new TypeError();
         }
         await db.changeAchieveStatus(achId, action === 'Accept');
-        notifyService.sendNotify(user.id, '✔ Достижение принято!️', achievement.achievement).then();
     } else {
         const changePromise = db.changeAchieveStatus(achId, action === 'Accept');
         const [userInner, changeResult] = await Promise.all([userPromise, changePromise]);
         user = userInner;
-        db.findAchieveById(achId).then((ach) => {
-            notifyService.sendNotify(user.id, '❌ Достижение отклонено', ach.achievement).then();
-        })
-
     }
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
+    notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
-
-
 };
 
 module.exports.getRating = async function(faculty) {

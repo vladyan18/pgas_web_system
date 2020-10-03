@@ -3,6 +3,7 @@ const connection = require('../config/db');
 
 const notificationsSchema = mongoose.Schema({
     userId: String,
+    email: String,
     endpoints: [{
         endpointType: String,
         endpoint: {},

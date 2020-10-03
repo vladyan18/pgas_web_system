@@ -914,6 +914,21 @@ exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, 
     }
 };
 
+exports.changeNotificationEmail = async function(userId, email) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+    if (!notifSettings) {
+        notifSettings = { userId, email };
+        notifSettings = await NotificationsSettingsModel.create(notifSettings);
+        await UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean();
+    } else {
+        await NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+            {$set: {email: email}}
+        ).lean();
+    }
+    return true;
+};
+
 exports.saveNotificationEndpoint = async function(userId, sessionId, notificationEndpoint) {
     let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
     notifSettings = notifSettings.NotificationsSettings;
@@ -943,11 +958,11 @@ exports.removeNotificationEndpoint = async function(userId, sessionId) {
     ).lean();
 };
 
-exports.getNotificationEndpoints = async function(userId) {
+exports.getNotificationSettings = async function(userId) {
     let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    if (!notifSettings) return null;
     notifSettings = notifSettings.NotificationsSettings;
-    if (!notifSettings) return [];
-    return notifSettings.endpoints;
+    return notifSettings;
 };
 
 exports.checkSessionValidity = async function(sessionId) {

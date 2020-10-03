@@ -276,6 +276,10 @@ module.exports.getRating = async function(userId, facultyName) { //TODO refactor
    return achievementsProcessing.getRating(facultyName, false, userId);
 };
 
+module.exports.changeEmailForNotifications = async function(userId, email) {
+    return db.changeNotificationEmail(userId, email);
+};
+
 module.exports.registerForNotifications = async function(userId, sessionId, notificationEndpoint) {
     return db.saveNotificationEndpoint(userId, sessionId, notificationEndpoint);
 };
@@ -285,5 +289,13 @@ module.exports.unregisterForNotifications = async function(userId, sessionId) {
 };
 
 module.exports.getNotificationsSubscriptions = async function(userId) {
-    return db.getNotificationEndpoints(userId);
+    return db.getNotificationSettings(userId);
+};
+
+module.exports.unsubscribeEmail = async function(userId, email) {
+    const user = await db.findUser(userId);
+    if (!user) return false;
+    const settings = await db.getNotificationSettings(user.id);
+    if (!settings || settings.email !== email) return false;
+    return db.changeNotificationEmail(user.id, undefined);
 };

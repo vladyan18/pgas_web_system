@@ -249,6 +249,41 @@ router.post('/notifications_subscribe', authCheck, (req, res) => {
     res.status(200).json({'success': true})
 });
 
+router.get('/change_notification_email', authCheck, async (req, res) => {
+    await userService.changeEmailForNotifications(req.userId, req.query.email);
+    res.status(200).json({'success': true});
+});
+
+router.get('/unsubscribe_email', async (req, res) => {
+    const userRawId = req.query.key;
+    const email = req.query.email;
+    const result = await userService.unsubscribeEmail(userRawId, email);
+     if (!result) {
+         return res.sendStatus(400);
+     }
+
+     res.status(200).send(`
+    <html>
+    <body>
+    Вы успешно отписаны от оповещений на почту!
+    </body>
+    </html>
+    `)
+});
+
+router.post('/unsubscribe_email', async (req, res) => {
+    const userRawId = req.body.key;
+    const email = req.body.email;
+    const result = await userService.unsubscribeEmail(userRawId, email);
+    if (result) {
+        res.status(200).json({'success': true});
+    } else {
+        res.status(400).json({'success': false});
+    }
+
+});
+
+
 router.post('/notifications_unsubscribe', authCheck, (req, res) => {
     userService.unregisterForNotifications(req.userId, req.session.id).then();
 

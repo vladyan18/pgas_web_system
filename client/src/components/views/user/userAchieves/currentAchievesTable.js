@@ -28,7 +28,8 @@ const columns = [{
   headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
     formatter: (cell, row) => {
       if (row.ball !== undefined && row.ball !== null) {
-          return <b>{row.ball}</b>;
+          return <><b>{row.ball} </b>
+              {(row.preliminaryBall && row.preliminaryBall !== row.ball) ? <i><span style={{color: 'grey', fontSize: 'small'}} title="Предварительный балл, может измениться">({row.preliminaryBall})</span></i> : ''}</>;
       }
       if (row.preliminaryBall) {
           return <i><span style={{color: 'grey'}} title="Предварительный балл, может измениться">{row.preliminaryBall}</span></i>

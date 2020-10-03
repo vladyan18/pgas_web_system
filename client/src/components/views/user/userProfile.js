@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
 import '../../../style/add_portfolio.css';
 import {withRouter} from 'react-router-dom';
 import {Panel} from './style'
@@ -9,20 +9,53 @@ import userPersonalStore from "../../../stores/userPersonalStore";
 import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
 /** @jsx jsx */
 
+function SubscriptionForm({defaultValue}) {
+  const [ subscriptionEmail, setSubcriptionEmail ] = useState(defaultValue || (userPersonalStore.personal.id + '@student.spbu.ru'));
+  const [ subscripted, setSubcripted ] = useState(!!defaultValue && defaultValue !== '');
+
+  function changeNotificationEmail(email) {
+    fetchGet('/change_notification_email', { email }).then(() => {
+      console.log(email);
+      if (email && email !== '') setSubcripted(true)
+      else setSubcripted(false);
+    });
+  }
+
+  if (subscripted) {
+    return <div style={{display: 'flex', marginTop: '0.5rem'}}>
+      <div><span>{subscriptionEmail}</span></div>
+      <button className="btn btn-outline-danger"  style={{border: 'none', padding: '0 1rem', marginLeft: '1rem'}} onClick={() => changeNotificationEmail('')}>Отписаться</button>
+    </div>
+  }
+
+  return <form onSubmit={(e) => {
+    e.preventDefault();
+    changeNotificationEmail(subscriptionEmail);
+  }}>
+    <div className="input-group mb-3" style={{maxWidth: '30rem'}}>
+      <input type='email' className="form-control" onChange={(e) => setSubcriptionEmail(e.target.value)} defaultValue={subscriptionEmail}/>
+      <div className="input-group-append">
+        <button type='submit' className="btn btn-primary">Подписаться</button>
+      </div>
+    </div>
+  </form>
+}
+
 class UserProfile extends Component {
   constructor(props) {
     super(props);
     this.handlePrivacyChange = this.handlePrivacyChange.bind(this);
     this.state = {};
-    this.checkSubscription = function () {
-      checkNotificationSubscription().then((result) => {
-        this.setState({subscribedToNotification: result});
-      });
-    }
+
+    this.checkSubscription = async function () {
+      let result = await fetchGet('/notifications_subscribtions', {});
+      if (!result.subscriptions) result.subscriptions = {};
+      this.setState({notificationSettings: result.subscriptions});
+    };
 
     this.removeSubscription = function () {
       fetchSendWithoutRes('/notifications_unsubscribe', {}).then();
-    }
+    };
   };
 
   handlePrivacyChange(e) {
@@ -110,7 +143,15 @@ class UserProfile extends Component {
           </tbody>
         </table>
 
-        <div style={{cursor: 'pointer', marginBottom: '2rem'}}>
+
+      {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && this.state.notificationSettings &&
+      <div style={{margin: '3rem 0 1rem 0'}}>
+        <b>Управление уведомлениями</b>
+        <SubscriptionForm defaultValue={this.state.notificationSettings.email}/>
+      </div>
+      }
+
+        <div style={{cursor: 'pointer', marginTop: '3rem', marginBottom: '2rem'}}>
         <OverlayTrigger trigger={['hover', 'focus']} placement="left"
                         overlay={allowAccessPopover} >
           <div className="checkbox" style={{color: "green"}}>
@@ -119,25 +160,8 @@ class UserProfile extends Component {
             <label htmlFor="checkbox_1" style={{cursor: 'pointer'}}>Открыть участникам доступ к моим достижениям</label>
           </div>
         </OverlayTrigger>
-          {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <button className="btn btn-primary" onClick={() => {
-            if (this.state.subscribedToNotification) {
-              askUserPermission()
-              this.removeSubscription();
-            } else {
-              subscribeUser()
-            }
-          }}>{this.state.subscribedToNotification ? 'Отписаться от уведомлений' : 'Подписаться на уведомления'}</button>}
         </div>
     </Panel>);
-  }
-}
-
-async function checkNotificationSubscription() {
-  const result = await fetchGet('/notifications_subscribtions', {});
-  if (!result || result.subscriptions.length === 0) return;
-
-  if (result.subscriptions.findIndex((x) => x.sessionId === result.sessionId) > -1) {
-    return true;
   }
 }
 
