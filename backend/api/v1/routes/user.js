@@ -116,6 +116,7 @@ router.post('/update_achieve', authCheck,
         res.sendStatus(200);
     });
 
+
 router.post('/delete_achieve', authCheck,
     async function(req, res) {
         try {
@@ -249,6 +250,12 @@ router.post('/notifications_subscribe', authCheck, (req, res) => {
     res.status(200).json({'success': true})
 });
 
+router.post('/change_settings', authCheck, async (req, res) => {
+    const settings = req.body;
+    await userService.changeUserSettings(req.userId, settings);
+    res.status(200).json({'success': true})
+});
+
 router.get('/change_notification_email', authCheck, async (req, res) => {
     await userService.changeEmailForNotifications(req.userId, req.query.email);
     res.status(200).json({'success': true});
@@ -295,9 +302,13 @@ router.get('/notifications_subscribtions', authCheck, async (req, res) => {
     res.status(200).json({subscriptions, sessionId: req.session.id});
 });
 
-router.get('/portfolio', authCheck, async (req, res) => {
-    const html = await userService.getPortfolio(req.userId);
-    res.status(200).send(html);
+router.get('/portfolio/:id', async (req, res) => {
+    const html = await userService.getPortfolio(req.params.id);
+    if (html) {
+        res.status(200).send(html);
+    } else {
+        res.sendStatus(404);
+    }
 });
 
 module.exports = router;

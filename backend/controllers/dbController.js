@@ -84,6 +84,10 @@ exports.getUserRights = function(id) {
   return UserModel.findOne({id: id}, 'Role Rights').lean();
 };
 
+exports.changeUserSettings = function(id, newSettings) {
+    return UserModel.updateOne({id: id}, {$set: {Settings: newSettings}});
+};
+
 exports.findUserByAchieve = async function(id) {
   const ach = await AchieveModel.findById(id.toString());
   return UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}}).lean();

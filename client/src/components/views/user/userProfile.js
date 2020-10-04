@@ -32,6 +32,7 @@ function SubscriptionForm({defaultValue}) {
     e.preventDefault();
     changeNotificationEmail(subscriptionEmail);
   }}>
+    <p style={{color: 'grey', marginTop: '1rem'}}><i>Вы можете подписаться на уведомления о проверке Ваших достижений</i></p>
     <div className="input-group mb-3" style={{maxWidth: '30rem'}}>
       <input type='email' className="form-control" onChange={(e) => setSubcriptionEmail(e.target.value)} defaultValue={subscriptionEmail}/>
       <div className="input-group-append">
@@ -39,6 +40,27 @@ function SubscriptionForm({defaultValue}) {
       </div>
     </div>
   </form>
+}
+
+function PortfolioForm(props) {
+  const [portfolioOpened, setPortfolioOpened] = useState(userPersonalStore.Settings && userPersonalStore.Settings.portfolioOpened);
+
+  async function switchPortfolio() {
+    await fetchSendWithoutRes('/change_settings', {portfolioOpened: !portfolioOpened});
+    setPortfolioOpened(!portfolioOpened);
+  }
+
+  if (!portfolioOpened) {
+    return <div style={{marginTop: '1rem'}}>
+      <p style={{color: 'grey'}}><i>После создания своего Портфолио, Вы сможете опубликовать ссылку на него</i></p>
+      <button className="btn btn-primary" onClick={switchPortfolio}>Создать портфолио</button>
+    </div>
+  }
+
+  return <div style={{marginTop: '1rem'}}>
+    <p><b style={{color: 'grey'}}>Адрес портфолио:</b> { 'https://achieve.spbu.ru/api/portfolio/' + userPersonalStore.personal.id }</p>
+    <button className="btn btn-outline-danger"  onClick={switchPortfolio}>Закрыть доступ к Портфолио</button>
+  </div>
 }
 
 class UserProfile extends Component {
@@ -143,13 +165,23 @@ class UserProfile extends Component {
           </tbody>
         </table>
 
+      <div style={{margin: '3rem 0 1rem 0'}}>
+        <hr/>
+        <b>Управление Портфолио</b>
+        <PortfolioForm/>
+      </div>
+
+
 
       { this.state.notificationSettings &&
-      <div style={{margin: '3rem 0 1rem 0'}}>
+      <div style={{margin: '3rem 0 2rem 0'}}>
+        <hr/>
         <b>Управление уведомлениями</b>
         <SubscriptionForm defaultValue={this.state.notificationSettings.email}/>
       </div>
       }
+
+      <hr/>
 
         <div style={{cursor: 'pointer', marginTop: '3rem', marginBottom: '2rem'}}>
         <OverlayTrigger trigger={['hover', 'focus']} placement="left"

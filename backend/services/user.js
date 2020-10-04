@@ -49,6 +49,14 @@ module.exports.registerUser = async function(userId, userData, session) {
     });
 };
 
+module.exports.changeUserSettings = async function(userId, newSettings) {
+    let user = await db.findUserById(userId);
+    if (!user) return;
+    let settings = user.Settings || {};
+    settings = Object.assign(settings, newSettings);
+    await db.changeUserSettings(userId, settings);
+};
+
 const natural = require('natural');
 const plainEK3Crits = [];
 let roots = [];
@@ -351,6 +359,8 @@ module.exports.getPortfolio = async function(userId) {
     }
 
     const user = await db.findUserByIdWithAllAchievements(userId);
+    if (!user || !user.Settings || !user.Settings.portfolioOpened) return false;
+
     user.Achievement = user.Achievement.filter(x => ['Принято', 'Принято с изменениями'].includes(x.status));
 
     let template = await fs.promises.readFile('./client/public/portfolio.html', {encoding: 'utf-8'});
