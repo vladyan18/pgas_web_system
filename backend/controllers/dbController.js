@@ -31,8 +31,10 @@ exports.getUserWithConfirmations = async function(id) {
 
 async function getUserWithAchievements(id, isArchived) {
   let query;
-  if (isArchived) {
+  if (isArchived && isArchived !== 'all') {
     query = { $or: [{achDate: {$lt: '2019-09-1'}}, {isArchived: true}] };
+  } else if (isArchived === 'all') {
+      query = {};
   } else {
     query = { achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true} };
   }
@@ -63,6 +65,10 @@ async function getUserWithAchievements(id, isArchived) {
 
 exports.findUserByIdWithAchievements = async function(id) {
   return getUserWithAchievements(id, false);
+};
+
+exports.findUserByIdWithAllAchievements = async function(id) {
+    return getUserWithAchievements(id, 'all');
 };
 
 exports.findUserByIdWithArchivedAchievements = async function(id) {

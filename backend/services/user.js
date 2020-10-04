@@ -306,25 +306,53 @@ module.exports.unsubscribeEmail = async function(userId, email) {
 
 const getDateFromStr = require('../helpers/getDateFromStr');
 module.exports.getPortfolio = async function(userId) {
+    function createCharsString(chars) {
+        const charsDictionary = {
+            'ДСПО': 'Соответствует профилю обучения',
+            'ДнСПО': 'Не соответствует профилю обучения',
+            'БДнК': 'Без доклада на конференции',
+            'СДнК': 'С докладом на конференции',
+            'УД': 'Устный доклад',
+            'СД': 'Стендовый доклад',
+            'Заочн. уч.': 'Заочное участие',
+            'Очн. уч.': 'Очное участие',
+            'Заруб. изд.': 'Зарубежное издание',
+            'Росс. изд.': 'Российское издание',
+            'ММК': 'Материалы международной конференции',
+            'Публикация (кроме тезисов)': 'Публикация',
+            'Индивидуальный (один студент и, возможно, научный руководитель)': 'Индивидуальный',
+            'Документ, удостоверяющий исключительное право студента на достигнутый им научный (научно-методический, научно-технический, научно-творческий) результат интеллектуальной деятельности (патент, свидетельство)': 'Исключительное право на достигнутый научный результат интеллектуальной деятельности (патент, свидетельство)'
+        };
+
+        let str = '';
+        for (let i = 1; i < chars.length; i++) {
+            let char = charsDictionary[chars[i]] || chars[i];
+            str += char + (i !== chars.length - 1 ? ', ' : '');
+        }
+        return str;
+    }
     function createTable(achievements) {
         let accum = '';
         for (let ach of achievements) {
             accum += `<tr>
             <td style="color: grey; width: 10%; vertical-align: top; padding-bottom: 1rem;">${getDateFromStr(ach.achDate)}</td>
-            <td style="padding-left: 2rem; vertical-align: top; padding-bottom: 1rem;">${ach.achievement}</td>  
+            <td style="padding-left: 2rem; vertical-align: top; padding-bottom: 1rem;">${ach.achievement} <br/> <span style="color:grey; font-weight: 350; font-size: small;">${createCharsString(ach.chars)}</span></td>  
             </tr>`
         }
         return `<table><tbody>${accum}</tbody></table>`;
     }
 
     function getFieldOfWork(fieldName, crits, user) {
-        const achievements = user.Achievement.filter((x) => crits.includes(x.crit));
+        const achievements = user.Achievement.filter((x) => crits.includes(x.crit))
+            .sort((a, b) => new Date(b.achDate) - new Date(a.achDate));
         if (achievements.length === 0) return '';
         let block = createTable(achievements);
         return `<h2 class="subheader">${fieldName}</h2><hr/>` + block;
     }
 
-    const user = await db.findUserByIdWithAchievements(userId);
+    const user = await db.findUserByIdWithAllAchievements(userId);
+    user.Achievement = user.Achievement.filter(x => ['Принято', 'Принято с изменениями'].includes(x.status));
+
     let template = await fs.promises.readFile('./client/public/portfolio.html', {encoding: 'utf-8'});
     template = template.replace('$FIO$', user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic)
         .replace('$FACULTY$', user.Faculty)
