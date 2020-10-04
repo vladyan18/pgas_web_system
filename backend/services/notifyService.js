@@ -98,7 +98,9 @@ module.exports.notifyUserAboutNewAchieveStatus = async function(userId, achId) {
 
         if (userSettings.email && userSettings.email !== '') {
             const {subject, html, text, headers} = createMessageAboutNewStatus(userSettings.email, user, achievement);
-            module.exports.sendEmail(userSettings.email, subject, html, text, headers).then().catch();
+            if (subject && subject !== '') {
+                module.exports.sendEmail(userSettings.email, subject, html, text, headers).then().catch();
+            }
         }
 
         const indexInQueue = emailQueue.findIndex(x => x.achId === achId);
