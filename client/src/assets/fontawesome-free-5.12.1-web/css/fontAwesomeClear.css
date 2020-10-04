@@ -41,6 +41,10 @@
 .fa-compress:before {
     content: "\f066"; }
 
+.fa-refresh:before {
+    content: "\f021";
+}
+
 .fa-expand:before {
     content: "\f065"; }
 

@@ -21,6 +21,12 @@ body {
     align-self: center;
 }
 
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+
 @media (max-width: 768px) {
     .logo_img {
         margin-left: 0;

@@ -10,6 +10,14 @@ import styled from '@emotion/styled';
 import {observer} from "mobx-react";
 import SystematicsInfo from "./systematicsInfo";
 
+const spinningStyle = css`
+    -webkit-animation:spin 1s linear infinite;
+    -moz-animation:spin 1s linear infinite;
+    animation:spin 1s linear infinite;
+    
+    background-color: lightblue;
+    `
+
 class AchievesUserGroups extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -21,6 +29,7 @@ class AchievesUserGroups extends React.PureComponent {
     this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
     this.updateSystematicsCallback = this.updateSystematicsCallback.bind(this);
     this.toggleOnlyUpdated = this.toggleOnlyUpdated.bind(this);
+    this.updateUsers = this.updateUsers.bind(this);
   };
 
   updateSystematicsCallback(systematicsConflicts) {
@@ -36,8 +45,14 @@ class AchievesUserGroups extends React.PureComponent {
     this.setState({modalIsOpen: false, modalAchId: achId});
   }
 
-  updateUsers(newUsers) {
-
+  updateUsers() {
+    if (this.props.updater) {
+      this.setState({loading: true}, () => {
+        this.props.updater().then(() => {
+          this.setState({loading: false});
+        })
+      })
+    }
   }
 
   toggleCheckedAchieve() {
@@ -150,6 +165,17 @@ class AchievesUserGroups extends React.PureComponent {
                       }}/>
         }
       </Modal>
+        {this.props.updater && <div css={[css`
+      width: 3rem; height: 3rem;; background-color: blue; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
+      position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
+        display: block;
+        @media only screen and (max-device-width: 768px) {
+            display: block;
+        }
+      `, this.state.loading ? spinningStyle : '']}
+             onClick={this.updateUsers}>
+          <i className="fa fa-refresh" aria-hidden="true" style={{margin: 'auto'}}></i>
+        </div>}
       </main>
     );
   }
