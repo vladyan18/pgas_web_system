@@ -21,7 +21,7 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
     const unsubscribeLink = `<a style="color: grey" href="${unsubscribeUrl}">Отписаться</a>`;
 
     message.headers = {"List-Unsubscribe": `<${unsubscribeUrl}>`};
-    if (status === 'Принято') {
+    if (['Принято', 'Принято с изменениями'].includes(status)) {
         message.subject = 'Достижение принято! ✔';
         message.html = `<div>
         Достижение было <b>принято</b>. 
