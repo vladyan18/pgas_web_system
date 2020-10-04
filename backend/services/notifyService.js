@@ -94,7 +94,7 @@ module.exports.notifyUserAboutNewAchieveStatus = async function(userId, achId) {
 
     const timeout = setTimeout(async () => {
         const [user, userSettings, achievement] = await Promise.all([db.findUserById(userId), db.getNotificationSettings(userId), db.findAchieveById(achId)]);
-        if (!userSettings || !achievement) return;
+        if (!user || !userSettings || !achievement) return;
 
         if (userSettings.email && userSettings.email !== '') {
             const {subject, html, text, headers} = createMessageAboutNewStatus(userSettings.email, user, achievement);
