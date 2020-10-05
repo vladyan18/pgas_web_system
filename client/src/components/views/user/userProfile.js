@@ -57,8 +57,9 @@ function PortfolioForm(props) {
     </div>
   }
 
+  const portfolioUrl = 'https://achieve.spbu.ru/api/portfolio/' + userPersonalStore.personal.id;
   return <div style={{marginTop: '1rem'}}>
-    <p><b style={{color: 'grey'}}>Адрес портфолио:</b> { 'https://achieve.spbu.ru/api/portfolio/' + userPersonalStore.personal.id }</p>
+    <p><b style={{color: 'grey'}}>Адрес портфолио:</b> <a href={ portfolioUrl } target="_blank">{ portfolioUrl }</a></p>
     <button className="btn btn-outline-danger"  onClick={switchPortfolio}>Закрыть доступ к Портфолио</button>
   </div>
 }
