@@ -134,7 +134,7 @@ exports.isRegistered = async function(id) {
 
 
 exports.getAdminsForFaculty = function(facultyName) {
-  return UserModel.find({Role: {$in: ['Admin', 'Moderator']}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
+  return UserModel.find({Role: {$in: ['Admin', 'Moderator', 'Observer']}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
 };
 
 exports.getCurrentUsers = function(faculty) {
@@ -421,9 +421,12 @@ exports.changeRole = async function(reqUserId, userId, newRole, faculty) { // TO
     if (user.Rights.includes(faculty) && newRole !== 'User') {
         return UserModel.updateOne({id: userId}, {$set: {Role: newRole}}).lean();
     } else if (newRole !== 'User') {
-        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $push: {Rights: faculty}}).lean();
+        let rights = user.Rights.filter((x) => x !== faculty);
+        rights.push(faculty);
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     } else {
-        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $pull: {Rights: faculty}}).lean();
+        let rights = user.Rights.filter((x) => x !== faculty);
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     }
 };
 

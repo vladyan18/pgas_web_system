@@ -56,7 +56,6 @@ const pageTop = css`
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
 `;
 
-
 class StaffHeader extends Component {
   constructor(props) {
     super(props);
@@ -116,7 +115,7 @@ class StaffHeader extends Component {
               }
             </DropdownButton>
 
-            {(userPersonalStore.Role == 'Admin' || userPersonalStore.Role == 'SuperAdmin') &&
+            {['Admin', 'SuperAdmin', 'Moderator', 'Observer'].includes(userPersonalStore.Role) &&
                         <div style={{'marginRight': '1rem'}}>
                           <button type="button" id="SubmitButton"
                             className="btn btn-outline-primary" onClick={this.switchToUser}>

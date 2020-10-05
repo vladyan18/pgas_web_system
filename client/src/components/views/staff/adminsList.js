@@ -12,6 +12,7 @@ import staffContextStore from "../../../stores/staff/staffContextStore";
 const dictionary = {
     'Admin': 'Администратор',
     'Moderator': 'Проверяющий',
+    'Observer': 'Наблюдатель',
     'User': 'Пользователь'
 };
 

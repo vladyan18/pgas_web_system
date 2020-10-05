@@ -3,6 +3,7 @@ import '../../../style/user_main.css';
 import {observer} from 'mobx-react';
 import CriteriasTableViewer from './criteriasManagePage/criteriasTableViewer';
 import staffContextStore from '../../../stores/staff/staffContextStore';
+import userPersonalStore from '../../../stores/userPersonalStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
@@ -30,11 +31,11 @@ class StaffCriteriasPage extends Component {
                 </p>
               </div>
               <div className="centered_ver">
-                <button id="DeleteButton" className="btn btn-primary"
+                {userPersonalStore.Role !== 'Observer' && <button id="DeleteButton" className="btn btn-primary"
                   value="Примечания" onClick={() => {
                     this.props.history.push('/staff/manageAnnotations');
                   }}>Примечания
-                </button>
+                </button>}
               </div>
               <div className="centered_ver">
                 <button id="DeleteButton" className="btn btn-secondary"

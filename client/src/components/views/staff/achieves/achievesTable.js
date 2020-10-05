@@ -7,6 +7,7 @@ import {observer} from "mobx-react";
 import AchievesComment from "./achievesComment";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import staffContextStore from "../../../../stores/staff/staffContextStore";
+import userPersonalStore from '../../../../stores/userPersonalStore';
 import ReactMarkdown from 'react-markdown';
 
 class AchievesTable extends Component {
@@ -47,7 +48,7 @@ class AchievesTable extends Component {
     newComments = {};
     commentsFormatter = (cell, row) => <AchievesComment row={row} updater={this.props.updater}/>;
 
-    actionsFormatter = (cell, row) => (
+    actionsFormatter = userPersonalStore.Role !== 'Observer' ? (cell, row) => (
         <div style={{"display": "block"}}>
             <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem", padding: "0.1rem"}}>
                 <button type="button" className="custom_button centered_hor" data-toggle="modal"
@@ -66,7 +67,7 @@ class AchievesTable extends Component {
                 </button>
             </div>
         </div>
-    );
+    ) : null;
 
     allowAccessPopover = (crit) => (
         <Popover id="popover-basic" style={{width: "120rem"}}>

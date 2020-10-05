@@ -24,6 +24,7 @@ const pageTop = css`
     }
 `;
 
+
 const blockHeader = css`
     color: #4a4a4a;
     display: flex;
@@ -35,6 +36,7 @@ const blockHeader = css`
     height: 3rem;
   }
 `;
+
 
 const logoBackground = css`
   background-color: #9F2D20;
@@ -200,7 +202,7 @@ const DesktopRightBlock = observer((props) => {
           {userPersonalStore && userPersonalStore.fio}
         </div>
       </div>
-      {(userPersonalStore.Role === 'Admin' || userPersonalStore.Role === 'SuperAdmin') &&
+      {['Admin', 'SuperAdmin', 'Moderator', 'Observer'].includes(userPersonalStore.Role) &&
       <div style={{'marginRight': '1rem'}}>
         <button type="button" id="SubmitButton"
                 className="btn btn-outline-primary"
