@@ -313,7 +313,7 @@ module.exports.unsubscribeEmail = async function(userId, email) {
 
 
 const getDateFromStr = require('../helpers/getDateFromStr');
-module.exports.getPortfolio = async function(userId) {
+module.exports.getPortfolio = async function(requesterId, userId) {
     function createCharsString(chars) {
         const charsDictionary = {
             'ДСПО': 'Соответствует профилю обучения',
@@ -359,7 +359,21 @@ module.exports.getPortfolio = async function(userId) {
     }
 
     const user = await db.findUserByIdWithAllAchievements(userId);
-    if (!user || !user.Settings || !user.Settings.portfolioOpened) return false;
+    if (!user) return false;
+
+    if (!user.Settings || !user.Settings.portfolioOpened) {
+        if (requesterId) {
+            const requester = await db.findUserById(requesterId);
+            if (!requester) return false;
+
+            if (requester.Role !== 'SuperAdmin' && (!['Admin', 'Moderator'].includes(requester.Role) || !requester.Rights.includes(user.Faculty)))
+            {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
     user.Achievement = user.Achievement.filter(x => ['Принято', 'Принято с изменениями'].includes(x.status));
 

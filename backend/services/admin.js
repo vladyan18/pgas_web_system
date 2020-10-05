@@ -61,6 +61,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
             const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
             info.push({
                 Id: user._id,
+                userId: user.id,
                 user: fio,
                 Course: user.Course,
                 Type: user.Type,

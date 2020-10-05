@@ -303,7 +303,7 @@ router.get('/notifications_subscribtions', authCheck, async (req, res) => {
 });
 
 router.get('/portfolio/:id', async (req, res) => {
-    const html = await userService.getPortfolio(req.params.id);
+    const html = await userService.getPortfolio(req.userId, req.params.id);
     if (html) {
         res.status(200).send(html);
     } else {
