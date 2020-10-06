@@ -63,7 +63,7 @@ function UserNavbar(props) {
       <ul className="ul_nav" css={ulNav}>
         <UserNavItem to='/home'>Мои достижения</UserNavItem>
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
-        {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг</UserNavItem>}
+        {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг на ПГАС</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
         <UserNavItem to='/confirmations' onHover={() => preloadDocuments(props.preloads)}>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
