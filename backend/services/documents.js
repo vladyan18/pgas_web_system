@@ -1,16 +1,17 @@
-const db = require('./../controllers/dbController');
+const db = require('../dataLayer');
 const path = require('path');
 const anketPath = path.join(__dirname, '..');
 const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile);
-const getDateFromStr = require('../helpers/getDateFromStr');
-const achievementsProcessing = require('./achievementsProcessing');
 const Zip = require('node-zip');
 const XlsxPopulate = require('xlsx-populate');
 const docx = require('docx');
 const QRCode = require('qrcode');
 const translitter = require('cyrillic-to-translit-js');
+
+const achievementsProcessing = require('./achievementsProcessing');
+const { getDateFromStr, getFIO }  = require('../helpers');
 
 module.exports.getAnket = async function(userId, facultyName) { //TODO refactor
         const dbpromises = [db.findUserById(userId), db.findActualAchieves(userId)];
@@ -132,12 +133,13 @@ function insertPersonalInfo(file, user, faculty) {
         direction: 'STDIR',
         birthdate: 'BD'
     };
-    const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+    const fio = getFIO(user);
 
     let datestring;
     if (user.Birthdate) datestring = getDateFromStr(new Date(user.Birthdate));
 
-    return String(file).replace(markers.fio, fio)
+    return String(file)
+        .replace(markers.fio, fio)
         .replace(markers.type, user.Type)
         .replace(markers.course, user.Course)
         .replace(markers.email, user.SpbuId)

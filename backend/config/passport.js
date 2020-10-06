@@ -1,7 +1,8 @@
 'use strict';
 const passport = require('passport');
-const db = require('../controllers/dbController');
+const db = require('../dataLayer');
 const ActiveDirectoryStrategy = require('./ldapstrategy');
+const { Roles } = require('../../common/consts');
 
 passport.use(new ActiveDirectoryStrategy({
   integrated: false,
@@ -18,12 +19,12 @@ passport.use(new ActiveDirectoryStrategy({
 
 
 passport.serializeUser( async function(user, done) {
-  const id = user._json.sAMAccountName;
+  const id = user._json.sAMAccountName.toLowerCase();
   const isUser = await db.isUser(id);
   let isRegistered = false;
   if (!isUser) {
     await db.createUser({
-      Role: 'User',
+      Role: Roles.USER,
       id: id,
       SpbuId: id + '@student.spbu.ru',
       Ball: 0,
@@ -33,11 +34,6 @@ passport.serializeUser( async function(user, done) {
     await db.migrate(id);
   } else isRegistered = await db.isRegistered(id);
   user.Registered = isRegistered;
-  const role = await db.getUserRights(id);
-  if (role) {
-    user.Role = role.Role;
-    user.Rights = role.Rights;
-  }
   user.user_id = id;
   console.log('User', id, 'successfuly logged in');
   done(null, user);

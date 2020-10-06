@@ -1,85 +1,47 @@
-const db = require('../controllers/dbController.js');
+const db = require('../dataLayer');
+const { AccessLevels } = require('../../common/consts');
+const { rightsCheck } = require('../helpers');
 
-module.exports.user = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        return res.sendStatus(401);
+function userAccessFactory(negativeCb) {
+    return (req, res, next) => {
+        if (req.isAuthenticated()) {
+            next();
+        } else {
+            return negativeCb(res);
+        }
     }
-};
+}
 
-module.exports.observer = async (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.sendStatus(401);
-    }
-    let id;
-    if (req.user._json && req.user._json.email) {
-        id = req.user._json.email;
-    } else id = req.user.user_id;
-    const User = await db.findUserById(id);
+module.exports.user = userAccessFactory((res) => res.sendStatus(401));
 
-    if (User.Role && ['SuperAdmin', 'Admin', 'Moderator', 'Observer'].includes(User.Role)) {
-        next();
-    } else {
-        return res.redirect('/404');
-    }
-};
+module.exports.registration = userAccessFactory((res) => res.redirect('/login'));
 
-module.exports.moderator = async (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.sendStatus(401);
-    }
-    let id;
-    if (req.user._json && req.user._json.email) {
-        id = req.user._json.email;
-    } else id = req.user.user_id;
-    const User = await db.findUserById(id);
 
-    if (User.Role && ['SuperAdmin', 'Admin', 'Moderator'].includes(User.Role)) {
-        next();
-    } else {
-        return res.redirect('/404');
-    }
-};
+function checkAccessFactory(accessLevel) {
+    return async (req, res, next) => {
+        if (!req.isAuthenticated()) {
+            return res.sendStatus(401);
+        }
 
-module.exports.admin = async (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.sendStatus(401);
-    }
-    let id;
-    if (req.user._json && req.user._json.email) {
-        id = req.user._json.email;
-    } else id = req.user.user_id;
-    const User = await db.findUserById(id);
-    if (req.isAuthenticated() && (User.Role === 'Admin' || User.Role === 'SuperAdmin')) {
-        next();
-    } else {
-        return res.redirect('/404');
-    }
-};
+        let id;
+        if (req.user._json && req.user._json.email) {
+            id = req.user._json.email;
+        } else id = req.user.user_id;
 
-module.exports.superAdmin = async (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        return res.sendStatus(401);
-    }
-    let id;
-    if (req.user._json && req.user._json.email) {
-        id = req.user._json.email;
-    } else id = req.user.user_id;
-    console.log(id);
-    const User = await db.findUserById(id);
-    console.log(User);
-    if (req.isAuthenticated() && (User.Role === 'SuperAdmin')) {
-        next();
-    } else {
-        return res.redirect('/404');
-    }
-};
+        const user = await db.findUserById(id);
 
-module.exports.registration = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        return res.redirect('/login');
+        if (rightsCheck.hasAccessLevel(user, accessLevel)) {
+            next();
+        } else {
+            return res.redirect('/404');
+        }
     }
-};
+}
+
+module.exports.observer = checkAccessFactory(AccessLevels.OBSERVER);
+
+module.exports.moderator = checkAccessFactory(AccessLevels.MODERATOR);
+
+module.exports.admin = checkAccessFactory(AccessLevels.ADMIN);
+
+module.exports.superAdmin = checkAccessFactory(AccessLevels.SUPERADMIN);

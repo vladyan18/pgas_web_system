@@ -1,7 +1,8 @@
 'use strict';
 
-const db = require('./../controllers/dbController');
+const db = require('../dataLayer');
 const nodemailer = require("nodemailer");
+const { statusCheck } = require('../helpers');
 
 const webpush = require('web-push')
 webpush.setVapidDetails("https://achieve.spbu.ru",
@@ -18,10 +19,10 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
         charsString += chars[i] + (i !== chars.length - 1 ? ', ' : '');
     }
     const unsubscribeUrl = `https://achieve.spbu.ru/api/unsubscribe_email?key=${_id}&email=${email}`;
-    const unsubscribeLink = `<a style="color: grey" href="${unsubscribeUrl}">Отписаться</a>`;
+    const unsubscribeLink = `<a style="color: grey" href="${ unsubscribeUrl }">Отписаться</a>`;
 
-    message.headers = {"List-Unsubscribe": `<${unsubscribeUrl}>`};
-    if (['Принято', 'Принято с изменениями'].includes(status)) {
+    message.headers = {"List-Unsubscribe": `<${ unsubscribeUrl }>`};
+    if (statusCheck.isAccepted({ status })) {
         message.subject = 'Достижение принято! ✔';
         message.html = `<div>
         Достижение было <b>принято</b>. 
@@ -49,7 +50,7 @@ function createMessageAboutNewStatus(email, {_id}, {status, achievement, comment
         https://achieve.spbu.ru
         `
 
-    } else if (status === 'Отказано') {
+    } else if (statusCheck.isDeclined({ status })) {
         message.subject = 'Достижение отклонено ❌';
         message.html = `<div>
         Достижение было <b>отклонено</b>. 

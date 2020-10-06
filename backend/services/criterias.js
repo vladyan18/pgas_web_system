@@ -1,9 +1,8 @@
-const db = require('./../controllers/dbController');
-const getCurrentDate = require('../helpers/getCurrentDate');
+const db = require('../dataLayer');
+const { getCurrentDate, parseCriterias } = require('../helpers');
 const achievementsProcessing = require('./achievementsProcessing');
 const fs = require('fs');
 const xlsx = require('xlsx');
-const parseCriterias = require('../helpers/parseCriterias');
 
 module.exports.getRawCriteriasAndLimits = async function(facultyName) {
     return db.getRawCriteriasAndLimits(facultyName);

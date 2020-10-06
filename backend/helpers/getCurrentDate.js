@@ -6,4 +6,4 @@ const options = {
 
 module.exports = function () {
     return new Date().toLocaleString('ru', options);
-}
+};

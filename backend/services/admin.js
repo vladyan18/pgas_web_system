@@ -1,7 +1,8 @@
-const db = require('./../controllers/dbController');
-const getCurrentDate = require('../helpers/getCurrentDate');
+const db = require('../dataLayer');
+const { getCurrentDate, getFIO } = require('../helpers');
 const achievementsProcessing = require('./achievementsProcessing');
 const notifyService = require('./notifyService');
+const { Statuses } = require('../../common/consts');
 
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
@@ -24,7 +25,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
         throw new TypeError();
     }
 
-    achievement.status = 'Изменено';
+    achievement.status = Statuses.CHANGED;
     achievement.isPendingChanges = false;
     achievement.date = getCurrentDate();
 
@@ -36,8 +37,6 @@ module.exports.changeAchievement = async function(achievement, userId) {
     args.to = createdAchieve;
     //await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
-
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -58,7 +57,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
         }
 
         if ( user.Achievement.length > 0) {
-            const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+            const fio = getFIO(user);
             info.push({
                 Id: user._id,
                 userId: user.id,
@@ -94,7 +93,6 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
     }
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
 };
@@ -103,7 +101,7 @@ module.exports.getRating = async function(faculty) {
     return achievementsProcessing.getRating(faculty, true);
 };
 
-module.exports.addUserToRating = async function(userId) { // TODO refactor
+module.exports.addUserToRating = async function(userId) {
     await db.addUserToRating(userId);
 };
 

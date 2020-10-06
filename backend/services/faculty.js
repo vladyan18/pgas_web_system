@@ -1,4 +1,4 @@
-const db = require('./../controllers/dbController');
+const db = require('../dataLayer');
 
 module.exports.getFaculty = async function(facultyName) {
     return db.getFaculty(facultyName);

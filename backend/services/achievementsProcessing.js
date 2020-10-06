@@ -1,7 +1,11 @@
-const db = require('./../controllers/dbController');
-const isAchievementAccepted = require('../helpers/isAchievementAccepted');
+'use strict';
 
-module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary) {
+const db = require('../dataLayer');
+console.log(db);
+const { Statuses } = require('../../common/consts');
+const { statusCheck, getFIO } = require('../helpers');
+
+module.exports.calculateBallsForUser = async function(id, faculty) {
     const achievementsPromise = db.findActualAchieves(id);
     const criteriasPromise = db.getCriteriasObject(faculty);
     const [criterias, achievements] = await Promise.all([criteriasPromise, achievementsPromise]);
@@ -13,38 +17,20 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
     for (const achievement of achievements) {
         if (!achievement) continue;
 
-        if (isPreliminary && (achievement.status === 'Отказано' || achievement.status === 'Данные некорректны')) {
-            achievement.preliminaryBall = undefined;
-            await db.updateAchieve(achievement._id, achievement);
-            continue;
-        }
-
-        if (!isAchievementAccepted(achievement)) {
-                if (achievement.status === 'Отказано') {
-                    achievement.preliminaryBall = undefined;
-                }
-                achievement.ball = undefined;
-                await db.updateAchieve(achievement._id, achievement);
-                if (!isPreliminary) {
-                    continue;
-                }
-        }
-
         let currentLevel = criterias;
         if (!Array.isArray(currentLevel)) {
             const correctChars = [];
             for (const ch of achievement.chars) {
-                currentLevel = currentLevel[ch]; // TODO
+                currentLevel = currentLevel[ch];
                 if (!currentLevel) {
                     break;
                 }
                 correctChars.push(ch);
             }
             if (!currentLevel) {
-                console.log('ERROR', achievement.chars);
                 achievement.preliminaryBall = undefined;
                 achievement.ball = undefined;
-                achievement.status = 'Данные некорректны';
+                achievement.status = Statuses.INCORRECT;
                 achievement.chars = correctChars;
                 achievement.crit = correctChars[0];
                 await db.updateAchieve(achievement._id, achievement);
@@ -60,10 +46,10 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
 
     const promises = [];
     for (const key of Object.keys(criterias)) {
-        calculateBallsForCriterion(achievementsForCriterion[key], isPreliminary);
-        for (const curAch of achievementsForCriterion[key]) {
+        const calculatedAchievements = calculateBallsForCriterion(achievementsForCriterion[key]);
+        for (const curAch of calculatedAchievements) {
             if (!curAch) continue;
-            promises.push(db.updateAchieve(curAch['ach']._id, curAch['ach']));
+            promises.push(db.updateAchieve(curAch.ach._id, curAch.ach));
         }
     }
     if (promises.length > 0) {
@@ -71,43 +57,75 @@ module.exports.calculateBallsForUser = async function(id, faculty, isPreliminary
     }
 };
 
-const trimNumber = function(num) {
-    return Number((num).toFixed(3));
-};
-
-const calculateBallsForCriterion = function(achievements, isPreliminary) {
-    let summ = 0;
-    let max = 0;
+const calculateBallsForCriterion = function(achievements) {
+    for (let i = 0; i < achievements.length; i++) {
+        achievements[i].ach.preliminaryBall = undefined;
+        achievements[i].ach.ball = undefined;
+    }
 
     for (let i = 0; i < achievements.length; i++) {
-        if (!achievements[i]) continue;
-        let maxIndex;
-        for (let achNum = 0; achNum < achievements.length; achNum++) {
-            let achievementBalls = achievements[achNum]['balls'];
-            if (!achievementBalls) continue;
-            let shift = i;
-            if (shift >= achievementBalls.length) shift = achievementBalls.length - 1;
-            if (trimNumber(achievementBalls[shift]) > max || (trimNumber(achievementBalls[shift]) === 0 && max === 0) ||
-                (isPreliminary &&
-                    trimNumber(achievementBalls[shift]) >= max &&
-                    isAchievementAccepted(achievements[achNum]['ach'])
-                )) {
-                max = trimNumber(achievementBalls[shift]);
-                maxIndex = achNum;
-            }
+        const [bestAchievement, bestBall] = findBestAchievement(achievements, i, false);
+        const [preliminaryBestAchievement, bestPreliminaryBall] = findBestAchievement(achievements, i, true);
+
+
+        if (bestAchievement) {
+            bestAchievement.ach.ball = bestBall;
         }
-        if (achievements[maxIndex]) {
-            if (isPreliminary) {
-                achievements[maxIndex]['ach'].preliminaryBall = max;
-            } else {
-                achievements[maxIndex]['ach'].ball = max;
-            }
-            achievements[maxIndex]['balls'] = undefined;
+
+        if (preliminaryBestAchievement) {
+            preliminaryBestAchievement.ach.preliminaryBall = bestPreliminaryBall;
         }
-        summ += max;
-        max = 0;
     }
-    return summ;
+
+    return achievements;
+};
+
+function findBestAchievement(achievements, step, isPreliminary) {
+    let candidates;
+
+    if (isPreliminary) {
+        candidates = achievements.filter(({ach}) => !ach.preliminaryBall && ach.preliminaryBall !== 0)
+            .filter(({ach}) => !statusCheck.shouldNotCountPreliminary(ach));
+    }
+    else {
+        candidates = achievements.filter(({ach}) => !ach.ball && ach.ball !== 0)
+            .filter(({ach}) => statusCheck.isAccepted(ach))
+    }
+    if (candidates.length === 0) return [null, null];
+
+    let candidateForMax = candidates[0];
+
+    for (let achNum = 1; achNum < candidates.length; achNum++) {
+        const currentCandidate = candidates[achNum];
+        const achievementBallsArray = currentCandidate.balls;
+        let shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
+
+        let currentBall = trimNumber(achievementBallsArray[shift]);
+        let currentMaxCandidateBall = trimNumber(candidateForMax.balls[shift]);
+
+        if (currentBall > currentMaxCandidateBall) {
+            candidateForMax = currentCandidate;
+            continue;
+        }
+
+        if (currentBall === 0 && currentMaxCandidateBall === 0) {
+            candidateForMax = currentCandidate;
+            continue;
+        }
+
+        if (isPreliminary && currentBall === currentMaxCandidateBall) {
+            if (statusCheck.isAccepted(currentCandidate.ach) && !statusCheck.isAccepted(candidateForMax.ach)) {
+                candidateForMax = currentCandidate;
+            }
+        }
+
+    }
+    const shift = step < candidateForMax.balls.length ? step : candidateForMax.balls.length - 1;
+    return [ candidateForMax, candidateForMax.balls[shift] ];
+}
+
+const trimNumber = function(num) {
+    return Number((num).toFixed(3));
 };
 
 function getAreaNum(critName, kri) {
@@ -160,7 +178,7 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
                 }
             }
         }
-        const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+        const fio = getFIO(user);
         const newUser = {_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction};
 
         if (!isAdmin) {
@@ -189,7 +207,6 @@ module.exports.checkActualityOfUsersAchievements = async function(faculty) { // 
             await db.checkActualityOfAchievementCharacteristics(achievement, crits, user);
         }
         await module.exports.calculateBallsForUser(user.id, faculty);
-        await module.exports.calculateBallsForUser(user.id, faculty, true);
     }
 };
 

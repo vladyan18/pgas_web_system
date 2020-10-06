@@ -1,4 +1,4 @@
-const db = require('./../controllers/dbController');
+const db = require('../dataLayer');
 const passport = require('passport');
 
 module.exports.authenticate = async function(username, password) {

@@ -1,9 +1,11 @@
 'use strict';
-const db = require('./../controllers/dbController');
-const getCurrentDate = require('../helpers/getCurrentDate');
-const achievementsProcessing = require('./achievementsProcessing');
+
+const db = require('../dataLayer');
 const fs = require('fs');
-const path = require('path');
+const { getCurrentDate, getFIO, statusCheck, rightsCheck } = require('../helpers');
+const { Statuses, Roles, CharsNiceVariants, AccessLevels } = require('../../common/consts');
+const achievementsProcessing = require('./achievementsProcessing');
+
 
 module.exports.getUserRights = async function(id) {
     return db.getUserRights(id);
@@ -40,6 +42,8 @@ module.exports.getProfile = async function(id) {
 };
 
 module.exports.registerUser = async function(userId, userData, session) {
+    const userObject = await db.findUserByIdWithAchievements(userId);
+
     await db.registerUser(userId, userData.lastname, userData.name, userData.patronymic,
         userData.birthdate, userData.spbuId, userData.faculty, userData.course, userData.type,
         userData.settings);
@@ -47,6 +51,11 @@ module.exports.registerUser = async function(userId, userData, session) {
     session.save(function(err) {
         console.log(err);
     });
+
+    if (userObject && userObject.Faculty && userObject.Faculty !== userData.Faculty && userObject.Achievements && userObject.Achievements.length > 0) {
+
+        await achievementsProcessing.calculateBallsForUser(userId, userObject.Faculty);
+    }
 };
 
 module.exports.changeUserSettings = async function(userId, newSettings) {
@@ -119,16 +128,16 @@ module.exports.addAchievement = async function(userId, achievement) {
     try {
         validationResult = await db.validateAchievement(achievement, user);
     } catch (e) {
-        console.log('Ach validation outer error');
+        console.log('Ach validation outer error', e);
     }
     if (!validationResult) throw new TypeError();
 
-    achievement.status = 'Ожидает проверки';
+    achievement.status = Statuses.NEW;
     achievement.date = getCurrentDate();
     achievement.comment = '';
     const createdAchieve = await db.createAchieve(achievement);
     await db.addAchieveToUser(userId, createdAchieve._id);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
+    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
 };
 
 module.exports.classifyDescription = async function(description, faculty = 'ПМ-ПУ') {
@@ -150,7 +159,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
 
     const oldAch = await db.findAchieveById(achId);
     achievement.comment = oldAch.comment;
-    achievement.status = oldAch.status === 'Данные некорректны' ? 'Ожидает проверки' : oldAch.status;
+    achievement.status = oldAch.status === Statuses.INCORRECT ? Statuses.NEW : oldAch.status;
     achievement.criteriasHash = oldAch.criteriasHash;
     achievement.isPendingChanges = oldAch.isPendingChanges;
     achievement.ball = oldAch.ball;
@@ -171,7 +180,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
             if (confirmsIdentical) {
                 continue;
             } else {
-                if (oldAch.status !== 'Ожидает проверки') {
+                if (!statusCheck.isNew(oldAch)) {
                     achievement.isPendingChanges = true;
                 }
                 continue;
@@ -196,7 +205,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
             if (!changeDetected) continue;
         }
         if (oldAch[field] !== achievement[field]) {
-            if (oldAch.status !== 'Ожидает проверки' && oldAch.status !== 'Данные некорректны') {
+            if (statusCheck.isChangeByUserBlocked(oldAch)) {
                 console.log('Detected change in field:', field, oldAch[field], achievement[field]);
                 throw new TypeError();
             }
@@ -204,7 +213,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
     }
 
     await db.updateAchieve(achId, achievement);
-    await achievementsProcessing.calculateBallsForUser(userId, user.Faculty, true);
+    await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
 };
 
 module.exports.deleteAchievement = async function(userId, achId) {
@@ -216,7 +225,6 @@ module.exports.deleteAchievement = async function(userId, achId) {
 
     await db.deleteAchieve(achId);
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     return true;
 };
 
@@ -315,23 +323,7 @@ module.exports.unsubscribeEmail = async function(userId, email) {
 const getDateFromStr = require('../helpers/getDateFromStr');
 module.exports.getPortfolio = async function(requesterId, userId) {
     function createCharsString(chars) {
-        const charsDictionary = {
-            'ДСПО': 'Соответствует профилю обучения',
-            'ДнСПО': 'Не соответствует профилю обучения',
-            'БДнК': 'Без доклада на конференции',
-            'СДнК': 'С докладом на конференции',
-            'УД': 'Устный доклад',
-            'СД': 'Стендовый доклад',
-            'Заочн. уч.': 'Заочное участие',
-            'Очн. уч.': 'Очное участие',
-            'Заруб. изд.': 'Зарубежное издание',
-            'Росс. изд.': 'Российское издание',
-            'ММК': 'Материалы международной конференции',
-            'Публикация (кроме тезисов)': 'Публикация',
-            'Индивидуальный (один студент и, возможно, научный руководитель)': 'Индивидуальный',
-            'Документ, удостоверяющий исключительное право студента на достигнутый им научный (научно-методический, научно-технический, научно-творческий) результат интеллектуальной деятельности (патент, свидетельство)': 'Исключительное право на достигнутый научный результат интеллектуальной деятельности (патент, свидетельство)'
-        };
-
+        const charsDictionary = CharsNiceVariants;
         let str = '';
         for (let i = 1; i < chars.length; i++) {
             let char = charsDictionary[chars[i]] || chars[i];
@@ -362,23 +354,19 @@ module.exports.getPortfolio = async function(requesterId, userId) {
     if (!user) return false;
 
     if (!user.Settings || !user.Settings.portfolioOpened) {
-        if (requesterId) {
-            const requester = await db.findUserById(requesterId);
-            if (!requester) return false;
+        if (!requesterId) return false;
 
-            if (requester.Role !== 'SuperAdmin' && (!['Admin', 'Moderator'].includes(requester.Role) || !requester.Rights.includes(user.Faculty)))
-            {
-                return false;
-            }
-        } else {
+        const requester = await db.findUserById(requesterId);
+        if (!requester) return false;
+        if ( !rightsCheck.hasAccessLevelInFaculty(requester, AccessLevels.MODERATOR, user.Faculty) ) {
             return false;
         }
     }
 
-    user.Achievement = user.Achievement.filter(x => ['Принято', 'Принято с изменениями'].includes(x.status));
+    user.Achievement = user.Achievement.filter(x => statusCheck.isAccepted(x));
 
     let template = await fs.promises.readFile('./client/public/portfolio.html', {encoding: 'utf-8'});
-    template = template.replace('$FIO$', user.LastName + ' ' + user.FirstName + ' ' + user.Patronymic)
+    template = template.replace('$FIO$', getFIO(user))
         .replace('$FACULTY$', user.Faculty)
         .replace('$TYPE$', user.Type)
         .replace('$COURSE$', user.Course);
