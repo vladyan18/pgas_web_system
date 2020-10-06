@@ -23,7 +23,7 @@ function UserHeaderContainer(props) {
       pathname = 'Мой профиль';
       break;
     case '/rating':
-      pathname = 'Рейтинг';
+      pathname = 'Рейтинг на ПГАС';
       break;
     case '/login':
       pathname = 'Система учета достижений';

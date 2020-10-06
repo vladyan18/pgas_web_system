@@ -95,9 +95,9 @@ class StaffChangeAchievement extends Component {
   }
 
   render() {
-    return (<div style={{display: 'flex', maxHeight: '42rem'}}>
+    return (<div style={{display: 'flex', maxHeight: '42rem', maxWidth: '99vw'}}>
       { !this.state.confirmsOpened &&
-            <div className="block" style={{overflow: 'auto', width: '50rem', maxHeight: '100%', maxWidth: '30rem'}}>
+            <div className="block" style={{overflow: 'auto', width: '50rem', maxHeight: '100%', maxWidth: '30vw'}}>
               <div className="profile" style={{'display: flex; justify-content': 'space-between', 'margin': '0'}}>
                 <p className="headline" style={{'margin-bottom': 'auto', 'margin-right': '1rem'}}>
                         Подтверждения

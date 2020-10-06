@@ -29,6 +29,10 @@ const userSchema = mongoose.Schema({
     },
   ],
   Settings: {},
+  NotificationsSettings: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'NotificationsSettings',
+  },
 });
 
 const User = connection.model('User', userSchema);

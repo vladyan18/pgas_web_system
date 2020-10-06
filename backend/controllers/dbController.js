@@ -12,6 +12,8 @@ const criteriasCache = require('../resources/criteriasCacheInstance');
 const ConfirmationModel = require('../models/confirmation');
 const HistoryNoteModel = require('../models/historyNote');
 const AnnotationsModel = require('../models/annotation');
+const NotificationsSettingsModel = require('../models/notificationsSettings');
+const SessionsModel = require('../models/sessions');
 const annotationsCache = require('../resources/annotationsCacheInstance');
 const achievementsProcessing = require('../services/achievementsProcessing');
 const { BloomFilter } = require('bloom-filters');
@@ -29,8 +31,10 @@ exports.getUserWithConfirmations = async function(id) {
 
 async function getUserWithAchievements(id, isArchived) {
   let query;
-  if (isArchived) {
+  if (isArchived && isArchived !== 'all') {
     query = { $or: [{achDate: {$lt: '2019-09-1'}}, {isArchived: true}] };
+  } else if (isArchived === 'all') {
+      query = {};
   } else {
     query = { achDate: {$gte: '2019-09-1'}, isArchived: {$ne: true} };
   }
@@ -63,6 +67,10 @@ exports.findUserByIdWithAchievements = async function(id) {
   return getUserWithAchievements(id, false);
 };
 
+exports.findUserByIdWithAllAchievements = async function(id) {
+    return getUserWithAchievements(id, 'all');
+};
+
 exports.findUserByIdWithArchivedAchievements = async function(id) {
   return getUserWithAchievements(id, true);
 };
@@ -74,6 +82,10 @@ exports.findUser = function(id) {
 
 exports.getUserRights = function(id) {
   return UserModel.findOne({id: id}, 'Role Rights').lean();
+};
+
+exports.changeUserSettings = function(id, newSettings) {
+    return UserModel.updateOne({id: id}, {$set: {Settings: newSettings}});
 };
 
 exports.findUserByAchieve = async function(id) {
@@ -122,7 +134,7 @@ exports.isRegistered = async function(id) {
 
 
 exports.getAdminsForFaculty = function(facultyName) {
-  return UserModel.find({Role: {$in: ['Admin', 'Moderator']}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
+  return UserModel.find({Role: {$in: ['Admin', 'Moderator', 'Observer']}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
 };
 
 exports.getCurrentUsers = function(faculty) {
@@ -209,6 +221,11 @@ exports.createAchieve = async function(achieve) {
 };
 
 exports.deleteAchieve = async function(id) {
+  const ach = await AchieveModel.findOne({_id: id}).lean();
+  if (['Принято', 'Принято с изменениями', 'Отказано'].includes(ach.status)) {
+      await AchieveModel.updateOne({_id: id}, {$set: {isArchived: true}});
+      return true;
+  }
   const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}}).lean();
   if (!u) return true;
   for (let i = u.Achievement.length - 1; i >= 0; i--) {
@@ -404,9 +421,12 @@ exports.changeRole = async function(reqUserId, userId, newRole, faculty) { // TO
     if (user.Rights.includes(faculty) && newRole !== 'User') {
         return UserModel.updateOne({id: userId}, {$set: {Role: newRole}}).lean();
     } else if (newRole !== 'User') {
-        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $push: {Rights: faculty}}).lean();
+        let rights = user.Rights.filter((x) => x !== faculty);
+        rights.push(faculty);
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     } else {
-        return UserModel.updateOne({id: userId}, {$set: {Role: newRole}, $pull: {Rights: faculty}}).lean();
+        let rights = user.Rights.filter((x) => x !== faculty);
+        return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     }
 };
 
@@ -905,4 +925,61 @@ exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, 
     } else {
         return {oldChars: achievement.chars, incorrectChars: incorrectChars, notSure: notSure};
     }
+};
+
+exports.changeNotificationEmail = async function(userId, email) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+    if (!notifSettings) {
+        notifSettings = { userId, email };
+        notifSettings = await NotificationsSettingsModel.create(notifSettings);
+        await UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean();
+    } else {
+        await NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+            {$set: {email: email}}
+        ).lean();
+    }
+    return true;
+};
+
+exports.saveNotificationEndpoint = async function(userId, sessionId, notificationEndpoint) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+    if (!notifSettings) {
+        notifSettings = { userId };
+        notifSettings = await NotificationsSettingsModel.create(notifSettings);
+        UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean().then();
+    }
+
+    const endpoint = {
+        endpointType: 'webpush',
+        endpoint: notificationEndpoint,
+        sessionId: sessionId,
+    };
+
+    return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+        {$push: {endpoints: endpoint}}
+        ).lean();
+};
+
+exports.removeNotificationEndpoint = async function(userId, sessionId) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    notifSettings = notifSettings.NotificationsSettings;
+
+    return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
+        {$pull: {endpoints: {sessionId: sessionId}}}
+    ).lean();
+};
+
+exports.getNotificationSettings = async function(userId) {
+    let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
+    if (!notifSettings) return null;
+    notifSettings = notifSettings.NotificationsSettings;
+    return notifSettings;
+};
+
+exports.checkSessionValidity = async function(sessionId) {
+    let session = await SessionsModel.findOne({_id: sessionId}).lean();
+    return !!session;
+
 };

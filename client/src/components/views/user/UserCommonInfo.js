@@ -3,11 +3,7 @@ import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
-import {Panel} from './style'
-
-const horizontalLine = css`
-    border-top: 1px solid #9F2D20;
-`;
+import {Panel, HorizontalLine} from './style'
 
 function UserCommonInfo(props) {
   return (<Panel className="col-md-9">
@@ -15,7 +11,7 @@ function UserCommonInfo(props) {
       <p className="headline">
                 Информация
       </p>
-      <hr css={horizontalLine}/>
+      <HorizontalLine/>
       <div className="blue_bg">
         <p className="header_info_desc" style={{fontWeight: '500'}}>
                     Документы ПГАС

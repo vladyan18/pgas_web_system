@@ -12,11 +12,11 @@ class CurrentContestAchievesContainer extends Component {
   };
 
   componentDidMount() {
-    this.getAchieves();
+    this.getAchieves().then();
   }
 
-  getAchieves() {
-    currentContestStore.update(staffContextStore.faculty).then();
+  async getAchieves() {
+    await currentContestStore.update(staffContextStore.faculty);
   }
 
   render() {

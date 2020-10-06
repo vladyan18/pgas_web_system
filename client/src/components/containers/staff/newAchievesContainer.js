@@ -16,7 +16,7 @@ class NewAchievesContainer extends Component {
   }
 
   async getAchieves() {
-    staffNewAchievementsStore.update(staffContextStore.faculty).then();
+    await staffNewAchievementsStore.update(staffContextStore.faculty);
   }
 
   render() {

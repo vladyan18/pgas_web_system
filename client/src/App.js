@@ -4,6 +4,7 @@ import User from "./components/user";
 import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
+import * as serviceWorker from "./serviceWorker";
 
 const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
 const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));
@@ -23,6 +24,8 @@ class App extends Component {
             const isAuth = localStorage.getItem('isAuthenticated') === 'true';
             this.setState({isAuth: isAuth});
         };
+        serviceWorker.unregister();
+        console.log('UNREGISTERED SW')
     }
 
     render() {

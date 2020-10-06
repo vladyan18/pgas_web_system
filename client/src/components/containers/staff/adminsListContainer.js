@@ -7,7 +7,11 @@ import {observer} from "mobx-react";
 function AdminsListContainer(props) {
   const [admins, setAdmins] = useState([]);
   function refresh() {
-        fetchGet('/getAdmins', {faculty: staffContextStore.faculty}).then((adminsList) => setAdmins([...adminsList]));
+        fetchGet('/getAdmins', {faculty: staffContextStore.faculty}).then((adminsList) => {
+          if (adminsList) {
+            setAdmins([...adminsList])
+          }
+        });
   }
   useEffect(() => refresh(), []);
 

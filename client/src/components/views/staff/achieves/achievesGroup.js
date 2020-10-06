@@ -4,6 +4,7 @@ import AchievesTable from './achievesTable';
 import StaffChangeAchievement from '../StaffChangeAchievement';
 import Modal from 'react-modal';
 import staffContextStore from '../../../../stores/staff/staffContextStore';
+import userPersonalStore from '../../../../stores/userPersonalStore';
 
 class AchievesGroup extends Component {
   constructor(props) {
@@ -119,13 +120,13 @@ class AchievesGroup extends Component {
                     </div>
                     <h3 className={'form-control nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
                       style={{'border': '0', 'boxShadow': 'none'}}>
-                      <a style={{'color': 'white'}} target="_blank" href="/">{this.props.item.user}</a>
+                      <a style={{'color': 'white'}} target="_blank" href={userPersonalStore.Role !== 'Observer' ? ('/api/portfolio/' + this.props.item.userId) : '/'}>{this.props.item.user}</a>
                     </h3>
-                    <div className="input-group-append">
+                    {userPersonalStore.Role !== 'Observer' && <div className="input-group-append">
                       <button type="button" className="btn btn-dark btn-xs newAchievesGroupButton"
                         onClick={this.toggleRating}>
                         {this.props.item.IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг'}</button>
-                    </div>
+                    </div>}
                   </div>
                   {!this.state.hidden && <div className="block">
 

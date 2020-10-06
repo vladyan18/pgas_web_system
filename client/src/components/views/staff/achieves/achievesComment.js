@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {fetchSendWithoutRes} from "../../../../services/fetchService";
+import userPersonalStore from '../../../../stores/userPersonalStore';
 import AchievesGroup from "./achievesGroup";
 
 
@@ -28,7 +29,7 @@ class AchievesComment extends Component {
         return <div className="input-group commentContainer" style={{height: 'unset', width: '100%'}}>
             <div style={{width: '100%'}}>
             <textarea id={this.props.row._id} className={"form-control" + (this.props.row.comment ? " commentSended" : "")}
-                      value={this.state.value}
+                      value={this.state.value} disabled={userPersonalStore.Role === 'Observer'}
                       onChange={this.handleCommentChange} style={{height: "8.2rem", width: '100%'}}/>
                 {this.state && this.state.focused && <div  style={{"marginRight": "0px", display: 'flex', justifyContent: 'space-between'}}>
                     <button className="btn btn-danger"

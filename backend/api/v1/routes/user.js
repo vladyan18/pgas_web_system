@@ -11,6 +11,10 @@ const fs = require('fs');
 const path = require('path');
 const uploadConfirmation = require( '../../../config/confirmationMulter');
 const uploadsConfirmationsPath = path.join(__dirname, '../../../static/confirmations'); //TODO
+const webpush = require('web-push')
+webpush.setVapidDetails("https://achieve.spbu.ru",
+    "BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730",
+    "e9gl2YUIbBRdSZ_GCJAwo8RwuOHNbDAE1TUfPCnEesQ");
 if (!fs.existsSync(uploadsConfirmationsPath)) {
     fs.mkdirSync(uploadsConfirmationsPath);
 }
@@ -111,6 +115,7 @@ router.post('/update_achieve', authCheck,
         }
         res.sendStatus(200);
     });
+
 
 router.post('/delete_achieve', authCheck,
     async function(req, res) {
@@ -237,4 +242,73 @@ router.get('/getFacultiesList', authCheck,
         const list = await facultyService.getFacultiesList();
         res.status(200).send({list: list});
     });
+
+router.post('/notifications_subscribe', authCheck, (req, res) => {
+    const subscription = req.body;
+    userService.registerForNotifications(req.userId, req.session.id, subscription).then();
+
+    res.status(200).json({'success': true})
+});
+
+router.post('/change_settings', authCheck, async (req, res) => {
+    const settings = req.body;
+    await userService.changeUserSettings(req.userId, settings);
+    res.status(200).json({'success': true})
+});
+
+router.get('/change_notification_email', authCheck, async (req, res) => {
+    await userService.changeEmailForNotifications(req.userId, req.query.email);
+    res.status(200).json({'success': true});
+});
+
+router.get('/unsubscribe_email', async (req, res) => {
+    const userRawId = req.query.key;
+    const email = req.query.email;
+    const result = await userService.unsubscribeEmail(userRawId, email);
+     if (!result) {
+         return res.sendStatus(400);
+     }
+
+     res.status(200).send(`
+    <html>
+    <body>
+    Вы успешно отписаны от оповещений на почту!
+    </body>
+    </html>
+    `)
+});
+
+router.post('/unsubscribe_email', async (req, res) => {
+    const userRawId = req.body.key;
+    const email = req.body.email;
+    const result = await userService.unsubscribeEmail(userRawId, email);
+    if (result) {
+        res.status(200).json({'success': true});
+    } else {
+        res.status(400).json({'success': false});
+    }
+
+});
+
+
+router.post('/notifications_unsubscribe', authCheck, (req, res) => {
+    userService.unregisterForNotifications(req.userId, req.session.id).then();
+
+    res.status(200).json({'success': true})
+});
+
+router.get('/notifications_subscribtions', authCheck, async (req, res) => {
+    const subscriptions = await userService.getNotificationsSubscriptions(req.userId);
+    res.status(200).json({subscriptions, sessionId: req.session.id});
+});
+
+router.get('/portfolio/:id', async (req, res) => {
+    const html = await userService.getPortfolio(req.userId, req.params.id);
+    if (html) {
+        res.status(200).send(html);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
 module.exports = router;

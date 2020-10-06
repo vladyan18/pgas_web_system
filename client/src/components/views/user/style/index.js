@@ -11,6 +11,9 @@ export const Panel = styled.div`
     @media only screen and (max-device-width: 480px) {
         padding: 0 1rem;
     }
+        @media only screen and (max-device-width: 812px) {
+        margin: 0 auto 2rem auto;
+    }
 `;
 
 export const LoginPanel = styled.div`
@@ -26,4 +29,7 @@ export const LoginPanel = styled.div`
 
 export const HorizontalLine = styled.hr`
     border-top: 1px solid #9F2D20;
+    @media only screen and (max-device-width: 480px) {
+        border-top: 1px solid #F6F6F6;
+    }
 `;

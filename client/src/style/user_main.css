@@ -17,6 +17,10 @@ label {
     font-family: sans-serif;
 }
 
+.withoutTopBorder th {
+    border-top: none;
+}
+
 .markdown_view * {
     margin: 0;
 }
@@ -532,6 +536,7 @@ textarea::-moz-placeholder {
 
     .left_navbar {
         width: 100%;
+        display: none;
     }
 
     .ul_nav {
@@ -550,17 +555,18 @@ textarea::-moz-placeholder {
 
 @media screen and (max-width: 800px) {
     .main_block {
-        margin-top: 15px;
+        margin-top: 1rem;
+
     }
 
     .table td {
-        padding-left: 0.1rem;
+        padding-left: 0.75rem;
         padding-right: 0.1rem;
         font-size: small;
     }
 
     .table th {
-        padding-left: 0.1rem;
+        padding-left: 0.75rem;
         padding-right: 0.1rem;
         font-size: x-small;
     }

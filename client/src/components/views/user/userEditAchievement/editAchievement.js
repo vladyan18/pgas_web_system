@@ -25,7 +25,10 @@ const Panel = styled.div`
     padding: 0 2rem;
     border-radius: 2px;
     @media only screen and (max-device-width: 480px) {
-        padding: 0 1rem;
+        padding: 0rem 1rem;
+    }
+            @media only screen and (max-device-width: 812px) {
+        margin: 0 auto 2rem auto;
     }
 `;
 
@@ -237,8 +240,7 @@ class EditAchievement extends Component {
                         {!this.props.isCopying && <>
                         <button id="DeleteButton" className="btn btn-warning" style={{marginRight: "1rem"}}
                                 value="Копировать" onClick={this.copyAch}>Копировать</button>
-                            <DeleteButton onClick={this.deleteAch} disabled={this.state.status != 'Ожидает проверки'&&
-                            this.state.status !== 'Данные некорректны'}/>
+                            <DeleteButton onClick={this.deleteAch} disabled={userPersonalStore.IsInRating} />
                         </>}
                     </div>
                 </ButtonPanel>

@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const adminAuthCheck = require('../../../middlewares/authCheck').admin;
 const moderatorAuthCheck = require('../../../middlewares/authCheck').moderator;
+const observerAuthCheck = require('../../../middlewares/authCheck').observer;
 const adminService = require('../../../services/admin');
 const userService = require('../../../services/user');
 const documentsService = require('../../../services/documents');
@@ -33,7 +34,7 @@ router.post('/AchFailed', moderatorAuthCheck,
         res.sendStatus(200);
     });
 
-router.get('/getUsersForAdmin', moderatorAuthCheck,
+router.get('/getUsersForAdmin', observerAuthCheck,
     async function(req, res) {
         const usersList = await adminService.getUsersForAdmin(req.query.faculty);
         res.send({Info: usersList});
@@ -48,13 +49,13 @@ router.get('/userForAdmin', moderatorAuthCheck, // TODO refactor
         } else res.sendStatus(404);
     });
 
-router.get('/checked', moderatorAuthCheck,
+router.get('/checked', observerAuthCheck,
     async function(req, res) {
         const usersList = await adminService.getUsersForAdmin(req.query.faculty, true);
         res.send({Info: usersList});
     });
 
-router.get('/getRating', moderatorAuthCheck,
+router.get('/getRating', observerAuthCheck,
     async function(req, res) {
         const users = await adminService.getRating(req.query.faculty);
         res.status(200).send({Users: users});
@@ -85,7 +86,7 @@ router.get('/getAdmins', adminAuthCheck,
         res.status(200).send(admins);
     });
 
-router.get('/getResultTable', moderatorAuthCheck,
+router.get('/getResultTable', observerAuthCheck,
     async function(req, res) {
         const [filePromise, fileName] = await documentsService.getResultTable(req.query.faculty);
 
@@ -93,7 +94,7 @@ router.get('/getResultTable', moderatorAuthCheck,
         res.send(await filePromise);
     });
 
-router.get('/getStatistics', moderatorAuthCheck,
+router.get('/getStatistics', observerAuthCheck,
     async function(req, res) {
         const statistics = await adminService.getStatisticsForFaculty(req.query.faculty);
         res.status(200).send(statistics);

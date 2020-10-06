@@ -21,9 +21,10 @@ router.post('/login', authenticate,
 
 router.get('/logout',
     async function(req, res) {
-    req.session.destroy();
-    req.logout();
-    res.redirect('/home');
+    req.session.destroy(function (err) {
+        req.logout();
+        res.redirect('/home');
+    });
 });
 
 module.exports = router;

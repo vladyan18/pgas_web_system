@@ -9,9 +9,7 @@ import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 import {BASE_API_URL} from '../../../../common/constants';
 import {withRouter} from "react-router-dom";
-const horizontalLine = css`
-    border-top: 1px solid #9F2D20;
-`;
+import {HorizontalLine} from "../style";
 
 // a20800
 const mainButton = css`
@@ -33,6 +31,12 @@ const Panel = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
     margin-bottom: 2rem;
     border-radius: 2px;
+    @media only screen and (max-device-width: 480px) {
+        padding-top: 1rem;
+    }
+            @media only screen and (max-device-width: 812px) {
+        margin: 0 auto 2rem auto;
+    }
 `;
 
 
@@ -112,7 +116,7 @@ class UserAchieves extends Component {
           </form>
         </div>
 
-        <hr css={horizontalLine}/>
+        <HorizontalLine/>
         <div style={{display:'flex'}}>
         {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
         {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
@@ -144,8 +148,8 @@ class UserAchieves extends Component {
         </div>}
 
       </div>
-      {userPersonalStore && (userPersonalStore.LastName === 'Волосников' || userPersonalStore.LastName === 'Testov') && <div css={css`
-      width: 50px; height: 50px; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
+      <div css={css`
+      width: 3rem; height: 3rem;; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
       position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
         display: none;
         @media only screen and (max-device-width: 768px) {
@@ -154,7 +158,7 @@ class UserAchieves extends Component {
       `}
       onClick={() => this.props.history.push('/upload')}>
         <i className="fa fa-plus" aria-hidden="true" style={{margin: 'auto'}}></i>
-      </div>}
+      </div>
     </Panel>);
   }
 }

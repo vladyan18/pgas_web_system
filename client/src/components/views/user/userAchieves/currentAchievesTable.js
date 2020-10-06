@@ -28,7 +28,8 @@ const columns = [{
   headerStyle: {verticalAlign: 'middle', textAlign: 'right'},
     formatter: (cell, row) => {
       if (row.ball !== undefined && row.ball !== null) {
-          return <b>{row.ball}</b>;
+          return <><b>{row.ball} </b>
+              {(row.preliminaryBall && row.preliminaryBall !== row.ball) ? <i><span style={{color: 'grey', fontSize: 'small'}} title="Предварительный балл, может измениться">({row.preliminaryBall})</span></i> : ''}</>;
       }
       if (row.preliminaryBall) {
           return <i><span style={{color: 'grey'}} title="Предварительный балл, может измениться">{row.preliminaryBall}</span></i>
@@ -83,7 +84,9 @@ class CurrentAchievesTable extends Component {
                     <div id="row_docs">
                         <BootstrapTable keyField='_id' data={this.props.currentAchieves} columns={columns}
                                         rowEvents={this.rowEvents}
-                                        rowClasses={this.rowClasses} columnClasses={this.columnClasses}
+                                        headerClasses={"withoutTopBorder"}
+                                        rowClasses={this.rowClasses}
+                                        columnClasses={this.columnClasses}
 bordered={false}
 />
                     </div>

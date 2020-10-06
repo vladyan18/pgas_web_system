@@ -5,6 +5,10 @@ body {
     background-color: #e9e9e9;
 }
 
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 .headerContainer {
     box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.2);
     z-index: 99;

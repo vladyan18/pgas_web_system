@@ -10,6 +10,14 @@ import {makeExportUsersTable} from '../../../services/exportXLSX';
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 
+const rolesDictionary = {
+  'SuperAdmin': 'Суперадмин',
+  'Admin': 'Администратор',
+  'Moderator': 'Проверяющий',
+  'Observer': 'Наблюдатель'
+};
+
+
 class StaffMenu extends Component {
   constructor(props) {
     super(props);
@@ -58,6 +66,7 @@ class StaffMenu extends Component {
             <p className="headline">
                             Меню сотрудника
             </p>
+            <p style={{color: 'grey'}}>Роль: {rolesDictionary[userPersonalStore.Role]}</p>
             <hr className="hr_blue"/>
             <div className="container buttonsPanel">
               <div className="row buttonsRow row-eq-height">

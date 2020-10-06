@@ -8,6 +8,23 @@ module.exports.user = (req, res, next) => {
     }
 };
 
+module.exports.observer = async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.sendStatus(401);
+    }
+    let id;
+    if (req.user._json && req.user._json.email) {
+        id = req.user._json.email;
+    } else id = req.user.user_id;
+    const User = await db.findUserById(id);
+
+    if (User.Role && ['SuperAdmin', 'Admin', 'Moderator', 'Observer'].includes(User.Role)) {
+        next();
+    } else {
+        return res.redirect('/404');
+    }
+};
+
 module.exports.moderator = async (req, res, next) => {
     if (!req.isAuthenticated()) {
         return res.sendStatus(401);
