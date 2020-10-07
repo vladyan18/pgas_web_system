@@ -11,7 +11,7 @@ class UserEditProfilePage extends Component {
     super(props);
     this.state = {isDateValid: false, dateValidationResult: true, Type: 'Бакалавриат'};
     this.state.LastName = props.personal.LastName;
-    this.state.Name = props.personal.FirstName;
+    this.state.FirstName = props.personal.FirstName;
     this.state.Patronymic = props.personal.Patronymic;
     this.state.Birthdate = getDate(props.personal.Birthdate);
     this.state.Faculty = props.personal.Faculty;
@@ -31,14 +31,14 @@ class UserEditProfilePage extends Component {
 
     this.register = (e) => {
       const user = {};
-      user.lastname = this.state.LastName;
-      user.name = this.state.Name;
-      user.patronymic = this.state.Patronymic;
-      user.birthdate = makeDate(this.state.Birthdate);
-      user.faculty = this.state.Faculty;
-      user.type = this.state.Type;
-      user.course = this.state.Course;
-      user.settings = this.state.Settings;
+      user.LastName = this.state.LastName;
+      user.FirstName = this.state.FirstName;
+      user.Patronymic = this.state.Patronymic;
+      user.Birthdate = makeDate(this.state.Birthdate);
+      user.Faculty = this.state.Faculty;
+      user.Type = this.state.Type;
+      user.Course = this.state.Course;
+      user.Settings = this.state.Settings;
 
       fetchSendWithoutRes('/api/registerUser', user).then((result) => {
         if (result) this.props.history.push('/');
@@ -85,8 +85,8 @@ class UserEditProfilePage extends Component {
                   value={this.state.LastName} onChange={(e) => this.handleChange(e, 'LastName')}
                   className="form-control" required autoComplete="off"/><br/>
                 <span className="redText">*</span><label>Имя</label><br/>
-                <input type='text' style={{margin: '0'}} id='name' name='name' value={this.state.Name}
-                  onChange={(e) => this.handleChange(e, 'Name')} className="form-control" required
+                <input type='text' style={{margin: '0'}} id='name' name='name' value={this.state.FirstName}
+                  onChange={(e) => this.handleChange(e, 'FirstName')} className="form-control" required
                   autoComplete="off"/><br/>
                 <label>Отчество</label><br/>
                 <input type='text' style={{margin: '0'}} id='patronymic' name='patronymic'

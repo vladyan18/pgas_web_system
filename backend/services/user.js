@@ -259,7 +259,7 @@ module.exports.unsubscribeEmail = async function(userId, email) {
     return db.changeNotificationEmail(user.id, undefined);
 };
 
-module.exports.getPortfolio = async function(requesterId, userId) {
+module.exports.getPortfolioHTML = async function(requesterId, userId) {
     const user = await db.findUserByIdWithAllAchievements(userId);
     if (!user) return false;
 

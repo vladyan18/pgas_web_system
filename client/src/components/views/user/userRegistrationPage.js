@@ -64,7 +64,7 @@ const logoSPbU = css`
 `;
 
 class UserRegistrationPage extends Component {
-    reqFields = ['LastName', 'Name', 'Birthdate', 'Faculty', 'Type', 'Course'];
+    reqFields = ['LastName', 'FirstName', 'Birthdate', 'Faculty', 'Type', 'Course'];
     constructor(props) {
         super(props);
         this.state = {isDateValid: false, Type: "Бакалавриат"};
@@ -103,13 +103,14 @@ class UserRegistrationPage extends Component {
             if (!valid) return;
 
             let user = {};
-            user.lastname = this.state.LastName;
-            user.name = this.state.Name;
-            user.patronymic = this.state.Patronymic;
-            user.birthdate = makeDate(this.state.Birthdate);
-            user.faculty = this.state.Faculty;
-            user.type = this.state.Type;
-            user.course = this.state.Course;
+            user.LastName = this.state.LastName;
+            user.FirstName = this.state.FirstName;
+            user.Patronymic = this.state.Patronymic;
+            user.Birthdate = makeDate(this.state.Birthdate);
+            user.Faculty = this.state.Faculty;
+            user.Type = this.state.Type;
+            user.Course = this.state.Course;
+            console.log(this.state)
 
             fetchSendWithoutRes('/api/registerUser', user).then((result) => {
                 if (result) this.props.history.push('/');
@@ -178,8 +179,8 @@ class UserRegistrationPage extends Component {
                                        required autocomplete="off"/><br/>
                                 <span className="redText">*</span><label>Имя</label><br/>
                                 <input type='text' style={{margin: "0"}} id='name' name='name'
-                                       onChange={(e) => this.handleChange(e, 'Name')}
-                                       className={"form-control" + this.isValid('Name')} required
+                                       onChange={(e) => this.handleChange(e, 'FirstName')}
+                                       className={"form-control" + this.isValid('FirstName')} required
                                        autocomplete="off"/><br/>
                                 <label>Отчество</label><br/>
                                 <input type='text' style={{margin: "0"}} id='patronymic' name='patronymic'

@@ -74,10 +74,10 @@ router.post('/registerUser', regCheck,
         try {
             const userData = req.body;
             console.log('New registration: ', userData);
-            if (!userData.settings) {
-                userData.settings = {};
+            if (!userData.Settings) {
+                userData.Settings = {};
             }
-            userData.settings.notifiedAboutUpdate = true;
+            userData.Settings.notifiedAboutUpdate = true;
             await userService.registerUser(req.userId, userData, req.session);
             res.sendStatus(200);
         } catch (err) {
@@ -302,7 +302,16 @@ router.get('/notifications_subscribtions', authCheck, async (req, res) => {
 });
 
 router.get('/portfolio/:id', async (req, res) => {
-    const html = await userService.getPortfolio(req.userId, req.params.id);
+    const html = await userService.getPortfolioHTML(req.userId, req.params.id);
+    if (html) {
+        res.status(200).send(html);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
+router.get('/downloadPortfolio', async (req, res) => {
+    const html = await userService.getPortfolioHTML(req.userId, req.params.id);
     if (html) {
         res.status(200).send(html);
     } else {

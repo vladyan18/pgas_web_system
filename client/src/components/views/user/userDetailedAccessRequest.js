@@ -27,19 +27,19 @@ class UserDetailedAccessRequest extends Component {
     accept() {
         let userOld = userPersonalStore.personal;
         let user = {};
-        user.lastname = userOld.LastName;
-        user.name = userOld.FirstName;
-        user.patronymic = userOld.Patronymic;
-        user.birthdate = userOld.Birthdate;
-        user.faculty = userOld.Faculty;
-        user.type = userOld.Type;
-        user.course = userOld.Course;
+        user.LastName = userOld.LastName;
+        user.FirstName = userOld.FirstName;
+        user.Patronymic = userOld.Patronymic;
+        user.Birthdate = userOld.Birthdate;
+        user.Faculty = userOld.Faculty;
+        user.Type = userOld.Type;
+        user.Course = userOld.Course;
 
-        user.settings = userOld.Settings;
-        if (!user.settings) {
-            user.settings = {};
+        user.Settings = userOld.Settings;
+        if (!user.Settings) {
+            user.Settings = {};
         }
-        user.settings.detailedAccessAllowed = true;
+        user.Settings.detailedAccessAllowed = true;
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();
@@ -50,19 +50,19 @@ class UserDetailedAccessRequest extends Component {
     deny() {
         let userOld = userPersonalStore.personal;
         let user = {};
-        user.lastname = userOld.LastName;
-        user.name = userOld.FirstName;
-        user.patronymic = userOld.Patronymic;
-        user.birthdate = userOld.Birthdate;
-        user.faculty = userOld.Faculty;
-        user.type = userOld.Type;
-        user.course = userOld.Course;
+        user.LastName = userOld.LastName;
+        user.FirstName = userOld.FirstName;
+        user.Patronymic = userOld.Patronymic;
+        user.Birthdate = userOld.Birthdate;
+        user.Faculty = userOld.Faculty;
+        user.Type = userOld.Type;
+        user.Course = userOld.Course;
 
-        user.settings = userOld.Settings;
-        if (!user.settings) {
-            user.settings = {};
+        user.Settings = userOld.Settings;
+        if (!user.Settings) {
+            user.Settings = {};
         }
-        user.settings.detailedAccessAllowed = false;
+        user.Settings.detailedAccessAllowed = false;
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();
