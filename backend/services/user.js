@@ -43,6 +43,8 @@ module.exports.getProfile = async function(id) {
 module.exports.registerUser = async function(userId, userData, session) {
     const userObject = await db.findUserByIdWithAchievements(userId);
 
+    const isValid = !!userData.LastName && !!userData.FirstName && !!userData.Faculty && !!userData.Type && !!userData.Course && !!userData.Birthdate;
+    if (!isValid) return;
     await db.registerUser(userId, userData);
     session.passport.user.Registered = true;
     session.save(function(err) {
