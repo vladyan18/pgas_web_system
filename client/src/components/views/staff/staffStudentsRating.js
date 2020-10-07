@@ -68,7 +68,7 @@ class StaffStudentsRating extends Component {
                 headerStyle: {width: '10px', fontSize:'smaller'},
                 style: {'vertical-align': 'middle', fontSize: 'small', overflow: 'hidden', width: '10px'},
                 classes: 'text-center',
-                formatter: (cell, row) => row.Type[0]
+                formatter: (cell, row) => row.Type ? row.Type[0] : ''
             },
             {
                 dataField: 'Course',
