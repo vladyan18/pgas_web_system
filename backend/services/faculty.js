@@ -1,4 +1,4 @@
-const db = require('./../controllers/dbController');
+const db = require('../dataLayer');
 
 module.exports.getFaculty = async function(facultyName) {
     return db.getFaculty(facultyName);
@@ -10,5 +10,5 @@ module.exports.createFaculty = async function(facultyObject) {
 
 module.exports.getFacultiesList = async function() {
     const faculties = await db.getAllFaculties();
-    return faculties.map(x => x.Name);
+    return faculties.map((x) => x.Name);
 };

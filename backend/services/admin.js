@@ -1,6 +1,7 @@
-const db = require('./../controllers/dbController');
-const getCurrentDate = require('../helpers/getCurrentDate');
-const achievementsProcessing = require('./achievementsProcessing');
+const db = require('../dataLayer');
+const { getCurrentDate, getFIO, statusCheck } = require('../helpers');
+const { achievementsProcessing } = require('./utils');
+const { Statuses } = require('../../common/consts');
 const notifyService = require('./notifyService');
 
 module.exports.comment = async function(achievementId, commentText) {
@@ -10,7 +11,7 @@ module.exports.comment = async function(achievementId, commentText) {
 module.exports.getData = async function() {
     const faculties = await db.getAllFaculties();
     const result = {};
-    for (let { Name: fac } of faculties) {
+    for (const { Name: fac } of faculties) {
         result[fac] = await db.getCompletelyAllUsersAchievements(fac);
     }
     return result;
@@ -24,7 +25,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
         throw new TypeError();
     }
 
-    achievement.status = 'Изменено';
+    achievement.status = Statuses.CHANGED;
     achievement.isPendingChanges = false;
     achievement.date = getCurrentDate();
 
@@ -34,10 +35,8 @@ module.exports.changeAchievement = async function(achievement, userId) {
     const args = {};
     args.from = oldAchieve;
     args.to = createdAchieve;
-    //await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
+    // await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
-
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -58,7 +57,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
         }
 
         if ( user.Achievement.length > 0) {
-            const fio = user.LastName + ' ' + user.FirstName + ' ' + (user.Patronymic ? user.Patronymic : '');
+            const fio = getFIO(user);
             info.push({
                 Id: user._id,
                 userId: user.id,
@@ -76,7 +75,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
 };
 
 module.exports.changeAchievementStatus = async function(userId, achId, action) {
-    const userPromise = db.findUser(userId);
+    const userPromise = db.findUserByInnerId(userId);
     let user;
     if (action === 'Accept') {
         const achievementPromise = db.findAchieveById(achId);
@@ -94,7 +93,6 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
     }
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
-    await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty, true);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
 };
@@ -103,7 +101,7 @@ module.exports.getRating = async function(faculty) {
     return achievementsProcessing.getRating(faculty, true);
 };
 
-module.exports.addUserToRating = async function(userId) { // TODO refactor
+module.exports.addUserToRating = async function(userId) {
     await db.addUserToRating(userId);
 };
 
@@ -115,7 +113,7 @@ module.exports.changeUserRole = async function(reqUserId, userId, newRole, facul
     await db.changeRole(reqUserId, userId, newRole, faculty);
 };
 
-module.exports.getAdmins = async function(facultyName, userId) { //TODO security
+module.exports.getAdmins = async function(facultyName, userId) { // TODO security
     const admins = await db.getAdminsForFaculty(facultyName);
     return admins.map((x) => {
         const str = x.LastName + ' ' + x.FirstName + ' ' + x.Patronymic;
@@ -123,8 +121,76 @@ module.exports.getAdmins = async function(facultyName, userId) { //TODO security
     });
 };
 
-module.exports.getStatisticsForFaculty = async function(facultyName) {
-    return db.getStatisticsForFaculty(facultyName);
+module.exports.getStatisticsForFaculty = async function(facultyName) { // TODO refactor
+    const students = await db.getUsersWithAllInfo(facultyName, true);
+
+    let articlesIndexCol = 3;
+    if (facultyName === 'Физфак') articlesIndexCol = 2;
+    let achCount = 0;
+    const critsCounts = {};
+    const critsBalls = {};
+    const achieves = {};
+    const achievesBalls = {};
+    let RINC = 0;
+    let SCOPUS = 0;
+    let VAK = 0;
+    let unindexed = 0;
+    let accepted = 0;
+    let declined = 0;
+    let waitingForCheck = 0;
+    for (const user of students) {
+        for (const ach of user.Achievement) {
+            if (statusCheck.isDeclined(ach)) declined += 1;
+            if (statusCheck.isNew(ach)) waitingForCheck += 1;
+            if (!statusCheck.isAccepted(ach)) continue;
+            accepted += 1;
+            achCount += 1;
+            if (!critsCounts[ach.chars[0]]) {
+                critsCounts[ach.chars[0]] = 0;
+                critsBalls[ach.chars[0]] = 0;
+            }
+            critsCounts[ach.chars[0]] += 1;
+            critsBalls[ach.chars[0]] += ach.ball;
+
+            if (!achieves[ach.chars[0] + ' ' + ach.chars[1]]) {
+                achieves[ach.chars[0] + ' ' + ach.chars[1]] = 0;
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] = 0;
+            }
+
+            if (ach.chars[0] === '6 (9а)') {
+                if (!achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]]) {
+                    achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0;
+                    achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] = 0;
+                }
+                achieves[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += 1;
+                achievesBalls[ach.chars[0] + ' ' + ach.chars[1] + ' ' + ach.chars[2]] += ach.ball;
+            }
+
+            achieves[ach.chars[0] + ' ' + ach.chars[1]] += 1;
+            achievesBalls[ach.chars[0] + ' ' + ach.chars[1]] += ach.ball;
+
+            if (ach.chars.some((x) => x.indexOf('РИНЦ') > 0)) RINC += 1;
+            else
+            if (ach.chars.some((x) => x.indexOf('Scopus') > 0)) SCOPUS += 1;
+            else
+            if (ach.chars.some((x) => x.indexOf('ВАК') > 0)) VAK += 1;
+            else if (ach.chars[0] === '5 (8б)' || ach.chars[0] === '8б') unindexed += 1;
+        }
+    }
+    return {
+        'Total achs count': achCount,
+        'Accepted': accepted,
+        'Declined': declined,
+        'Waiting': waitingForCheck,
+        'RINC': RINC,
+        'SCOPUS': SCOPUS,
+        'VAK': VAK,
+        'Unindexed': unindexed,
+        'CritsCounts': critsCounts,
+        'CritsBalls': critsBalls,
+        'Achieves': achieves,
+        'AchievesBalls': achievesBalls,
+    };
 };
 
 module.exports.getconfitmationsStatistics = async function() {
@@ -134,6 +200,5 @@ module.exports.getconfitmationsStatistics = async function() {
 module.exports.purgeConfirmations = async function() {
     return db.purgeConfirmations();
 };
-
 
 

@@ -4,6 +4,6 @@ const options = {
     day: 'numeric',
 };
 
-module.exports = function () {
+module.exports = function() {
     return new Date().toLocaleString('ru', options);
-}
+};

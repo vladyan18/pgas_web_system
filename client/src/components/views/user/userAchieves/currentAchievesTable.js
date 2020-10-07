@@ -4,6 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {css, jsx} from '@emotion/core';
 import './tableStyles.css';
+import { Statuses } from '../../../../consts';
 
 const achievementFormatter = function(cell, row) {
   let statusTitle = null;
@@ -14,6 +15,7 @@ const achievementFormatter = function(cell, row) {
     }}>{row.status}</div>;
   return <><span style={{marginRight: "1rem"}}><b>{ row.crit }</b></span>{ row.achievement }{statusTitle}</>;
 };
+
 
 const columns = [{
   dataField: 'achievement',
@@ -58,14 +60,14 @@ class CurrentAchievesTable extends Component {
     rowClasses(row) {
     const baseClass = 'user-table__achieveRow';
     switch (row.status) {
-      case 'Отказано':
+      case Statuses.DECLINED:
         return baseClass + ' user-table__declined-row';
-      case 'Данные некорректны':
+      case Statuses.INCORRECT:
         return baseClass + ' user-table__incorrect-row';
-      case 'Изменено':
+      case Statuses.CHANGED:
         return baseClass + ' user-table__edited-row';
-      case 'Принято с изменениями':
-      case 'Принято':
+      case Statuses.CHANGED_AND_ACCEPTED:
+      case Statuses.ACCEPTED:
         return baseClass + ' user-table__accepted-row';
     }
     return baseClass;
