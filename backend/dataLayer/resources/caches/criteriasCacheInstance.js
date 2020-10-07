@@ -1,4 +1,4 @@
-const CriteriasModel = require('../../models/criterias');
+const CriteriasModel = require('../../../models/criterias');
 const facultyCache = require('./facultyCacheInstance');
 
 class CriteriasCache {
@@ -17,7 +17,7 @@ class CriteriasCache {
                 _id: facObject.CritsId.toString(),
                 rawCrits: crits.Crits,
                 Crits: JSON.parse(crits.Crits),
-                Limits: crits.Limits
+                Limits: crits.Limits,
             };
         }
         return this.cache[facultyName];

@@ -1,4 +1,4 @@
-const FacultyModel = require('../../models/faculty');
+const FacultyModel = require('../../../models/faculty');
 
 class FacultyCache {
     constructor() {

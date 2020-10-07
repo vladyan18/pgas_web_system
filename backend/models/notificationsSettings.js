@@ -7,8 +7,8 @@ const notificationsSchema = mongoose.Schema({
     endpoints: [{
         endpointType: String,
         endpoint: {},
-        sessionId: String
-    }]
+        sessionId: String,
+    }],
 });
 
 const NotificationsSettings = connection.model('NotificationsSettings', notificationsSchema);

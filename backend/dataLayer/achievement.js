@@ -1,12 +1,12 @@
 'use strict';
 
-const { Dates, Statuses } = require("../../common/consts");
-const { statusCheck } = require("../helpers");
+const { Dates, Statuses } = require('../../common/consts');
+const { statusCheck } = require('../helpers');
 const { UserModel, AchieveModel } = require('../models');
-const faculty = require('./faculty')
+const faculty = require('./faculty');
 
 exports.archiveAchievements = async function() {
-    await AchieveModel.updateMany({status: Statuses.DECLINED}, {$set:{isArchived: true}});
+    await AchieveModel.updateMany({status: Statuses.DECLINED}, {$set: {isArchived: true}});
     console.log('UPDATED');
 };
 
@@ -15,7 +15,7 @@ exports.findAchieveById = async function(id) {
 };
 
 exports.createAchieve = async function(achieve) {
-    if (achieve.crit === '7а' || achieve.crit === '1 (7а)') {
+    if (!achieve.achDate) {
         achieve.achDate = new Date(Dates.DEFAULT_DATE);
     }
     return AchieveModel.create(achieve);
@@ -29,6 +29,7 @@ exports.deleteAchieve = async function(id) {
     }
     const u = await UserModel.findOne({Achievement: {$elemMatch: {$eq: id.toString()}}}).lean();
     if (!u) return true;
+
     for (let i = u.Achievement.length - 1; i >= 0; i--) {
         if (u.Achievement[i].toString() === id) {
             u.Achievement.splice(i, 1);
@@ -43,9 +44,12 @@ exports.deleteAchieve = async function(id) {
 exports.updateAchieve = async function(id, achieve) {
     const newAch = {
         crit: achieve.chars ? achieve.chars[0] : null,
-        chars: achieve.chars, status: achieve.status,
-        achievement: achieve.achievement, ball: achieve.ball,
-        achDate: achieve.achDate, comment: achieve.comment,
+        chars: achieve.chars,
+        status: achieve.status,
+        achievement: achieve.achievement,
+        ball: achieve.ball,
+        achDate: achieve.achDate,
+        comment: achieve.comment,
         endingDate: achieve.endingDate,
         isPendingChanges: achieve.isPendingChanges,
         preliminaryBall: achieve.preliminaryBall,
@@ -53,7 +57,6 @@ exports.updateAchieve = async function(id, achieve) {
 
     newAch.confirmations = achieve.confirmations;
     if (achieve.confirmations && achieve.confirmations.length > 0) {
-
         for (let i = 0; i < achieve.confirmations.length; i++) {
             newAch.confirmations[i] = achieve.confirmations[i];
         }
@@ -85,7 +88,7 @@ exports.comment = async function(id, comment) {
     return AchieveModel.updateOne({_id: id}, {$set: {comment: comment}}).lean();
 };
 
-exports.validateAchievement = async function(achievement, user) { // TODO refactor !!
+exports.validateAchievement = async function(achievement, user) { // TODO refactor !!!
     if (!achievement || !user) return false;
     const crits = await faculty.getCriteriasObject(user.Faculty);
     if (!crits) {
@@ -159,7 +162,6 @@ function checkAchievement(achievement, criterias, user) {
                 achievement.chars.splice(1, 0, 'Организация прочих мероприятий');
             } else if (achievement.crit === '9а' && achievement.chars.length > 4) {
                 achievement.chars.splice(1, 1, 'Организация мероприятий при участии СПбГУ');
-
             } else if (achievement.crit === '8б') {
                 achievement.chars.splice(2, 1);
                 let haveBdnsk = false;

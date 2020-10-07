@@ -19,7 +19,10 @@ module.exports = {
     "rules": {
         'max-len': 'off',
         'require-jsdoc': 'off',
-        'valid-jsdoc': 'off'
+        'valid-jsdoc': 'off',
+        'linebreak-style': 'off',
+        'indent': 'off',
+        'object-curly-spacing': 'off'
     },
     "plugins": [
        // "security"

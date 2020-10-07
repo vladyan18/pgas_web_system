@@ -4,7 +4,7 @@ const connection = require('../config/db');
 const sessionsSchema = mongoose.Schema({
     _id: String,
     expires: Date,
-    session: String
+    session: String,
 });
 
 const Sessions = connection.model('Sessions', sessionsSchema);

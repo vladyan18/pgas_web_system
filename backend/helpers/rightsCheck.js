@@ -5,7 +5,7 @@ module.exports.hasAccessLevel = function({Role}, accessLevel) {
     return accessLevel.includes(Role);
 };
 
-module.exports.hasAccessLevelInFaculty = function ({Role, Rights}, accessLevel, facultyName) {
+module.exports.hasAccessLevelInFaculty = function({Role, Rights}, accessLevel, facultyName) {
     if (!Role) return false;
 
     if ( module.exports.hasAccessLevel({ Role }, AccessLevels.SUPERADMIN) ) {
@@ -14,7 +14,7 @@ module.exports.hasAccessLevelInFaculty = function ({Role, Rights}, accessLevel, 
 
     const hasLevel = module.exports.hasAccessLevel({ Role }, accessLevel);
     if (!hasLevel || !Rights || Rights.length === 0) {
-        return false
+        return false;
     }
 
     return Rights.includes(facultyName);

@@ -9,7 +9,7 @@ function userAccessFactory(negativeCb) {
         } else {
             return negativeCb(res);
         }
-    }
+    };
 }
 
 module.exports.user = userAccessFactory((res) => res.sendStatus(401));
@@ -35,7 +35,7 @@ function checkAccessFactory(accessLevel) {
         } else {
             return res.redirect('/404');
         }
-    }
+    };
 }
 
 module.exports.observer = checkAccessFactory(AccessLevels.OBSERVER);

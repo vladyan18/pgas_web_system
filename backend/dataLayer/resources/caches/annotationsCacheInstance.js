@@ -1,4 +1,4 @@
-const AnnotationsModel = require('../../models/annotation');
+const AnnotationsModel = require('../../../models/annotation');
 const facultyCache = require('./facultyCacheInstance');
 
 class AnnotationsCache {

@@ -3,8 +3,8 @@ const randomstring = require('randomstring');
 const path = require('path');
 const translitter = require('cyrillic-to-translit-js');
 const sanitize = require('sanitize-filename');
-var fs = require('fs');
-var crypto = require('crypto');
+const fs = require('fs');
+const crypto = require('crypto');
 
 const uploadsConfirmationsPath = path.join(__dirname, '../static/confirmations');
 
@@ -21,12 +21,12 @@ const storage = multer.diskStorage({
   },
 });
 
-storage._handleFile = function _handleFile (req, file, cb) {
+storage._handleFile = function _handleFile(req, file, cb) {
     const that = storage;
     const hash = crypto.createHash('md5');
-    that.getDestination(req, file, function (err, destination) {
+    that.getDestination(req, file, function(err, destination) {
         if (err) return cb(err);
-        that.getFilename(req, file, function (err, filename) {
+        that.getFilename(req, file, function(err, filename) {
             if (err) return cb(err);
 
             const finalPath = path.join(destination, filename);
@@ -34,20 +34,20 @@ storage._handleFile = function _handleFile (req, file, cb) {
 
             file.stream.pipe(outStream);
             outStream.on('error', cb);
-            file.stream.on('data', function (chunk) {
-                hash.update(chunk)
+            file.stream.on('data', function(chunk) {
+                hash.update(chunk);
             });
-            outStream.on('finish', function () {
+            outStream.on('finish', function() {
                 cb(null, {
                     destination: destination,
                     filename: filename,
                     path: finalPath,
                     size: outStream.bytesWritten,
-                    hash: hash.digest('hex')
-                })
-            })
-        })
-    })
+                    hash: hash.digest('hex'),
+                });
+            });
+        });
+    });
 };
 
 const upload = multer({storage: storage, limits: {fileSize: 1024*1024*15}}).single('file');

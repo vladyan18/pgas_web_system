@@ -1,7 +1,7 @@
 'use strict';
 
-const { Dates, Roles } = require("../../common/consts");
-const { UserModel, AchieveModel, NotificationsSettingsModel } = require('../models');
+const { Dates, Roles } = require('../../common/consts');
+const { UserModel, NotificationsSettingsModel } = require('../models');
 
 exports.findUserById = async function(id) {
     return UserModel.findOne({id: id}).lean();
@@ -9,18 +9,18 @@ exports.findUserById = async function(id) {
 
 exports.getUserWithConfirmations = async function(id) {
     return UserModel.findOne({id: id}).populate({
-        path: 'Confirmations'
+        path: 'Confirmations',
     }).lean();
 };
 
 async function getUserWithAchievements(id, isArchived) {
     let query;
     if (isArchived && isArchived !== 'all') {
-        query = { $or: [{achDate: {$lt: Dates.MINIMAL}}, {isArchived: true}] };
+        query = {$or: [{achDate: {$lt: Dates.MINIMAL}}, {isArchived: true}]};
     } else if (isArchived === 'all') {
         query = {};
     } else {
-        query = { achDate: {$gte: Dates.MINIMAL}, isArchived: {$ne: true} };
+        query = {achDate: {$gte: Dates.MINIMAL}, isArchived: {$ne: true}};
     }
     const user = await UserModel.findOne({id: id}).populate(
         {
@@ -28,7 +28,7 @@ async function getUserWithAchievements(id, isArchived) {
             match: query,
             populate: {
                 path: 'confirmations.id',
-                select: '-FilePath'
+                select: '-FilePath',
             },
         },
     ).lean();
@@ -60,7 +60,7 @@ exports.findUserByIdWithArchivedAchievements = async function(id) {
 };
 
 
-exports.findUser = function(id) {
+exports.findUserByInnerId = function(id) {
     return UserModel.findById(id).lean();
 };
 
@@ -70,11 +70,6 @@ exports.getUserRights = function(id) {
 
 exports.changeUserSettings = function(id, newSettings) {
     return UserModel.updateOne({id: id}, {$set: {Settings: newSettings}});
-};
-
-exports.findUserByAchieve = async function(id) {
-    const ach = await AchieveModel.findById(id.toString());
-    return UserModel.findOne({Achievement: {$elemMatch: {$eq: ach}}}).lean();
 };
 
 exports.migrate = async function(id) {
@@ -112,7 +107,10 @@ exports.isRegistered = async function(id) {
 };
 
 exports.getAdminsForFaculty = function(facultyName) {
-    return UserModel.find({Role: {$in: [Roles.ADMIN, Roles.MODERATOR, Roles.OBSERVER]}, Rights: {$elemMatch: {$eq: facultyName}}}).lean();
+    return UserModel.find({
+        Role: {$in: [Roles.ADMIN, Roles.MODERATOR, Roles.OBSERVER]},
+        Rights: {$elemMatch: {$eq: facultyName}},
+    }).lean();
 };
 
 exports.getCurrentUsers = function(faculty) {
@@ -120,17 +118,20 @@ exports.getCurrentUsers = function(faculty) {
 };
 
 exports.getNewUsers = function(faculty) {
-    return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]).lean();
+    return UserModel.find().or([{Faculty: faculty, IsInRating: undefined}, {
+        Faculty: faculty,
+        IsInRating: false,
+    }]).lean();
 };
 
 exports.getCompletelyAllUsersAchievements = async function(faculty) {
     const populateQuery = {
-        path: 'Achievement'
+        path: 'Achievement',
     };
     return UserModel.find({Faculty: faculty}).populate(populateQuery).lean();
 };
 
-exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false) {
+exports.getUsersWithAllInfo = async function(faculty, checked = false, stale = false) {
     let query;
     const populateQuery = {
         path: 'Achievement',
@@ -140,21 +141,16 @@ exports.getUsersWithAllInfo = async function(faculty, checked=false, stale=false
         },
     };
     if (!checked) {
-        query = {$or: [{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]}
+        query = {$or: [{Faculty: faculty, IsInRating: undefined}, {Faculty: faculty, IsInRating: false}]};
     } else {
         query = {Faculty: faculty, IsInRating: true};
     }
     return UserModel.find(query).populate(populateQuery).lean();
 };
 
-exports.isUser = function(token) {
-    return UserModel.findOne({id: token}, function(err, user) {
-        if (err) {
-            return false;
-        }
-
-        return !!user;
-    });
+exports.isUser = async function(token) {
+    const user = await UserModel.findOne({id: token}, 'id').lean();
+    return !!user;
 };
 
 exports.createUser = function(User) {
@@ -187,18 +183,18 @@ exports.findActualAchieves = async function(userId) {
     return actualAchieves;
 };
 
-exports.registerUser = async function(userId, lastname, name, patronymic, birthdate, spbuId, newFaculty, course, type, settings) {
+exports.registerUser = async function(userId, {LastName, FirstName, Patronymic, Birthdate, Faculty, Course, Type, Settings}) { // TODO refactor
     await UserModel.findOneAndUpdate({id: userId}, {
         $set: {
-            LastName: lastname,
-            FirstName: name,
-            Patronymic: patronymic,
-            Birthdate: birthdate,
-            Faculty: newFaculty,
-            Course: course,
-            Type: type,
+            LastName,
+            FirstName,
+            Patronymic,
+            Birthdate,
+            Faculty,
+            Course,
+            Type,
             Registered: true,
-            Settings: settings,
+            Settings,
         },
     });
 };
@@ -228,11 +224,11 @@ exports.changeRole = async function(reqUserId, userId, newRole, faculty) { // TO
     if (user.Rights.includes(faculty) && newRole !== Roles.USER) {
         return UserModel.updateOne({id: userId}, {$set: {Role: newRole}}).lean();
     } else if (newRole !== Roles.USER) {
-        let rights = user.Rights.filter((x) => x !== faculty);
+        const rights = user.Rights.filter((x) => x !== faculty);
         rights.push(faculty);
         return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     } else {
-        let rights = user.Rights.filter((x) => x !== faculty);
+        const rights = user.Rights.filter((x) => x !== faculty);
         return UserModel.updateOne({id: userId}, {$set: {Role: newRole, Rights: rights}}).lean();
     }
 };
@@ -245,12 +241,12 @@ exports.changeNotificationEmail = async function(userId, email) {
     let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
     notifSettings = notifSettings.NotificationsSettings;
     if (!notifSettings) {
-        notifSettings = { userId, email };
+        notifSettings = {userId, email};
         notifSettings = await NotificationsSettingsModel.create(notifSettings);
         await UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean();
     } else {
         await NotificationsSettingsModel.updateOne({_id: notifSettings._id},
-            {$set: {email: email}}
+            {$set: {email: email}},
         ).lean();
     }
     return true;
@@ -260,7 +256,7 @@ exports.saveNotificationEndpoint = async function(userId, sessionId, notificatio
     let notifSettings = await UserModel.findOne({id: userId}, 'NotificationsSettings').populate('NotificationsSettings').lean();
     notifSettings = notifSettings.NotificationsSettings;
     if (!notifSettings) {
-        notifSettings = { userId };
+        notifSettings = {userId};
         notifSettings = await NotificationsSettingsModel.create(notifSettings);
         UserModel.updateOne({id: userId}, {$set: {NotificationsSettings: notifSettings._id}}).lean().then();
     }
@@ -272,7 +268,7 @@ exports.saveNotificationEndpoint = async function(userId, sessionId, notificatio
     };
 
     return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
-        {$push: {endpoints: endpoint}}
+        {$push: {endpoints: endpoint}},
     ).lean();
 };
 
@@ -281,7 +277,7 @@ exports.removeNotificationEndpoint = async function(userId, sessionId) {
     notifSettings = notifSettings.NotificationsSettings;
 
     return NotificationsSettingsModel.updateOne({_id: notifSettings._id},
-        {$pull: {endpoints: {sessionId: sessionId}}}
+        {$pull: {endpoints: {sessionId: sessionId}}},
     ).lean();
 };
 

@@ -21,7 +21,7 @@ router.post('/login', authenticate,
 
 router.get('/logout',
     async function(req, res) {
-    req.session.destroy(function (err) {
+    req.session.destroy(function(err) {
         req.logout();
         res.redirect('/home');
     });

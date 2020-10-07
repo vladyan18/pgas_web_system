@@ -1,10 +1,9 @@
 'use strict';
 
 const db = require('../dataLayer');
-const fs = require('fs');
-const { getCurrentDate, getFIO, statusCheck, rightsCheck } = require('../helpers');
-const { Statuses, Roles, CharsNiceVariants, AccessLevels } = require('../../common/consts');
-const achievementsProcessing = require('./achievementsProcessing');
+const { getCurrentDate, statusCheck, rightsCheck } = require('../helpers');
+const { Statuses, AccessLevels } = require('../../common/consts');
+const { achievementsProcessing, characteristicsPrediction, portfolioFormatter } = require('./utils');
 
 
 module.exports.getUserRights = async function(id) {
@@ -44,83 +43,25 @@ module.exports.getProfile = async function(id) {
 module.exports.registerUser = async function(userId, userData, session) {
     const userObject = await db.findUserByIdWithAchievements(userId);
 
-    await db.registerUser(userId, userData.lastname, userData.name, userData.patronymic,
-        userData.birthdate, userData.spbuId, userData.faculty, userData.course, userData.type,
-        userData.settings);
+    await db.registerUser(userId, userData);
     session.passport.user.Registered = true;
     session.save(function(err) {
         console.log(err);
     });
 
     if (userObject && userObject.Faculty && userObject.Faculty !== userData.Faculty && userObject.Achievements && userObject.Achievements.length > 0) {
-
         await achievementsProcessing.calculateBallsForUser(userId, userObject.Faculty);
     }
 };
 
 module.exports.changeUserSettings = async function(userId, newSettings) {
-    let user = await db.findUserById(userId);
+    const user = await db.findUserById(userId);
     if (!user) return;
     let settings = user.Settings || {};
     settings = Object.assign(settings, newSettings);
     await db.changeUserSettings(userId, settings);
 };
 
-const natural = require('natural');
-const plainEK3Crits = [];
-let roots = [];
-function getCrit(crits, arr) {
-    let critNames = Object.keys(crits);
-
-    if (!isNaN(crits[critNames[0]])) {
-        plainEK3Crits.push(arr);
-        return;
-    }
-
-    for (let key of critNames) {
-        getCrit(crits[key], [...arr, key]);
-    }
-}
-const classifiers = {};
-async function initClassifier(plainCrits, facultyName) {
-    const users = await db.getCompletelyAllUsersAchievements(facultyName);
-    const classifier = new natural.BayesClassifier(natural.PorterStemmerRu);
-    plainCrits.forEach((x, index) => classifier.addDocument(x, index));
-    let count = 0;
-    for (let user of users) {
-        if (!user.Achievement) continue;
-        for (let ach of user.Achievement) {
-            let str = '';
-            for (let i = 0; i < ach.chars.length; i++) {
-                str += ' ' + ach.chars[i];
-            }
-            let id = plainCrits.indexOf(str);
-            if (id === -1 || !ach.achievement || ach.achievement.length === 0) continue;
-            count += 1;
-            classifier.addDocument(ach.achievement, id);
-        }
-    }
-
-    console.log(facultyName, 'COUNT:', count);
-    classifier.train();
-    classifiers[facultyName] = [null, classifier];
-}
-
-async function initAllClassifiers(facultiesList) {
-    const crit = await db.getCriteriasObject('ПМ-ПУ');
-    roots = Object.keys(crit);
-    getCrit(crit, []);
-    const plainCrits = plainEK3Crits.map(x => {
-        let str = '';
-        for (let i = 0; i < x.length; i++) {
-            str += ' ' + x[i];
-        }
-        return str;
-    });
-    facultiesList.forEach((fac) => initClassifier(plainCrits, fac).then());
-}
-
-initAllClassifiers(['ПМ-ПУ', 'Юридический', 'Социологический', 'Политологии', 'МКН', 'Исторический', 'Психологии', 'ВШМ']).then();
 
 module.exports.addAchievement = async function(userId, achievement) {
     const user = await db.findUserById(userId);
@@ -141,8 +82,7 @@ module.exports.addAchievement = async function(userId, achievement) {
 };
 
 module.exports.classifyDescription = async function(description, faculty = 'ПМ-ПУ') {
-    if (!classifiers[faculty]) return undefined;
-    return {root: null, classifier: plainEK3Crits[Number(classifiers[faculty][1].classify(description))]};
+    return characteristicsPrediction.classify(description, faculty);
 };
 
 module.exports.updateAchievement = async function(userId, achId, achievement) {
@@ -217,7 +157,7 @@ module.exports.updateAchievement = async function(userId, achId, achievement) {
 };
 
 module.exports.deleteAchievement = async function(userId, achId) {
-    let user = await db.findUserById(userId);
+    const user = await db.findUserById(userId);
 
     if (!user.Achievement.some((o) => (o && o.toString() === achId))) {
         return null;
@@ -228,7 +168,7 @@ module.exports.deleteAchievement = async function(userId, achId) {
     return true;
 };
 
-module.exports.getAchievement = async function(achId) { //TODO what is it?
+module.exports.getAchievement = async function(achId) { // TODO what is it?
     const ach = await db.findAchieveById(achId);
     const confirms = [];
 
@@ -254,7 +194,7 @@ module.exports.addFileForConfirmation = async function(userId, confirmationFile)
     }
 
     if (!user.Confirmations || !user.Confirmations.some((x) => x._id.toString() === result._id.toString())) {
-        await db.addConfirmationToUser(user._id, result._id)
+        await db.addConfirmationToUser(user._id, result._id);
     }
     return {result, sameFiles};
 };
@@ -282,16 +222,16 @@ module.exports.getConfirmationFileStream = async function(filePath) {
     return db.getConfirmationFileStream(filePath);
 };
 
-module.exports.deleteConfirmation = async function (userId, confirmationId) {
+module.exports.deleteConfirmation = async function(userId, confirmationId) {
     return db.deleteConfirmation(userId, confirmationId);
-}
+};
 
-module.exports.getConfirmations = async function(userId) { //TODO refactor
+module.exports.getConfirmations = async function(userId) { // TODO refactor
     const user = await db.findUserById(userId);
     return db.getConfirmations(user.Confirmations);
 };
 
-module.exports.getRating = async function(userId, facultyName) { //TODO refactor
+module.exports.getRating = async function(userId, facultyName) { // TODO refactor
    return achievementsProcessing.getRating(facultyName, false, userId);
 };
 
@@ -312,44 +252,14 @@ module.exports.getNotificationsSubscriptions = async function(userId) {
 };
 
 module.exports.unsubscribeEmail = async function(userId, email) {
-    const user = await db.findUser(userId);
+    const user = await db.findUserByInnerId(userId);
     if (!user) return false;
     const settings = await db.getNotificationSettings(user.id);
     if (!settings || settings.email !== email) return false;
     return db.changeNotificationEmail(user.id, undefined);
 };
 
-
-const getDateFromStr = require('../helpers/getDateFromStr');
 module.exports.getPortfolio = async function(requesterId, userId) {
-    function createCharsString(chars) {
-        const charsDictionary = CharsNiceVariants;
-        let str = '';
-        for (let i = 1; i < chars.length; i++) {
-            let char = charsDictionary[chars[i]] || chars[i];
-            str += char + (i !== chars.length - 1 ? ', ' : '');
-        }
-        return str;
-    }
-    function createTable(achievements) {
-        let accum = '';
-        for (let ach of achievements) {
-            accum += `<tr>
-            <td style="color: grey; width: 10%; vertical-align: top; padding-bottom: 1rem;">${getDateFromStr(ach.achDate)}</td>
-            <td style="padding-left: 2rem; vertical-align: top; padding-bottom: 1rem;">${ach.achievement} <br/> <span style="color:grey; font-weight: 350; font-size: small;">${createCharsString(ach.chars)}</span></td>  
-            </tr>`
-        }
-        return `<table><tbody>${accum}</tbody></table>`;
-    }
-
-    function getFieldOfWork(fieldName, crits, user) {
-        const achievements = user.Achievement.filter((x) => crits.includes(x.crit))
-            .sort((a, b) => new Date(b.achDate) - new Date(a.achDate));
-        if (achievements.length === 0) return '';
-        let block = createTable(achievements);
-        return `<h2 class="subheader">${fieldName}</h2><hr/>` + block;
-    }
-
     const user = await db.findUserByIdWithAllAchievements(userId);
     if (!user) return false;
 
@@ -363,30 +273,7 @@ module.exports.getPortfolio = async function(requesterId, userId) {
         }
     }
 
-    user.Achievement = user.Achievement.filter(x => statusCheck.isAccepted(x));
+    user.Achievement = user.Achievement.filter((x) => statusCheck.isAccepted(x));
 
-    let template = await fs.promises.readFile('./client/public/portfolio.html', {encoding: 'utf-8'});
-    template = template.replace('$FIO$', getFIO(user))
-        .replace('$FACULTY$', user.Faculty)
-        .replace('$TYPE$', user.Type)
-        .replace('$COURSE$', user.Course);
-
-    let achievementsBlock = '';
-
-    const fields = [
-        ['Олимпиады', ['7в']],
-        ['Проекты', ['7б']],
-        ['Публикации', ['8б']],
-        ['Гранты и призы за научную деятельность', ['8а']],
-        ['Творчество', ['10а', '10б']],
-        ['Общественная деятельность', ['9а', '9б']],
-        ['Спорт', ['11а', '11б', '11в']],
-    ];
-
-    for (let [fieldName, crits] of fields) {
-        achievementsBlock += getFieldOfWork(fieldName, crits, user);
-    }
-
-    template = template.replace('$ACHIEVEMENTS$', achievementsBlock);
-    return template;
-}
+    return portfolioFormatter.buildPortfolioHTML(user);
+};

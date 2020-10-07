@@ -225,4 +225,3 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
 }
 
 
-

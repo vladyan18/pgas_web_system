@@ -10,11 +10,11 @@ const facultyService = require('../../../services/faculty');
 const fs = require('fs');
 const path = require('path');
 const uploadConfirmation = require( '../../../config/confirmationMulter');
-const uploadsConfirmationsPath = path.join(__dirname, '../../../static/confirmations'); //TODO
-const webpush = require('web-push')
-webpush.setVapidDetails("https://achieve.spbu.ru",
-    "BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730",
-    "e9gl2YUIbBRdSZ_GCJAwo8RwuOHNbDAE1TUfPCnEesQ");
+const uploadsConfirmationsPath = path.join(__dirname, '../../../static/confirmations'); // TODO
+const webpush = require('web-push');
+webpush.setVapidDetails('https://achieve.spbu.ru',
+    'BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730',
+    'e9gl2YUIbBRdSZ_GCJAwo8RwuOHNbDAE1TUfPCnEesQ');
 if (!fs.existsSync(uploadsConfirmationsPath)) {
     fs.mkdirSync(uploadsConfirmationsPath);
 }
@@ -37,7 +37,7 @@ router.get('/getRights', authCheck,
     async function(req, res) {
         const rights = await userService.getUserRights(req.userId);
         if (rights) {
-            res.status(200).send({Role: rights.Role, Rights: rights.Rights});;
+            res.status(200).send({Role: rights.Role, Rights: rights.Rights});
         } else {
             res.status(404).send({Error: 404});
         }
@@ -192,7 +192,7 @@ router.get('/getConfirm/*', authCheck, // TODO SECURITY
             .substr(filename.search('-') + 1).toLowerCase();
 
         res.setHeader('Content-Length', fileStream.stat.size);
-        let contentType, contentDisposition;
+        let contentType; let contentDisposition;
         if (filename.endsWith('.pdf')) {
             contentType = 'application/pdf';
             contentDisposition = 'inline';
@@ -247,13 +247,13 @@ router.post('/notifications_subscribe', authCheck, (req, res) => {
     const subscription = req.body;
     userService.registerForNotifications(req.userId, req.session.id, subscription).then();
 
-    res.status(200).json({'success': true})
+    res.status(200).json({'success': true});
 });
 
 router.post('/change_settings', authCheck, async (req, res) => {
     const settings = req.body;
     await userService.changeUserSettings(req.userId, settings);
-    res.status(200).json({'success': true})
+    res.status(200).json({'success': true});
 });
 
 router.get('/change_notification_email', authCheck, async (req, res) => {
@@ -275,7 +275,7 @@ router.get('/unsubscribe_email', async (req, res) => {
     Вы успешно отписаны от оповещений на почту!
     </body>
     </html>
-    `)
+    `);
 });
 
 router.post('/unsubscribe_email', async (req, res) => {
@@ -287,14 +287,13 @@ router.post('/unsubscribe_email', async (req, res) => {
     } else {
         res.status(400).json({'success': false});
     }
-
 });
 
 
 router.post('/notifications_unsubscribe', authCheck, (req, res) => {
     userService.unregisterForNotifications(req.userId, req.session.id).then();
 
-    res.status(200).json({'success': true})
+    res.status(200).json({'success': true});
 });
 
 router.get('/notifications_subscribtions', authCheck, async (req, res) => {

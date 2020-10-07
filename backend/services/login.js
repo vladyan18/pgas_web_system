@@ -1,4 +1,3 @@
-const db = require('../dataLayer');
 const passport = require('passport');
 
 module.exports.authenticate = async function(username, password) {
@@ -27,5 +26,5 @@ module.exports.authenticate = async function(username, password) {
             console.log('USER', user);
             resolve(user);
         })();
-    }))
+    }));
 };

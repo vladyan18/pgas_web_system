@@ -1,9 +1,8 @@
 'use strict';
 
-const db = require('../dataLayer');
-console.log(db);
-const { Statuses } = require('../../common/consts');
-const { statusCheck, getFIO } = require('../helpers');
+const db = require('../../dataLayer');
+const { Statuses } = require('../../../common/consts');
+const { statusCheck, getFIO } = require('../../helpers');
 
 module.exports.calculateBallsForUser = async function(id, faculty) {
     const achievementsPromise = db.findActualAchieves(id);
@@ -86,10 +85,9 @@ function findBestAchievement(achievements, step, isPreliminary) {
     if (isPreliminary) {
         candidates = achievements.filter(({ach}) => !ach.preliminaryBall && ach.preliminaryBall !== 0)
             .filter(({ach}) => !statusCheck.shouldNotCountPreliminary(ach));
-    }
-    else {
+    } else {
         candidates = achievements.filter(({ach}) => !ach.ball && ach.ball !== 0)
-            .filter(({ach}) => statusCheck.isAccepted(ach))
+            .filter(({ach}) => statusCheck.isAccepted(ach));
     }
     if (candidates.length === 0) return [null, null];
 
@@ -98,10 +96,10 @@ function findBestAchievement(achievements, step, isPreliminary) {
     for (let achNum = 1; achNum < candidates.length; achNum++) {
         const currentCandidate = candidates[achNum];
         const achievementBallsArray = currentCandidate.balls;
-        let shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
+        const shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
 
-        let currentBall = trimNumber(achievementBallsArray[shift]);
-        let currentMaxCandidateBall = trimNumber(candidateForMax.balls[shift]);
+        const currentBall = trimNumber(achievementBallsArray[shift]);
+        const currentMaxCandidateBall = trimNumber(candidateForMax.balls[shift]);
 
         if (currentBall > currentMaxCandidateBall) {
             candidateForMax = currentCandidate;
@@ -118,10 +116,9 @@ function findBestAchievement(achievements, step, isPreliminary) {
                 candidateForMax = currentCandidate;
             }
         }
-
     }
     const shift = step < candidateForMax.balls.length ? step : candidateForMax.balls.length - 1;
-    return [ candidateForMax, candidateForMax.balls[shift] ];
+    return [candidateForMax, candidateForMax.balls[shift]];
 }
 
 const trimNumber = function(num) {
@@ -140,7 +137,7 @@ function getAreaNum(critName, kri) {
     return 4;
 }
 
-module.exports.getRating = async function(facultyName, isAdmin, requestingUserId) { //TODO refactor to stream
+module.exports.getRating = async function(facultyName, isAdmin, requestingUserId) { // TODO refactor to stream
     let requestingUser;
     if (!isAdmin) {
         requestingUser = await db.findUserById(requestingUserId);
@@ -153,7 +150,7 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
     const kri = criterionObject.Crits;
     const limits = criterionObject.Limits;
     const Users = await db.getUsersWithAllInfo(facultyName, true);
-    let users = Users.map((user) => {
+    const users = Users.map((user) => {
         let sumBall = 0;
         const crits = {};
         const sums = [0, 0, 0, 0, 0];
@@ -182,8 +179,8 @@ module.exports.getRating = async function(facultyName, isAdmin, requestingUserId
         const newUser = {_id: user._id, Name: fio, Type: user.Type, Course: user.Course, Crits: crits, Ball: sumBall, Direction: user.Direction};
 
         if (!isAdmin) {
-            const shouldAddAchievements = requestingUser.Settings && requestingUser.Settings.detailedAccessAllowed
-                && user.Settings && user.Settings.detailedAccessAllowed;
+            const shouldAddAchievements = requestingUser.Settings && requestingUser.Settings.detailedAccessAllowed &&
+                user.Settings && user.Settings.detailedAccessAllowed;
             if (shouldAddAchievements) {
                 newUser.Achievements = Achs;
             }
@@ -223,7 +220,7 @@ module.exports.checkCorrectnessInNewCriterias = async function(faculty, newCrite
         for (const achievement of user.Achievement) {
             const res = await db.checkCorrectnessInNewCriterias(achievement, newCriterias, user);
             if (res && !res.ok) {
-                incorrectAchievements.push({user: user.LastName + ' ' + user.FirstName, oldChars: res.oldChars, incorrectChars: res.incorrectChars})
+                incorrectAchievements.push({user: user.LastName + ' ' + user.FirstName, oldChars: res.oldChars, incorrectChars: res.incorrectChars});
             }
 
             if (res && res.notSure) {

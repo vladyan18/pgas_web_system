@@ -1,6 +1,6 @@
 const db = require('../dataLayer');
-const { getCurrentDate, parseCriterias } = require('../helpers');
-const achievementsProcessing = require('./achievementsProcessing');
+const { parseCriterias } = require('../helpers');
+const achievementsProcessing = require('./utils/achievementsProcessing');
 const fs = require('fs');
 const xlsx = require('xlsx');
 
@@ -34,15 +34,15 @@ const checkCriteriasDifference = async function(newCriterias, facultyName) {
     const differences = [];
     const checkLevel = (oldLevel, newLevel, path) => {
         const oldKeys = Object.keys(oldLevel).filter((x) => isNaN(Number(x)));
-        const newKeys = Object.keys(newLevel).filter((x) => isNaN(Number(x)));;
+        const newKeys = Object.keys(newLevel).filter((x) => isNaN(Number(x)));
 
-        for (let oldKey of oldKeys) {
+        for (const oldKey of oldKeys) {
             if (!newKeys.includes(oldKey)) {
                 differences.push({key: oldKey, path: path, reason: 'removed'});
             }
         }
 
-        for (let newKey of newKeys) {
+        for (const newKey of newKeys) {
             if (!oldKeys.includes(newKey)) {
                 differences.push({key: newKey, path: path, reason: 'added'});
             } else {
