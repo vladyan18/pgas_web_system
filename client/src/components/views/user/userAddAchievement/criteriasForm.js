@@ -350,7 +350,7 @@ export default class CriteriasForm extends Component {
       {(this.props.critError && this.props.critErrorMessage) &&
             <span className="redText">{this.props.critErrorMessage}</span>}
       <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
-      {this.state.selects.map((item, index) => {
+      {this.state.crit && this.state.selects.map((item, index) => {
         return (
           <><div key={item.id} css={animateFadeIn}  style={this.props.experimental ? {marginTop: index !== 0 ? '1rem': 0, marginBottom: '1rem'} : {}}>
             <DescriptionToTermin values={item.options}/>

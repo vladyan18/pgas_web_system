@@ -4,8 +4,7 @@ import {observer} from 'mobx-react';
 import {withRouter} from 'react-router-dom';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import staffContextStore from '../../../stores/staff/staffContextStore';
-import {fetchGet} from '../../../services/fetchService';
-import {makeExportUsersTable} from '../../../services/exportXLSX';
+
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
@@ -26,16 +25,7 @@ class StaffMenu extends Component {
     this.openCurrentContestRating = this.openCurrentContestRating.bind(this);
     this.openCriteriasMenu = this.openCriteriasMenu.bind(this);
     this.openAdminsList = this.openAdminsList.bind(this);
-    this.exportExcel = this.exportExcel.bind(this);
   };
-
-  async exportExcel() {
-    if (!staffContextStore.faculty) return null;
-
-    const users = await fetchGet('/api/checked', {faculty: staffContextStore.faculty});
-
-    await makeExportUsersTable(users.Info, staffContextStore.faculty);
-  }
 
   openNewAchieves() {
     this.props.history.push('/staff/newAchieves');
@@ -126,8 +116,8 @@ class StaffMenu extends Component {
                     <button type="button" id="SubmitButton"
                       className="btn btn-success menuButton"
                       value="Панель сотрудника"
-                      onClick={this.exportExcel}>
-                                            Экспорт в Excel
+                      onClick={() => this.props.history.push('/staff/export')}>
+                                            Экспорт
                     </button>
                   </div>
                 </div>

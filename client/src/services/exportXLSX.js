@@ -23,13 +23,26 @@ function getDate(d) {
   return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + '.' + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '.' + d.getFullYear();
 }
 
-export const makeExportUsersTable = async (users, faculty) => {
+export const makeExportUsersTable = async (users, faculty, filters) => {
   if (!users || users.length == 0) return;
 
   const table = [];
   table.push(['ФИО', 'Ст. об.', 'Курс', 'Критерий', 'Достижение', 'Дата', 'Хар-ки',  'Балл']);
 
   for (const user of users) {
+    if (filters && filters.length > 0) {
+      user.Achievements = user.Achievements.filter((x) => {
+        let res = false;
+        for (let filter of filters) {
+          let filterRes = true;
+          for (let char of filter) {
+            filterRes = filterRes && x.chars.includes(char);
+          }
+          res = res || filterRes;
+        }
+        return res;
+      })
+    }
 
     user.Achievements = user.Achievements.sort(function(obj1, obj2) {
       if (obj1.crit.indexOf('(') !== -1)

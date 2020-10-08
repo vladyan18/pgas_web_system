@@ -21,6 +21,7 @@ const CriteriasMenu = React.lazy(() => import('./views/staff/criteriasManagePage
 const AdminCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/adminCreationContainer'));
 const FacultyCreationContainer = React.lazy(() => import('./containers/staff/superAdmin/facultyCreationContainer'));
 const StaffStatistics = React.lazy(() => import("./views/staff/staffStatistics"));
+const StaffExport = React.lazy(() => import("./views/staff/staffExport"));
 
 
 
@@ -67,6 +68,7 @@ class Staff extends Component {
                         <Route path="/staff/facultyCreation" component={FacultyCreationContainer}/>
                         <Route path="/staff/adminCreation" component={AdminCreationContainer}/>
                         <Route path="/staff/statistics" component={StaffStatistics}/>
+                        <Route path="/staff/export" component={StaffExport}/>
                         <Route path="/staff/adminsList" component={AdminsListContainer}/>
                         <Route path="/staff/" component={StaffMenu}/>
                     </Switch>
