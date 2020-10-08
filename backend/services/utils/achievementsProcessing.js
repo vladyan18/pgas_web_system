@@ -96,10 +96,12 @@ function findBestAchievement(achievements, step, isPreliminary) {
     for (let achNum = 1; achNum < candidates.length; achNum++) {
         const currentCandidate = candidates[achNum];
         const achievementBallsArray = currentCandidate.balls;
-        const shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
 
+        const shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
         const currentBall = trimNumber(achievementBallsArray[shift]);
-        const currentMaxCandidateBall = trimNumber(candidateForMax.balls[shift]);
+
+        const maxCandidateShift = step < candidateForMax.balls.length ? step : candidateForMax.balls.length - 1;
+        const currentMaxCandidateBall = trimNumber(candidateForMax.balls[maxCandidateShift]);
 
         if (currentBall > currentMaxCandidateBall) {
             candidateForMax = currentCandidate;
