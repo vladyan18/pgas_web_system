@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -92,7 +93,6 @@ router.post('/add_achieve', authCheck,
         try {
             await userService.addAchievement(req.userId, achievement);
         } catch (error) {
-            console.log(error);
             if (error.name === 'TypeError') {
                 return res.sendStatus(400);
             } else throw error;
