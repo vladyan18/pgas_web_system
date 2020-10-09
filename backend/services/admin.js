@@ -7,7 +7,9 @@ const notifyService = require('./notifyService');
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
 
-    // TODO emit
+    db.getUserByAchievement(achievementId, 'Faculty').then(({Faculty}) => {
+        messageBus.emit('message_' + Faculty);
+    });
 };
 
 module.exports.getData = async function() {

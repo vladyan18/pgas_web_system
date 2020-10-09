@@ -10,6 +10,10 @@ exports.archiveAchievements = async function() {
     console.log('UPDATED');
 };
 
+exports.getUserByAchievement = async function(achId, filters) {
+    return UserModel.findOne({Achievement: {$elemMatch: {$eq: achId}}}, filters).lean();
+};
+
 exports.findAchieveById = async function(id) {
     return AchieveModel.findById(id).lean();
 };
