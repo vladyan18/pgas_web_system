@@ -25,6 +25,15 @@ class AchievesComment extends Component {
         this.setState({ value: e.target.value, focused: this.props.row.comment !== e.target.value})
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (!this.props.row) return;
+
+
+        if (this.props.row.comment !== prevProps.row.comment && this.state.value !== this.props.row.comment) {
+            this.setState({value: this.props.row.comment});
+        }
+    }
+
     render () {
         return <div className="input-group commentContainer" style={{height: 'unset', width: '100%'}}>
             <div style={{width: '100%'}}>
