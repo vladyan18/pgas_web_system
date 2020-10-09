@@ -6,6 +6,8 @@ const notifyService = require('./notifyService');
 
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
+
+    // TODO emit
 };
 
 module.exports.getData = async function() {
@@ -37,6 +39,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
     args.to = createdAchieve;
     // await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
+    messageBus.emit('message_' + user.Faculty);
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -94,6 +97,7 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
+    messageBus.emit('message_' + user.Faculty);
     // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
 };
 
@@ -199,6 +203,46 @@ module.exports.getconfitmationsStatistics = async function() {
 
 module.exports.purgeConfirmations = async function() {
     return db.purgeConfirmations();
+};
+
+
+const EventEmitter = require('events').EventEmitter;
+const messageBus = new EventEmitter();
+module.exports.subscribeForUsersUpdate = async function(faculty, checked, req, res) {
+    let responded = false;
+    // eslint-disable-next-line prefer-const
+    let timer;
+
+    const listener = function(res) {
+        messageBus.once('message_' + faculty, function() {
+            responded = true;
+            if (timer) {
+                clearTimeout(timer);
+            }
+            try {
+                res.status(200).json({status: 'ok'});
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+        });
+    };
+
+    req.on('abort', function() {
+        messageBus.removeListener('message_' + faculty, listener);
+        if (timer) {
+            clearTimeout(timer);
+        }
+    });
+
+    listener(res);
+    timer = setTimeout(() => {
+        if (!responded) {
+            messageBus.removeListener('message_' + faculty, listener);
+            try {
+                res.status(204).json({status: 'aborted'});
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+        }
+    }, 30000);
 };
 
 

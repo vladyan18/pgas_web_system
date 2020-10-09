@@ -105,4 +105,9 @@ router.get('/getHistory', moderatorAuthCheck, // TODO IMPLEMENT
         throw new Error('Not implemented');
     });
 
+router.get('/subscribeOnUsersUpdates', observerAuthCheck,
+    async function(req, res) {
+       adminService.subscribeForUsersUpdate(req.query.faculty, false, req, res).then();
+    });
+
 module.exports = router;

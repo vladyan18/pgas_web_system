@@ -9,6 +9,7 @@ import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 import {observer} from "mobx-react";
 import SystematicsInfo from "./systematicsInfo";
+import {fetchGet} from "../../../../services/fetchService";
 
 const spinningStyle = css`
     -webkit-animation:spin 1s linear infinite;
@@ -30,7 +31,24 @@ class AchievesUserGroups extends React.PureComponent {
     this.updateSystematicsCallback = this.updateSystematicsCallback.bind(this);
     this.toggleOnlyUpdated = this.toggleOnlyUpdated.bind(this);
     this.updateUsers = this.updateUsers.bind(this);
+    this.subscribeForUpdation = this.subscribeForUpdation.bind(this);
   };
+
+  subscribeForUpdation() {
+    fetchGet('/subscribeOnUsersUpdates', {faculty: staffContextStore.faculty}).then((res) => {
+      if (this && !this.unmounted) {
+        if (res && res.status === 'ok') {
+          this.updateUsers();
+        }
+        this.subscribeForUpdation();
+        console.log('UPDATE FROM SERVER')
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
+  }
 
   updateSystematicsCallback(systematicsConflicts) {
     if (JSON.stringify(systematicsConflicts) !== JSON.stringify(this.state.systematicsConflicts))
@@ -64,6 +82,10 @@ class AchievesUserGroups extends React.PureComponent {
   }
   handleDirectionSelect(e) {
     this.setState({currentDirection: e.target.value});
+  }
+
+  componentDidMount() {
+    this.subscribeForUpdation();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
