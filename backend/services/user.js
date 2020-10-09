@@ -67,7 +67,7 @@ module.exports.changeUserSettings = async function(userId, newSettings) {
 
 module.exports.addAchievement = async function(userId, achievement) {
     const user = await db.findUserById(userId);
-    if (user.IsInRating && !['ПМ-ПУ'].includes(user.Faculty)) throw new TypeError('It is forbidden');
+    if (user.IsInRating) throw new TypeError('It is forbidden');
     let validationResult = false;
     try {
         validationResult = await db.validateAchievement(achievement, user);
