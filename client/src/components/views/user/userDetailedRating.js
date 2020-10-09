@@ -90,15 +90,15 @@ class UserDetailedRating extends Component {
                     </p>
                 </div>
                 <div className="centered_ver" style={{"display": "flex"}}>
-                    {   this.props.toggleModeCallback &&
-                        <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-outline-info"
-                                value="Кратко" onClick={this.toggleDetailedMode}>Кратко </button>
-                    }
-                    <button id="DeleteButton" className="btn btn-secondary"
+                    <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-secondary"
                             value="Назад" onClick={() => {
                         this.props.history.goBack()
                     }}>Назад
                     </button>
+                    {   this.props.toggleModeCallback &&
+                    <button id="DeleteButton" className="btn btn-outline-info"
+                            value="Кратко" onClick={this.toggleDetailedMode}>Кратко </button>
+                    }
                     {!this.props.userMode && <form action="/api/getResultTable">
                         <input type="hidden" name="faculty" value={staffContextStore.faculty} />
                         <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
@@ -106,11 +106,7 @@ class UserDetailedRating extends Component {
                 </div>
 
             </div>
-            {this.props.faculty == 'ВШЖиМК' && this.props.directions && this.props.directions.length > 0
-            && <select id='1' className="form-control selectors" onChange={this.handleDirectionSelect}>
-                {this.props.directions.map(dir =>
-                    <option value={dir}>{dir}</option> )}
-            </select>}
+
             <hr className="hr_blue" style={{marginTop: '0'}}/>
             {sorted.length === 0 && <div id="floatingCirclesG">
                 <div className="f_circleG" id="frotateG_01"></div>

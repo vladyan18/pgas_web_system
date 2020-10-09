@@ -6,6 +6,7 @@ import {withRouter} from "react-router-dom";
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
+import MainPanel from "./components/mainPanel";
 
 const Panel = styled.div`
     background-color: white;
@@ -149,38 +150,19 @@ class StaffStudentsRating extends Component {
         }
 
         return (
+            <MainPanel heading={"Рейтинг студентов"}
+                       panelClass={"col-md-9"}
+            buttons={
+                <>
+                    {this.props.toggleDetailedModeCallback &&
+                    <button id="DeleteButton" style={{marginLeft: '1rem'}} className="btn btn-outline-info"
+                            value="Подробно" onClick={this.toggleDetailedMode}>Подробно</button>}
+                    {!this.props.userMode && <form action="/api/getResultTable" style={{marginLeft: '1rem'}}>
+                        <input type="hidden" name="faculty" value={staffContextStore.faculty} />
+                        <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
+                    </form>}
+                </>}>
 
-                    <Panel className="col-md-9">
-                        <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
-                            <div className="centered_ver">
-                                <p className="headline">
-                                    Рейтинг студентов
-                                </p>
-                            </div>
-                            <div className="centered_ver" style={{"display": "flex"}}>
-                                {
-                                    this.props.toggleDetailedModeCallback &&
-                                    <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-outline-info"
-                                        value="Подробно" onClick={this.toggleDetailedMode}>Подробно</button>
-                                }
-                                <button id="DeleteButton" className="btn btn-secondary"
-                                        value="Назад" onClick={() => {
-                                    this.props.history.goBack()
-                                }}>Назад
-                                </button>
-                                {!this.props.userMode && <form action="/api/getResultTable">
-                                    <input type="hidden" name="faculty" value={staffContextStore.faculty} />
-                                    <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>
-                                </form>}
-                            </div>
-
-                        </div>
-                        {this.props.faculty == 'ВШЖиМК' && this.props.directions && this.props.directions.length > 0
-                        && <select id='1' className="form-control selectors" onChange={this.handleDirectionSelect}>
-                            {this.props.directions.map(dir =>
-                                <option value={dir}>{dir}</option> )}
-                        </select>}
-                        <hr className="hr_blue" style={{marginTop: '0'}}/>
                         <table className="table table-bordered" id='users'>
                             <thead>
                             <tr>
@@ -196,8 +178,7 @@ class StaffStudentsRating extends Component {
                             <div style={{overflowX: 'auto'}}>
                         <BootstrapTable   keyField='_id' data={sorted} columns={this.state.columns}/>
                             </div>}
-
-                    </Panel>
+            </MainPanel>
         )
     }
 }

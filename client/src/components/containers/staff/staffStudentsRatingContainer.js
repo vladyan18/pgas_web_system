@@ -22,15 +22,14 @@ class StaffStudentsContainer extends Component {
 
   render() {
     return staffContextStore.criterias &&
-            <main>
-              <div id="panel" className="row justify_center">
-                <StaffStudentsRating
+                <main className="row"  style={{'justifyContent': 'center', 'display': 'flex'}}>
+                  <StaffStudentsRating
                   faculty={staffContextStore.faculty}
                   directions={staffContextStore.directions}
                   crits={staffContextStore.criterias}
                   data={CurrentContestRatingStore.users}/>
-              </div>
-            </main> ||
+                </main>
+               ||
             null;
   }
 }

@@ -12,10 +12,9 @@ const Panel = styled.div`
     }
 `;
 
-function MainPanel({ heading, ...props }) {
-    return <main>
-        <div id="panel" className="row justify_center">
-            <Panel className="col-md-9">
+function MainPanel({ heading, panelClass, ...props }) {
+    return <div className={panelClass || "col-md-9"} style={{margin: 0, padding:0}}>
+            <Panel style={{width: '100%'}}>
                 <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
                     <div className="centered_ver">
                         <p className="headline">
@@ -28,6 +27,9 @@ function MainPanel({ heading, ...props }) {
                             props.history.goBack()
                         }}>Назад
                         </button>
+                        {
+                            props.buttons && props.buttons
+                        }
                     </div>
                 </div>
                 <hr className="hr_blue" style={{marginTop: '0', marginBottom: '1rem'}}/>
@@ -35,8 +37,7 @@ function MainPanel({ heading, ...props }) {
                     {props.children && props.children}
                 </div>
             </Panel>
-        </div>
-    </main>
+    </div>
 }
 
 

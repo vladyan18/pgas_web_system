@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import MainPanel from "./components/mainPanel";
 import {observer} from "mobx-react";
 import CriteriasForm from "../user/userAddAchievement/criteriasForm";
+import CenteredMainPanel from "./components/centeredMainPanel";
 
 
 
@@ -36,7 +37,7 @@ function StaffExport(props) {
     const [filters, setFilters] = useState([]);
     const [changingFilter, setChangingFilter] = useState();
 
-    return <MainPanel heading={"Экспорт"}>
+    return <CenteredMainPanel heading={"Экспорт"}>
         <div css={css`margin-bottom: 2rem;`}>
             {filters && filters.map(x => <p>{x.toString()}</p>)}
             <div>
@@ -50,7 +51,7 @@ function StaffExport(props) {
         </div>
 
        <button className="btn btn-success" onClick={() => exportExcel(filters)}> Сформировать Excel-таблицу </button>
-    </MainPanel>
+    </CenteredMainPanel>
 }
 
 export default observer(withRouter(StaffExport))

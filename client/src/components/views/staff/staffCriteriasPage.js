@@ -7,6 +7,7 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
+import CenteredMainPanel from "./components/centeredMainPanel";
 
 class StaffCriteriasPage extends Component {
   constructor(props) {
@@ -21,39 +22,24 @@ class StaffCriteriasPage extends Component {
 
   render() {
     return (
-      <main>
-        <div id="panel" className="row justify_center" >
-          <div className="col-9 general" css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
-            <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between'}}>
-              <div className="centered_ver">
-                <p className="headline">
-                                    Критерии
-                </p>
-              </div>
-              <div className="centered_ver">
-                {userPersonalStore.Role !== 'Observer' && <button id="DeleteButton" className="btn btn-primary"
-                  value="Примечания" onClick={() => {
-                    this.props.history.push('/staff/manageAnnotations');
-                  }}>Примечания
-                </button>}
-              </div>
-              <div className="centered_ver">
-                <button id="DeleteButton" className="btn btn-secondary"
-                  value="Назад" onClick={() => {
-                    this.props.history.goBack();
-                  }}>Назад
-                </button>
-              </div>
-            </div>
-            <hr className="hr_blue"/>
+        <CenteredMainPanel heading={"Критерии"}
+        buttons={
+          <>
+            {userPersonalStore.Role !== 'Observer' && <button id="DeleteButton" className="btn btn-primary"
+                                                              value="Примечания" onClick={() => {
+              this.props.history.push('/staff/manageAnnotations');
+            }}>Примечания
+            </button>}
+          </>
+        }>
+
             <div style={{'width': '100%', 'height': '100%'}}>
               {(staffContextStore.criterias && staffContextStore.schema) &&
                             <CriteriasTableViewer criterias={staffContextStore.criterias}
                               schema={staffContextStore.schema} limits={staffContextStore.limits}/>}
             </div>
-          </div>
-        </div>
-      </main>);
+
+        </CenteredMainPanel>);
   }
 }
 
