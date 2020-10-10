@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import logoBss from '../img/logo_bss2.png';
 import lock from '../assets/img/lock.png';
-import {BASE_API_URL} from '../common/constants';
+import {BASE_API_URL} from '../consts/constants';
 import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../services/fetchService";
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import {LoginPanel} from "./views/user/style";
-import UserHeader from "./views/user/userHeader";
-import UserHeaderContainer from "./containers/user/userHeaderContainer";
+import {LoginPanel} from "./common/style";
+import UserHeader from "./user/header/userHeader";
+import UserHeaderContainer from "./user/header/userHeaderContainer";
 
 class Login extends Component {
   constructor(props) {

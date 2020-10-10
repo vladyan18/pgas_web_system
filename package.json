@@ -67,6 +67,7 @@
     "grunt-contrib-jshint": "^2.1.0",
     "gulp-uglify": "^3.0.2",
     "gulp-useref": "^3.1.6",
+    "husky": "^4.3.0",
     "jsdoc-route-plugin": "^0.1.0",
     "lazypipe": "^1.0.2",
     "web-push": "^3.4.4"

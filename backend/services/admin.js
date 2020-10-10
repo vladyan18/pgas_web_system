@@ -208,7 +208,7 @@ module.exports.purgeConfirmations = async function() {
 };
 
 
-const EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('events').EventEmitter; // TODO вынести в синглетон (?)
 const messageBus = new EventEmitter();
 module.exports.subscribeForUsersUpdate = async function(faculty, checked, req, res) {
     let responded = false;

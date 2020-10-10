@@ -1,5 +1,5 @@
 import React from 'react';
-import {BASE_API_URL} from '../common/constants';
+import {BASE_API_URL} from '../consts/constants';
 
 function FetchError(message, body) {
   this.body = body;

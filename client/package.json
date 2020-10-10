@@ -64,5 +64,10 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.18.3",
     "react-svg-loader": "^3.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "eslint ./backend"
+    }
   }
 }

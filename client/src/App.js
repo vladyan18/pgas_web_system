@@ -1,14 +1,14 @@
 import './style/user_main.css';
 import React, {Component, Suspense} from 'react';
-import User from "./components/user";
+import User from "./components/user/user";
 import Route from "react-router-dom/Route";
 import {Switch} from "react-router-dom";
 import Login from "./components/login";
 import * as serviceWorker from "./serviceWorker";
 
-const UserRegistrationContainer = React.lazy(() => import("./components/containers/user/UserRegistrationContainer"));
-const UserEditProfileContainer = React.lazy(() => import("./components/containers/user/UserEditProfileContainer"));
-const Staff = React.lazy(() => import('./components/staff'));
+const UserRegistrationContainer = React.lazy(() => import("./components/user/registrationPage/UserRegistrationContainer"));
+const UserEditProfileContainer = React.lazy(() => import("./components/user/editProfilePage/UserEditProfileContainer"));
+const Staff = React.lazy(() => import('./components/staff/staff'));
 
 class App extends Component {
     constructor(props) {
