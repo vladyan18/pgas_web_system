@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
 import AchievesComment from "./achievesComment";
 import {OverlayTrigger, Popover} from "react-bootstrap";
+import Table from '../../common/table'
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import userPersonalStore from '../../../stores/userPersonalStore';
 import ReactMarkdown from 'react-markdown';
@@ -200,7 +200,7 @@ class AchievesTable extends Component {
         else filteredAchieves = this.props.data;
         return (
             <div className="adminAchievesTableContainer">
-                <BootstrapTable keyField='_id' data={filteredAchieves} columns={this.columns}
+                <Table keyField='_id' data={filteredAchieves} columns={this.columns}
                                 rowClasses={this.rowClasses}/>
             </div>
         )

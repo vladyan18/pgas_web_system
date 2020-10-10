@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import BootstrapTable from "react-bootstrap-table-next";
+import Table from '../../common/table'
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import {withRouter} from "react-router-dom";
 /** @jsx jsx */
@@ -176,7 +176,7 @@ class StaffStudentsRating extends Component {
 
                         {this.state.columns &&
                             <div style={{overflowX: 'auto'}}>
-                        <BootstrapTable   keyField='_id' data={sorted} columns={this.state.columns}/>
+                        <Table keyField='_id' data={sorted} columns={this.state.columns}/>
                             </div>}
             </MainPanel>
         )

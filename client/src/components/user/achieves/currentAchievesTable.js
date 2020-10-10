@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {css, jsx} from '@emotion/core';
 import './tableStyles.css';
 import { Statuses } from '../../../consts';
+import Table from '../../common/table'
 
 const achievementFormatter = function(cell, row) {
   let statusTitle = null;
@@ -84,7 +84,7 @@ class CurrentAchievesTable extends Component {
             return (
                 <div id="achBlock" style={{'display': 'block', 'overflow': 'auto'}}>
                     <div id="row_docs">
-                        <BootstrapTable keyField='_id' data={this.props.currentAchieves} columns={columns}
+                        <Table keyField='_id' data={this.props.currentAchieves} columns={columns}
                                         rowEvents={this.rowEvents}
                                         headerClasses={"withoutTopBorder"}
                                         rowClasses={this.rowClasses}

@@ -1,11 +1,11 @@
 import React from 'react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import BootstrapTable from 'react-bootstrap-table-next';
 import {ConfirmationColumns} from '../confirmation/ConfirmationColumns';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
 import userAchievesStore from '../../../stores/userAchievesStore';
 import UserMainPanel from '../../common/userMainPanel';
+import Table from '../../common/table';
 
 
 function UserDocuments(props) {
@@ -73,7 +73,7 @@ function UserDocuments(props) {
 
   return (<UserMainPanel title={'Мои документы'}>
       <div>
-          {props.confirmations && <BootstrapTable keyField='_id' data={props.confirmations}
+          {props.confirmations && <Table keyField='_id' data={props.confirmations}
                                                   headerClasses={'withoutTopBorder'}
                             columns={columns}
                             bordered={false}/>}

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
@@ -8,6 +7,7 @@ import {Popover} from "react-bootstrap";
 import HelpButton from "../../common/helpButton";
 import EditConfirmation from "./editConfirmation";
 import FloatingCircle from "../../floatingCircle";
+import Table from '../../common/table';
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -454,7 +454,7 @@ class ConfirmationForm extends Component {
 
                 <div>
                     {this.state.confirmations && this.state.confirmations.length > 0 &&
-                    <BootstrapTable keyField='_id' data={this.state.confirmations} columns={columns}
+                    <Table keyField='_id' data={this.state.confirmations} columns={columns}
                                     headerClasses={["hidden"]} bordered={false}/>
                     }
                 </div>
@@ -624,11 +624,10 @@ class ConfirmationForm extends Component {
                             }
                                 {(this.state.existingOpened && !this.state.existingSelected && this.state.commonConfirms) && <div>
                                     <label htmlFor="Name">Выберите подтверждение:</label>
-                                    <BootstrapTable keyField='_id' data={this.state.commonConfirms}
+                                    <Table keyField='_id' data={this.state.commonConfirms}
                                                     columns={this.columns}
                                                     rowEvents={this.commonConfRowEvents}
-                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
-                                                    bordered={false}/>
+                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}/>
                                 </div>}
                                 {(this.state.existingSelected) &&
                                 <form>
@@ -644,11 +643,11 @@ class ConfirmationForm extends Component {
                                 {(this.state.sameFilesLoaded && !this.state.existingSelected) && <div>
                                     <p style={{marginTop: "1rem"}}><b>Вы уже загружали этот документ.</b><br/><br/>
                                     Вы можете прикрепить существующее подтверждение с этим файлом, кликнув на него:</p>
-                                    <BootstrapTable keyField='_id' data={this.state.sameFilesLoaded}
+                                    <Table keyField='_id' data={this.state.sameFilesLoaded}
                                                     columns={this.columns}
                                                     rowEvents={this.commonConfRowEvents}
-                                                    headerClasses={["hidden"]} classes={["existingConfirmationsRow"]}
-                                                    bordered={false}/>
+                                                    headerClasses={["hidden"]}
+                                                    classes={["existingConfirmationsRow"]}/>
                                                     <div style={{display: 'flex', justifyContent: 'center', marginBottom: '1rem'}}>
                                     <button id="SaveButton" className="btn btn-outline-danger" style={{borderWidth: '0'}} type="button"
                                            onClick={(e) => {this.saveResult(e, this.state.loadedFile)}}>

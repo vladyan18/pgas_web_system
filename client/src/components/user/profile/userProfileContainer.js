@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import '../../../style/user_main.css';
 import UserProfile from './userProfile';
 import {observer} from 'mobx-react';
 import userPersonalStore from '../../../stores/userPersonalStore';

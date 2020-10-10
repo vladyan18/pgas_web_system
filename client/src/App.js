@@ -26,7 +26,6 @@ class App extends Component {
             this.setState({isAuth: isAuth});
         };
         serviceWorker.unregister();
-        console.log('UNREGISTERED SW')
     }
 
     render() {

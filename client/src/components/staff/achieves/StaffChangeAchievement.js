@@ -4,7 +4,7 @@ import AchievementDateInput from '../../common/AchievementDateInput';
 import {fetchSendWithoutRes} from '../../../stores/criteriasStore';
 import CriteriasForm from '../../user/addAchievement/criteriasForm';
 import staffContextStore from '../../../stores/staff/staffContextStore';
-import BootstrapTable from 'react-bootstrap-table-next';
+import Table from '../../common/table';
 import {ConfirmationColumns} from '../../user/confirmation/ConfirmationColumns';
 import {getDate} from '../../../helpers';
 
@@ -105,7 +105,7 @@ class StaffChangeAchievement extends Component {
                 </p>
               </div>
               <div>
-                <BootstrapTable keyField='_id' data={this.state.confirmations}
+                <Table keyField='_id' data={this.state.confirmations}
                   columns={ConfirmationColumns}
                   headerClasses={['hidden']} classes={['existingConfirmationsRow']}
                   bordered={false}/>
