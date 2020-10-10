@@ -16,7 +16,7 @@ import UserMainPanel from '../../common/userMainPanel';
 /** @jsx jsx */
 
 
-class UserAddAchievement extends Component {
+class UserAddAchievement extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {isDateValid: false, chars: undefined};

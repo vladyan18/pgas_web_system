@@ -7,6 +7,7 @@ import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compre
 import { ReactComponent as LogoBSS } from '../../../assets/img/logo_bss-compressed-medium.svg';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
+import styled from '@emotion/styled';
 import UserNavItem from '../navbar/userNavItem';
 import Dropdown from 'react-bootstrap/Dropdown';
 
@@ -151,6 +152,8 @@ function HamMenu(props) {
   </div>;
 }
 
+const bssTitleCSS = css`color: #595959;`;
+const pageNameCSS = css`padding-left: 13px; color: black;`;
 function DesktopLeftBlock(props) {
   return <div css={blockHeader}>
     <a href={'https://spbu.ru'} target="_blank" rel="noopener noreferrer">
@@ -164,8 +167,8 @@ function DesktopLeftBlock(props) {
       </div>
     </a>
     <div className="p_header">
-      <span css={css`color: #595959;`}>Студенческий совет СПбГУ</span> <br/>
-      <span css={css`padding-left: 13px; color: black;`}>{props.pageName}</span>
+      <span css={bssTitleCSS}>Студенческий совет СПбГУ</span> <br/>
+      <span css={pageNameCSS}>{props.pageName}</span>
     </div>
   </div>;
 }
@@ -181,7 +184,7 @@ function MobileLeftBlock(props) {
          }
          `}
          onClick={props.switchMenu}>
-      <i className="fa fa-bars"></i> Меню
+      <i className="fa fa-bars"/> Меню
     </div>
     <div style={{marginLeft: '0.5rem'}}>
     <a href={'https://vk.com/ssspbu'} target="_blank" rel="noopener noreferrer">
@@ -193,10 +196,25 @@ function MobileLeftBlock(props) {
   </div>;
 }
 
+const FIOblock = styled.div`display: flex; justify-content: flex-end;`;
+const AdminPanelButton = styled.button`
+@media only screen and (max-device-width: 768px) {
+                    font-size: smaller;
+                    border-color: transparent;
+                      }
+`;
+const LogoutButton = styled.button`
+border-color: #9F2D20;
+                color: #9F2D20;
+                  @media only screen and (max-device-width: 768px) {
+                    font-size: smaller;
+                    border-color: transparent;
+                 }
+`;
+
 const DesktopRightBlock = observer((props) => {
   return (<>{!props.clear && <div css={rightPanel}>
-    <div css={css`display: flex; justify-content: flex-end;`}>
-
+    <FIOblock>
       <div css={verticalAlign}>
         <div css={FIO}>
           {userPersonalStore && userPersonalStore.fio}
@@ -204,37 +222,23 @@ const DesktopRightBlock = observer((props) => {
       </div>
       {['Admin', 'SuperAdmin', 'Moderator', 'Observer'].includes(userPersonalStore.Role) &&
       <div style={{'marginRight': '1rem'}}>
-        <button type="button" id="SubmitButton"
+        <AdminPanelButton type="button" id="SubmitButton"
                 className="btn btn-outline-primary"
-                css = {css`                 
-                    @media only screen and (max-device-width: 768px) {
-                    font-size: smaller;
-                    border-color: transparent;
-                      }`
-                }
                 onClick={props.switchToStaff}>
           Режим проверяющего
-        </button>
+        </AdminPanelButton>
       </div>
       }
       <div>
         {userPersonalStore && userPersonalStore.personal && <form action="/api/logout">
-          <button type="submit"
+          <LogoutButton type="submit"
                   className="btn btn-outline-danger"
-                  css={css`
-                border-color: #9F2D20;
-                color: #9F2D20;
-                  @media only screen and (max-device-width: 768px) {
-                    font-size: smaller;
-                    border-color: transparent;
-                 }
-                `}
                   action="/api/logout">
             Выход
-          </button>
+          </LogoutButton>
         </form>}
       </div>
-    </div>
+    </FIOblock>
   </div>}</>);
 });
 
@@ -262,7 +266,7 @@ const MobileRightBlock = observer((props) => {
             <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
               {userPersonalStore && userPersonalStore.LastName && <>
                 {`${userPersonalStore.LastName} ${userPersonalStore.FirstName[0]}. ${userPersonalStore.Patronymic ? userPersonalStore.Patronymic[0] + '.' : ''} `}
-                <i className="fa fa-chevron-down"></i>
+                <i className="fa fa-chevron-down"/>
               </>}
             </Dropdown.Toggle>
 
@@ -277,10 +281,14 @@ const MobileRightBlock = observer((props) => {
   </div>} </>;
 });
 
+const headerCSS = css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`;
+
 class UserHeader extends Component {
   constructor(props) {
     super(props);
     this.switchToStaff = this.switchToStaff.bind(this);
+    this.switchMenu = this.switchMenu.bind(this);
+    this.closeMenu = this.closeMenu.bind(this);
     const isMobile = (window.innerWidth <= 812);
     this.state = {isMobile};
   }
@@ -289,18 +297,25 @@ class UserHeader extends Component {
     this.props.history.push('/staff');
   }
 
-  render() {
-    const props = this.props;
-    return <>
-    <header css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
-      <div className="row" css={pageTop}>
-        {!this.state.isMobile && <DesktopLeftBlock {...props}/>}
-        {this.state.isMobile && <MobileLeftBlock switchMenu={() => this.setState({isMenuOpened: !this.state.isMenuOpened})}/>}
+  switchMenu() {
+    this.setState({isMenuOpened: !this.state.isMenuOpened});
+  }
 
-        {!this.state.isMobile && <DesktopRightBlock {...props} switchToStaff={this.switchToStaff}/>}
-        {this.state.isMobile && <MobileRightBlock {...props}/>}
+  closeMenu() {
+    this.setState({isMenuOpened: false});
+  }
+
+  render() {
+    return <>
+    <header css={headerCSS}>
+      <div className="row" css={pageTop}>
+        {!this.state.isMobile && <DesktopLeftBlock {...this.props}/>}
+        {this.state.isMobile && <MobileLeftBlock switchMenu={this.switchMenu}/>}
+
+        {!this.state.isMobile && <DesktopRightBlock {...this.props} switchToStaff={this.switchToStaff}/>}
+        {this.state.isMobile && <MobileRightBlock {...this.props}/>}
       </div>
-      <HamMenu isOpen={this.state.isMenuOpened} onClose={() => this.setState({isMenuOpened: false})}/>
+      <HamMenu isOpen={this.state.isMenuOpened} onClose={this.closeMenu}/>
     </header></>;
   }
 }

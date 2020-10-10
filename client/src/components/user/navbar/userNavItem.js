@@ -54,18 +54,20 @@ const activeElement = css`
   }
 `;
 
+const linkComponentCSS = css`margin-left: 0.25rem;`;
+
 
 class UserNavItem extends Component {
   render() {
     const {location, onHover, onClick} = this.props;
     const {index, to, children, ...props} = this.props;
 
-    const isActive = location.pathname == to || (location.pathname == '/' && to == '/home');
+    const isActive = location.pathname === to || (location.pathname === '/' && to === '/home');
     const LinkComponent = index ? Link : Link;
 
     return (
       <li css={[navElement, isActive && activeElement]}>
-        <LinkComponent css={css`margin-left: 0.25rem;`} to={to} {...props} onMouseEnter={onHover} onClick={onClick}>{children}</LinkComponent>
+        <LinkComponent css={linkComponentCSS} to={to} {...props} onMouseEnter={onHover} onClick={onClick}>{children}</LinkComponent>
       </li>
     );
   }

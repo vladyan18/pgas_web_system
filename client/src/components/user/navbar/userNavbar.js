@@ -58,6 +58,7 @@ function preloadDocuments(preloads) {
 }
 
 function UserNavbar(props) {
+  const onhover = () => preloadDocuments(props.preloads);
   return <div className="col-md-3 leftBlock" css={leftBlock}>
     <div css={LeftNavbar}>
       <ul className="ul_nav" css={ulNav}>
@@ -65,7 +66,7 @@ function UserNavbar(props) {
         <UserNavItem to='/upload'>Добавить достижение</UserNavItem>
         {userPersonalStore.IsInRating && <UserNavItem to='/rating'>Рейтинг на ПГАС</UserNavItem>}
         <UserNavItem to='/documents'>Информация</UserNavItem>
-        <UserNavItem to='/confirmations' onHover={() => preloadDocuments(props.preloads)}>Мои документы</UserNavItem>
+        <UserNavItem to='/confirmations' onHover={onhover}>Мои документы</UserNavItem>
         <UserNavItem to='/profile'>Мой профиль</UserNavItem>
       </ul>
     </div>
