@@ -51,7 +51,8 @@
   },
   "scripts": {
     "start": "set NODE_ENV=production && node --nouse-idle-notification backend/start.js",
-    "devstart": "set DB_USER=bekhterev&& set DB_PASSWORD=bekhterev&& set DB_HOST=localhost&& set DB_NAME=bekhterev&& npm start"
+    "devstart": "set DB_USER=bekhterev&& set DB_PASSWORD=bekhterev&& set DB_HOST=localhost&& set DB_NAME=bekhterev&& npm start",
+    "eslint": "npx eslint ./backend"
   },
   "author": "",
   "engines": {
@@ -74,7 +75,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "eslint ./backend"
+      "pre-commit": "npm run eslint"
     }
   }
 }
