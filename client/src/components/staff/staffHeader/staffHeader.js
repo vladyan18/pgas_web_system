@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from '../../../assets/img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';

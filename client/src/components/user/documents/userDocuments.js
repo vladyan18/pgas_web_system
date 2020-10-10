@@ -1,11 +1,11 @@
 import React from 'react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import {Panel, HorizontalLine} from '../../common/style';
 import BootstrapTable from 'react-bootstrap-table-next';
 import {ConfirmationColumns} from '../confirmation/ConfirmationColumns';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
 import userAchievesStore from '../../../stores/userAchievesStore';
+import UserMainPanel from '../../common/userMainPanel';
 
 
 function UserDocuments(props) {
@@ -18,7 +18,7 @@ function UserDocuments(props) {
 
     if (!window.confirm(text)) return false;
 
-    fetchSendWithoutRes('/delete_confirmation', {id: confirmation._id}).then((res) => {
+    fetchSendWithoutRes('/delete_confirmation', {id: confirmation._id}).then(() => {
           userAchievesStore.updateCommonConfirmations();
         },
     );
@@ -41,6 +41,7 @@ function UserDocuments(props) {
     {
       isDummyField: true,
       style: {textAlign: 'right'},
+      // eslint-disable-next-line react/display-name
       formatter: (cell, row) => {
         if (!props.achievements) {
           return null;
@@ -70,18 +71,14 @@ function UserDocuments(props) {
     },
   ]);
 
-  return (<Panel className="col-md-9">
-    <div>
-      <p className="headline"> Мои документы</p>
-      <HorizontalLine/>
+  return (<UserMainPanel title={'Мои документы'}>
       <div>
           {props.confirmations && <BootstrapTable keyField='_id' data={props.confirmations}
                                                   headerClasses={'withoutTopBorder'}
                             columns={columns}
                             bordered={false}/>}
       </div>
-    </div>
-  </Panel>);
+  </UserMainPanel>);
 }
 
 export default UserDocuments;

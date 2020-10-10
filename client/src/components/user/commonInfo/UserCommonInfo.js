@@ -2,36 +2,31 @@ import React from 'react';
 import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import styled from '@emotion/styled';
-import {Panel, HorizontalLine} from '../../common/style';
+import UserMainPanel from '../../common/userMainPanel';
 
-function UserCommonInfo(props) {
-  return (<Panel className="col-md-9">
-    <div css={css`margin-bottom: 2rem;`}>
-      <p className="headline">
-                Информация
-      </p>
-      <HorizontalLine/>
+function UserCommonInfo() {
+  return (
+      <UserMainPanel title={'Информация'}>
       <div className="blue_bg">
         <p className="header_info_desc" style={{fontWeight: '500'}}>
                     Документы ПГАС
         </p>
         <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
-          <a target="_blank"
+          <a target="_blank" rel="noreferrer"
             href="https://students.spbu.ru/mmen-stipendii/stipendii/povyshennaya-akademicheskaya-stipendiya">
             <span className="name_doc">
                                             Раздел ПГАС на сайте УРМ СПбГУ
             </span>
           </a>
           <br/>
-          <a target="_blank" href="https://students.spbu.ru/files/2953_11092020.pdf">
+          <a target="_blank" href="https://students.spbu.ru/files/2953_11092020.pdf" rel="noreferrer">
             <span className="name_doc">
                                                 Распоряжение об организации работы по назначению ПГАС
             </span>
           </a>
           <br/>
           <a target="_blank"
-            href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf">
+            href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf" rel="noreferrer">
             <span className="name_doc">
                                                 Постановление УС об определении размера ПГАС
             </span>
@@ -58,12 +53,12 @@ function UserCommonInfo(props) {
                     Обнаружили ошибку или неточность? Есть вопросы по работе системы?
         </p>
         <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
-                    По всем вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu"> Стипкома
+                    По всем вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu" rel="noreferrer"> Стипкома
                     Студсовета ПМ-ПУ.</a>
         </p>
       </div>
-    </div>
-  </Panel>);
+      </UserMainPanel>
+  );
 }
 
 export default UserCommonInfo;

@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 export const Panel = styled.div`
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-    padding: 0 2rem;
+    padding: 1rem 2rem 0rem;
     border-radius: 2px;
     margin-bottom: 2rem;
     @media only screen and (max-device-width: 480px) {

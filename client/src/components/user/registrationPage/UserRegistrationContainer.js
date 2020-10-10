@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import UserRegistrationPage from './/userRegistrationPage';
+import UserRegistrationPage from './userRegistrationPage';
 import {fetchGet} from '../../../services/fetchService';
 
 class UserRegistrationContainer extends Component {

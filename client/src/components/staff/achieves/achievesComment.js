@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
 import userPersonalStore from '../../../stores/userPersonalStore';
-import AchievesGroup from './achievesGroup';
 
 
 class AchievesComment extends Component {

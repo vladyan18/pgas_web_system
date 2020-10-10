@@ -1,8 +1,8 @@
 import React from 'react';
 import '../../../style/user_main.css';
-import UserCommonInfo from './/UserCommonInfo';
+import UserCommonInfo from './UserCommonInfo';
 
-function UserCommonInfoContainer(props) {
+function UserCommonInfoContainer() {
   return <UserCommonInfo/>;
 }
 

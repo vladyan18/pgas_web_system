@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/admin.css';
 import AchievesTable from './achievesTable';
-import StaffChangeAchievement from './StaffChangeAchievement';
 import Modal from 'react-modal';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 import userPersonalStore from '../../../stores/userPersonalStore';
@@ -77,7 +76,7 @@ class AchievesGroup extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
     if (this.props.filters.hideCheckedAchieves) {
       let needHide = true;
       for (const ach of this.props.item.Achievements) {
@@ -116,7 +115,7 @@ class AchievesGroup extends Component {
                     <div className={'nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
                       style={{'textAlign': 'center'}}>
                       <i className={'fas fa-chevron-' + (this.state.hidden ? 'right' : 'down') + ' mychevron'}
-                        onClick={this.toggleHide}></i>
+                        onClick={this.toggleHide}/>
                     </div>
                     <h3 className={'form-control nameHeader' + (this.props.item.IsInRating ? ' inRating' : '')}
                       style={{'border': '0', 'boxShadow': 'none'}}>

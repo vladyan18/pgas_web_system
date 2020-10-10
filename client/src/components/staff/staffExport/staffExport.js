@@ -31,7 +31,7 @@ function AddFilter(props) {
     </div>;
 }
 
-function StaffExport(props) {
+function StaffExport() {
     const [filters, setFilters] = useState([]);
     const [changingFilter, setChangingFilter] = useState();
 

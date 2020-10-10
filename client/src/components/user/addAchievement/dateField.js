@@ -1,10 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {css, jsx} from '@emotion/core';
-import criteriasStore, {fetchSendObj} from '../../../stores/criteriasStore';
-import ReactMarkdown from 'react-markdown';
-import HelpButton from '../../common/helpButton';
-import {Popover} from 'react-bootstrap';
-import userPersonalStore from '../../../stores/userPersonalStore';
 import AchievementDateInput from '../../common/AchievementDateInput';
 /** @jsx jsx */
 
@@ -32,7 +27,7 @@ function DateFieldLabel(props) {
                 <b>Дата достижения:</b>
             </label>
             <label style={{cursor: 'pointer', color: '#595959', marginLeft: 0, marginBottom: 0}}>
-                <input type="checkbox" id="defaultCheck1" onChange={(e) => props.switchDiapasone()}
+                <input type="checkbox" id="defaultCheck1" onChange={() => props.switchDiapasone()}
                        style={{cursor: 'pointer', color: mainColor}} checked={props.hasDiapasone}
                        disabled={props.disabled}
                 />

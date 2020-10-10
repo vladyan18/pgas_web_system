@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import Dropzone from 'react-dropzone';
 import CriteriasTableViewer from './criteriasTableViewer';
-import {fetchSendObj, fetchSendWithoutRes} from '../../../services/fetchService';
+import {fetchSendWithoutRes} from '../../../services/fetchService';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 
 class CriteriasMenu extends Component {

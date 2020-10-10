@@ -4,9 +4,10 @@ import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
-import {OverlayTrigger, Popover} from "react-bootstrap";
+import {Popover} from "react-bootstrap";
 import HelpButton from "../../common/helpButton";
 import EditConfirmation from "./editConfirmation";
+import FloatingCircle from "../../floatingCircle";
 
 class ConfirmationForm extends Component {
     constructor(props) {
@@ -108,7 +109,7 @@ class ConfirmationForm extends Component {
         let commonConfirms = await fetchGet('/api/getConfirmations', {});
 
         for (let conf of commonConfirms) {
-            if (conf.Type == 'SZ') {
+            if (conf.Type === 'SZ') {
                 commonConfirms.splice(commonConfirms.indexOf(conf), 1)
             }
         }
@@ -121,7 +122,7 @@ class ConfirmationForm extends Component {
         text: 'Тип',
         style: {width: "10%", fontSize: "small"},
         formatter: (cell, row) => {
-            if (row.Type == 'link') {
+            if (row.Type === 'link') {
                 if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
                     return 'e-library'
                 }
@@ -133,7 +134,7 @@ class ConfirmationForm extends Component {
         text: 'Подтверждение',
         style: {width: "40%", overflow:"hidden"},
         formatter: (cell, row) => {
-            if (row.Type == 'SZ') {
+            if (row.Type === 'SZ') {
                 return (<div style={{fontSize: "small"}}>{row.Name}
                     {row.SZ ? (row.SZ.Appendix ? ', прил. ' + row.SZ.Appendix : '') : ''}
                     {row.SZ ? (row.SZ.Paragraph ? ', п. ' + row.SZ.Paragraph : '') : ''}
@@ -145,9 +146,9 @@ class ConfirmationForm extends Component {
     }, {
         isDummyField: true,
         formatter: (cell, row) => {
-            if (row.Type == 'doc')
+            if (row.Type === 'doc')
                 return <span>{(row.Size / 1024 / 1024).toFixed(2)} Мб</span>;
-            if (row.Type == 'link') {
+            if (row.Type === 'link') {
                 if (row.Data.startsWith('https://elibrary.ru/item.asp?id=') || row.Data.startsWith('elibrary.ru/item.asp?id=')) {
                     if (row.CrawlResult) {
                         return (
@@ -247,7 +248,7 @@ class ConfirmationForm extends Component {
         e.preventDefault();
         e.stopPropagation();
 
-        if (this.state.Type == 'doc') {
+        if (this.state.Type === 'doc') {
             if (!this.state.file || !this.state.Name) {
                 return
             }
@@ -289,7 +290,7 @@ class ConfirmationForm extends Component {
                 }
             })
 
-        } else if (this.state.Type == 'link') {
+        } else if (this.state.Type === 'link') {
             if (!this.state.URL || !this.state.Name) {
                 return
             }
@@ -467,16 +468,7 @@ class ConfirmationForm extends Component {
                     <>
                         {this.state.isLoading &&
                         <div style={{backGroundColor: "#e2e2e2", padding: "3rem"}}>
-                            <div id="floatingCirclesG">
-                                <div className="f_circleG" id="frotateG_01"></div>
-                                <div className="f_circleG" id="frotateG_02"></div>
-                                <div className="f_circleG" id="frotateG_03"></div>
-                                <div className="f_circleG" id="frotateG_04"></div>
-                                <div className="f_circleG" id="frotateG_05"></div>
-                                <div className="f_circleG" id="frotateG_06"></div>
-                                <div className="f_circleG" id="frotateG_07"></div>
-                                <div className="f_circleG" id="frotateG_08"></div>
-                            </div>
+                            <FloatingCircle/>
                         </div>}
                         {(this.state.modalIsOpen && !this.state.isLoading) &&
                         <div className="modalContentWrapper" style={{maxHeight: "40rem", maxWidth: "100vw", margin:'auto'}}>
@@ -548,7 +540,7 @@ class ConfirmationForm extends Component {
                                 </form>
                             }
                             {
-                                this.state.Type == 'SZ' && <form>
+                                this.state.Type === 'SZ' && <form>
                                     <label htmlFor="Name"><span className="redText">*</span>Название служебной записки:
                                         <HelpButton  overlay={SZNamePopover} placement={"top"} />
                                     </label>
@@ -566,7 +558,7 @@ class ConfirmationForm extends Component {
                                 </form>
                             }
                             {
-                                this.state.Type == 'doc' && <form onSubmit={e => {
+                                this.state.Type === 'doc' && <form onSubmit={e => {
                                     e.preventDefault();
                                 }}>
                                     <label htmlFor="Name"><span className="redText">*</span>Название:</label>

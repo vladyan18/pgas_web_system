@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/add_portfolio.css';
 import DescriptionToTermin from './DescriptionToTermin';
-import ReactMarkdown from 'react-markdown';
-import criteriasStore from '../../../stores/criteriasStore';
 import DescriptionToCriterion from './DescriptionToCriterion';
 import {css, jsx} from '@emotion/core';
 import CriteriasOptionsSelector from './criteriasOptionSelector';
@@ -154,9 +152,7 @@ export default class CriteriasForm extends Component {
   checkValidity() {
     const state = {...this.state};
     let crit = this.props.crits;
-    let id = '';
     for (let i = 0; i < state.length; i++) {
-      id += state.values[i];
       crit = crit[state.values[i]];
     }
     const keys = Object.keys(crit);
@@ -191,6 +187,7 @@ export default class CriteriasForm extends Component {
     e.stopPropagation();
     try {
       e.target.blur();
+      // eslint-disable-next-line no-empty
     } catch (error) {}
 
     const state = {...this.state};
@@ -286,6 +283,7 @@ this.checkValidity();
             this.lastSelectRef.dispatchEvent(new Event('change'));
           }
           // this.lastSelectRef.focus();
+          // eslint-disable-next-line no-empty
         } catch (e) {}
       }
     });

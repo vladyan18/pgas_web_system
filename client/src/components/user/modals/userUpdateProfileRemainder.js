@@ -1,7 +1,5 @@
 import Modal from 'react-modal';
 import React, {Component} from 'react';
-import ConfirmationForm from '../confirmation/ConfirmationForm';
-import {Popover} from 'react-bootstrap';
 import '../../../style/checkbox.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
@@ -42,7 +40,7 @@ class UserUpdateProfileRemainder extends Component {
         if (!user.settings) user.settings = {};
         user.settings.notifiedAboutUpdate = true;
 
-        fetchSendWithoutRes('/api/registerUser', user).then((result) => {
+        fetchSendWithoutRes('/api/registerUser', user).then(() => {
             userPersonalStore.update().then();
         });
     }

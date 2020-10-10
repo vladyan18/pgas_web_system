@@ -5,7 +5,7 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import userAchievesStore from '../../../stores/userAchievesStore';
 
-export function UserAddAchievementContainer(props) {
+export function UserAddAchievementContainer() {
   useEffect(() => {
     if (!userPersonalStore.personal) userPersonalStore.update().then();
     if (!userAchievesStore.achieves) userAchievesStore.getAchieves();

@@ -30,6 +30,7 @@ module.exports = {
     'linebreak-style': 'off',
     'indent': 'off',
     'object-curly-spacing': 'off',
-    'new-cap': 'off'
+    'new-cap': 'off',
+    "no-unused-vars": ["error", { "varsIgnorePattern": "[(^React)(^css)(^jsx)]"}]
   },
 };

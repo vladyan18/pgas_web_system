@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Panel, HorizontalLine} from '../../common/style';
 import {css} from '@emotion/core';
 import {fetchGet, fetchSendWithoutRes} from '../../../services/fetchService';
@@ -108,7 +108,7 @@ function AdminsList(props) {
     if (!props.admins) return null;
 
     function setModerator(user) {
-        fetchSendWithoutRes('/setUserRole', {id: user.id, newRole: 'Moderator', faculty: staffContextStore.faculty}).then((res) => {
+        fetchSendWithoutRes('/setUserRole', {id: user.id, newRole: 'Moderator', faculty: staffContextStore.faculty}).then(() => {
             props.refreshCb();
             setModal(false);
         });

@@ -8,7 +8,6 @@ import {withRouter} from "react-router-dom";
 import '../../../style/checkbox.css'
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import {OverlayTrigger, Popover} from "react-bootstrap";
 import {Panel} from "../../common/style";
 import {ReactComponent as LogoBSS} from "../../../assets/img/logo_bss-compressed-medium.svg";
 

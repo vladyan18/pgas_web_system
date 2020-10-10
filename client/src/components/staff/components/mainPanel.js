@@ -14,13 +14,11 @@ const Panel = styled.div`
 
 function MainPanel({ heading, panelClass, ...props }) {
     return <div className={panelClass || 'col-md-9'} style={{margin: 0, padding: 0}}>
-            <Panel style={{width: '100%'}}>
-                <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0'}} >
-                    <div className="centered_ver">
-                        <p className="headline">
-                            { heading }
-                        </p>
-                    </div>
+            <Panel style={{width: '100%', paddingTop: '1rem'}}>
+                <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0 0 1rem 0'}} >
+                    <p className="headline" style={{marginBottom: 0}}>
+                        { heading }
+                    </p>
                     <div className="centered_ver" style={{'display': 'flex'}}>
                         <button id="DeleteButton" className="btn btn-secondary"
                                 value="Назад" onClick={() => {

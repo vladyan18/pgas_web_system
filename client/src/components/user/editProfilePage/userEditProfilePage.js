@@ -5,6 +5,7 @@ import logo from '../../../assets/img/gerb.png';
 import DateInput from '../../common/DateInput';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
 import {withRouter} from 'react-router-dom';
+import {getDate} from '../../../helpers';
 
 class UserEditProfilePage extends Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class UserEditProfilePage extends Component {
       this.setState(st);
     };
 
-    this.register = (e) => {
+    this.register = () => {
       const user = {};
       user.LastName = this.state.LastName;
       user.FirstName = this.state.FirstName;
@@ -104,7 +105,7 @@ class UserEditProfilePage extends Component {
                   onChange={(e) => this.handleChange(e, 'Faculty')} required defaultValue="">
                   <option disabled value="">Факультет</option>
                   {this.props.faculties.map((fac) => {
-                    return (<option value={fac}>{fac}</option>);
+                    return (<option key={fac} value={fac}>{fac}</option>);
                   })}
                 </select><br/>
                 <span className="redText">*</span><label>Ступень обучения</label><br/>
@@ -143,7 +144,7 @@ class UserEditProfilePage extends Component {
                 </div>
               </form>
             </div>
-            <div className="col-xl-4 col-lg-3 col-md-2 col-sm-2 col-1"></div>
+            <div className="col-xl-4 col-lg-3 col-md-2 col-sm-2 col-1"/>
           </div>
         </main>
       </div>);
@@ -154,12 +155,6 @@ function makeDate(d) {
   if (!d) return undefined;
   const date = d.split('.');
   return new Date(date[2] + '-' + date[1] + '-' + date[0]);
-}
-
-function getDate(d) {
-  if (!d) return undefined;
-  d = new Date(d);
-  return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + '.' + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '.' + d.getFullYear();
 }
 
 export default withRouter(UserEditProfilePage);

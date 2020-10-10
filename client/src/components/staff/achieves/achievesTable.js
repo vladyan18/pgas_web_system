@@ -3,7 +3,6 @@ import '../../../style/user_main.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import {withRouter} from "react-router-dom";
 import {fetchSendWithoutRes} from "../../../services/fetchService";
-import {observer} from "mobx-react";
 import AchievesComment from "./achievesComment";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import staffContextStore from "../../../stores/staff/staffContextStore";

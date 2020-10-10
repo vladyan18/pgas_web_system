@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import '../../style/user_main.css';
 import {observer} from 'mobx-react';
 import StaffStudentsRating from '../staff/staffStudentsRating/staffStudentsRating';
-import {withRouter} from 'react-router-dom';
 import {fetchGet} from '../../services/fetchService';
 import userPersonalStore from '../../stores/userPersonalStore';
 import criteriasStore from '../../stores/criteriasStore';

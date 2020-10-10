@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {css, jsx} from '@emotion/core';
 
 import { useToasts } from 'react-toast-notifications';

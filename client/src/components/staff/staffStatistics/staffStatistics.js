@@ -6,15 +6,14 @@ import {fetchGet} from '../../../services/fetchService';
 import {Doughnut, Bar, Chart, Scatter, Line} from 'react-chartjs-2';
 import 'chartjs-plugin-labels';
 import PCA from 'pca-js';
-import {agnes} from 'ml-hclust';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 
 const originalDoughnutDraw = Chart.controllers.doughnut.prototype.draw;
 Chart.helpers.extend(Chart.controllers.doughnut.prototype, {
-  draw: function() {
-    originalDoughnutDraw.apply(this, arguments);
+  draw: function(...args) {
+    originalDoughnutDraw.apply(this, args);
 
     const chart = this.chart;
     const legendHeight = chart.legend.height;

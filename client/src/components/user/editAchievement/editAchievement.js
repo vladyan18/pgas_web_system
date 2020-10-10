@@ -6,8 +6,6 @@ import {withRouter} from "react-router-dom";
 import ConfirmationForm from "../confirmation/ConfirmationForm";
 import userAchievesStore from "../../../stores/userAchievesStore";
 import userPersonalStore from "../../../stores/userPersonalStore";
-import HelpButton from "../../common/helpButton";
-import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import DescriptionField from "../addAchievement/descriptionField";
 import DateField from "../addAchievement/dateField";
@@ -15,30 +13,9 @@ import CriterionSelector from "../addAchievement/criterionSelector";
 import DescriptionToCriterion from "../addAchievement/DescriptionToCriterion";
 import SaveButton from "../addAchievement/saveButton";
 import DeleteButton from "./deleteButton";
+import UserMainPanel from "../../common/userMainPanel";
+import {getDate} from "../../../helpers";
 /** @jsx jsx */
-
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-    padding: 0 2rem;
-    border-radius: 2px;
-    @media only screen and (max-device-width: 480px) {
-        padding: 0rem 1rem;
-    }
-            @media only screen and (max-device-width: 812px) {
-        margin: 0 auto 2rem auto;
-    }
-`;
-
-const ButtonPanel = styled.div`
-   display: flex; 
-   justify-content: space-between;
-   margin: 0;
-    @media only screen and (max-device-width: 480px) {
-        display: block; 
-    }   
-`;
-
 
 class EditAchievement extends Component {
     crits;
@@ -61,7 +38,7 @@ class EditAchievement extends Component {
                 chars: ach.chars,
                 isDateValid: true,
                 descrInvalid: !ach.achievement,
-                charsInvalid: ach.status === 'Данные некорректны' ? true : false,
+                charsInvalid: ach.status === 'Данные некорректны',
                 dateValue: getDate(ach.achDate),
                 endDateValue: ach.endingDate ? getDate(ach.endingDate) : undefined,
                 confirmations: ach.confirmations,
@@ -223,27 +200,21 @@ class EditAchievement extends Component {
 
         if (!CriteriasStore.criterias) return null;
         const isDisabled = ['Принято', 'Принято с изменениями', 'Отказано'].includes(this.state.status);
-        return (<Panel className="col-md-9" id="panel">
-            <div>
-                <ButtonPanel className="profile">
-                    <p className="headline" style={{"margin-bottom": "auto"}}>
-                        {this.props.isCopying ? 'Копирование достижения' : 'Изменение достижения'}
-                    </p>
-                    <div style={{'margin-top': 'auto'}}>
-                        <button id="DeleteButton" className="btn btn-secondary" style={{marginRight: "1rem"}}
-                                value="Назад" onClick={() => {
-                            this.props.history.goBack()
-                        }}>Назад
-                        </button>
-                        {!this.props.isCopying && <>
-                        <button id="DeleteButton" className="btn btn-warning" style={{marginRight: "1rem"}}
-                                value="Копировать" onClick={this.copyAch}>Копировать</button>
-                            <DeleteButton onClick={this.deleteAch} disabled={userPersonalStore.IsInRating} />
-                        </>}
-                    </div>
-                </ButtonPanel>
-
-                <hr className="hr_blue"/>
+        return (<UserMainPanel title={this.props.isCopying ? 'Копирование достижения' : 'Изменение достижения'}
+             buttons={<>
+                 <button id="DeleteButton" className="btn btn-secondary" style={{marginRight: "1rem"}}
+                         value="Назад" onClick={() => {
+                     this.props.history.goBack()
+                 }}>Назад
+                 </button>
+             {!this.props.isCopying && <>
+                 <button id="DeleteButton" className="btn btn-warning" style={{marginRight: "1rem"}}
+                 value="Копировать" onClick={this.copyAch}>Копировать</button>
+                 <DeleteButton onClick={this.deleteAch} disabled={userPersonalStore.IsInRating} />
+                 </>}
+                </>
+             }
+        >
                 <p className="desc_headline">
                     {this.props.isCopying && 'Добавление нового достижения на основании существующего'}
 
@@ -310,15 +281,8 @@ class EditAchievement extends Component {
                     crits={this.state.crits}
                     type={this.props.isCopying ? 'add' : 'save'}
                 />
-            </div>
-        </Panel>)
+        </UserMainPanel>)
     }
-}
-
-function getDate(d) {
-    if (!d) return undefined;
-    d = new Date(d);
-    return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + "." + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + "." + d.getFullYear();
 }
 
 function makeDate(d) {

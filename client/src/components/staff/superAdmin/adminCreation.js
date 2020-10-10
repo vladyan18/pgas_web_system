@@ -66,14 +66,14 @@ class AdminCreation extends Component {
     this.removeRight = (right) => {
       const st = this.state;
       const index = st.Rights.indexOf(right);
-      if (index != -1) {
+      if (index !== -1) {
         st.Rights.splice(st.Rights.indexOf(right), 1);
       }
       this.setState(st);
     };
 
 
-    this.validateRights = (e) => {
+    this.validateRights = () => {
       if (this.state.Rights.length === 0) {
         const st = this.state;
         st.isRightsValid = false;
@@ -153,7 +153,7 @@ class AdminCreation extends Component {
                     <div style={{'display': 'flex', 'flexWrap': 'wrap', 'width': '20rem'}}>
                       {this.state.Rights.map((right) => {
                         return <div className="btn-xs btn-dark tag"
-                          onClick={(e) => this.removeRight(right)}>{right}</div>;
+                          onClick={() => this.removeRight(right)}>{right}</div>;
                       })}
                     </div>
                     <select id='RightsSelect'

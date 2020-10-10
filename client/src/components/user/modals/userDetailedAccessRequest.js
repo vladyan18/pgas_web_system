@@ -1,7 +1,5 @@
 import Modal from 'react-modal';
 import React, {Component} from 'react';
-import ConfirmationForm from '../confirmation/ConfirmationForm';
-import {Popover} from 'react-bootstrap';
 import '../../../style/checkbox.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
@@ -20,7 +18,7 @@ class UserDetailedAccessRequest extends Component {
         this.setState({modalIsOpen: false});
     }
 
-    handleCheck(e) {
+    handleCheck() {
         this.setState({checked: !this.state.checked});
     }
 
@@ -41,7 +39,7 @@ class UserDetailedAccessRequest extends Component {
         }
         user.Settings.detailedAccessAllowed = true;
 
-        fetchSendWithoutRes('/api/registerUser', user).then((result) => {
+        fetchSendWithoutRes('/api/registerUser', user).then(() => {
             userPersonalStore.update().then();
             this.closeModal();
         });
@@ -64,7 +62,7 @@ class UserDetailedAccessRequest extends Component {
         }
         user.Settings.detailedAccessAllowed = false;
 
-        fetchSendWithoutRes('/api/registerUser', user).then((result) => {
+        fetchSendWithoutRes('/api/registerUser', user).then(() => {
             userPersonalStore.update().then();
             this.closeModal();
         });

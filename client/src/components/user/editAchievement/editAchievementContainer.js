@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import EditAchievement from './/editAchievement';
+import EditAchievement from './editAchievement';
 import userAchievesStore from '../../../stores/userAchievesStore';
 import {observer} from 'mobx-react';
 

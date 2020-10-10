@@ -1,10 +1,8 @@
 import React from 'react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import styled from '@emotion/styled';
 import {useState} from 'react';
-import {Panel, HorizontalLine} from '../../common/style';
-import HelpButton from '../../common/helpButton';
+import {HorizontalLine} from '../../common/style';
 
 function LinkConfirmation(props) {
     let url = props.confirmation.Data;

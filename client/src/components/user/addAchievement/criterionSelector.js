@@ -58,6 +58,7 @@ const critsNames = [
 ];
 
 const critsCellFactory = (outputFormatter, isDisabled, isSelected, callback) => {
+    // eslint-disable-next-line react/display-name
     return (num) => {
         if (!critsNames[num]) return null;
         return <td key={num} css={[cellStyle, !isDisabled ? cellActiveStyle : '']} onClick={() => {
@@ -111,7 +112,7 @@ const CriterionSelector = React.memo((props) => {
             ` : ''
         }><table style={{width: '100%'}}>{selectedCell(props.crits.indexOf(props.chars[0]))}</table></div>;
 }, (prevProps, nextProps) => {
-    return false; // prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
+    return prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
 });
 
 export default CriterionSelector;

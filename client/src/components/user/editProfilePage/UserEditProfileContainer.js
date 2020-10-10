@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import {fetchGet} from '../../../services/fetchService';
-import UserEditProfilePage from './/userEditProfilePage';
+import UserEditProfilePage from './userEditProfilePage';
 import userPersonalStore from '../../../stores/userPersonalStore';
 
 class UserEditProfileContainer extends Component {

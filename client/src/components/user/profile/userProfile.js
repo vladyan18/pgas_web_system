@@ -1,12 +1,12 @@
 import React, {Component, useState} from 'react';
 import '../../../style/add_portfolio.css';
 import {withRouter} from 'react-router-dom';
-import {Panel} from '../../common/style';
-import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import {OverlayTrigger, Popover} from 'react-bootstrap';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {fetchGet, fetchSendObj, fetchSendWithoutRes} from '../../../services/fetchService';
+import {getDate} from '../../../helpers/';
+import UserMainPanel from '../../common/userMainPanel';
 /** @jsx jsx */
 
 function SubscriptionForm({defaultValue}) {
@@ -42,7 +42,7 @@ function SubscriptionForm({defaultValue}) {
   </form>;
 }
 
-function PortfolioForm(props) {
+function PortfolioForm() {
   const [portfolioOpened, setPortfolioOpened] = useState(userPersonalStore.Settings && userPersonalStore.Settings.portfolioOpened);
 
   async function switchPortfolio() {
@@ -84,17 +84,17 @@ class UserProfile extends Component {
   handlePrivacyChange(e) {
     const userOld = userPersonalStore.personal;
     const user = {};
-    user.lastname = userOld.LastName;
-    user.name = userOld.FirstName;
-    user.patronymic = userOld.Patronymic;
-    user.birthdate = userOld.Birthdate;
-    user.faculty = userOld.Faculty;
-    user.type = userOld.Type;
-    user.course = userOld.Course;
+    user.LastName = userOld.LastName;
+    user.FirstName = userOld.FirstName;
+    user.Patronymic = userOld.Patronymic;
+    user.Birthdate = userOld.Birthdate;
+    user.Faculty = userOld.Faculty;
+    user.Type = userOld.Type;
+    user.Course = userOld.Course;
 
-    user.settings = { detailedAccessAllowed: e.target.checked};
+    user.Settings = { detailedAccessAllowed: e.target.checked};
 
-    fetchSendWithoutRes('/api/registerUser', user).then((result) => {
+    fetchSendWithoutRes('/api/registerUser', user).then(() => {
       userPersonalStore.update().then();
     });
   }
@@ -123,20 +123,14 @@ class UserProfile extends Component {
         </Popover>
     );
 
-    return (<Panel className="col-md-9">
-        <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0'}}>
-          <p className="headline" style={{'margin-bottom': 'auto'}}>
-                    Мой профиль
-          </p>
-          <div style={{'margin-top': 'auto'}}>
-            <button id="editButton" className="btn btn-primary" value="Редактировать"
+    return (
+        <UserMainPanel title={'Мой профиль'}
+          buttons={
+          <button id="editButton" className="btn btn-primary" value="Редактировать"
               onClick={() => this.props.history.push('/edit_profile')}>Редактировать
-            </button>
-          </div>
-        </div>
-
-
-        <hr className="hr_blue"/>
+          </button>
+          }
+        >
         <table style={{'margin-bottom': '2rem'}}>
           <tbody>
             <tr>
@@ -193,15 +187,8 @@ class UserProfile extends Component {
           </div>
         </OverlayTrigger>
         </div>
-    </Panel>);
+    </UserMainPanel>);
   }
-}
-
-
-function getDate(d) {
-  if (!d) return undefined;
-  d = new Date(d);
-  return (d.getDate() > 9 ? d.getDate() : '0' + d.getDate()) + '.' + ((d.getMonth() + 1) > 9 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '.' + d.getFullYear();
 }
 
 async function askUserPermission() {

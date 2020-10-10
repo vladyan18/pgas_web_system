@@ -71,6 +71,7 @@ class UserNavItem extends Component {
   }
 }
 
+// eslint-disable-next-line no-class-assign
 UserNavItem = withRouter(UserNavItem);
 
 export default UserNavItem;

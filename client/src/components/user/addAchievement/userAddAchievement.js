@@ -1,32 +1,20 @@
 import React, {Component} from 'react';
 import '../../../style/add_portfolio.css';
 import CriteriasForm from './criteriasForm';
-import CriteriasStore, {fetchSendObj, fetchSendWithoutRes} from '../../../stores/criteriasStore';
+import CriteriasStore, {fetchSendWithoutRes} from '../../../stores/criteriasStore';
 import {withRouter} from 'react-router-dom';
 import ConfirmationForm from '../confirmation/ConfirmationForm';
 import userAchievesStore from '../../../stores/userAchievesStore';
 import userPersonalStore from '../../../stores/userPersonalStore';
-import {FormGroup, OverlayTrigger, Popover} from 'react-bootstrap';
-import HelpButton from '../../common/helpButton';
-import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import CriterionSelector from './criterionSelector';
 import DescriptionToCriterion from './DescriptionToCriterion';
 import DescriptionField from './descriptionField';
 import DateField from './dateField';
-import {Panel, HorizontalLine} from '../../common/style';
 import SaveButton from './saveButton';
+import UserMainPanel from '../../common/userMainPanel';
 /** @jsx jsx */
 
-const recommendation = css`
-  color: blue;
-  cursor: pointer;
-  font-weight: lighter;
-  
-  :hover {
-  color: #7c969e;
-  }
-`;
 
 class UserAddAchievement extends Component {
   constructor(props) {
@@ -175,12 +163,7 @@ class UserAddAchievement extends Component {
 
 
     return (
-      <Panel className="col-md-9" id="panel">
-        <div>
-          <p className="headline">
-                        Добавление достижения
-          </p>
-          <HorizontalLine/>
+        <UserMainPanel title={'Добавление достижения'}>
           {!this.state.chars && <p className="" style={{fontWeight: '350'}}>
             <b>Выберите критерий:</b>
           </p>}
@@ -208,8 +191,8 @@ class UserAddAchievement extends Component {
                 value={this.state.ach}
                 descrInvalid={this.state.descrInvalid}
                 descriptionRef={(input) => {
- this.descriptionInputRef = input;
-}}
+                  this.descriptionInputRef = input;
+                }}
                 dateRef={() => this.dateRef}
                 updateDescr={this.updateDescr}
                 updateChars={(newValue) => this.setState(newValue)}
@@ -238,8 +221,7 @@ class UserAddAchievement extends Component {
             isDateValid={this.state.isDateValid}
             crits={this.state.crits}
           />
-        </div>
-      </Panel>);
+        </UserMainPanel>);
   }
 }
 

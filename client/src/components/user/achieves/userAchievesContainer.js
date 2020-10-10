@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import UserAchieves from './/userAchieves';
+import UserAchieves from './userAchieves';
 import {observer} from 'mobx-react';
 import userPersonalStore from '../../../stores/userPersonalStore';
 

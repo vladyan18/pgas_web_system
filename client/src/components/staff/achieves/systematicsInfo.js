@@ -32,12 +32,12 @@ class SystematicsInfo extends Component {
         for (let k = 0; k < users.length; k++) {
             const counts = [];
             for (let i = 0; i < critNames.length; i++) {
-              counts.push(0);
+                counts.push(0);
             }
 
             if (users[k].Achievements) {
                 for (const ach of users[k].Achievements) {
-			if (critNames.indexOf(ach.crit) === -1) console.log('ERROR', ach.crit);
+                    if (critNames.indexOf(ach.crit) === -1) console.log('ERROR', ach.crit);
                     if (ach.status === 'Принято' || ach.status === 'Принято с изменениями') {
                         counts[critNames.indexOf(ach.crit)] += 1;
                     }
@@ -53,10 +53,10 @@ class SystematicsInfo extends Component {
             }
         }
 
-            if (this.props.updateSystematicsCallback) {
-                this.props.updateSystematicsCallback(systematicsConflicts);
-            }
-            return systematicsConflicts;
+        if (this.props.updateSystematicsCallback) {
+            this.props.updateSystematicsCallback(systematicsConflicts);
+        }
+        return systematicsConflicts;
     }
 
     getCritsElements(conflicts) {
@@ -66,14 +66,15 @@ class SystematicsInfo extends Component {
         return critNames.map((crit) => <div style={{marginBottom: this.state.openedCrits[crit] ? '1rem' : null}}>
             <div style={{maxWidth: '20rem', marginLeft: 'auto', marginRight: 'auto', textAlign: 'left'}}>
             <span onClick={() => this.toggleCrit(crit)}
-            style={{cursor: 'pointer', color: 'red'}}>
+                  style={{cursor: 'pointer', color: 'red'}}>
                 {crit + (this.state.openedCrits[crit] ? ' ▶' : ' ▼')}
             </span>
-            {this.state.openedCrits[crit] &&
+                {this.state.openedCrits[crit] &&
                 <div style={{marginLeft: '2rem'}}>
-                    {conflicts.filter((x) => x.crit === crit).map((conflict) => <div><a href={'#' + conflict.id}>{conflict.username}</a></div>)}
+                    {conflicts.filter((x) => x.crit === crit).map((conflict) => <div><a
+                        href={'#' + conflict.id}>{conflict.username}</a></div>)}
                 </div>
-            }
+                }
             </div>
         </div>);
     }
@@ -81,20 +82,26 @@ class SystematicsInfo extends Component {
     render() {
         const conflicts = this.getSystConflicts(staffContextStore.criterias);
         if (!conflicts) return null;
-        return <>{ conflicts.length > 0 &&
-                <div style={{width: '100%', textAlign: 'center'}}>
-                      <span style={{color: 'red', borderBottom: '1px dashed red', fontSize: 'medium', cursor: 'pointer', height: '1rem;'}}
-                      onClick={this.toggleCollapse}>
+        return <>{conflicts.length > 0 &&
+        <div style={{width: '100%', textAlign: 'center'}}>
+                      <span style={{
+                          color: 'red',
+                          borderBottom: '1px dashed red',
+                          fontSize: 'medium',
+                          cursor: 'pointer',
+                          height: '1rem',
+                      }}
+                            onClick={this.toggleCollapse}>
                       Систематика!
                       </span>
-                    {!this.state.collapsed &&
-                        <div>
-                            {
-                                this.getCritsElements(conflicts)
-                            }
-                        </div>
-                    }
-                </div>
+            {!this.state.collapsed &&
+            <div>
+                {
+                    this.getCritsElements(conflicts)
+                }
+            </div>
+            }
+        </div>
         }</>;
     }
 }

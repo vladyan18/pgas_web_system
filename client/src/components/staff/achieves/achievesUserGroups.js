@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import '../../../style/admin.css';
 import AchievesGroup from './achievesGroup';
 import Modal from 'react-modal';
@@ -6,8 +6,6 @@ import StaffChangeAchievement from './StaffChangeAchievement';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
-import styled from '@emotion/styled';
-import {observer} from 'mobx-react';
 import SystematicsInfo from './systematicsInfo';
 import {fetchGet} from '../../../services/fetchService';
 
@@ -87,14 +85,6 @@ this.setState({systematicsConflicts: systematicsConflicts});
 
   componentDidMount() {
     this.subscribeForUpdation();
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (!this.props.isNewList && staffContextStore.directions && staffContextStore.directions.length > 0) {
-      if (!this.state.currentDirection) {
-        this.setState({currentDirection: staffContextStore.directions[0]});
-      }
-    }
   }
 
   render() {
@@ -197,7 +187,7 @@ this.setState({systematicsConflicts: systematicsConflicts});
         }
       `, this.state.loading ? spinningStyle : '']}
              onClick={this.updateUsers}>
-          <i className="fa fa-refresh" aria-hidden="true" style={{margin: 'auto'}}></i>
+          <i className="fa fa-refresh" aria-hidden="true" style={{margin: 'auto'}}/>
         </div>}
       </main>
     );

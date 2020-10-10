@@ -1,7 +1,7 @@
 import {decorate, observable} from 'mobx';
 import {fetchGet} from "../services/fetchService";
 
-export * from '../services/fetchService'
+export * from '../services/fetchService' // TODO WTF
 
 class CriteriasStore {
     criterias;

@@ -5,10 +5,9 @@ import userAchievesStore from '../../../stores/userAchievesStore';
 import {observer} from 'mobx-react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import styled from '@emotion/styled';
 import {BASE_API_URL} from '../../../consts/constants';
 import {withRouter} from 'react-router-dom';
-import {HorizontalLine} from '../../common/style';
+import UserMainPanel from '../../common/userMainPanel';
 
 // a20800
 const mainButton = css`
@@ -25,11 +24,9 @@ const mainButton = css`
     }
 `;
 
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+const panelCSS = css`
     margin-bottom: 2rem;
-    border-radius: 2px;
+    padding: 1rem;
     @media only screen and (max-device-width: 480px) {
         padding-top: 1rem;
     }
@@ -84,7 +81,7 @@ class UserAchieves extends Component {
     let summaryPreliminaryBall = 0;
     if (userAchievesStore.achieves) {
       for (const ach of userAchievesStore.achieves) {
-        if (ach.status == 'Принято' || ach.status == 'Принято с изменениями') {
+        if (ach.status === 'Принято' || ach.status === 'Принято с изменениями') {
           summaryBall += ach.ball;
         }
         if (ach.preliminaryBall) {
@@ -93,29 +90,13 @@ class UserAchieves extends Component {
       }
     }
     if (!userAchievesStore.achieves) return null;
-    return (<Panel css={css`padding: 1rem;`} className="col-md-9">
-
-      <div>
-        <div css={css`display: flex; justify-content: space-between;`}>
-          <div css={css`
-        height: max-content; 
-        margin-top:auto; 
-        margin-bottom: auto; 
-        color: black;
-        font-size: larger;
-            @media only screen and (max-device-width: 480px) {
-        font-size: medium;
-        }
-        `}>
-            <b>Текущие достижения</b>
-
-          </div>
+    return (<UserMainPanel title={<b style={{fontSize: '1.2rem'}}>Текущие достижения</b>} panelCSS={panelCSS}
+        buttons={
           <form action={BASE_API_URL + '/getAnket'} onSubmit={this.checkConfirms}>
             <input type="submit" id="download" className="btn" css={mainButton} value="Скачать анкету"/>
           </form>
-        </div>
-
-        <HorizontalLine/>
+        }
+        >
         <div style={{display: 'flex'}}>
         {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
         {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
@@ -136,7 +117,7 @@ class UserAchieves extends Component {
           <div css={css`background-color: #4C4C4C; color: white; width: 100%; padding: 5px 5px 5px 1rem; margin-bottom: 1rem; cursor: pointer;`}
                onClick={this.toggleArchiveHide}>
             <i className={'fas fa-chevron-' + (!this.state.archiveHidden ? 'right' : 'down') + ' mychevron'}
-               ></i>
+               />
              <span style={{marginLeft: '1rem'}}>Архив достижений</span>
           </div>
           {!this.state.archiveHidden && <div css={css`width: 100%; min-height: 10rem;`}>
@@ -146,9 +127,8 @@ class UserAchieves extends Component {
           </div>}
         </div>}
 
-      </div>
       <div css={css`
-      width: 3rem; height: 3rem;; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
+      width: 3rem; height: 3rem; background-color: #129b41; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, .6);;
       position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; cursor: pointer; color: white; font-size: 2rem; text-align: center;
         display: none;
         @media only screen and (max-device-width: 768px) {
@@ -156,9 +136,9 @@ class UserAchieves extends Component {
         }
       `}
       onClick={() => this.props.history.push('/upload')}>
-        <i className="fa fa-plus" aria-hidden="true" style={{margin: 'auto'}}></i>
+        <i className="fa fa-plus" aria-hidden="true" style={{margin: 'auto'}}/>
       </div>
-    </Panel>);
+    </UserMainPanel>);
   }
 }
 
