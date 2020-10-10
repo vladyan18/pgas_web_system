@@ -4,7 +4,7 @@ import FacultyCreation from './facultyCreation';
 class FacultyCreationContainer extends Component {
   constructor(props) {
     super(props);
-  };
+  }
 
 
   render() {

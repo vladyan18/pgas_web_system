@@ -1,11 +1,11 @@
-import Modal from "react-modal";
-import React, {Component} from "react";
-import ConfirmationForm from "../confirmation/ConfirmationForm";
-import {Popover} from "react-bootstrap";
-import "../../../style/checkbox.css"
-import userPersonalStore from "../../../stores/userPersonalStore";
-import {fetchSendWithoutRes} from "../../../services/fetchService";
-import {withRouter} from "react-router";
+import Modal from 'react-modal';
+import React, {Component} from 'react';
+import ConfirmationForm from '../confirmation/ConfirmationForm';
+import {Popover} from 'react-bootstrap';
+import '../../../style/checkbox.css';
+import userPersonalStore from '../../../stores/userPersonalStore';
+import {fetchSendWithoutRes} from '../../../services/fetchService';
+import {withRouter} from 'react-router';
 
 class UserUpdateProfileRemainder extends Component {
     constructor(props) {
@@ -29,8 +29,8 @@ class UserUpdateProfileRemainder extends Component {
     }
 
     save() {
-        let userOld = userPersonalStore.personal;
-        let user = {};
+        const userOld = userPersonalStore.personal;
+        const user = {};
         user.lastname = userOld.LastName;
         user.name = userOld.FirstName;
         user.patronymic = userOld.Patronymic;
@@ -51,20 +51,19 @@ class UserUpdateProfileRemainder extends Component {
         if (!userPersonalStore.personal) return null;
         if (!userPersonalStore.personal.Registered) return null;
 
-        if (!userPersonalStore.Settings || !userPersonalStore.Settings.notifiedAboutUpdate)
-        {
-            return <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+        if (!userPersonalStore.Settings || !userPersonalStore.Settings.notifiedAboutUpdate) {
+            return <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
                           isOpen={this.state.modalIsOpen}
                           onRequestClose={this.closeModal}
                           shouldCloseOnOverlayClick={false}
                           contentLabel="Example Modal"
                           overlayClassName="Overlay">
-                <div className="modalContentWrapper" style={{maxHeight: "50rem", maxWidth: "100vw",}}>
+                <div className="modalContentWrapper" style={{maxHeight: '50rem', maxWidth: '100vw' }}>
                     <div className="block"
-                         style={{maxHeight: "inherit", maxWidth: "100vw", overflow: "auto", paddingTop: '0.5rem'}}>
+                         style={{maxHeight: 'inherit', maxWidth: '100vw', overflow: 'auto', paddingTop: '0.5rem'}}>
                         <div className="profile"
-                             style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
-                            <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
+                             style={{'display: flex; justify-content': 'space-between', 'margin': '0'}}>
+                            <p className="headline" style={{'margin-bottom': 'auto', 'margin-right': '1rem'}}>
                                 <b>Проверьте актуальность личных данных</b>
                             </p>
                         </div>
@@ -74,7 +73,7 @@ class UserUpdateProfileRemainder extends Component {
                         <p style={{marginBottom: '2rem'}}>Данные, внесенные в систему, используются при формировании анкеты. <br/>
                             Если что-то поменялось, не забудьте отредактировать профиль.</p>
 
-                        <div style={{display: 'flex', justifyContent:'center'}}>
+                        <div style={{display: 'flex', justifyContent: 'center'}}>
                         <table style={{'margin-bottom': '2rem'}}>
                             <tbody>
                             <tr>
@@ -94,7 +93,7 @@ class UserUpdateProfileRemainder extends Component {
                         </div>
 
 
-                        <div style={{display: 'flex', justifyContent:'space-between',
+                        <div style={{display: 'flex', justifyContent: 'space-between',
                         marginTop: '2rem'}}>
                             <button id="DeleteButton" className="btn btn-secondary"
                                     value="Назад" onClick={this.closeModal}
@@ -107,9 +106,9 @@ class UserUpdateProfileRemainder extends Component {
                         </div>
                     </div>
                 </div>
-            </Modal>
+            </Modal>;
           } else return null;
     }
 }
 
-export default withRouter(UserUpdateProfileRemainder)
+export default withRouter(UserUpdateProfileRemainder);

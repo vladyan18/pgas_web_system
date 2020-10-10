@@ -24,7 +24,7 @@ class StaffChangeAchievement extends Component {
       achDate: achieve.achDate,
       confirmations: achieve.confirmations,
       isDateValid: true,
-      hasChanges: false
+      hasChanges: false,
     };
     this.updateDescr = this.updateDescr.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
@@ -32,7 +32,7 @@ class StaffChangeAchievement extends Component {
     this.updateChars = this.updateChars.bind(this);
     this.updateComment = this.updateComment.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
-  };
+  }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (!prevState.hasChanges) {

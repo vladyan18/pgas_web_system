@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import staffContextStore from "../../../stores/staff/staffContextStore";
-import {observer} from "mobx-react";
+import staffContextStore from '../../../stores/staff/staffContextStore';
+import {observer} from 'mobx-react';
 
 
 class SystematicsInfo extends Component {
@@ -11,7 +11,7 @@ class SystematicsInfo extends Component {
         this.toggleCollapse = this.toggleCollapse.bind(this);
         this.toggleCrit = this.toggleCrit.bind(this);
         this.getCritsElements = this.getCritsElements.bind(this);
-    };
+    }
 
     toggleCollapse() {
         this.setState({collapsed: !this.state.collapsed, openedCrits: {}});
@@ -45,13 +45,12 @@ class SystematicsInfo extends Component {
             }
 
             for (let i = 0; i < counts.length; i++) {
-                if ([5, 10 + shift].includes(i) && counts[i] === 1) { //TODO
+                if ([5, 10 + shift].includes(i) && counts[i] === 1) { // TODO
                     systematicsConflicts.push({crit: critNames[i], username: users[k].user, id: users[k].Id});
                 } else if (i === 6 && counts[i] > 0 && counts[i] < 3) {
                     systematicsConflicts.push({crit: critNames[i], username: users[k].user, id: users[k].Id});
                 }
             }
-
         }
 
             if (this.props.updateSystematicsCallback) {
@@ -76,15 +75,15 @@ class SystematicsInfo extends Component {
                 </div>
             }
             </div>
-        </div>)
+        </div>);
     }
 
-    render () {
+    render() {
         const conflicts = this.getSystConflicts(staffContextStore.criterias);
         if (!conflicts) return null;
-        return  <>{ conflicts.length > 0 &&
-                <div style={{width:'100%', textAlign: 'center'}}>
-                      <span style={{color:'red', borderBottom: '1px dashed red', fontSize:'medium', cursor: 'pointer', height: '1rem;'}}
+        return <>{ conflicts.length > 0 &&
+                <div style={{width: '100%', textAlign: 'center'}}>
+                      <span style={{color: 'red', borderBottom: '1px dashed red', fontSize: 'medium', cursor: 'pointer', height: '1rem;'}}
                       onClick={this.toggleCollapse}>
                       Систематика!
                       </span>
@@ -96,7 +95,7 @@ class SystematicsInfo extends Component {
                         </div>
                     }
                 </div>
-        }</>
+        }</>;
     }
 }
 

@@ -7,9 +7,9 @@ import staffContextStore from '../../../stores/staff/staffContextStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
-import {observer} from "mobx-react";
-import SystematicsInfo from "./systematicsInfo";
-import {fetchGet} from "../../../services/fetchService";
+import {observer} from 'mobx-react';
+import SystematicsInfo from './systematicsInfo';
+import {fetchGet} from '../../../services/fetchService';
 
 const spinningStyle = css`
     -webkit-animation:spin 1s linear infinite;
@@ -17,7 +17,7 @@ const spinningStyle = css`
     animation:spin 1s linear infinite;
     
     background-color: lightblue;
-    `
+    `;
 
 class AchievesUserGroups extends React.PureComponent {
   constructor(props) {
@@ -32,7 +32,7 @@ class AchievesUserGroups extends React.PureComponent {
     this.toggleOnlyUpdated = this.toggleOnlyUpdated.bind(this);
     this.updateUsers = this.updateUsers.bind(this);
     this.subscribeForUpdation = this.subscribeForUpdation.bind(this);
-  };
+  }
 
   subscribeForUpdation() {
     fetchGet('/subscribeOnUsersUpdates', {faculty: staffContextStore.faculty}).then((res) => {
@@ -41,9 +41,9 @@ class AchievesUserGroups extends React.PureComponent {
           this.updateUsers();
         }
         this.subscribeForUpdation();
-        console.log('UPDATE FROM SERVER')
+        console.log('UPDATE FROM SERVER');
       }
-    })
+    });
   }
 
   componentWillUnmount() {
@@ -51,8 +51,9 @@ class AchievesUserGroups extends React.PureComponent {
   }
 
   updateSystematicsCallback(systematicsConflicts) {
-    if (JSON.stringify(systematicsConflicts) !== JSON.stringify(this.state.systematicsConflicts))
-    this.setState({systematicsConflicts: systematicsConflicts})
+    if (JSON.stringify(systematicsConflicts) !== JSON.stringify(this.state.systematicsConflicts)) {
+this.setState({systematicsConflicts: systematicsConflicts});
+}
   }
 
   openEditModal(achId) {
@@ -68,8 +69,8 @@ class AchievesUserGroups extends React.PureComponent {
       this.setState({loading: true}, () => {
         this.props.updater().then(() => {
           this.setState({loading: false});
-        })
-      })
+        });
+      });
     }
   }
 
@@ -78,7 +79,7 @@ class AchievesUserGroups extends React.PureComponent {
   }
 
   toggleOnlyUpdated() {
-    this.setState({onlyUpdated: !this.state.onlyUpdated})
+    this.setState({onlyUpdated: !this.state.onlyUpdated});
   }
   handleDirectionSelect(e) {
     this.setState({currentDirection: e.target.value});
@@ -108,7 +109,7 @@ class AchievesUserGroups extends React.PureComponent {
 
     for (const user of filteredUsers) {
       if (this.state.onlyUpdated) {
-        user.Achievements = user.Achievements.filter((x) => x.isPendingChanges)
+        user.Achievements = user.Achievements.filter((x) => x.isPendingChanges);
       }
       for (const ach of user.Achievements) {
         if (ach.status !== 'Ожидает проверки' ) {
@@ -127,7 +128,7 @@ class AchievesUserGroups extends React.PureComponent {
       <main id="main">
             <div id="panel" className="col list" style={{'width': '100%'}} css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
               {countOfUpdatedAchieves > 0 && <div style={{width: '100%', textAlign: 'center'}}>
-                <span style={{color: 'blue',  borderBottom: '1px dashed blue',
+                <span style={{color: 'blue', borderBottom: '1px dashed blue',
                   cursor: 'pointer'}} onClick={this.toggleOnlyUpdated}>Обновлено достижений: <b>{countOfUpdatedAchieves}</b></span>
               </div>}
               <div style={{display: 'flex', justifyContent: 'space-between'}}>

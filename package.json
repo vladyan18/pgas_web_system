@@ -52,7 +52,7 @@
   "scripts": {
     "start": "set NODE_ENV=production && node --nouse-idle-notification backend/start.js",
     "devstart": "set DB_USER=bekhterev&& set DB_PASSWORD=bekhterev&& set DB_HOST=localhost&& set DB_NAME=bekhterev&& npm start",
-    "eslint": "npx eslint ./backend"
+    "eslint": "npx eslint ./backend --fix"
   },
   "author": "",
   "engines": {
@@ -63,6 +63,7 @@
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-react": "^7.21.4",
     "eslint-plugin-security": "^1.4.0",
     "grunt": "^1.0.4",
     "grunt-contrib-jshint": "^2.1.0",

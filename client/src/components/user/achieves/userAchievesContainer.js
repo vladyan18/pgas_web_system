@@ -7,7 +7,7 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 class UserAchievesContainer extends Component {
   constructor(props) {
     super(props);
-  };
+  }
 
 
   render() {

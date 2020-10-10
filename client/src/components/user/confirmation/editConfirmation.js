@@ -3,12 +3,12 @@ import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
 import {useState} from 'react';
-import {Panel, HorizontalLine} from "../../common/style";
-import HelpButton from "../../common/helpButton";
+import {Panel, HorizontalLine} from '../../common/style';
+import HelpButton from '../../common/helpButton';
 
 function LinkConfirmation(props) {
     let url = props.confirmation.Data;
-    if (url.startsWith("//")) {
+    if (url.startsWith('//')) {
         url = url.substring(2);
     }
     const [URL, setURL] = useState(url);
@@ -29,15 +29,19 @@ function LinkConfirmation(props) {
                 </label>
                 <input id="AddInfo" className="form-control" type="text" required
                        onInput={(e) => setAdditionalInfo(e.target.value)} defaultValue={additionalInfo} autoComplete={'off'}/>
-                       <div style={{display: "flex", justifyContent: "space-between"}}>
+                       <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                       onClick={() => {props.saveCallback({URL, Name, additionalInfo})}} disabled={!(URL && Name)}/>
+                       onClick={() => {
+props.saveCallback({URL, Name, additionalInfo});
+}} disabled={!(URL && Name)}/>
                 <input id="SaveButton" className="btn btn-danger" type="button" value="Отменить"
-                       onClick={() => {props.saveCallback()}}/>
+                       onClick={() => {
+props.saveCallback();
+}}/>
                        </div>
             </form>
         </div>
-    )
+    );
 }
 
 function DocConfirmation(props) {
@@ -56,15 +60,19 @@ function DocConfirmation(props) {
                 <input id="AddInfo" className="form-control" type="text" required
                        onInput={(e) => setAdditionalInfo(e.target.value)} defaultValue={additionalInfo} autoComplete={'off'}/>
 
-                <div style={{display: "flex", justifyContent: "space-between"}}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
                 <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                       onClick={() => {props.saveCallback({Name, additionalInfo})}} disabled={!(Name)}/>
+                       onClick={() => {
+props.saveCallback({Name, additionalInfo});
+}} disabled={!(Name)}/>
                 <input id="SaveButton" className="btn btn-danger" type="button" value="Отменить"
-                       onClick={() => {props.saveCallback()}}/>
+                       onClick={() => {
+props.saveCallback();
+}}/>
                 </div>
             </form>
         </div>
-    )
+    );
 }
 
 function SZConfirmation(props) {
@@ -85,16 +93,20 @@ function SZConfirmation(props) {
             <label htmlFor="Link">Пункт:</label>
             <input disabled id="SZPar" className="form-control" type="text" required
                    onChange={(e) => setSZParagraph(e.target.value)} defaultValue={SZParagraph}/>
-            <div style={{display: "flex", justifyContent: "space-between"}}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <input id="SaveButton" className="btn btn-success" type="button" value="Сохранить"
-                   onClick={() => {props.saveCallback({SZ: {Appendix: SZAppendix, Paragraph: SZParagraph}, Name})}}
+                   onClick={() => {
+props.saveCallback({SZ: {Appendix: SZAppendix, Paragraph: SZParagraph}, Name});
+}}
                    disabled={!(Name)}/>
             <input id="SaveButton" className="btn btn-danger" type="button" value="Отменить"
-                   onClick={() => {props.saveCallback()}}/>
+                   onClick={() => {
+props.saveCallback();
+}}/>
             </div>
         </form>
         </div>
-    )
+    );
 }
 
 function EditConfirmation(props) {
@@ -104,9 +116,9 @@ function EditConfirmation(props) {
         props.save(object);
     }
 
-    return (<div className="modalContentWrapper" style={{display: "flex", justifyContent: "center", maxWidth: "100vw"}}>
+    return (<div className="modalContentWrapper" style={{display: 'flex', justifyContent: 'center', maxWidth: '100vw'}}>
         <div className="block"
-             style={{maxHeight: "inherit", width: "25rem", overflow: "auto"}}>
+             style={{maxHeight: 'inherit', width: '25rem', overflow: 'auto'}}>
             <p className="headline">Редактирование подтверждения</p>
             <HorizontalLine/>
             {(confirmation.Type === 'link') && <LinkConfirmation confirmation={confirmation} saveCallback={save}/>}

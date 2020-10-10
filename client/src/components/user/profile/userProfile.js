@@ -1,22 +1,22 @@
 import React, {Component, useState} from 'react';
 import '../../../style/add_portfolio.css';
 import {withRouter} from 'react-router-dom';
-import {Panel} from '../../common/style'
+import {Panel} from '../../common/style';
 import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
-import {OverlayTrigger, Popover} from "react-bootstrap";
-import userPersonalStore from "../../../stores/userPersonalStore";
-import {fetchGet, fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
+import {OverlayTrigger, Popover} from 'react-bootstrap';
+import userPersonalStore from '../../../stores/userPersonalStore';
+import {fetchGet, fetchSendObj, fetchSendWithoutRes} from '../../../services/fetchService';
 /** @jsx jsx */
 
 function SubscriptionForm({defaultValue}) {
-  const [ subscriptionEmail, setSubcriptionEmail ] = useState(defaultValue || (userPersonalStore.personal.id + '@student.spbu.ru'));
-  const [ subscripted, setSubcripted ] = useState(!!defaultValue && defaultValue !== '');
+  const [subscriptionEmail, setSubcriptionEmail] = useState(defaultValue || (userPersonalStore.personal.id + '@student.spbu.ru'));
+  const [subscripted, setSubcripted] = useState(!!defaultValue && defaultValue !== '');
 
   function changeNotificationEmail(email) {
     fetchGet('/change_notification_email', { email }).then(() => {
       console.log(email);
-      if (email && email !== '') setSubcripted(true)
+      if (email && email !== '') setSubcripted(true);
       else setSubcripted(false);
     });
   }
@@ -24,8 +24,8 @@ function SubscriptionForm({defaultValue}) {
   if (subscripted) {
     return <div style={{display: 'flex', marginTop: '0.5rem'}}>
       <div><span>{subscriptionEmail}</span></div>
-      <button className="btn btn-outline-danger"  style={{border: 'none', padding: '0 1rem', marginLeft: '1rem'}} onClick={() => changeNotificationEmail('')}>Отписаться</button>
-    </div>
+      <button className="btn btn-outline-danger" style={{border: 'none', padding: '0 1rem', marginLeft: '1rem'}} onClick={() => changeNotificationEmail('')}>Отписаться</button>
+    </div>;
   }
 
   return <form onSubmit={(e) => {
@@ -39,7 +39,7 @@ function SubscriptionForm({defaultValue}) {
         <button type='submit' className="btn btn-primary">Подписаться</button>
       </div>
     </div>
-  </form>
+  </form>;
 }
 
 function PortfolioForm(props) {
@@ -54,14 +54,14 @@ function PortfolioForm(props) {
     return <div style={{marginTop: '1rem'}}>
       <p style={{color: 'grey'}}><i>После создания своего Портфолио, Вы сможете опубликовать ссылку на него</i></p>
       <button className="btn btn-primary" onClick={switchPortfolio}>Создать портфолио</button>
-    </div>
+    </div>;
   }
 
   const portfolioUrl = 'https://achieve.spbu.ru/api/portfolio/' + userPersonalStore.personal.id;
   return <div style={{marginTop: '1rem'}}>
     <p><b style={{color: 'grey'}}>Адрес портфолио:</b> <a href={ portfolioUrl } target="_blank">{ portfolioUrl }</a></p>
-    <button className="btn btn-outline-danger"  onClick={switchPortfolio}>Закрыть доступ к Портфолио</button>
-  </div>
+    <button className="btn btn-outline-danger" onClick={switchPortfolio}>Закрыть доступ к Портфолио</button>
+  </div>;
 }
 
 class UserProfile extends Component {
@@ -70,20 +70,20 @@ class UserProfile extends Component {
     this.handlePrivacyChange = this.handlePrivacyChange.bind(this);
     this.state = {};
 
-    this.checkSubscription = async function () {
-      let result = await fetchGet('/notifications_subscribtions', {});
+    this.checkSubscription = async function() {
+      const result = await fetchGet('/notifications_subscribtions', {});
       if (!result.subscriptions) result.subscriptions = {};
       this.setState({notificationSettings: result.subscriptions});
     };
 
-    this.removeSubscription = function () {
+    this.removeSubscription = function() {
       fetchSendWithoutRes('/notifications_unsubscribe', {}).then();
     };
-  };
+  }
 
   handlePrivacyChange(e) {
-    let userOld = userPersonalStore.personal;
-    let user = {};
+    const userOld = userPersonalStore.personal;
+    const user = {};
     user.lastname = userOld.LastName;
     user.name = userOld.FirstName;
     user.patronymic = userOld.Patronymic;
@@ -105,7 +105,7 @@ class UserProfile extends Component {
 
   render() {
     const allowAccessPopover = (
-        <Popover id="popover-basic" style={{width: "40rem"}}>
+        <Popover id="popover-basic" style={{width: '40rem'}}>
           <Popover.Title as="h3">Согласие на открытие доступа</Popover.Title>
           <Popover.Content>
             Ставя эту галочку, вы разрешаете участникам конкурса с вашего факультета, <b>также поставившим эту
@@ -113,7 +113,7 @@ class UserProfile extends Component {
             просматривать ваши достижения в рейтинге на ПГАС. Такая возможность предоставляется в целях
             повышения открытости процесса и формирования доверия между всеми участниками назначения ПГАС.
             <br/>
-            <i style={{fontSize: "small", color: "#5d5d5d"}}>Таким образом, ставя данную галочку, вы
+            <i style={{fontSize: 'small', color: '#5d5d5d'}}>Таким образом, ставя данную галочку, вы
               дополнительно даете согласие на публикацию информации,
               относящейся к вашим персональным данным в соответствии со статьей 9 Федерального закона
               от 27.07.2006 №152-ФЗ «О персональных данных», в целях повышения открытости процесса назначения
@@ -124,7 +124,7 @@ class UserProfile extends Component {
     );
 
     return (<Panel className="col-md-9">
-        <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', margin: "0"}}>
+        <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0'}}>
           <p className="headline" style={{'margin-bottom': 'auto'}}>
                     Мой профиль
           </p>
@@ -173,7 +173,6 @@ class UserProfile extends Component {
       </div>
 
 
-
       { this.state.notificationSettings &&
       <div style={{margin: '3rem 0 2rem 0'}}>
         <hr/>
@@ -187,7 +186,7 @@ class UserProfile extends Component {
         <div style={{cursor: 'pointer', marginTop: '3rem', marginBottom: '2rem'}}>
         <OverlayTrigger trigger={['hover', 'focus']} placement="left"
                         overlay={allowAccessPopover} >
-          <div className="checkbox" style={{color: "green"}}>
+          <div className="checkbox" style={{color: 'green'}}>
             <input type="checkbox" id="checkbox_1" defaultChecked={userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed}
             onChange={this.handlePrivacyChange} style={{cursor: 'pointer', marginRight: '5px'}}/>
             <label htmlFor="checkbox_1" style={{cursor: 'pointer'}}>Открыть участникам доступ к моим достижениям</label>
@@ -210,57 +209,57 @@ async function askUserPermission() {
 }
 
 function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4)
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
   // eslint-disable-next-line
   const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/")
 
-  const rawData = window.atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
 
   for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
+    outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray
+  return outputArray;
 }
 
 function sendSubscription(subscription) {
   return fetchSendObj('/notifications_subscribe', subscription);
 }
-const convertedVapidKey = urlBase64ToUint8Array("BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730");
+const convertedVapidKey = urlBase64ToUint8Array('BFfYWgmcjhhOoC9nue978vFsO3t06G3ePJXgDvTIJ8WZ_mSP_VQhnI-oTn6oJSmjFTHkzjyem4UTvXcGHWWj730');
 
 function subscribeUser() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then(function(registration) {
       if (!registration.pushManager) {
         console.log('Push manager unavailable.');
-        return
+        return;
       }
 
       registration.pushManager.getSubscription().then(function(existedSubscription) {
         if (existedSubscription === null) {
-          console.log('No subscription detected, make a request.')
+          console.log('No subscription detected, make a request.');
           registration.pushManager.subscribe({
             applicationServerKey: convertedVapidKey,
             userVisibleOnly: true,
           }).then(function(newSubscription) {
-            console.log('New subscription added.')
-            sendSubscription(newSubscription)
+            console.log('New subscription added.');
+            sendSubscription(newSubscription);
           }).catch(function(e) {
             if (Notification.permission !== 'granted') {
-              console.log('Permission was not granted.')
+              console.log('Permission was not granted.');
             } else {
-              console.error('An error ocurred during the subscription process.', e)
+              console.error('An error ocurred during the subscription process.', e);
             }
-          })
+          });
         } else {
-          console.log('Existed subscription detected.')
-          sendSubscription(existedSubscription)
+          console.log('Existed subscription detected.');
+          sendSubscription(existedSubscription);
         }
-      })
+      });
     })
         .catch(function(e) {
-          console.error('An error ocurred during Service Worker registration.', e)
-        })
+          console.error('An error ocurred during Service Worker registration.', e);
+        });
   }
 }
 

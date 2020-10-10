@@ -1,11 +1,11 @@
 import React from 'react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
-import {Panel, HorizontalLine} from "../../common/style";
-import BootstrapTable from "react-bootstrap-table-next";
-import {ConfirmationColumns} from "../confirmation/ConfirmationColumns";
-import {fetchSendWithoutRes} from "../../../services/fetchService";
-import userAchievesStore from "../../../stores/userAchievesStore";
+import {Panel, HorizontalLine} from '../../common/style';
+import BootstrapTable from 'react-bootstrap-table-next';
+import {ConfirmationColumns} from '../confirmation/ConfirmationColumns';
+import {fetchSendWithoutRes} from '../../../services/fetchService';
+import userAchievesStore from '../../../stores/userAchievesStore';
 
 
 function UserDocuments(props) {
@@ -20,7 +20,7 @@ function UserDocuments(props) {
 
     fetchSendWithoutRes('/delete_confirmation', {id: confirmation._id}).then((res) => {
           userAchievesStore.updateCommonConfirmations();
-        }
+        },
     );
   }
   let columns = [
@@ -34,20 +34,20 @@ function UserDocuments(props) {
             .some((x) => x.confirmations.some((conf) => conf._id === row._id))) {
           return <i style={{color: 'grey'}} className="fa fa-paperclip" title="Приложено к достижению"/>;
         }
-      }
-    }
+      },
+    },
   ].concat(ConfirmationColumns);
   columns = columns.concat([
     {
       isDummyField: true,
-      style: {textAlign: "right"},
+      style: {textAlign: 'right'},
       formatter: (cell, row) => {
         if (!props.achievements) {
           return null;
         }
 
         if (props.achievements
-            .filter((x) => ['Принято', 'Принято с изменениями', 'Отказано'].find(st => st === x.status))
+            .filter((x) => ['Принято', 'Принято с изменениями', 'Отказано'].find((st) => st === x.status))
             .some((x) => x.confirmations.some((conf) => conf._id === row._id))) {
           return null;
         }
@@ -55,18 +55,19 @@ function UserDocuments(props) {
         <button onClick={() => deleteCommonConfirmation(row)}
             style={
               {
-                cursor: "pointer",
-                marginLeft: "0.3rem",
-                border:'none',
+                cursor: 'pointer',
+                marginLeft: '0.3rem',
+                border: 'none',
                 padding: 0,
                 backgroundColor: 'transparent',
                 outline: 'none',
-                color: "red",
-                fontSize: "1.1rem"
+                color: 'red',
+                fontSize: '1.1rem',
               }}><i className="fa fa-trash-alt"/>
         </button>
-      }</>}
-    }
+      }</>;
+},
+    },
   ]);
 
   return (<Panel className="col-md-9">
@@ -75,7 +76,7 @@ function UserDocuments(props) {
       <HorizontalLine/>
       <div>
           {props.confirmations && <BootstrapTable keyField='_id' data={props.confirmations}
-                                                  headerClasses={"withoutTopBorder"}
+                                                  headerClasses={'withoutTopBorder'}
                             columns={columns}
                             bordered={false}/>}
       </div>

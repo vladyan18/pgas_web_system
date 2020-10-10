@@ -4,7 +4,7 @@ import {OverlayTrigger} from 'react-bootstrap';
 class HelpButton extends Component {
   constructor(props) {
     super(props);
-  };
+  }
 
 
   render() {
@@ -21,7 +21,7 @@ class HelpButton extends Component {
               padding: 0,
               backgroundColor: 'transparent',
               outline: 'none',
-                color: '#727272'
+                color: '#727272',
             }}
           onClick={(e) => {
             e.preventDefault();

@@ -11,10 +11,10 @@ const tableStyle = css`
             text-align: center;
         }
     }
-    `
+    `;
 const specialStyle = css`
     font-weight: 600 !important;
-`
+`;
 
 const cellStyle = css`
         height: 2rem;
@@ -51,10 +51,10 @@ const critsNames = [
     ['9б', 'информирование'],
     ['10а', 'награды за творчество'],
     ['10б', 'искусство и литература'],
-    //['10в', 'обществ. деят. не в СПбГУ'],
+    // ['10в', 'обществ. деят. не в СПбГУ'],
     ['11а', 'призы в спорте'],
     ['11б', 'участие в спорте'],
-    ['11в', 'ГТО']
+    ['11в', 'ГТО'],
 ];
 
 const critsCellFactory = (outputFormatter, isDisabled, isSelected, callback) => {
@@ -67,9 +67,9 @@ const critsCellFactory = (outputFormatter, isDisabled, isSelected, callback) => 
         }}>
             <div css={[critNumberStyle, isSelected ? css`display: inline-block !important; width: 2rem !important; font-weight: 600;` : '']}>{critsNames[num][0]}</div>
             <span css={[critDescriptionStyle, isSelected ? specialStyle : '']}>{critsNames[num][1]}</span>
-        </td>
-    }
-}
+        </td>;
+    };
+};
 
 const CriterionSelector = React.memo((props) => {
     const cb = (val) => {
@@ -82,7 +82,7 @@ const CriterionSelector = React.memo((props) => {
     useEffect(() => {
         if (criteriasStore.criterias && Object.keys(criteriasStore.criterias).length === 13 && critsNames.length === 12) {
             critsNames[5][1] = 'активизм и организация в СПбГУ';
-            critsNames.splice(9, 0, ['10в', 'обществ. деят. не в СПбГУ'])
+            critsNames.splice(9, 0, ['10в', 'обществ. деят. не в СПбГУ']);
         }
     }, []);
 
@@ -111,7 +111,7 @@ const CriterionSelector = React.memo((props) => {
             ` : ''
         }><table style={{width: '100%'}}>{selectedCell(props.crits.indexOf(props.chars[0]))}</table></div>;
 }, (prevProps, nextProps) => {
-    return false; //prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
-})
+    return false; // prevProps.chars === nextProps.chars && prevProps.updateCharsCb === nextProps.updateCharsCb && prevProps.crits === nextProps.crits;
+});
 
 export default CriterionSelector;

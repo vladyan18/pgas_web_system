@@ -9,7 +9,7 @@ class NewAchievesContainer extends Component {
   constructor(props) {
     super(props);
     this.getAchieves = this.getAchieves.bind(this);
-  };
+  }
 
   componentDidMount() {
     this.getAchieves().then();

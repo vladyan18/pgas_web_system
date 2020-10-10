@@ -10,7 +10,7 @@ class StaffStudentsContainer extends Component {
   constructor(props) {
     super(props);
     this.getUsers = this.getUsers.bind(this);
-  };
+  }
 
   componentDidMount() {
     this.getUsers();
@@ -22,14 +22,13 @@ class StaffStudentsContainer extends Component {
 
   render() {
     return staffContextStore.criterias &&
-                <main className="row"  style={{'justifyContent': 'center', 'display': 'flex'}}>
+                <main className="row" style={{'justifyContent': 'center', 'display': 'flex'}}>
                   <StaffStudentsRating
                   faculty={staffContextStore.faculty}
                   directions={staffContextStore.directions}
                   crits={staffContextStore.criterias}
                   data={CurrentContestRatingStore.users}/>
-                </main>
-               ||
+                </main> ||
             null;
   }
 }

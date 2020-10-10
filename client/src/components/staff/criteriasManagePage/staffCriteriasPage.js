@@ -7,12 +7,12 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
-import CenteredMainPanel from "../components/centeredMainPanel";
+import CenteredMainPanel from '../components/centeredMainPanel';
 
 class StaffCriteriasPage extends Component {
   constructor(props) {
     super(props);
-  };
+  }
 
   componentWillMount() {
     if (!staffContextStore.criterias || !staffContextStore.schema) {
@@ -22,7 +22,7 @@ class StaffCriteriasPage extends Component {
 
   render() {
     return (
-        <CenteredMainPanel heading={"Критерии"}
+        <CenteredMainPanel heading={'Критерии'}
         buttons={
           <>
             {userPersonalStore.Role !== 'Observer' && <button id="DeleteButton" className="btn btn-primary"

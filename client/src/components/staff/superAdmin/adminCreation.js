@@ -99,7 +99,7 @@ class AdminCreation extends Component {
         }).catch((reason) => console.log('ERROR', reason));
       }
     };
-  };
+  }
 
 
   render() {

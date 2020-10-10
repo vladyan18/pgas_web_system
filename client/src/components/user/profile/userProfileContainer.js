@@ -8,7 +8,7 @@ import userPersonalStore from '../../../stores/userPersonalStore';
 class UserProfileContainer extends Component {
   constructor(props) {
     super(props);
-  };
+  }
 
   render() {
     return <UserProfile fio={userPersonalStore.fio} Birthdate={userPersonalStore.Birthdate}

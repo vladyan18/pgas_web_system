@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {css, jsx} from '@emotion/core';
 
-import { useToasts } from 'react-toast-notifications'
+import { useToasts } from 'react-toast-notifications';
 /** @jsx jsx */
 
 function SaveButton({sendKrit, chars, charsInvalid, descrInvalid, isDateValid, crits, type}) {
@@ -24,7 +24,7 @@ function SaveButton({sendKrit, chars, charsInvalid, descrInvalid, isDateValid, c
 
     return <div style={{width: '100%'}}>
         <button type="button" id="SubmitButton"
-                className={"btn btn-" + (type === 'save' ? 'success' : "primary") + " btn-md button_send" }
+                className={'btn btn-' + (type === 'save' ? 'success' : 'primary') + ' btn-md button_send' }
                 data-target="#exampleModal" value="отправить" onClick={handleClick}
                 disabled={
                     !chars ||
@@ -32,7 +32,7 @@ function SaveButton({sendKrit, chars, charsInvalid, descrInvalid, isDateValid, c
                 }>
             {type === 'save' ? 'Сохранить' : 'Добавить достижение'}
         </button>
-    </div>
+    </div>;
 }
 
 export default SaveButton;

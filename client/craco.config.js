@@ -1,13 +1,13 @@
 const emotionPresetOptions = {};
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 
 const disableModuleScopePlugin = {
   overrideWebpackConfig: ({ webpackConfig }) => {
     webpackConfig.resolve.plugins = webpackConfig.resolve.plugins.filter(
-        plugin => !(plugin instanceof ModuleScopePlugin)
+        (plugin) => !(plugin instanceof ModuleScopePlugin),
     );
 
-    return webpackConfig
+    return webpackConfig;
   },
 };
 
@@ -24,6 +24,6 @@ module.exports = {
     ],
   },
   plugins: [
-    { plugin: disableModuleScopePlugin, }
-  ]
+    { plugin: disableModuleScopePlugin },
+  ],
 };

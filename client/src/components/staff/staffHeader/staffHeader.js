@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import logo from '../../../img/gerb.png';
+import logo from '../../../assets/img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
@@ -62,7 +62,7 @@ class StaffHeader extends Component {
     this.switchToUser = this.switchToUser.bind(this);
     this.goToMenu = this.goToMenu.bind(this);
     this.switchFaculty = this.switchFaculty.bind(this);
-  };
+  }
 
   switchToUser() {
     this.props.history.push('/home');

@@ -7,7 +7,7 @@ class AchievementDateInput extends Component {
     super(props);
     this.state = {isValid: true, value: '', validMessage: ''};
     this.handleChange = this.handleChange.bind(this);
-  };
+  }
 
   handleChange(value) {
     const st = this.state;

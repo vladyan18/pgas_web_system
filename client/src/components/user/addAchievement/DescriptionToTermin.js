@@ -36,7 +36,7 @@ export default class DescriptionToTermin extends Component {
         <p className="desc_selectors" id="desc_criterion_first">
           <ReactMarkdown source={criteriasStore.languagesForPublications} linkTarget={() => '_blank'}/>
         </p>
-      </div>
+      </div>;
     } else return null;
   }
 }

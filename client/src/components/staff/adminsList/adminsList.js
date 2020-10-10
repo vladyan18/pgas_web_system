@@ -1,23 +1,23 @@
-import React, {useEffect} from "react";
-import {Panel, HorizontalLine} from "../../common/style";
-import {css} from "@emotion/core";
-import {fetchGet, fetchSendWithoutRes} from "../../../services/fetchService";
+import React, {useEffect} from 'react';
+import {Panel, HorizontalLine} from '../../common/style';
+import {css} from '@emotion/core';
+import {fetchGet, fetchSendWithoutRes} from '../../../services/fetchService';
 import {useState} from 'react';
-import Modal from "react-modal";
-import staffContextStore from "../../../stores/staff/staffContextStore";
+import Modal from 'react-modal';
+import staffContextStore from '../../../stores/staff/staffContextStore';
 
 
 const dictionary = {
     'Admin': 'Администратор',
     'Moderator': 'Проверяющий',
     'Observer': 'Наблюдатель',
-    'User': 'Пользователь'
+    'User': 'Пользователь',
 };
 
 const selectorStyle = css`
     cursor: pointer;
     margin: 0;
-`
+`;
 
 function RoleSelector(props) {
     const [role, setRole] = useState(props.role);
@@ -43,7 +43,7 @@ function RoleSelector(props) {
         {
             Object.keys(dictionary).map((role) => <option key={role} value={role}>{dictionary[role]}</option>)
         }
-    </select>
+    </select>;
 }
 
 function AddNewAdmin(props) {
@@ -69,9 +69,9 @@ function AddNewAdmin(props) {
         }
     }
 
-    return <div className="modalContentWrapper" style={{display: "flex", justifyContent: "center"}}>
+    return <div className="modalContentWrapper" style={{display: 'flex', justifyContent: 'center'}}>
         <div className="block"
-             style={{maxHeight: "inherit", width: "60rem", overflow: "auto"}}>
+             style={{maxHeight: 'inherit', width: '60rem', overflow: 'auto'}}>
             <div style={{ display: 'flex', justifyContent: 'space-between'}}>
                 <p className="headline">Добавление проверяющего</p>
                 <div>
@@ -100,7 +100,7 @@ function AddNewAdmin(props) {
                 </div>
             }
         </div>
-    </div>
+    </div>;
 }
 
 function AdminsList(props) {
@@ -140,7 +140,7 @@ function AdminsList(props) {
                 </div>
             </div>
             <HorizontalLine/>
-            <div style={{'justifyContent': 'center', 'display': 'flex', marginBottom: '2rem'}}>
+            <div style={{'justifyContent': 'center', 'display': 'flex', 'marginBottom': '2rem'}}>
             <table className="table table-light">
                 <thead>
                 <tr><th css={css`text-align: center;`}>ФИО</th><th>Роль</th></tr>
@@ -156,7 +156,7 @@ function AdminsList(props) {
             </table>
             </div>
     </Panel>
-        <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+        <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
                isOpen={modalOpened}
                onRequestClose={() => setModal(false)}
                shouldCloseOnOverlayClick={true}
@@ -164,7 +164,7 @@ function AdminsList(props) {
                overlayClassName="Overlay">
             <AddNewAdmin closeCb={() => setModal(false)} addCb={setModerator}/>
         </Modal>
-    </main>
+    </main>;
 }
 
-export default AdminsList
+export default AdminsList;

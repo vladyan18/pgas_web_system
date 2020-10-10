@@ -9,7 +9,7 @@ class EditAchievementContainer extends Component {
     super(props);
     this.state = {achId: props.match.params.id, isCopying: false};
     this.copyAchievement = this.copyAchievement.bind(this);
-  };
+  }
 
   componentDidMount() {
     if (!userAchievesStore.achieves) userAchievesStore.getAchieves();

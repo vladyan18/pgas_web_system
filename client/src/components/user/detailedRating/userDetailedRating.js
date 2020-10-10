@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import logo from '../../../img/gerb.png';
+import logo from '../../../assets/img/gerb.png';
 import '../../../style/user_main.css';
 import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
@@ -7,9 +7,9 @@ import {withRouter} from 'react-router-dom';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
-import staffContextStore from "../../../stores/staff/staffContextStore";
-import BootstrapTable from "react-bootstrap-table-next";
-import criteriasStore from "../../../stores/criteriasStore";
+import staffContextStore from '../../../stores/staff/staffContextStore';
+import BootstrapTable from 'react-bootstrap-table-next';
+import criteriasStore from '../../../stores/criteriasStore';
 
 const Panel = styled.div`
     background-color: white;
@@ -30,7 +30,7 @@ class UserDetailedRating extends Component {
     constructor(props) {
         super(props);
         this.toggleDetailedMode = this.toggleDetailedMode.bind(this);
-    };
+    }
 
     toggleDetailedMode() {
         if (this.props.toggleModeCallback) {
@@ -39,19 +39,19 @@ class UserDetailedRating extends Component {
     }
     render() {
         const props = this.props;
-        let filtered = this.props.data;
+        const filtered = this.props.data;
         let sorted = [];
         if (filtered) {
-                sorted = filtered.sort(function (obj1, obj2) {
+                sorted = filtered.sort(function(obj1, obj2) {
                 let diff = obj2.Ball - obj1.Ball;
-                if (diff != 0)
-                    return obj2.Ball - obj1.Ball;
-                else {
-                    for (let crit of Object.keys(obj1.Crits)) {
+                if (diff != 0) {
+return obj2.Ball - obj1.Ball;
+} else {
+                    for (const crit of Object.keys(obj1.Crits)) {
                         diff = obj2.Crits[crit] - obj1.Crits[crit];
-                        if (diff !== 0) return diff
+                        if (diff !== 0) return diff;
                     }
-                    return 0
+                    return 0;
                 }
             });
         }
@@ -70,32 +70,33 @@ class UserDetailedRating extends Component {
 
         for (const user of sorted) {
             user.sums = [0, 0, 0, 0, 0];
-            if (user.Achievements)
-            for (const ach of user.Achievements) {
+            if (user.Achievements) {
+for (const ach of user.Achievements) {
                 user.sums[getAreaNum(ach.crit)] += ach.ball;
             }
+}
         }
 
         function hasOverhead(user, crit) {
             return limits && user.Crits[crit] > 0 &&
-                (user.sums[getAreaNum(crit)] > limits[getAreaNum(crit)])
+                (user.sums[getAreaNum(crit)] > limits[getAreaNum(crit)]);
         }
 
         const limits = criteriasStore.limits;
         return <Panel className="col-md-9">
-            <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
+            <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0'}} >
                 <div className="centered_ver">
                     <p className="headline">
                         Рейтинг студентов
                     </p>
                 </div>
-                <div className="centered_ver" style={{"display": "flex"}}>
+                <div className="centered_ver" style={{'display': 'flex'}}>
                     <button id="DeleteButton" style={{marginRight: '1rem'}} className="btn btn-secondary"
                             value="Назад" onClick={() => {
-                        this.props.history.goBack()
+                        this.props.history.goBack();
                     }}>Назад
                     </button>
-                    {   this.props.toggleModeCallback &&
+                    { this.props.toggleModeCallback &&
                     <button id="DeleteButton" className="btn btn-outline-info"
                             value="Кратко" onClick={this.toggleDetailedMode}>Кратко </button>
                     }
@@ -122,13 +123,13 @@ class UserDetailedRating extends Component {
                 <div style={{marginBottom: '2rem'}}>
                     <h4 style={{display: 'flex',
                         justifyContent: 'space-between',
-                        backgroundColor: user.Achievements ? '#42996c' : '#595959'
+                        backgroundColor: user.Achievements ? '#42996c' : '#595959',
                     }}><div>{(index + 1) + '. ' + user.Name}</div><div>{user.Ball}</div></h4>
                     <table className="table table-bordered" css={criteriasTable} id='users'>
                         <thead>
                         <tr style={{fontSize: 'small'}}>
                             {Object.keys(criteriasStore.criterias).map((crit) =>
-                                <td style={{textAlign: 'center', padding: '5px'
+                                <td style={{textAlign: 'center', padding: '5px',
                                 }}><b>{crit}</b></td>)}
                         </tr>
                         </thead>
@@ -139,8 +140,8 @@ class UserDetailedRating extends Component {
                                     color: hasOverhead(user, crit) ? 'red' : 'black',
                                     }
                                 } title={hasOverhead(user, crit) ?
-                                    'Суммарный балл за область превышает установленное ограничение, поэтому \n при итоговом суммировании он будет считаться с ограничением.'
-                                    : null
+                                    'Суммарный балл за область превышает установленное ограничение, поэтому \n при итоговом суммировании он будет считаться с ограничением.' :
+                                    null
                                 }><span style={{borderBottom: hasOverhead(user, crit) ? '1px dashed red' : null}}>{user.Crits[crit]}</span></td>)}
                         </tr>
                         </tbody>
@@ -159,22 +160,22 @@ class UserDetailedRating extends Component {
                     <tbody id="usersTable">
                     {
                         user.Achievements.map((ach) => (ach.status === 'Принято' || ach.status === 'Принято с изменениями') && <tr>
-                            <td style={{textAlign: 'center', width:'5%', verticalAlign: 'middle'}}>{ach.crit}</td>
+                            <td style={{textAlign: 'center', width: '5%', verticalAlign: 'middle'}}>{ach.crit}</td>
                             <td style={{verticalAlign: 'middle'}}>{ach.achievement}</td>
-                            <td style={{fontSize: 'small', width:'10%', verticalAlign: 'middle'}}>{getDate(ach.achDate)}</td>
-                            <td style={{fontSize: 'xx-small', width:'20%', verticalAlign: 'middle'}}>{ach.chars.slice(1).toString().replace(/,/g, ', ')}</td>
-                            <td style={{textAlign: 'center', width:'5%', verticalAlign: 'middle'}}>{ach.ball}</td>
+                            <td style={{fontSize: 'small', width: '10%', verticalAlign: 'middle'}}>{getDate(ach.achDate)}</td>
+                            <td style={{fontSize: 'xx-small', width: '20%', verticalAlign: 'middle'}}>{ach.chars.slice(1).toString().replace(/,/g, ', ')}</td>
+                            <td style={{textAlign: 'center', width: '5%', verticalAlign: 'middle'}}>{ach.ball}</td>
                         </tr>)
                     }
                     </tbody>
                     </table> }
 
-                    { !user.Achievements && <div style={{width: '100%', textAlign:'center', color: 'grey'}}>Пользователь запретил участникам конкурса просмотр своих достижений </div>}
-                </div>
+                    { !user.Achievements && <div style={{width: '100%', textAlign: 'center', color: 'grey'}}>Пользователь запретил участникам конкурса просмотр своих достижений </div>}
+                </div>,
             )
             }
 
-        </Panel>
+        </Panel>;
     }
 }
 

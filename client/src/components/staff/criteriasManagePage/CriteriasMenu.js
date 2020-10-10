@@ -16,7 +16,7 @@ class CriteriasMenu extends Component {
     };
     this.uploadCrits = this.uploadCrits.bind(this);
     this.saveCrits = this.saveCrits.bind(this);
-  };
+  }
 
   uploadCrits() {
     const data = new FormData();
@@ -46,7 +46,7 @@ class CriteriasMenu extends Component {
     fetchSendWithoutRes('/api/saveCriterias', {faculty: staffContextStore.faculty, crits: this.state.criterias})
         .then((success) => {
           console.log('SAVE CR', success);
-          this.props.history.goBack()
+          this.props.history.goBack();
         })
         .catch((error) => console.log(error),
         );
@@ -109,7 +109,7 @@ class CriteriasMenu extends Component {
               <tr><th>Ключ</th><th>Причина</th><th style={{textAlign: 'right'}}>Путь</th></tr>
               </thead>
               <tbody>
-              {this.state.differences.map(x => <tr style={{width: '100%'}}>
+              {this.state.differences.map((x) => <tr style={{width: '100%'}}>
                 <td>'{x.key}'</td>
                 <td style={{textAlign: 'center', color: x.reason === 'added' ? 'green' : 'red'}}>{x.reason}</td>
                 <td style={{textAlign: 'right'}}><span style={{fontSize: 'small'}}>{x.path}</span></td></tr>)}
@@ -125,28 +125,28 @@ class CriteriasMenu extends Component {
                 <tr><th>Студент</th><th>Некорректно:</th></tr>
                 </thead>
                 <tbody>
-                {this.state.incorrectAchievements.map(x => <tr style={{width: '100%'}}>
+                {this.state.incorrectAchievements.map((x) => <tr style={{width: '100%'}}>
                   <td>{x.user}</td>
                   <td style={{textAlign: 'left'}}>{(() => {
                     let str = '';
                     for (let i = 0; i < x.oldChars.length; i++) {
                         if (x.incorrectChars.includes(x.oldChars[i])) break;
-                        str += "'" + x.oldChars[i] + "'" + ', ';
+                        str += '\'' + x.oldChars[i] + '\'' + ', ';
                     }
                     return str;
                   })()
                   } {(() => {
                     let str = '';
                     for (let i = 0; i < x.incorrectChars.length; i++) {
-                      str += "'" +  x.incorrectChars[i]  + "'" + ', ';
+                      str += '\'' + x.incorrectChars[i] + '\'' + ', ';
                     }
-                    return <span style={{color: 'red'}}>{str}</span>
+                    return <span style={{color: 'red'}}>{str}</span>;
                   })()}</td></tr>)}
                 </tbody>
               </table></div>}
 
 
-            <div style={{'width': '70%', 'height': '100%', marginTop:'3rem'}}>
+            <div style={{'width': '70%', 'height': '100%', 'marginTop': '3rem'}}>
               {this.state.criterias &&
                                 <CriteriasTableViewer criterias={this.state.criterias.crits}
                                   schema={this.state.criterias.schema} limits={this.state.criterias.limits}/>}

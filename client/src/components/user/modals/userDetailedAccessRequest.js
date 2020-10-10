@@ -1,10 +1,10 @@
-import Modal from "react-modal";
-import React, {Component} from "react";
-import ConfirmationForm from "../confirmation/ConfirmationForm";
-import {Popover} from "react-bootstrap";
-import "../../../style/checkbox.css"
-import userPersonalStore from "../../../stores/userPersonalStore";
-import {fetchSendWithoutRes} from "../../../services/fetchService";
+import Modal from 'react-modal';
+import React, {Component} from 'react';
+import ConfirmationForm from '../confirmation/ConfirmationForm';
+import {Popover} from 'react-bootstrap';
+import '../../../style/checkbox.css';
+import userPersonalStore from '../../../stores/userPersonalStore';
+import {fetchSendWithoutRes} from '../../../services/fetchService';
 
 class UserDetailedAccessRequest extends Component {
     constructor(props) {
@@ -21,12 +21,12 @@ class UserDetailedAccessRequest extends Component {
     }
 
     handleCheck(e) {
-        this.setState({checked: !this.state.checked})
+        this.setState({checked: !this.state.checked});
     }
 
     accept() {
-        let userOld = userPersonalStore.personal;
-        let user = {};
+        const userOld = userPersonalStore.personal;
+        const user = {};
         user.LastName = userOld.LastName;
         user.FirstName = userOld.FirstName;
         user.Patronymic = userOld.Patronymic;
@@ -43,13 +43,13 @@ class UserDetailedAccessRequest extends Component {
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();
-            this.closeModal()
+            this.closeModal();
         });
     }
 
     deny() {
-        let userOld = userPersonalStore.personal;
-        let user = {};
+        const userOld = userPersonalStore.personal;
+        const user = {};
         user.LastName = userOld.LastName;
         user.FirstName = userOld.FirstName;
         user.Patronymic = userOld.Patronymic;
@@ -66,7 +66,7 @@ class UserDetailedAccessRequest extends Component {
 
         fetchSendWithoutRes('/api/registerUser', user).then((result) => {
             userPersonalStore.update().then();
-            this.closeModal()
+            this.closeModal();
         });
     }
 
@@ -74,22 +74,21 @@ class UserDetailedAccessRequest extends Component {
         if (!userPersonalStore.personal) return null;
         if (!userPersonalStore.personal.Registered) return null;
 
-        if (!userPersonalStore.Settings
-            || userPersonalStore.Settings.detailedAccessAllowed === undefined
-            || userPersonalStore.Settings.detailedAccessAllowed === null)
-        {
-            return <Modal className="Modal" style={{content: {"z-index": "111"}, overlay: {"z-index": "110"}}}
+        if (!userPersonalStore.Settings ||
+            userPersonalStore.Settings.detailedAccessAllowed === undefined ||
+            userPersonalStore.Settings.detailedAccessAllowed === null) {
+            return <Modal className="Modal" style={{content: {'z-index': '111'}, overlay: {'z-index': '110'}}}
                           isOpen={this.state.modalIsOpen}
                           onRequestClose={this.closeModal}
                           shouldCloseOnOverlayClick={false}
                           contentLabel="Example Modal"
                           overlayClassName="Overlay">
-                <div className="modalContentWrapper" style={{maxHeight: "40rem"}}>
+                <div className="modalContentWrapper" style={{maxHeight: '40rem'}}>
                     <div className="block"
-                         style={{maxHeight: "inherit", maxWidth: "29rem", overflow: "auto", paddingTop: '0.5rem'}}>
+                         style={{maxHeight: 'inherit', maxWidth: '29rem', overflow: 'auto', paddingTop: '0.5rem'}}>
                         <div className="profile"
-                             style={{"display: flex; justify-content": "space-between", "margin": "0"}}>
-                            <p className="headline" style={{"margin-bottom": "auto", "margin-right": "1rem"}}>
+                             style={{'display: flex; justify-content': 'space-between', 'margin': '0'}}>
+                            <p className="headline" style={{'margin-bottom': 'auto', 'margin-right': '1rem'}}>
                                 <b>Открытие доступа к достижениям</b>
                             </p>
                         </div>
@@ -101,7 +100,7 @@ class UserDetailedAccessRequest extends Component {
                             просматривать ваши достижения в рейтинге на ПГАС. Такая возможность предоставляется в целях
                             повышения открытости процесса и формирования доверия между всеми участниками назначения
                             ПГАС. </p>
-                        <i style={{fontSize: "small", color: "#5d5d5d"}}>Таким образом, ставя данную галочку, вы
+                        <i style={{fontSize: 'small', color: '#5d5d5d'}}>Таким образом, ставя данную галочку, вы
                             дополнительно даете согласие на публикацию информации,
                             относящейся к вашим персональным данным в соответствии со статьей 9 Федерального закона
                             от 27.07.2006 №152-ФЗ «О персональных данных», в целях повышения открытости процесса
@@ -109,7 +108,7 @@ class UserDetailedAccessRequest extends Component {
                             ПГАС. Отзыв данного согласия
                             возможен путем изменения настроек в профиле.</i>
 
-                        <div className="checkbox" style={{color: "green", marginTop: '1rem'}}>
+                        <div className="checkbox" style={{color: 'green', marginTop: '1rem'}}>
                             <input type="checkbox" id="checkbox_modal_1"
                                    defaultChecked={userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed}
                                    onChange={this.handleCheck}
@@ -118,7 +117,7 @@ class UserDetailedAccessRequest extends Component {
                                 достижениям</b></label>
                         </div>
 
-                        <div style={{display: 'flex', justifyContent:'space-between', paddingLeft: '4rem', paddingRight:'4rem',
+                        <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: '4rem', paddingRight: '4rem',
                         marginTop: '2rem'}}>
                         <button id="DeleteButton" className="btn btn-outline-danger"
                                 value="Назад" onClick={this.deny}>Отказаться
@@ -131,9 +130,9 @@ class UserDetailedAccessRequest extends Component {
                         </div>
                     </div>
                 </div>
-            </Modal>
+            </Modal>;
           } else return null;
     }
 }
 
-export default UserDetailedAccessRequest
+export default UserDetailedAccessRequest;

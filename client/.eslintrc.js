@@ -4,8 +4,8 @@ module.exports = {
     'es6': true,
   },
   'extends': [
-    'plugin:react/recommended',
     'google',
+    'plugin:react/recommended',
   ],
   'globals': {
     'Atomics': 'readonly',
@@ -21,9 +21,15 @@ module.exports = {
   'plugins': [
     'react',
   ],
+
   'rules': {
     'max-len': 'off',
     'react/prop-types': 'off',
-    'require-jsdoc': 'off'
+    'require-jsdoc': 'off',
+    'valid-jsdoc': 'off',
+    'linebreak-style': 'off',
+    'indent': 'off',
+    'object-curly-spacing': 'off',
+    'new-cap': 'off'
   },
 };

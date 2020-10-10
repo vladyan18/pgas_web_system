@@ -6,7 +6,7 @@ class AdminCreationContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-  };
+  }
 
   componentWillMount() {
     fetchGet('/api/getFacultiesList', {}).then((result) =>

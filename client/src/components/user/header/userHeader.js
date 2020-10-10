@@ -7,8 +7,8 @@ import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compre
 import { ReactComponent as LogoBSS } from '../../../assets/img/logo_bss-compressed-medium.svg';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
-import UserNavItem from "../navbar/userNavItem";
-import Dropdown from "react-bootstrap/Dropdown";
+import UserNavItem from '../navbar/userNavItem';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const pageTop = css`
     background-color: white;
@@ -67,7 +67,7 @@ const logoSpbuBackground = css`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  `
+  `;
 
 const logoSPbU = css`
   height: 55px;
@@ -103,52 +103,52 @@ font-size: medium;
 
 const styles = {
   bmBurgerButton: {
-    display: 'none'
+    display: 'none',
   },
   bmBurgerBarsHover: {
-    background: '#a90000'
+    background: '#a90000',
   },
   bmCrossButton: {
     height: '24px',
-    width: '24px'
+    width: '24px',
   },
   bmCross: {
-    background: '#1b1b1e'
+    background: '#1b1b1e',
   },
   bmMenuWrap: {
     position: 'fixed',
-    height: '100%'
+    height: '100%',
   },
   bmMenu: {
     background: '#f6f8f1',
     padding: '2.5em 0 0',
-    fontSize: '1.15em'
+    fontSize: '1.15em',
   },
   bmMorphShape: {
-    fill: '#373a47'
+    fill: '#373a47',
   },
   bmItemList: {
     color: '#b8b7ad',
-    padding: '0.8em'
+    padding: '0.8em',
   },
   bmItem: {
-    display: 'inline-block'
+    display: 'inline-block',
   },
   bmOverlay: {
-    background: 'rgba(0, 0, 0, 0.3)'
-  }
-}
+    background: 'rgba(0, 0, 0, 0.3)',
+  },
+};
 
 function HamMenu(props) {
   if (!props.isOpen) return null;
-  return <div style={{backgroundColor: "#fafafa", padding: '0.5rem 1rem'}}>
+  return <div style={{backgroundColor: '#fafafa', padding: '0.5rem 1rem'}}>
       <UserNavItem to='/home' onClick={props.onClose}>Мои достижения</UserNavItem>
       <UserNavItem to='/upload' onClick={props.onClose}>Добавить достижение</UserNavItem>
       {userPersonalStore.IsInRating && <UserNavItem to='/rating' onClick={props.onClose}>Рейтинг</UserNavItem>}
       <UserNavItem to='/documents' onClick={props.onClose}>Информация</UserNavItem>
       <UserNavItem to='/confirmations' onClick={props.onClose}>Мои документы</UserNavItem>
       <UserNavItem to='/profile' onClick={props.onClose}>Мой профиль</UserNavItem>
-  </div>
+  </div>;
 }
 
 function DesktopLeftBlock(props) {
@@ -167,7 +167,7 @@ function DesktopLeftBlock(props) {
       <span css={css`color: #595959;`}>Студенческий совет СПбГУ</span> <br/>
       <span css={css`padding-left: 13px; color: black;`}>{props.pageName}</span>
     </div>
-  </div>
+  </div>;
 }
 
 function MobileLeftBlock(props) {
@@ -190,11 +190,11 @@ function MobileLeftBlock(props) {
       </div>
     </a>
     </div>
-  </div>
+  </div>;
 }
 
 const DesktopRightBlock = observer((props) => {
-  return (<>{!props.clear &&  <div css={rightPanel}>
+  return (<>{!props.clear && <div css={rightPanel}>
     <div css={css`display: flex; justify-content: flex-end;`}>
 
       <div css={verticalAlign}>
@@ -235,14 +235,14 @@ const DesktopRightBlock = observer((props) => {
         </form>}
       </div>
     </div>
-  </div>}</>)
-})
+  </div>}</>);
+});
 
 const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     <a
         href=""
         ref={ref}
-        style={{color: "black"}}
+        style={{color: 'black'}}
         onClick={(e) => {
           e.preventDefault();
           onClick(e);
@@ -252,8 +252,8 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     </a>
 ));
 
-const  MobileRightBlock = observer((props) => {
-  return <>{!props.clear &&  <div>
+const MobileRightBlock = observer((props) => {
+  return <>{!props.clear && <div>
     <div css={css`display: flex; justify-content: flex-end;`}>
       <div css={verticalAlign}>
         <div css={FIO}>
@@ -274,8 +274,8 @@ const  MobileRightBlock = observer((props) => {
         </div>
       </div>
     </div>
-  </div>} </>
-})
+  </div>} </>;
+});
 
 class UserHeader extends Component {
   constructor(props) {
@@ -283,7 +283,7 @@ class UserHeader extends Component {
     this.switchToStaff = this.switchToStaff.bind(this);
     const isMobile = (window.innerWidth <= 812);
     this.state = {isMobile};
-  };
+  }
 
   switchToStaff() {
     this.props.history.push('/staff');
@@ -291,11 +291,11 @@ class UserHeader extends Component {
 
   render() {
     const props = this.props;
-    return<>
+    return <>
     <header css={css`box-shadow: 0 2px 4px rgba(0, 0, 0, .2);`}>
       <div className="row" css={pageTop}>
         {!this.state.isMobile && <DesktopLeftBlock {...props}/>}
-        {this.state.isMobile && <MobileLeftBlock  switchMenu={() => this.setState({isMenuOpened: !this.state.isMenuOpened})}/>}
+        {this.state.isMobile && <MobileLeftBlock switchMenu={() => this.setState({isMenuOpened: !this.state.isMenuOpened})}/>}
 
         {!this.state.isMobile && <DesktopRightBlock {...props} switchToStaff={this.switchToStaff}/>}
         {this.state.isMobile && <MobileRightBlock {...props}/>}

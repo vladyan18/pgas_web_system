@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {css, jsx} from '@emotion/core';
-import criteriasStore, {fetchSendObj} from "../../../stores/criteriasStore";
-import ReactMarkdown from "react-markdown";
-import HelpButton from "../../common/helpButton";
-import {Popover} from "react-bootstrap";
-import userPersonalStore from "../../../stores/userPersonalStore";
-import AchievementDateInput from "../../common/AchievementDateInput";
+import criteriasStore, {fetchSendObj} from '../../../stores/criteriasStore';
+import ReactMarkdown from 'react-markdown';
+import HelpButton from '../../common/helpButton';
+import {Popover} from 'react-bootstrap';
+import userPersonalStore from '../../../stores/userPersonalStore';
+import AchievementDateInput from '../../common/AchievementDateInput';
 /** @jsx jsx */
 
 const getLineColor = function(isInvalid) {
@@ -15,7 +15,7 @@ const getLineColor = function(isInvalid) {
 };
 
 function getValidityClass(val) {
-    if  (val) {
+    if (val) {
         return ' is-invalid';
     }
     if (val === false) {
@@ -28,7 +28,7 @@ function DateFieldLabel(props) {
     const mainColor = '#595959';
     return <div style={{display: 'flex'}}>
         <div>
-            <label style={{'marginTop': 'auto', width: '10rem'}} className="form-check-label">
+            <label style={{'marginTop': 'auto', 'width': '10rem'}} className="form-check-label">
                 <b>Дата достижения:</b>
             </label>
             <label style={{cursor: 'pointer', color: '#595959', marginLeft: 0, marginBottom: 0}}>
@@ -38,11 +38,11 @@ function DateFieldLabel(props) {
                 />
                 <span style={{marginLeft: '0.5rem', color: mainColor,
                     fontWeight: '350',
-                    fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"'
+                    fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
                 }}>диапазон</span>
             </label>
         </div>
-    </div>
+    </div>;
 }
 
 function makeDate(d) {
@@ -73,7 +73,7 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
                 setStartDate(value);
             }
             setValidity(newValidity);
-        }
+        };
     };
 
     useEffect(() => {
@@ -86,7 +86,7 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
         if (validity[0] === false || validity[1] === false || (hasDiapasone && isDiapasoneValid === false)) newFormInValidity = true;
         if (validity[0] === true) newFormInValidity = false;
         if (hasDiapasone && (validity[0] !== undefined || validity[1] !== undefined)) {
-            newFormInValidity = newFormInValidity || validity[1] !== true || isDiapasoneValid !== true
+            newFormInValidity = newFormInValidity || validity[1] !== true || isDiapasoneValid !== true;
         }
         setFormInvalidity(newFormInValidity);
         onValidityChange(newFormInValidity === false);
@@ -97,20 +97,20 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
     const endDateChangeCb = onDateChangeFactory('end');
 
     function validateDiapasone() {
-        if (validity[0] === undefined || validity[1] === undefined)  {
+        if (validity[0] === undefined || validity[1] === undefined) {
             setDiapasoneValid(undefined);
             return;
         }
 
         if (hasDiapasone && validity[0] && validity[1]) {
-            console.log('DP', endDate, startDate,  makeDate(endDate) > makeDate(startDate))
+            console.log('DP', endDate, startDate, makeDate(endDate) > makeDate(startDate));
             setDiapasoneValid(makeDate(endDate) > makeDate(startDate));
         }
     }
 
 
     return <div className="form-group form_elem_with_left_border" style={{'marginTop': '1rem',
-        'borderColor': getLineColor(formInvalidity)
+        'borderColor': getLineColor(formInvalidity),
     }}>
 
         <DateFieldLabel
@@ -130,7 +130,7 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
         <div id="Date" style={{
             'display': 'flex',
             'alignItems': 'center',
-            margin: '0.7rem 0 0.2rem 0'
+            'margin': '0.7rem 0 0.2rem 0',
         }}>
             {!hasDiapasone &&
             <AchievementDateInput dateRef={dateRef} className="form-control" isValid={validity[0]}
@@ -162,7 +162,7 @@ function DateField({defaultValue, onValidityChange, onDateChange, dateRef, disab
             </table>}
         </div>
         <div style={{fontSize: 'small', color: 'grey', textAlign: 'center', width: '10rem'}}>01.09.2019 — 31.08.2020</div>
-    </div>
+    </div>;
 }
 
 export default DateField;

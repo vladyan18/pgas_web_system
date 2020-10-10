@@ -1,7 +1,7 @@
-import {withRouter} from "react-router";
-import styled from "@emotion/styled";
-import React from "react";
-import staffContextStore from "../../../stores/staff/staffContextStore";
+import {withRouter} from 'react-router';
+import styled from '@emotion/styled';
+import React from 'react';
+import staffContextStore from '../../../stores/staff/staffContextStore';
 
 const Panel = styled.div`
     background-color: white;
@@ -13,18 +13,18 @@ const Panel = styled.div`
 `;
 
 function MainPanel({ heading, panelClass, ...props }) {
-    return <div className={panelClass || "col-md-9"} style={{margin: 0, padding:0}}>
+    return <div className={panelClass || 'col-md-9'} style={{margin: 0, padding: 0}}>
             <Panel style={{width: '100%'}}>
-                <div className="profile" style={{"display": "flex", "justify-content": "space-between", margin: "0"}} >
+                <div className="profile" style={{'display': 'flex', 'justify-content': 'space-between', 'margin': '0'}} >
                     <div className="centered_ver">
                         <p className="headline">
                             { heading }
                         </p>
                     </div>
-                    <div className="centered_ver" style={{"display": "flex"}}>
+                    <div className="centered_ver" style={{'display': 'flex'}}>
                         <button id="DeleteButton" className="btn btn-secondary"
                                 value="Назад" onClick={() => {
-                            props.history.goBack()
+                            props.history.goBack();
                         }}>Назад
                         </button>
                         {
@@ -37,8 +37,8 @@ function MainPanel({ heading, panelClass, ...props }) {
                     {props.children && props.children}
                 </div>
             </Panel>
-    </div>
+    </div>;
 }
 
 
-export default withRouter(MainPanel)
+export default withRouter(MainPanel);

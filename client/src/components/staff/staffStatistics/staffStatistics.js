@@ -44,7 +44,7 @@ class StaffStatistics extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-  };
+  }
 
   async componentDidMount() {
     const statisticsProm = fetchGet('/api/getStatistics', {faculty: staffContextStore.faculty});

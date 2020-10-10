@@ -3,9 +3,9 @@ import '../../../style/add_portfolio.css';
 import DescriptionToTermin from './DescriptionToTermin';
 import ReactMarkdown from 'react-markdown';
 import criteriasStore from '../../../stores/criteriasStore';
-import DescriptionToCriterion from "./DescriptionToCriterion";
+import DescriptionToCriterion from './DescriptionToCriterion';
 import {css, jsx} from '@emotion/core';
-import CriteriasOptionsSelector from "./criteriasOptionSelector";
+import CriteriasOptionsSelector from './criteriasOptionSelector';
 /** @jsx jsx */
 
 const selectorCss = css`
@@ -15,11 +15,11 @@ const selectorCss = css`
         > * {
             width: 50px !important;
         }
-  `
+  `;
 
 const animateFadeIn = css`
 animation: fade-in .2s ease;
-`
+`;
 
 const charsDictionary = {
   'ДСПО': 'Соответствует профилю обучения',
@@ -32,7 +32,7 @@ const charsDictionary = {
   'Очн. уч.': 'Очное участие',
   'Заруб. изд.': 'Зарубежное издание',
   'Росс. изд.': 'Российское издание',
-  'ММК': 'Материалы международной конференции'
+  'ММК': 'Материалы международной конференции',
 };
 function getCharacteristicName(char) {
   if (charsDictionary[char]) return charsDictionary[char];
@@ -53,7 +53,7 @@ export default class CriteriasForm extends Component {
       } else {
         this.state = {selects: [], length: 1, crit: undefined, values: []};
       }
-      //this.props.valuesCallback([this.critsTitles[0]]);
+      // this.props.valuesCallback([this.critsTitles[0]]);
     } else {
       const sel = [];
       let globalCrit = this.props.crits;
@@ -84,7 +84,7 @@ export default class CriteriasForm extends Component {
         values: this.props.values.slice(),
       };
       this.checkValidity();
-      //this.props.valuesCallback(this.state.values, true);
+      // this.props.valuesCallback(this.state.values, true);
     }
 
     // this.state = {selects: [{value:'', options: []}]}
@@ -102,8 +102,8 @@ export default class CriteriasForm extends Component {
           });
         }
       }
-    if (this.props.values
-        && prevProps.values !== this.props.values && this.props.values !== this.state.values) {
+    if (this.props.values &&
+        prevProps.values !== this.props.values && this.props.values !== this.state.values) {
       const sel = [];
       let globalCrit = this.props.crits;
       for (let i = 1; i < this.props.values.length; i++) {
@@ -136,18 +136,17 @@ export default class CriteriasForm extends Component {
       };
       if (this.state) {
         this.setState(newState, () => {
-          //this.lastSelectRef.focus();
+          // this.lastSelectRef.focus();
           this.checkValidity();
         });
       } else {
         this.state = newState;
         const keys = Object.keys(globalCrit);
         if (isNaN(Number(keys[0])) && keys.length === 1) {
-          this.handleSelect({target: {value: keys[0], id: this.props.values.length}})
+          this.handleSelect({target: {value: keys[0], id: this.props.values.length}});
         }
-        //this.lastSelectRef.focus();
+        // this.lastSelectRef.focus();
         this.checkValidity();
-
       }
     }
   }
@@ -163,12 +162,12 @@ export default class CriteriasForm extends Component {
     const keys = Object.keys(crit);
     const critsTitles = Object.keys(this.props.crits);
     if (isNaN(Number(keys[0])) || (critsTitles[0] === '7а' && isNaN(Number(crit[0])))) {
-      //state.selects.push({id: id + 'new', num: state.length + 1, value: '', options: keys});
+      // state.selects.push({id: id + 'new', num: state.length + 1, value: '', options: keys});
       this.props.valuesCallback(state.values, false);
     } else {
       this.props.valuesCallback(state.values, true);
     }
-    //this.setState(state);
+    // this.setState(state);
   }
 
   componentDidMount() {
@@ -181,8 +180,8 @@ export default class CriteriasForm extends Component {
       const keys = Object.keys(crits);
       if (isNaN(Number(keys[0])) && Object.keys(crits).length === 1 && this.state.values[0] !== Object.keys(this.props.crits)[0]) {
         this.props.valuesCallback([...this.state.values, keys[0]]);
-        //this.setState({values: [...this.state.values, keys[0]]}, () => this.props.valuesCallback(this.state.values, false));
-        //this.handleSelect({target: {value: keys[0], id: this.state.values.length}})
+        // this.setState({values: [...this.state.values, keys[0]]}, () => this.props.valuesCallback(this.state.values, false));
+        // this.handleSelect({target: {value: keys[0], id: this.state.values.length}})
       }
     }
   }
@@ -192,7 +191,7 @@ export default class CriteriasForm extends Component {
     e.stopPropagation();
     try {
       e.target.blur();
-    } catch(error) {}
+    } catch (error) {}
 
     const state = {...this.state};
     let key = Number(e.target.id);
@@ -224,24 +223,26 @@ export default class CriteriasForm extends Component {
             state.selects[i].options = Object.keys(criterion);
           }
         }
-        this.setState(state, () => {this.checkValidity();});
+        this.setState(state, () => {
+this.checkValidity();
+});
         return;
       } else {
         if (deep > 1) {
           state.values[key - 1] = e.target.value;
-          key += deep - 1
+          key += deep - 1;
         }
       }
 
       const d = state.values.length - key;
       for (let i = 0; i < d; i++) {
-        let val = state.values.pop();
+        const val = state.values.pop();
         state.selects.pop();
         state.length -= 1;
       }
 
       if (!deep || deep === 1) {
-        let val = state.values.pop();
+        const val = state.values.pop();
         state.length -= 1;
       }
     }
@@ -279,12 +280,12 @@ export default class CriteriasForm extends Component {
     this.setState(state, () => {
       if (this.lastSelectRef) {
         try {
-          this.lastSelectRef.scrollIntoView({ block: 'nearest'})
+          this.lastSelectRef.scrollIntoView({ block: 'nearest'});
           if (isNaN(Number(keys[0])) && keys.length === 1) {
             this.lastSelectRef.value = keys[0];
             this.lastSelectRef.dispatchEvent(new Event('change'));
           }
-          //this.lastSelectRef.focus();
+          // this.lastSelectRef.focus();
         } catch (e) {}
       }
     });
@@ -352,7 +353,7 @@ export default class CriteriasForm extends Component {
       <DescriptionToCriterion supressDescription={this.props.supressDescription} crit={this.state.crit}/>
       {this.state.crit && this.state.selects.map((item, index) => {
         return (
-          <><div key={item.id} css={animateFadeIn}  style={this.props.experimental ? {marginTop: index !== 0 ? '1rem': 0, marginBottom: '1rem'} : {}}>
+          <><div key={item.id} css={animateFadeIn} style={this.props.experimental ? {marginTop: index !== 0 ? '1rem': 0, marginBottom: '1rem'} : {}}>
             <DescriptionToTermin values={item.options}/>
             {this.props.experimental &&
             <CriteriasOptionsSelector
@@ -362,7 +363,9 @@ export default class CriteriasForm extends Component {
                 onChange={this.handleSelect}
                 id={item.num.toString()}/>}
             {!this.props.experimental && <select
-                ref={(x) => {if (item.num === this.state.length + 1) this.lastSelectRef = x;}}
+                ref={(x) => {
+if (item.num === this.state.length + 1) this.lastSelectRef = x;
+}}
                 className={'form-control selectors' + getSelectColorClass(item)} required
               id={item.num.toString()} css={selectorCss} key={item.uniq}
               defaultValue={item.value || ''} onChange={this.handleSelect} disabled={this.props.disabled}

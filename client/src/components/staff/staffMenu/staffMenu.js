@@ -13,7 +13,7 @@ const rolesDictionary = {
   'SuperAdmin': 'Суперадмин',
   'Admin': 'Администратор',
   'Moderator': 'Проверяющий',
-  'Observer': 'Наблюдатель'
+  'Observer': 'Наблюдатель',
 };
 
 
@@ -25,7 +25,7 @@ class StaffMenu extends Component {
     this.openCurrentContestRating = this.openCurrentContestRating.bind(this);
     this.openCriteriasMenu = this.openCriteriasMenu.bind(this);
     this.openAdminsList = this.openAdminsList.bind(this);
-  };
+  }
 
   openNewAchieves() {
     this.props.history.push('/staff/newAchieves');

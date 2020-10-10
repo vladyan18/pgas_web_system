@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import lock from '../../../img/lock.png';
+import lock from '../../../assets/img/lock.png';
 import { ReactComponent as LogoSPbU } from '../../../assets/img/logo_spbu-compressed-medium.svg';
 import DateInput from "../../common/DateInput";
 import {fetchSendWithoutRes} from "../../../services/fetchService";

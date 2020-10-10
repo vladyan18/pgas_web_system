@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import '../../../style/user_main.css';
-import staffContextStore from "../../../stores/staff/staffContextStore";
-import {withRouter} from "react-router-dom";
-import {fetchGet} from "../../../services/fetchService";
-import {makeExportUsersTable} from "../../../services/exportXLSX";
+import staffContextStore from '../../../stores/staff/staffContextStore';
+import {withRouter} from 'react-router-dom';
+import {fetchGet} from '../../../services/fetchService';
+import {makeExportUsersTable} from '../../../services/exportXLSX';
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
-import {observer} from "mobx-react";
-import CriteriasForm from "../../user/addAchievement/criteriasForm";
-import CenteredMainPanel from "../components/centeredMainPanel";
-
+import {observer} from 'mobx-react';
+import CriteriasForm from '../../user/addAchievement/criteriasForm';
+import CenteredMainPanel from '../components/centeredMainPanel';
 
 
 async function exportExcel(filters) {
@@ -29,16 +28,16 @@ function AddFilter(props) {
                        supressDescription={true}
                        forceEnabled={true}/>
         <button className="btn btn-info" onClick={() => props.setFilters(filter)}> Сохранить </button>
-    </div>
+    </div>;
 }
 
 function StaffExport(props) {
     const [filters, setFilters] = useState([]);
     const [changingFilter, setChangingFilter] = useState();
 
-    return <CenteredMainPanel heading={"Экспорт"}>
+    return <CenteredMainPanel heading={'Экспорт'}>
         <div css={css`margin-bottom: 2rem;`}>
-            {filters && filters.map(x => <p>{x.toString()}</p>)}
+            {filters && filters.map((x) => <p>{x.toString()}</p>)}
             <div>
             {!changingFilter && <button className="btn btn-outline-info" onClick={() => setChangingFilter(true)}>Добавить правило фильтра</button>}
             </div>
@@ -50,7 +49,7 @@ function StaffExport(props) {
         </div>
 
        <button className="btn btn-success" onClick={() => exportExcel(filters)}> Сформировать Excel-таблицу </button>
-    </CenteredMainPanel>
+    </CenteredMainPanel>;
 }
 
-export default observer(withRouter(StaffExport))
+export default observer(withRouter(StaffExport));

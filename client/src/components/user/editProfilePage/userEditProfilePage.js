@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
-import lock from '../../../img/lock.png';
-import logo from '../../../img/gerb.png';
+import lock from '../../../assets/img/lock.png';
+import logo from '../../../assets/img/gerb.png';
 import DateInput from '../../common/DateInput';
 import {fetchSendWithoutRes} from '../../../services/fetchService';
 import {withRouter} from 'react-router-dom';
@@ -50,7 +50,7 @@ class UserEditProfilePage extends Component {
       st.Birthdate = value;
       this.setState(st);
     };
-  };
+  }
 
 
   render() {

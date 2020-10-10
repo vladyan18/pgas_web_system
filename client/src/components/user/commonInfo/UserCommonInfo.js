@@ -3,7 +3,7 @@ import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
-import {Panel, HorizontalLine} from '../../common/style'
+import {Panel, HorizontalLine} from '../../common/style';
 
 function UserCommonInfo(props) {
   return (<Panel className="col-md-9">

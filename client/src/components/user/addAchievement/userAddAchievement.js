@@ -10,12 +10,12 @@ import {FormGroup, OverlayTrigger, Popover} from 'react-bootstrap';
 import HelpButton from '../../common/helpButton';
 import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
-import CriterionSelector from "./criterionSelector";
-import DescriptionToCriterion from "./DescriptionToCriterion";
-import DescriptionField from "./descriptionField";
-import DateField from "./dateField";
-import {Panel, HorizontalLine} from "../../common/style";
-import SaveButton from "./saveButton";
+import CriterionSelector from './criterionSelector';
+import DescriptionToCriterion from './DescriptionToCriterion';
+import DescriptionField from './descriptionField';
+import DateField from './dateField';
+import {Panel, HorizontalLine} from '../../common/style';
+import SaveButton from './saveButton';
 /** @jsx jsx */
 
 const recommendation = css`
@@ -59,7 +59,7 @@ class UserAddAchievement extends Component {
       st.charsInvalid = !isValid;
     } else st.charsInvalid = undefined;
     this.setState(st);
-  };
+  }
 
   updateConfirmations(confirms) {
     const st = this.state;
@@ -165,7 +165,6 @@ class UserAddAchievement extends Component {
   }
 
     render() {
-
     if (!CriteriasStore.criterias) return null;
 
     const getLineColor = function(isInvalid) {
@@ -208,7 +207,9 @@ class UserAddAchievement extends Component {
             {(!this.state.chars || this.state.chars[0] !== this.state.crits[0]) &&<><DescriptionField
                 value={this.state.ach}
                 descrInvalid={this.state.descrInvalid}
-                descriptionRef={(input) => { this.descriptionInputRef = input; }}
+                descriptionRef={(input) => {
+ this.descriptionInputRef = input;
+}}
                 dateRef={() => this.dateRef}
                 updateDescr={this.updateDescr}
                 updateChars={(newValue) => this.setState(newValue)}
@@ -218,7 +219,9 @@ class UserAddAchievement extends Component {
             <DateField
                 onValidityChange={this.onDateValidityChange}
                 onDateChange={this.handleDateChange}
-                dateRef={(input) => { this.dateRef = input; }}
+                dateRef={(input) => {
+ this.dateRef = input;
+}}
             /></>}
 
           <div className="show_hide_c11">

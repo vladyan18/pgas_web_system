@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {css, jsx} from '@emotion/core';
-import criteriasStore, {fetchSendObj} from "../../../stores/criteriasStore";
-import ReactMarkdown from "react-markdown";
-import HelpButton from "../../common/helpButton";
-import {Popover} from "react-bootstrap";
-import userPersonalStore from "../../../stores/userPersonalStore";
+import criteriasStore, {fetchSendObj} from '../../../stores/criteriasStore';
+import ReactMarkdown from 'react-markdown';
+import HelpButton from '../../common/helpButton';
+import {Popover} from 'react-bootstrap';
+import userPersonalStore from '../../../stores/userPersonalStore';
 /** @jsx jsx */
 
 const recommendationStyle = css`
@@ -27,7 +27,7 @@ const fieldStyle = css`
                 font-size: small;
             }
       }   
-`
+`;
 
 const getLineColor = function(isInvalid) {
     if (isInvalid === false) return '#19b319';
@@ -59,7 +59,7 @@ function RecommendationBlock(props) {
         }}>
             {props.value.toString().replace(/,/g, ', ')}
         </div>
-    </div>
+    </div>;
 }
 
 let timer;
@@ -71,7 +71,7 @@ const debounce = (callback, wait = 250) => {
 };
 
 function getValidityClass(val) {
-    if  (val) {
+    if (val) {
         return ' is-invalid';
     }
     if (val === false) {
@@ -106,16 +106,18 @@ function DescriptionField(props) {
             setRecommendation(undefined);
             return;
         }
-        fetchSendObj('/classifyDescription', {data: descr, faculty: userPersonalStore.Faculty}).then(res => {
-            if (userPersonalStore.LastName === 'Волосников')
-                console.log(res.root);
+        fetchSendObj('/classifyDescription', {data: descr, faculty: userPersonalStore.Faculty}).then((res) => {
+            if (userPersonalStore.LastName === 'Волосников') {
+console.log(res.root);
+}
             setRecommendation(res.classifier);
-        })}, 300);
+        });
+}, 300);
 
     useEffect(() => {
         if (textRef) {
-            //textRef.style.height = 'inherit';
-            const height = Math.max(textRef.scrollHeight + 2, 70) + "px";
+            // textRef.style.height = 'inherit';
+            const height = Math.max(textRef.scrollHeight + 2, 70) + 'px';
             if (height !== textRef.style.height) {
                 textRef.style.height = 0;
                 textRef.style.height = height;
@@ -124,7 +126,7 @@ function DescriptionField(props) {
     }, [textRef, props.value]);
     return <div className="form_elem_with_left_border" style={{marginTop: '20px', borderColor: getLineColor(props.descrInvalid)}}>
         <label className="control-label" htmlFor="comment"><b>Название достижения:</b>
-            <HelpButton overlay={achievementPopover} placement={"top"} />
+            <HelpButton overlay={achievementPopover} placement={'top'} />
         </label>
         <textarea
             ref={(textRef) => {
@@ -143,7 +145,7 @@ function DescriptionField(props) {
         />
 
         {!props.disableRecommend && <RecommendationBlock value={recommendation} cb={recommendationCb}/>}
-    </div>
+    </div>;
 }
 
 export default DescriptionField;

@@ -2,14 +2,13 @@ import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import CurrentAchievesTable from './currentAchievesTable';
 import userAchievesStore from '../../../stores/userAchievesStore';
-import userPersonalStore from '../../../stores/userPersonalStore';
 import {observer} from 'mobx-react';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import styled from '@emotion/styled';
 import {BASE_API_URL} from '../../../consts/constants';
-import {withRouter} from "react-router-dom";
-import {HorizontalLine} from "../../common/style";
+import {withRouter} from 'react-router-dom';
+import {HorizontalLine} from '../../common/style';
 
 // a20800
 const mainButton = css`
@@ -46,7 +45,7 @@ class UserAchieves extends Component {
     this.state = {archiveHidden: true};
     this.checkConfirms = this.checkConfirms.bind(this);
     this.toggleArchiveHide = this.toggleArchiveHide.bind(this);
-  };
+  }
 
   toggleArchiveHide() {
     this.setState({archiveHidden: !this.state.archiveHidden});
@@ -117,7 +116,7 @@ class UserAchieves extends Component {
         </div>
 
         <HorizontalLine/>
-        <div style={{display:'flex'}}>
+        <div style={{display: 'flex'}}>
         {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
         {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
         <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>Предварительный балл: {summaryPreliminaryBall}</div>}
@@ -163,7 +162,7 @@ class UserAchieves extends Component {
   }
 }
 
-//#9b1818
-//#129b41
+// #9b1818
+// #129b41
 
 export default withRouter(observer(UserAchieves));

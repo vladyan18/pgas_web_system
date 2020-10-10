@@ -13,7 +13,7 @@ class StaffAnnotationsPage extends Component {
     if (staffContextStore.annotations) this.state.annotation = staffContextStore.annotations;
     if (staffContextStore.learningProfile) this.state.learningProfile = staffContextStore.learningProfile;
     if (staffContextStore.languagesForPublications) this.state.languagesForPublications = staffContextStore.languagesForPublications;
-  };
+  }
 
   async componentDidMount() {
     if (!staffContextStore.criterias || !staffContextStore.schema) {

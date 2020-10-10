@@ -6,7 +6,7 @@ import {observer} from 'mobx-react';
 
 /** @jsx jsx */
 import {css, jsx} from '@emotion/core';
-import userAchievesStore from "../../../stores/userAchievesStore";
+import userAchievesStore from '../../../stores/userAchievesStore';
 
 const LeftNavbar = css`
   width: 90%;
@@ -72,4 +72,4 @@ function UserNavbar(props) {
   </div>;
 }
 
-export default observer(UserNavbar)
+export default observer(UserNavbar);

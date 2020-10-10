@@ -8,7 +8,7 @@ class DateInput extends Component {
     this.state = {isValid: true, value: ''};
     if (props.defaultValue) this.state.value = props.defaultValue;
     this.handleDateChange = this.handleDateChange.bind(this);
-  };
+  }
 
   handleDateChangeLeg(e) {
     const st = this.state;

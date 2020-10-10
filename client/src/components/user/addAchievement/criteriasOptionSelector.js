@@ -15,7 +15,7 @@ const charsDictionary = {
     'Заруб. изд.': 'Зарубежное издание',
     'Росс. изд.': 'Российское издание',
     'ММК': 'Материалы международной конференции',
-    'Документ, удостоверяющий исключительное право студента на достигнутый им научный (научно-методический, научно-технический, научно-творческий) результат интеллектуальной деятельности (патент, свидетельство)': 'Исключительное право на достигнутый научный результат интеллектуальной деятельности (патент, свидетельство)'
+    'Документ, удостоверяющий исключительное право студента на достигнутый им научный (научно-методический, научно-технический, научно-творческий) результат интеллектуальной деятельности (патент, свидетельство)': 'Исключительное право на достигнутый научный результат интеллектуальной деятельности (патент, свидетельство)',
 };
 
 function getCharacteristicName(char) {
@@ -29,7 +29,7 @@ const CriteriasOptionsSelector = React.memo(({options, value, disabled, onChange
     function onCheck(e, obj) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('ONCHECK', obj.target.value, obj.target.id)
+        console.log('ONCHECK', obj.target.value, obj.target.id);
         if (disabled) return;
         const value = obj.target.value;
         const result = {target: {value, id}};
@@ -48,9 +48,9 @@ const CriteriasOptionsSelector = React.memo(({options, value, disabled, onChange
             </div>)}
     </div>
 
-    </>
+    </>;
 }, (prevProps, nextProps) => {
     return prevProps.options === nextProps.options && prevProps.value === nextProps.value && prevProps.disabled === nextProps.disabled;
-})
+});
 
 export default CriteriasOptionsSelector;

@@ -45,7 +45,7 @@ class FacultyCreation extends Component {
         }
       });
     };
-  };
+  }
 
 
   render() {

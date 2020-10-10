@@ -13,7 +13,7 @@ class AchievesGroup extends Component {
     this.toggleHide = this.toggleHide.bind(this);
     this.toggleRating = this.toggleRating.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
-  };
+  }
 
   toggleModal() {
     if (this.state.modalIsOpen) {
