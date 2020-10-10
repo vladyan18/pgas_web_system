@@ -22,7 +22,8 @@ module.exports = {
         'valid-jsdoc': 'off',
         'linebreak-style': 'off',
         'indent': 'off',
-        'object-curly-spacing': 'off'
+        'object-curly-spacing': 'off',
+        'new-cap': 'off'
     },
     "plugins": [
        // "security"

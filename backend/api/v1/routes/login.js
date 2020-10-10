@@ -2,7 +2,6 @@
 const express = require('express');
 // eslint-disable-next-line new-cap
 const router = express.Router();
-const loginService = require('../../../services/login');
 const authenticate = require('../../../middlewares/authenticate');
 
 router.post('/login', authenticate,

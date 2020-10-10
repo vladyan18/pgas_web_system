@@ -213,6 +213,7 @@ function attendInTable(cellValue, columnIndex, rowIndex, sheet, Table, lastCritI
     let currentRepIndex = 0;
 
     addToSchema(categoryList, typesList, schema);
+    // eslint-disable-next-line no-constant-condition
     while (true) {
         if (!(categoryList[currentRepIndex] in prevRep)) {
             ierarchyAttend(prevRep, currentRepIndex, categoryList, value);

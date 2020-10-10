@@ -184,7 +184,6 @@ exports.findActualAchieves = async function(userId) {
 };
 
 exports.registerUser = async function(userId, {LastName, FirstName, Patronymic, Birthdate, Faculty, Course, Type, Settings}) { // TODO refactor
-    console.log(LastName)
     await UserModel.findOneAndUpdate({id: userId}, {
         $set: {
             LastName,

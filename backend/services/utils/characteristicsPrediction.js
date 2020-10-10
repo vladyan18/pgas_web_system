@@ -2,6 +2,7 @@ const db = require('../../dataLayer');
 const natural = require('natural');
 
 const plainEK3Crits = [];
+// eslint-disable-next-line no-unused-vars
 let roots = [];
 function getCrit(crits, arr) {
     const critNames = Object.keys(crits);

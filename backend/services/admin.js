@@ -93,6 +93,7 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
         await db.changeAchieveStatus(achId, action === 'Accept');
     } else {
         const changePromise = db.changeAchieveStatus(achId, action === 'Accept');
+        // eslint-disable-next-line no-unused-vars
         const [userInner, changeResult] = await Promise.all([userPromise, changePromise]);
         user = userInner;
     }
@@ -130,8 +131,6 @@ module.exports.getAdmins = async function(facultyName, userId) { // TODO securit
 module.exports.getStatisticsForFaculty = async function(facultyName) { // TODO refactor
     const students = await db.getUsersWithAllInfo(facultyName, true);
 
-    let articlesIndexCol = 3;
-    if (facultyName === 'Физфак') articlesIndexCol = 2;
     let achCount = 0;
     const critsCounts = {};
     const critsBalls = {};
