@@ -8,6 +8,7 @@ const observerAuthCheck = require('../../../middlewares/authCheck').observer;
 const adminService = require('../../../services/admin');
 const userService = require('../../../services/user');
 const documentsService = require('../../../services/documents');
+const historyService = require('../../../services/historyNotesController');
 
 router.post('/comment', moderatorAuthCheck,
     async function(req, res) {
@@ -17,20 +18,20 @@ router.post('/comment', moderatorAuthCheck,
 
 router.post('/adm_update_achieve', moderatorAuthCheck,
     async function(req, res) {
-        const achievement = req.body;
-        await adminService.changeAchievement(achievement, req.userId);
+        const achievement = req.body.achievement;
+        await adminService.changeAchievement(achievement, req.body.userId); // TODO WHAT THE FUCK?
         res.sendStatus(200);
     });
 
 router.post('/AchSuccess', moderatorAuthCheck,
     async function(req, res) {
-        await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Accept');
+        await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Accept', req.userId);
         res.sendStatus(200);
     });
 
 router.post('/AchFailed', moderatorAuthCheck,
     async function(req, res) {
-        await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Decline');
+        await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Decline', req.userId);
         res.sendStatus(200);
     });
 
@@ -100,9 +101,10 @@ router.get('/getStatistics', observerAuthCheck,
         res.status(200).send(statistics);
     });
 
-router.get('/getHistory', moderatorAuthCheck, // TODO IMPLEMENT
+router.get('/achHistory', moderatorAuthCheck,
     async function(req, res) {
-        throw new Error('Not implemented');
+        const history = await historyService.getHistoryForAchievement(req.query.achId);
+        res.status(200).send(history);
     });
 
 router.get('/subscribeOnUsersUpdates', observerAuthCheck,

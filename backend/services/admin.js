@@ -3,6 +3,7 @@ const { getCurrentDate, getFIO, statusCheck } = require('../helpers');
 const { achievementsProcessing } = require('./utils');
 const { Statuses } = require('../../common/consts');
 const notifyService = require('./notifyService');
+const historyNotes = require('./historyNotesController');
 
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
@@ -79,7 +80,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
     return info;
 };
 
-module.exports.changeAchievementStatus = async function(userId, achId, action) {
+module.exports.changeAchievementStatus = async function(userId, achId, action, requesterId) {
     const userPromise = db.findUserByInnerId(userId);
     let user;
     if (action === 'Accept') {
@@ -101,7 +102,7 @@ module.exports.changeAchievementStatus = async function(userId, achId, action) {
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
     messageBus.emit('message_' + user.Faculty);
-    // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
+    historyNotes.writeToHistory(requesterId, userId, achId, action).then();
 };
 
 module.exports.getRating = async function(faculty) {

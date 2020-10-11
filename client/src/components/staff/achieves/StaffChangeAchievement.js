@@ -1,21 +1,38 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import AchievementDateInput from '../../common/AchievementDateInput';
-import {fetchSendWithoutRes} from '../../../stores/criteriasStore';
+import {fetchGet, fetchSendWithoutRes} from '../../../stores/criteriasStore';
 import CriteriasForm from '../../user/addAchievement/criteriasForm';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 import Table from '../../common/table';
 import {ConfirmationColumns} from '../../user/confirmation/ConfirmationColumns';
 import {getDate} from '../../../helpers';
 
+function HistoryNote({history}) {
+  if (!history || history.length === 0) return null;
+  const lastNote = history[history.length - 1];
+  const author = lastNote.authorId;
+  const authorName = author.LastName + ' ' + author.FirstName[0] + '. ' + (author.Patronymic ? author.Patronymic[0] + '.' : '');
+  let actionTitle = ''
+  if (lastNote.action === 'Accept') {
+    actionTitle = 'Принял';
+  } else if (lastNote.action === 'Decline') {
+    actionTitle = 'Отклонил';
+  } else {
+    return null;
+  }
+
+  return <p style={{textAlign: 'right', marginBottom: 0, color: 'grey'}}>{actionTitle}: {authorName}</p>;
+}
+
 class StaffChangeAchievement extends Component {
   constructor(props) {
     super(props);
     const user = this.props.users.find((x) => x.Achievements.find((ach) => ach._id.toString() == this.props.achId));
     const achieve = user.Achievements.find((ach) => ach._id.toString() == this.props.achId);
-
     this.state = {
       user: user.user,
+      userId: user.userId,
       achId: achieve._id,
       dateValidationResult: true,
       changeChars: false,
@@ -33,6 +50,10 @@ class StaffChangeAchievement extends Component {
     this.updateChars = this.updateChars.bind(this);
     this.updateComment = this.updateComment.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
+  }
+
+  componentDidMount() {
+    fetchGet('/achHistory', {achId: this.state.achId}).then((x) => this.setState({history: x}));
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -90,7 +111,7 @@ class StaffChangeAchievement extends Component {
       }
     }
     res._id = this.props.achId;
-    fetchSendWithoutRes('/api/adm_update_achieve', res).then((result) => {
+    fetchSendWithoutRes('/api/adm_update_achieve', {achievement: res, userId: this.state.userId}).then((result) => {
       if (result) this.props.closeModal();
     });
   }
@@ -179,7 +200,7 @@ class StaffChangeAchievement extends Component {
 
         </div>
 
-
+        <HistoryNote history={this.state.history}/>
         <button id="DeleteButton" className="btn btn-warning" style={{marginTop: '3rem'}}
           value="Назад" disabled={!this.state.hasChanges} onClick={this.saveChanges}>Сохранить
         </button>
