@@ -137,8 +137,14 @@ class StaffStudentsRating extends Component {
     render() {
         let filtered = this.props.data;
         let sorted = [];
-
         if (filtered) {
+            for (let i = 0; i < filtered.length; i++) {
+                const sums = [0, 0, 0, 0, 0];
+                for (const crit of Object.keys(filtered[i].Crits)) {
+                    sums[getAreaNum(crit, this.props.crits)] += filtered[i].Crits[crit];
+                }
+                filtered[i].sums = sums;
+            }
             sorted = filtered.sort(function (obj1, obj2) {
                 let diff = obj2.Ball - obj1.Ball;
                 if (diff != 0)
@@ -151,14 +157,7 @@ class StaffStudentsRating extends Component {
                     return 0
                 }
             });
-        }
 
-        for (let i = 0; i < filtered.length; i++) {
-            const sums = [0, 0, 0, 0, 0];
-            for (const crit of Object.keys(filtered[i].Crits)) {
-                sums[getAreaNum(crit, this.props.crits)] += filtered[i].Crits[crit];
-            }
-            filtered[i].sums = sums;
         }
         return (
             <MainPanel heading={"Рейтинг студентов"}
