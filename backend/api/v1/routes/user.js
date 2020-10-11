@@ -310,6 +310,10 @@ router.get('/portfolio/:id', async (req, res) => {
     }
 });
 
+router.get('/landing', async (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../../../../client/public/landing.html'));
+});
+
 router.get('/downloadPortfolio', async (req, res) => {
     const html = await userService.getPortfolioHTML(req.userId, req.params.id);
     if (html) {

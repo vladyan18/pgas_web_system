@@ -5,7 +5,7 @@ import {css, jsx} from '@emotion/core';
 import UserMainPanel from '../../common/userMainPanel';
 import userPersonalStore from '../../../stores/userPersonalStore';
 
-const facultiesLinks = {
+const facultiesLinks = { // TODO refactor
     'ПМ-ПУ': 'https://vk.com/stipkomsspmpu',
     'Физический': 'https://vk.com/studsovet_ff',
     'Социологический': 'https://vk.com/soc_studsovet',
@@ -21,7 +21,7 @@ const facultiesLinks = {
     'ВШЖиМК (журналистика)': 'https://vk.com/studsovet.jfspbu',
     'ВШЖиМК (реклама и связи с общественностью)': 'https://vk.com/studsovet.jfspbu',
     'Исторический': 'https://vk.com/istfak_press',
-   // 'Биологический': '',
+    'Биологический': 'https://vk.com/bioss_spbu',
 };
 
 function UserCommonInfo() {
@@ -67,7 +67,7 @@ function UserCommonInfo() {
           {(userPersonalStore.Faculty && facultiesLinks[userPersonalStore.Faculty]) && <div className="blue_bg">
 
               <p className="header_info_desc" style={{fontWeight: '500'}}>
-                  Хотите свзяться с проверяющими, но не знаете, куда писать?
+                  Хотите связаться с проверяющими, но не знаете, куда писать?
               </p>
               <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
                   Соответствующий паблик для Вашего факультета: <a target="_blank" href={facultiesLinks[userPersonalStore.Faculty]} rel="noreferrer">{facultiesLinks[userPersonalStore.Faculty]}</a>
