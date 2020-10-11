@@ -7,15 +7,24 @@ import {withRouter} from "react-router-dom";
 import {css, jsx} from '@emotion/core';
 import styled from '@emotion/styled';
 import MainPanel from "../components/mainPanel";
+import criteriasStore from "../../../stores/criteriasStore";
 
-const Panel = styled.div`
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-    padding: 0 2rem;
-    @media only screen and (max-device-width: 480px) {
-        padding: 0 1rem;
-    }
-`;
+function getAreaNum(critName, criterias) {
+    const critNum = Object.keys(criterias).indexOf(critName);
+    if (critNum === -1) return undefined;
+    const shift = Object.keys(criterias).length === 12 ? 0 : 1;
+
+    if (critNum < 3) return 0;
+    if (critNum < 5) return 1;
+    if (critNum < 7) return 2;
+    if (critNum < 9 + shift) return 3;
+    return 4;
+}
+
+function hasOverhead(user, crit, criterias, limits) {
+    return limits && criterias && user.Crits[crit] > 0 &&
+        (user.sums[getAreaNum(crit, criterias)] > limits[getAreaNum(crit, criterias)]);
+}
 
 class StaffStudentsRating extends Component {
     constructor(props) {
@@ -97,14 +106,21 @@ class StaffStudentsRating extends Component {
 
 
         for (let i = 0; i < crits.length; i++) {
-            console.log(crits[i])
             this.columns.push({
                 dataField: "Crits." + crits[i] + "",
                 text: critsNames[i],
                 headerClasses: 'text-center',
                 headerStyle: {'vertical-align': 'middle', fontSize:'x-small', padding: '3px'},
                 style: {'vertical-align': 'middle', fontSize:'x-small', padding: '3px'},
-                classes: 'text-center'
+                classes: 'text-center',
+                formatter: (cell, row) => {
+                    const hasOh = hasOverhead(row, crits[i], this.props.crits, this.props.limits);
+                    if (hasOh) return <span
+                        title='Суммарный балл за область превышает установленное ограничение, поэтому при итоговом суммировании он будет считаться с ограничением.'
+                        style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', color: 'red' }}
+                    >{row.Crits[crits[i]]}</span>;
+                    return  row.Crits[crits[i]];
+                }
             })
         }
         if (!this.props.userMode)
@@ -118,20 +134,8 @@ class StaffStudentsRating extends Component {
         this.setState({columns: this.columns})
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
-        if (this.props.faculty == 'ВШЖиМК' && this.props.directions && this.props.directions.length > 0)
-            if (!this.state.currentDirection)
-                this.setState({currentDirection: this.props.directions[0]})
-
-
-    }
-
     render() {
         let filtered = this.props.data;
-        if (this.props.faculty == 'ВШЖиМК' && this.state.currentDirection) {
-            filtered = filtered.filter(x => x.Direction == this.state.currentDirection)
-        }
         let sorted = [];
 
         if (filtered) {
@@ -149,6 +153,13 @@ class StaffStudentsRating extends Component {
             });
         }
 
+        for (let i = 0; i < filtered.length; i++) {
+            const sums = [0, 0, 0, 0, 0];
+            for (const crit of Object.keys(filtered[i].Crits)) {
+                sums[getAreaNum(crit, this.props.crits)] += filtered[i].Crits[crit];
+            }
+            filtered[i].sums = sums;
+        }
         return (
             <MainPanel heading={"Рейтинг студентов"}
                        panelClass={"col-md-9"}

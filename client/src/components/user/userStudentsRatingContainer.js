@@ -69,6 +69,7 @@ return Number.parseInt(obj1.crit.substr(0, 2)) - Number.parseInt(obj2.crit.subst
                                   directions={userPersonalStore.Direction ? [userPersonalStore.Direction] : undefined}
                                   userMode={true}
                                   crits={criteriasStore.criterias}
+                                  limits={criteriasStore.limits}
                                   data={this.state.users}
                                   toggleDetailedModeCallback={(this.state.isDetailedMode === false) ? this.toggleMode : undefined}
       />;

@@ -8,6 +8,7 @@ import {css, jsx} from '@emotion/core';
 import {BASE_API_URL} from '../../../consts/constants';
 import {withRouter} from 'react-router-dom';
 import UserMainPanel from '../../common/userMainPanel';
+import criteriasStore from "../../../stores/criteriasStore";
 
 // a20800
 const mainButton = css`
@@ -35,6 +36,52 @@ const panelCSS = css`
     }
 `;
 
+
+function getAreaNum(critName, kri) {
+  const critNum = Object.keys(kri).indexOf(critName);
+  if (critNum === -1) return undefined;
+  const shift = Object.keys(kri).length === 12 ? 0 : 1;
+
+  if (critNum < 3) return 0;
+  if (critNum < 5) return 1;
+  if (critNum < 7) return 2;
+  if (critNum < 9 + shift) return 3;
+  return 4;
+}
+
+function sumOfBalls(achievements, isPreliminary) {
+  const criterias = criteriasStore.criterias;
+  const limits = criteriasStore.limits;
+
+  let sumBall = 0;
+  const crits = {};
+  const sums = [0, 0, 0, 0, 0];
+  for (const key of Object.keys(criterias)) {
+    crits[key] = 0;
+  }
+  achievements.forEach((ach) => {
+    if (ach && ( isPreliminary || (ach.status === 'Принято' || ach.status === 'Принято с изменениями'))) {
+      const ball = isPreliminary ? ach.preliminaryBall : ach.ball;
+      if (ball) {
+        crits[ach.crit] += ball;
+        sumBall += ball;
+        sums[getAreaNum(ach.crit, criterias)] += ball;
+      }
+    }
+  });
+
+  let hasOverhead = false;
+  if (limits) {
+    for (let i = 0; i < sums.length; i++) {
+      if (sums[i] > limits[i]) {
+        hasOverhead = true;
+        const delta = sums[i] - limits[i];
+        sumBall -= delta;
+      }
+    }
+  }
+  return {summaryBall: sumBall, hasOverhead};
+}
 
 class UserAchieves extends Component {
   constructor(props) {
@@ -77,19 +124,11 @@ class UserAchieves extends Component {
   }
 
   render() {
-    let summaryBall = 0;
-    let summaryPreliminaryBall = 0;
-    if (userAchievesStore.achieves) {
-      for (const ach of userAchievesStore.achieves) {
-        if (ach.status === 'Принято' || ach.status === 'Принято с изменениями') {
-          summaryBall += ach.ball;
-        }
-        if (ach.preliminaryBall) {
-          summaryPreliminaryBall += ach.preliminaryBall;
-        }
-      }
-    }
     if (!userAchievesStore.achieves) return null;
+
+    const {summaryBall, hasOverhead} = sumOfBalls(userAchievesStore.achieves, false);
+    const {summaryBall: summaryPreliminaryBall, hasOverhead: hasPreliminaryOverhead} = sumOfBalls(userAchievesStore.achieves, true);
+
     return (<UserMainPanel title={<b style={{fontSize: '1.2rem'}}>Текущие достижения</b>} panelCSS={panelCSS}
         buttons={
           <form action={BASE_API_URL + '/getAnket'} onSubmit={this.checkConfirms}>
@@ -98,9 +137,16 @@ class UserAchieves extends Component {
         }
         >
         <div style={{display: 'flex'}}>
-        {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: {summaryBall}</div>}
+          {summaryBall > 0 && <div css={css`font-size: small; margin-bottom: 1rem;`}>Суммарный балл: <span
+              style={hasOverhead ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : {}} title={hasOverhead && 'Достигнут предел баллов в одной или нескольких областях деятельности'}>{summaryBall}
+          </span></div>}
         {summaryPreliminaryBall > 0 && summaryBall !== summaryPreliminaryBall &&
-        <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>Предварительный балл: {summaryPreliminaryBall}</div>}
+        <div style={summaryBall > 0 ? {marginLeft: '2rem'} : {}} css={css`font-size: small; margin-bottom: 1rem; color: grey;`}>
+          Предварительный балл: <span
+            style={hasPreliminaryOverhead ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : {}} title={hasPreliminaryOverhead && 'Достигнут предел баллов в одной или нескольких областях деятельности'}>
+          {summaryPreliminaryBall}
+        </span>
+        </div>}
         </div>
         <div css={css`width: 100%; min-height: 10rem;`}>
             {userAchievesStore.achieves && <CurrentAchievesTable currentAchieves={userAchievesStore.achieves}/>}

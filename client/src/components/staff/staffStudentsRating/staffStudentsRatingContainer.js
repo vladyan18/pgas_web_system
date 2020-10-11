@@ -27,6 +27,7 @@ class StaffStudentsContainer extends Component {
                   faculty={staffContextStore.faculty}
                   directions={staffContextStore.directions}
                   crits={staffContextStore.criterias}
+                  limits={staffContextStore.limits}
                   data={CurrentContestRatingStore.users}/>
                 </main> ||
             null;
