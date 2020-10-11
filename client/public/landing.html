@@ -22,13 +22,28 @@
                 opacity: 1;
             }
         }
+
+        .header_title {
+            max-width: 100%;
+        }
+
+        .centered_v {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        @media screen and (max-width: 700px) {
+            .header_title {
+                font-size: x-small;
+            }
+        }
     </style>
 </head>
 <body style="background-color: #ffffff; margin-bottom: 2rem;">
 
 <header>
     <div class="row pageTop" style="border: none;">
-        <div class="blockHeader">
+        <div class="blockHeader" style="max-width: 70%">
             <a href="https://spbu.ru" target="_blank" rel="noopener noreferrer">
                 <div class="logoSpbuBackground">
                     <svg width="62.667" height="72" viewBox="0 0 47 54" fill="rgb(30.980392%,36.078431%,40.392157%)"
@@ -53,10 +68,10 @@
                     </svg>
                 </div>
             </a>
-            <div class="p_header">
-                <span>Студенческий совет СПбГУ</span>
-                <br>
-                <span style="padding-left: 13px; color: black">Система учета достижений</span>
+            <div class="p_header header_title">
+                <span class="centered_v">Студенческий совет СПбГУ</span>
+
+                <span class="centered_v" style="padding-left: 13px; color: black">Система учета достижений</span>
             </div>
         </div>
     </div>
@@ -74,7 +89,7 @@
                 </svg>
                 </div>
                 <div style="display: flex; justify-content: center; margin-top: 2rem;">
-                <p style="text-align: justify;  width: 720px">Информационная система для подачи и учета достижений, используемая
+                <p style="text-align: justify;  max-width: 720px">Информационная система для подачи и учета достижений, используемая
                     в целях проведения конкурса на повышенную государственную академическую стипендию. На данный момент сервис используют, совместно
                     с традиционными способами подачи, 16 направлений обучения.</p>
                 </div>
@@ -102,10 +117,10 @@
                     </details>
                 </div>
                 <section style="margin-top: 4rem; display:flex; justify-content: center; animation: fade-in 1s ease;">
-                    <div style="width: 720px">
+                    <div style="max-width: 720px">
                     <h2 style="font-size: 1.5rem;">Зачем использовать систему?</h2>
                         <br/>
-                    <p style="text-align: justify;  width: 720px">
+                    <p style="text-align: justify;  max-width: 720px">
                         При разработке системы главной целью ставилось упрощение всего процесса для обучающегося, чему служит максимально простой интерфейс,
                         требующий от студента минимальное количество необходимых усилий и подсказывающий, как правильно заполнить данные для ПГАС.
                         <br/><br/>
@@ -122,10 +137,10 @@
                     </div>
                 </section>
             <section style="margin-top: 4rem; display:flex; justify-content: center; animation: fade-in 1s ease;">
-                <div style="width: 720px">
+                <div style="max-width: 720px">
                     <h2 style="font-size: 1.5rem;">Кто и зачем разрабатывал систему?</h2>
                     <br/>
-                    <p style="text-align: justify;  width: 720px">
+                    <p style="text-align: justify;  max-width: 720px">
                         Система разработана <a href="https://vk.com/digital_bss" target="_blank">активистом</a> Студенческого совета (совета обучающихся) СПбГУ на добровольной основе
                         в целях упрощения и цифровизации процесса учета достижений в Санкт-Петербургском государственном университете.
                         <span style="color: grey; font-weight: lighter">Вы можете обратиться по ссылке, если хотите помочь или выразить благодарность.</span>
