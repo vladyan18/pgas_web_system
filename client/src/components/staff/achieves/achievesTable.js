@@ -8,6 +8,12 @@ import Table from '../../common/table'
 import staffContextStore from "../../../stores/staff/staffContextStore";
 import userPersonalStore from '../../../stores/userPersonalStore';
 import ReactMarkdown from 'react-markdown';
+import {Statuses} from "../../../../../common/consts";
+
+function needToShowConfirmationsAlert(row) {
+    if (row.crit === '7а' || row.crit === '1 (7а)' || row.status === Statuses.DECLINED) return false;
+    return (!row.confirmations || row.confirmations.length === 0);
+}
 
 class AchievesTable extends Component {
 
@@ -19,6 +25,7 @@ class AchievesTable extends Component {
         this.edit = this.edit.bind(this);
         this.handleCommentChange = this.handleCommentChange.bind(this);
         this.auto_grow = this.auto_grow.bind(this);
+        this.statusFormatter = this.statusFormatter.bind(this);
     };
 
     auto_grow(e) {
@@ -32,7 +39,8 @@ class AchievesTable extends Component {
     );
 
     charsFormatter = (cell, row) =>
-        (
+        (   <>
+                {needToShowConfirmationsAlert(row) && <span style={{color: 'red'}}>Нет подверждений</span>}
             <div style={{"display": "flex", 'flexWrap': "wrap", "maxWidth": "20rem"}}>
                 {row.chars.map((x) => {
                     let str = x;
@@ -42,6 +50,7 @@ class AchievesTable extends Component {
                     return (<div key={row._id.toString() + x} className="charsItem">{str}</div>)
                 })}
             </div>
+            </>
         );
 
     newComments = {};

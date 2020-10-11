@@ -6,6 +6,11 @@ import './tableStyles.css';
 import { Statuses } from '../../../consts';
 import Table from '../../common/table'
 
+function needToShowConfirmationsAlert(row) {
+    if (row.crit === '7а' || row.crit === '1 (7а)' || row.status === Statuses.ACCEPTED) return false;
+    return (!row.confirmations || row.confirmations.length === 0);
+}
+
 const achievementFormatter = function(cell, row) {
   let statusTitle = null;
   if (row.status !== 'Принято на рассмотрение')
@@ -13,11 +18,16 @@ const achievementFormatter = function(cell, row) {
     fontSize: "x-small",
     color: "#434343"
     }}>{row.status}</div>;
-  return <><span style={{marginRight: "1rem"}}><b>{ row.crit }</b></span>{ row.achievement }{statusTitle}</>;
+
+  return <div><span style={{marginRight: "1rem"}}><b>{ row.crit }</b></span>{ row.achievement }{statusTitle} {
+      needToShowConfirmationsAlert(row) &&
+      <span style={{color: '#ea0000', fontSize: 'small'}}>Не приложено подтверждение!</span>
+  }</div>;
 };
 
 
-const columns = [{
+const columns = [
+{
   dataField: 'achievement',
   text: 'Достижение',
   style: {width: '50%', textAlign: 'left', verticalAlign: 'middle'},
@@ -58,18 +68,25 @@ class CurrentAchievesTable extends Component {
     };
 
     rowClasses(row) {
-    const baseClass = 'user-table__achieveRow';
+    let baseClass = 'user-table__achieveRow';
     switch (row.status) {
       case Statuses.DECLINED:
-        return baseClass + ' user-table__declined-row';
+        baseClass += ' user-table__declined-row';
+        break;
       case Statuses.INCORRECT:
-        return baseClass + ' user-table__incorrect-row';
+        baseClass += ' user-table__incorrect-row';
+        break;
       case Statuses.CHANGED:
-        return baseClass + ' user-table__edited-row';
+        baseClass += ' user-table__edited-row';
+        break;
       case Statuses.CHANGED_AND_ACCEPTED:
       case Statuses.ACCEPTED:
-        return baseClass + ' user-table__accepted-row';
+        baseClass += ' user-table__accepted-row';
     }
+
+       if (needToShowConfirmationsAlert(row)) {
+           baseClass += ' without_confirmation';
+       }
     return baseClass;
   };
 

@@ -23,3 +23,7 @@
 .user-table__incorrect-row {
     background-color: #f38a00;
 }
+
+.without_confirmation {
+    border-left: 5px solid #ffb500;
+}
