@@ -3,6 +3,26 @@ import '../../../style/commonInfo.css';
 import {css, jsx} from '@emotion/core';
 /** @jsx jsx */
 import UserMainPanel from '../../common/userMainPanel';
+import userPersonalStore from '../../../stores/userPersonalStore';
+
+const facultiesLinks = {
+    'ПМ-ПУ': 'https://vk.com/stipkomsspmpu',
+    'Физический': 'https://vk.com/studsovet_ff',
+    'Социологический': 'https://vk.com/soc_studsovet',
+    'Химический': 'https://vk.com/chemstudsovet',
+    'Юридический': 'https://vk.com/jurfak.studsovet',
+    'ИНОЗ (География)': 'https://vk.com/studsovet_geofak',
+    'Медицинский': 'https://vk.com/grants_medspbu',
+    'ФМО': 'https://vk.com/sirspbu',
+   // 'ВШМ': '',
+    'Политологии': 'https://vk.com/studsovetfp',
+    'Психологии': 'https://vk.com/studentunionpsy',
+    'МКН': 'https://vk.com/scmcsspbu',
+    'ВШЖиМК (журналистика)': 'https://vk.com/studsovet.jfspbu',
+    'ВШЖиМК (реклама и связи с общественностью)': 'https://vk.com/studsovet.jfspbu',
+    'Исторический': 'https://vk.com/istfak_press',
+   // 'Биологический': '',
+};
 
 function UserCommonInfo() {
   return (
@@ -36,25 +56,31 @@ function UserCommonInfo() {
 
       <div className="blue_bg">
         <p className="header_info_desc" style={{fontWeight: '500'}}>
-                    Объявлен прием заявлений на академическую стипендию в повышенном размере
+                    Сроки проверки ПГАС в этом семестре
         </p>
         <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
-                    Уважаемые студенты!
-          <br/>
-                    Сотрудники учебных отделов по направлениям в срок до 17:45 2 октября 2020 года принимают от
-                    студентов Университета, получающих академическую стипендию, заявления-анкеты на повышенную
-                    государственную академическую стипендию, заполненные только в электронном виде и распечатанные в
-                    соответствии с установленной формой.
+                    Проверка заявлений на ПГАС в этом семестре продлится по 13.10.2020. <br/>
+                    Апелляции будут проходить с 14.10.2020 по 19.10.2020 <br/>
+                    Окончательные результаты проверки должны быть получены не позднее 23.10.2020
         </p>
       </div>
+          {(userPersonalStore.Faculty && facultiesLinks[userPersonalStore.Faculty]) && <div className="blue_bg">
+
+              <p className="header_info_desc" style={{fontWeight: '500'}}>
+                  Хотите свзяться с проверяющими, но не знаете, куда писать?
+              </p>
+              <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
+                  Соответствующий паблик для Вашего факультета: <a target="_blank" href={facultiesLinks[userPersonalStore.Faculty]} rel="noreferrer">{facultiesLinks[userPersonalStore.Faculty]}</a>
+              </p>
+          </div>}
+
       <div className="blue_bg">
 
         <p className="header_info_desc" style={{fontWeight: '500'}}>
-                    Обнаружили ошибку или неточность? Есть вопросы по работе системы?
+                    Есть вопросы по работе системы?
         </p>
         <p className="desc_selectors desc_criterion_dspo " style={{backgroundColor: '#e1f1ff', color: '#020202'}}>
-                    По всем вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/stipkomsspmpu" rel="noreferrer"> Стипкома
-                    Студсовета ПМ-ПУ.</a>
+                    По всем техническим вопросам можно обращаться в личные сообщения <a target="_blank" href="https://vk.com/digital_bss" rel="noreferrer"> паблика разработчика</a>.
         </p>
       </div>
       </UserMainPanel>
