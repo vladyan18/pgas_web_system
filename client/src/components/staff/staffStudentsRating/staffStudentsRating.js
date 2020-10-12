@@ -34,6 +34,10 @@ class StaffStudentsRating extends Component {
 
         this.handleDirectionSelect = this.handleDirectionSelect.bind(this);
         this.toggleDetailedMode = this.toggleDetailedMode.bind(this);
+
+        this.accessNotAllowedNotify = () => {
+            alert('Подробный рейтинг доступен только тем, кто открыл доступ к своим достижениям для участников конкурса \n(на странице "Мой профиль")');
+        }
     };
 
     numFormatter = (cell, row, rowIndex) => (rowIndex + 1);
@@ -164,9 +168,9 @@ class StaffStudentsRating extends Component {
                        panelClass={"col-md-9"}
             buttons={
                 <>
-                    {this.props.toggleDetailedModeCallback &&
+                    {this.props.userMode &&
                     <button id="DeleteButton" style={{marginLeft: '1rem'}} className="btn btn-outline-info"
-                            value="Подробно" onClick={this.toggleDetailedMode}>Подробно</button>}
+                            value="Подробно" onClick={this.props.toggleDetailedModeCallback ? this.toggleDetailedMode : this.accessNotAllowedNotify}>Подробно</button>}
                     {!this.props.userMode && <form action="/api/getResultTable" style={{marginLeft: '1rem'}}>
                         <input type="hidden" name="faculty" value={staffContextStore.faculty} />
                         <input type="submit" id="download" className="btn btn-primary" value="Скачать"/>

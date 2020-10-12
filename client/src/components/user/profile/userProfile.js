@@ -160,6 +160,17 @@ class UserProfile extends Component {
           </tbody>
         </table>
 
+          <div style={{cursor: 'pointer', marginTop: '3rem', marginBottom: '2rem'}}>
+            <OverlayTrigger trigger={['hover', 'focus']} placement="left"
+                            overlay={allowAccessPopover} >
+              <div className="checkbox" style={{color: 'green'}}>
+                <input type="checkbox" id="checkbox_1" defaultChecked={userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed}
+                       onChange={this.handlePrivacyChange} style={{cursor: 'pointer', marginRight: '5px'}}/>
+                <label htmlFor="checkbox_1" style={{cursor: 'pointer'}}>Открыть участникам доступ к моим достижениям</label>
+              </div>
+            </OverlayTrigger>
+          </div>
+
       <div style={{margin: '3rem 0 1rem 0'}}>
         <hr/>
         <b>Управление Портфолио</b>
@@ -177,16 +188,6 @@ class UserProfile extends Component {
 
       <hr/>
 
-        <div style={{cursor: 'pointer', marginTop: '3rem', marginBottom: '2rem'}}>
-        <OverlayTrigger trigger={['hover', 'focus']} placement="left"
-                        overlay={allowAccessPopover} >
-          <div className="checkbox" style={{color: 'green'}}>
-            <input type="checkbox" id="checkbox_1" defaultChecked={userPersonalStore.Settings && userPersonalStore.Settings.detailedAccessAllowed}
-            onChange={this.handlePrivacyChange} style={{cursor: 'pointer', marginRight: '5px'}}/>
-            <label htmlFor="checkbox_1" style={{cursor: 'pointer'}}>Открыть участникам доступ к моим достижениям</label>
-          </div>
-        </OverlayTrigger>
-        </div>
     </UserMainPanel>);
   }
 }
