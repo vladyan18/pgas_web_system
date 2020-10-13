@@ -46,9 +46,9 @@ function UserCommonInfo() {
           </a>
           <br/>
           <a target="_blank"
-            href="https://students.spbu.ru/files/Postanovlenie_US-PAS-2019.pdf" rel="noreferrer">
+            href="https://spbu.ru/sites/default/files/20200615_5386_1.pdf" rel="noreferrer">
             <span className="name_doc">
-                                                Постановление УС об определении размера ПГАС
+                                                Постановление УС об определении размера ПГАС в 2020 году
             </span>
           </a>
         </p>
