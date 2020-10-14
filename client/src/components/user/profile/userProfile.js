@@ -92,7 +92,11 @@ class UserProfile extends Component {
     user.Type = userOld.Type;
     user.Course = userOld.Course;
 
-    user.Settings = { detailedAccessAllowed: e.target.checked};
+    user.Settings = userOld.Settings;
+    if (!user.Settings) {
+      user.Settings = {};
+    }
+    user.Settings.detailedAccessAllowed = e.target.checked;
 
     fetchSendWithoutRes('/api/registerUser', user).then(() => {
       userPersonalStore.update().then();
