@@ -7,6 +7,9 @@ import staffContextStore from '../../../stores/staff/staffContextStore';
 import Table from '../../common/table';
 import {ConfirmationColumns} from '../../user/confirmation/ConfirmationColumns';
 import {getDate} from '../../../helpers';
+import HideIfForMyself from "./HideIfForMyself";
+import HideForObserver from "./HideIfForObserver";
+import userPersonalStore from "../../../stores/userPersonalStore";
 
 function HistoryNote({history}) {
   if (!history || history.length === 0) return null;
@@ -154,6 +157,7 @@ class StaffChangeAchievement extends Component {
           className="control-label col-xs-2">Достижение: </label>
         <textarea className="form-control area_text" name="comment"
           placeholder="Введите достижение (четкое, однозначное и полное описание)" id="comment"
+          disabled={userPersonalStore.Role === 'Observer'}
           required onChange={this.updateDescr} value={this.state.ach}
           style={{width: '100%', margin: '0'}}/>
 
@@ -169,6 +173,7 @@ class StaffChangeAchievement extends Component {
           }}>
             <AchievementDateInput className="form-control" isValid={this.state.dateValidationResult}
               updater={this.handleDateChange}
+              disabled={userPersonalStore.Role === 'Observer'}
               defaultValue={getDate(this.state.achDate)}/>
           </div>
         </div>
@@ -178,10 +183,14 @@ class StaffChangeAchievement extends Component {
             <label
               style={{'marginTop': 'auto', 'marginRight': '0.5rem'}}
               className="control-label col-xs-2">Характеристики: </label>
-            <button id="DeleteButton" className="btn btn-sm btn-outline-primary"
-              value="Назад"
-              onClick={() => this.setState({changeChars: !this.state.changeChars})}>Изменить
-            </button>
+            <HideForObserver>
+              <HideIfForMyself userId={this.state.userId}>
+                <button id="DeleteButton" className="btn btn-sm btn-outline-primary"
+                  value="Назад"
+                  onClick={() => this.setState({changeChars: !this.state.changeChars})}>Изменить
+                </button>
+              </HideIfForMyself>
+            </HideForObserver>
           </div>
           <div style={{'display': 'flex', 'flex-wrap': 'wrap', 'max-width': '40rem'}}>
             {this.state.chars.map((x) => {
@@ -201,9 +210,13 @@ class StaffChangeAchievement extends Component {
         </div>
 
         <HistoryNote history={this.state.history}/>
-        <button id="DeleteButton" className="btn btn-warning" style={{marginTop: '3rem'}}
-          value="Назад" disabled={!this.state.hasChanges} onClick={this.saveChanges}>Сохранить
-        </button>
+        <HideForObserver>
+          <HideIfForMyself userId={this.state.userId}>
+            <button id="DeleteButton" className="btn btn-warning" style={{marginTop: '3rem'}}
+              value="Назад" disabled={!this.state.hasChanges} onClick={this.saveChanges}>Сохранить
+            </button>
+          </HideIfForMyself>
+        </HideForObserver>
 
       </div>
       {this.state.changeChars &&

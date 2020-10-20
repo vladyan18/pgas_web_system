@@ -4,6 +4,8 @@ import AchievesTable from './achievesTable';
 import Modal from 'react-modal';
 import staffContextStore from '../../../stores/staff/staffContextStore';
 import userPersonalStore from '../../../stores/userPersonalStore';
+import HideIfForMyself from "./HideIfForMyself";
+import HideForObserver from "./HideIfForObserver";
 
 class AchievesGroup extends Component {
   constructor(props) {
@@ -121,15 +123,19 @@ class AchievesGroup extends Component {
                       style={{'border': '0', 'boxShadow': 'none'}}>
                       <a style={{'color': 'white'}} target="_blank" href={userPersonalStore.Role !== 'Observer' ? ('/api/portfolio/' + this.props.item.userId) : '/'}>{this.props.item.user}</a>
                     </h3>
-                    {userPersonalStore.Role !== 'Observer' && <div className="input-group-append">
-                      <button type="button" className="btn btn-dark btn-xs newAchievesGroupButton"
-                        onClick={this.toggleRating}>
-                        {this.props.item.IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг'}</button>
-                    </div>}
+                    <HideForObserver>
+                      <HideIfForMyself userId={this.props.item.userId}>
+                        <div className="input-group-append">
+                          <button type="button" className="btn btn-dark btn-xs newAchievesGroupButton"
+                            onClick={this.toggleRating}>
+                            {this.props.item.IsInRating ? 'Убрать из рейтинга' : 'Добавить в рейтинг'}</button>
+                        </div>
+                      </HideIfForMyself>
+                    </HideForObserver>
                   </div>
                   {!this.state.hidden && <div className="block">
 
-                    <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} updater={this.props.updater}
+                    <AchievesTable data={this.props.item.Achievements} userId={this.props.item.Id} userOuterId={this.props.item.userId} updater={this.props.updater}
                       openModal={this.props.openModal} filters={this.props.filters}
                                    systematicsConflicts={this.props.systematicsConflicts.filter((x) => x.id === this.props.item.Id)}/>
                   </div>}

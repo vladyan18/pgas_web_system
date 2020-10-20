@@ -10,6 +10,7 @@ import userPersonalStore from "../../stores/userPersonalStore";
 import staffContextStore from "../../stores/staff/staffContextStore";
 import {observer} from "mobx-react";
 import FloatingCircle from "../floatingCircle";
+import { ToastProvider } from 'react-toast-notifications'
 
 const AdminsListContainer = React.lazy(() => import("./adminsList/adminsListContainer"));
 const NewAchievesContainer = React.lazy(() => import("./achieves/newAchievesContainer"));
@@ -42,7 +43,8 @@ class Staff extends Component {
     }
 
     render() {
-        return (<div className="container-fluid">
+        return (<ToastProvider placement={'bottom-left'}>
+            <div className="container-fluid">
             <StaffHeaderContainer/>
             <div id="mainBody">
                 {staffContextStore.faculty &&
@@ -66,7 +68,8 @@ class Staff extends Component {
                 </Suspense>
                 }
             </div>
-        </div>)
+        </div>
+        </ToastProvider>)
     }
 
 }

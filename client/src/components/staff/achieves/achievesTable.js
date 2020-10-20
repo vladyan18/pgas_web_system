@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import '../../../style/user_main.css';
 import {withRouter} from "react-router-dom";
-import {fetchSendWithoutRes} from "../../../services/fetchService";
+import {fetchSendObj, fetchSendWithoutRes} from "../../../services/fetchService";
 import AchievesComment from "./achievesComment";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import Table from '../../common/table'
@@ -9,10 +9,25 @@ import staffContextStore from "../../../stores/staff/staffContextStore";
 import userPersonalStore from '../../../stores/userPersonalStore';
 import ReactMarkdown from 'react-markdown';
 import {Statuses} from "../../../../../common/consts";
+import ChangeStatusButton from "./changeStatusButton";
+import HideIfForMyself from "./HideIfForMyself";
+import HideForObserver from "./HideIfForObserver";
 
 function needToShowConfirmationsAlert(row) {
     if (row.crit === '7а' || row.crit === '1 (7а)' || row.status === Statuses.DECLINED) return false;
     return (!row.confirmations || row.confirmations.length === 0);
+}
+
+async function changeAchieveStatus(endPoint, id, userId, updater) {
+    const resp = await fetchSendObj(endPoint, {Id: id, UserId: userId});
+
+    if (resp) {
+        console.log(resp);
+        updater();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 class AchievesTable extends Component {
@@ -56,7 +71,7 @@ class AchievesTable extends Component {
     newComments = {};
     commentsFormatter = (cell, row) => <AchievesComment row={row} updater={this.props.updater}/>;
 
-    actionsFormatter = userPersonalStore.Role !== 'Observer' ? (cell, row) => (
+    actionsFormatter = (cell, row) => (
         <div style={{"display": "block"}}>
             <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem", padding: "0.1rem"}}>
                 <button type="button" className="custom_button centered_hor" data-toggle="modal"
@@ -64,18 +79,18 @@ class AchievesTable extends Component {
                                                                                               className="fa fa-edit editText custom_icon_button"/>
                 </button>
             </div>
-            <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem"}}>
-                <button type="button" className="custom_button centered_hor"
-                        onClick={(e) => this.decline(e, row._id)}><i className="fa  fa-times redText custom_icon_button"/>
-                </button>
-            </div>
-            <div style={{"width": "100%", display: "flex", justifyContent: "center"}}>
-                <button type="button" className="custom_button centered_hor"
-                        onClick={(e) => this.accept(e, row._id)}><i style={{paddingLeft: "0.2rem"}} className="fa fa-check greenText custom_icon_button"/>
-                </button>
-            </div>
+            <HideForObserver>
+                <HideIfForMyself userId={this.props.userOuterId}>
+                    <div style={{"width": "100%", display: "flex", justifyContent: "center", marginBottom: "1rem"}}>
+                        <ChangeStatusButton cb={this.decline} id={row._id} iconClass={"fa fa-times redText custom_icon_button"}/>
+                    </div>
+                    <div style={{"width": "100%", display: "flex", justifyContent: "center"}}>
+                        <ChangeStatusButton cb={this.accept} id={row._id} iconClass={"fa fa-check greenText custom_icon_button"}/>
+                    </div>
+                </HideIfForMyself>
+            </HideForObserver>
         </div>
-    ) : null;
+    );
 
     allowAccessPopover = (crit) => (
         <Popover id="popover-basic" style={{width: "120rem"}}>
@@ -153,36 +168,12 @@ class AchievesTable extends Component {
         return className;
     };
 
-    accept(e, id) {
-        fetch("/api/AchSuccess", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({Id: id, UserId: this.props.userId})
-        }).then((resp) => {
-            if (resp.status === 200) {
-                this.props.updater()
-            }
-        })
-            .catch((error) => console.log(error))
+    async accept(e, id) {
+        return changeAchieveStatus("/AchSuccess", id, this.props.userId, this.props.updater);
     }
 
-    decline(e, id) {
-        fetch("/api/AchFailed", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({Id: id, UserId: this.props.userId})
-        }).then((resp) => {
-            if (resp.status === 200) {
-                this.props.updater()
-            }
-        })
-            .catch((error) => console.log(error))
+    async decline(e, id) {
+        return changeAchieveStatus("/AchFailed", id, this.props.userId, this.props.updater);
     }
 
 

@@ -64,7 +64,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
 
         if ( user.Achievement.length > 0) {
             const fio = getFIO(user);
-            info.push({
+            info.push({ // TODO REFACTOR SCHEMA
                 Id: user._id,
                 userId: user.id,
                 user: fio,
@@ -82,22 +82,21 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
 
 module.exports.changeAchievementStatus = async function(userId, achId, action, requesterId) {
     const userPromise = db.findUserByInnerId(userId);
-    let user;
-    if (action === 'Accept') {
-        const achievementPromise = db.findAchieveById(achId);
-        const [userInner, achievement] = await Promise.all([userPromise, achievementPromise]);
-        const checkResult = await db.validateAchievement(achievement, userInner);
-        user = userInner;
-        if (!checkResult) {
-            throw new TypeError();
-        }
-        await db.changeAchieveStatus(achId, action === 'Accept');
-    } else {
-        const changePromise = db.changeAchieveStatus(achId, action === 'Accept');
-        // eslint-disable-next-line no-unused-vars
-        const [userInner, changeResult] = await Promise.all([userPromise, changePromise]);
-        user = userInner;
+    const achievementPromise = db.findAchieveById(achId);
+    const [user, achievement] = await Promise.all([userPromise, achievementPromise]);
+
+    if (user.id === requesterId) {
+        throw new TypeError('Forbidden operation');
     }
+
+    if (action === 'Accept') {
+        const checkResult = await db.validateAchievement(achievement, user);
+        if (!checkResult) {
+            throw new TypeError('Invalid achievement');
+        }
+    }
+
+    await db.changeAchieveStatus(achId, action === 'Accept');
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();

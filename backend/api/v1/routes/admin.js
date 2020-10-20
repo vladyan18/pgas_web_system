@@ -25,14 +25,26 @@ router.post('/adm_update_achieve', moderatorAuthCheck,
 
 router.post('/AchSuccess', moderatorAuthCheck,
     async function(req, res) {
-        await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Accept', req.userId);
-        res.sendStatus(200);
+        try {
+            await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Accept', req.userId);
+            res.status(200).send({status: 'ok'});
+        } catch (e) {
+            if (e instanceof TypeError) {
+                res.status(400).send({message: e.message});
+            }
+        }
     });
 
 router.post('/AchFailed', moderatorAuthCheck,
     async function(req, res) {
+    try {
         await adminService.changeAchievementStatus(req.body.UserId, req.body.Id, 'Decline', req.userId);
-        res.sendStatus(200);
+        res.status(200).send({status: 'ok'});
+    } catch (e) {
+        if (e instanceof TypeError) {
+            res.status(400).send({message: e.message});
+        }
+    }
     });
 
 router.get('/getUsersForAdmin', observerAuthCheck,
