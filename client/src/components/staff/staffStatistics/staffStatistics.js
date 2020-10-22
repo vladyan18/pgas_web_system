@@ -59,7 +59,7 @@ class StaffStatistics extends Component {
     for (const user of users) {
       summaryBalls[user.user] = 0;
       const userRow = [];
-
+      if (!user.Type) continue;
       if (!coursesCounts[user.Type[0] + user.Course]) coursesCounts[user.Type[0] + user.Course] = 0;
       coursesCounts[user.Type[0] + user.Course] += 1;
 
