@@ -59,7 +59,7 @@ return Number.parseInt(obj1.crit.substr(0, 2)) - Number.parseInt(obj2.crit.subst
       if (ach.status !== 'Принято' && ach.status !== 'Принято с изменениями') continue;
       const row = [];
       row.push(user.user);
-      row.push(user.Type[0]);
+      row.push(user.Type ? user.Type[0] : 'н/д');
       row.push(user.Course);
       row.push(ach.chars[0]);
       row.push(ach.achievement);
