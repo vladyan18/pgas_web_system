@@ -1,3 +1,5 @@
+'use strict';
+
 const multer = require('multer');
 const randomstring = require('randomstring');
 const path = require('path');

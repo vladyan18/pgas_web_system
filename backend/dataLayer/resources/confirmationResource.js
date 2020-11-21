@@ -25,8 +25,8 @@ module.exports.save = async function(confirmation) {
                 fs.promises.unlink(confirmationsFilePath + path.basename(confirmation.FilePath)).then();
                 confirmation.FilePath = sameFile.FilePath;
                 exists = true;
-            } catch (e) {
-            }
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
         }
     } else {
         filter.add(confirmation.Hash);
@@ -42,6 +42,7 @@ module.exports.remove = async function(filePath) {
             return;
         }
         fs.promises.unlink(filePath).then();
+        // eslint-disable-next-line no-empty
     } catch (e) {}
 };
 

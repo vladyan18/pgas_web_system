@@ -43,6 +43,8 @@ module.exports.getProfile = async function(id) {
 module.exports.registerUser = async function(userId, userData, session) {
     const userObject = await db.findUserByIdWithAchievements(userId);
 
+    const isValid = !!userData.LastName && !!userData.FirstName && !!userData.Faculty && !!userData.Type && !!userData.Course && !!userData.Birthdate;
+    if (!isValid) return;
     await db.registerUser(userId, userData);
     session.passport.user.Registered = true;
     session.save(function(err) {
@@ -65,6 +67,7 @@ module.exports.changeUserSettings = async function(userId, newSettings) {
 
 module.exports.addAchievement = async function(userId, achievement) {
     const user = await db.findUserById(userId);
+    if (user.IsInRating) throw new TypeError('It is forbidden');
     let validationResult = false;
     try {
         validationResult = await db.validateAchievement(achievement, user);
@@ -183,7 +186,7 @@ module.exports.getAchievement = async function(achId) { // TODO what is it?
 
 module.exports.addFileForConfirmation = async function(userId, confirmationFile) {
     const userPromise = db.getUserWithConfirmations(userId);
-    const [resultPromise, exists] = await db.createConfirmation(confirmationFile);
+    const [resultPromise] = await db.createConfirmation(confirmationFile);
     const [user, result] = await Promise.all([userPromise, resultPromise]);
     result.FilePath = undefined;
 
@@ -208,7 +211,7 @@ module.exports.addConfirmation = async function(userId, confirmation) {
     }
 
     const userPromise = db.findUserById(userId);
-    const [resultPromise, exists] = await db.createConfirmation(confirmation);
+    const [resultPromise] = await db.createConfirmation(confirmation);
     const [user, result] = await Promise.all([userPromise, resultPromise]);
 
     if (!user.Confirmations || !user.Confirmations.some((x) => x === result._id.toString())) {
@@ -259,7 +262,7 @@ module.exports.unsubscribeEmail = async function(userId, email) {
     return db.changeNotificationEmail(user.id, undefined);
 };
 
-module.exports.getPortfolio = async function(requesterId, userId) {
+module.exports.getPortfolioHTML = async function(requesterId, userId) {
     const user = await db.findUserByIdWithAllAchievements(userId);
     if (!user) return false;
 

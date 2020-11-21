@@ -101,6 +101,7 @@ exports.getconfitmationsStatistics = async function() {
 
 exports.purgeConfirmations = async function() {
     return null;
+    // eslint-disable-next-line no-unreachable
     const filePath = confirmationsFilePath;
     const populateQuery = {
         path: 'Achievement',

@@ -10,6 +10,10 @@ exports.archiveAchievements = async function() {
     console.log('UPDATED');
 };
 
+exports.getUserByAchievement = async function(achId, filters) {
+    return UserModel.findOne({Achievement: {$elemMatch: {$eq: achId}}}, filters).lean();
+};
+
 exports.findAchieveById = async function(id) {
     return AchieveModel.findById(id).lean();
 };
@@ -240,6 +244,7 @@ function checkAchievement(achievement, criterias, user) {
 exports.checkActualityOfAchievementCharacteristics = async function(achievement, criterias, user) {
     if (achievement.criteriasHash && achievement.criteriasHash === criterias.Hash) return;
 
+    // eslint-disable-next-line no-unused-vars
     const [migratedAchievement, currentLevel, correctChars, incorrectChars, notSure] = checkAchievement(achievement, criterias, user);
     achievement = migratedAchievement;
 
@@ -263,6 +268,7 @@ exports.checkActualityOfAchievementCharacteristics = async function(achievement,
 };
 
 exports.checkCorrectnessInNewCriterias = async function(achievement, criterias, user) {
+    // eslint-disable-next-line no-unused-vars
     const [migratedAchievement, currentLevel, correctChars, incorrectChars, notSure] = checkAchievement(achievement, criterias, user);
     achievement = migratedAchievement;
 

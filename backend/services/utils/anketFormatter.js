@@ -81,7 +81,7 @@ function insertPersonalInfo(file, user, faculty) {
         .replace(markers.birthdate, datestring);
 }
 
-async function insertAchievements(file, criterias, achievs) { //TODO refactor
+async function insertAchievements(file, criterias, achievs) { // TODO refactor
     const confirmNum = {val: 1, confirms: {}};
     const allConfirmations = [];
     const crits = Object.keys(criterias);

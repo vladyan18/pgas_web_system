@@ -1,5 +1,5 @@
 import React from 'react';
-import {BASE_API_URL} from '../common/constants';
+import {BASE_API_URL} from '../consts/constants';
 
 function FetchError(message, body) {
   this.body = body;
@@ -13,14 +13,19 @@ async function sendObject(url, obj) {
   if (url.startsWith('/api/')) {
     url = url.replace('/api/', '/');
   }
-  const response = await fetch(BASE_API_URL + url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(obj),
-  });
+  let response = {};
+  try {
+      response = await fetch(BASE_API_URL + url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(obj),
+    });
+  } catch (e) {
+    console.log(e);
+  }
   if (response.ok) {
     return response.json();
   } else if (response.status === 401) {

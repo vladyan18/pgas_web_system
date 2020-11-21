@@ -3,9 +3,14 @@ const { getCurrentDate, getFIO, statusCheck } = require('../helpers');
 const { achievementsProcessing } = require('./utils');
 const { Statuses } = require('../../common/consts');
 const notifyService = require('./notifyService');
+const historyNotes = require('./historyNotesController');
 
 module.exports.comment = async function(achievementId, commentText) {
     await db.comment(achievementId, commentText);
+
+    db.getUserByAchievement(achievementId, 'Faculty').then(({Faculty}) => {
+        messageBus.emit('message_' + Faculty);
+    });
 };
 
 module.exports.getData = async function() {
@@ -37,6 +42,7 @@ module.exports.changeAchievement = async function(achievement, userId) {
     args.to = createdAchieve;
     // await history.writeToHistory(req, id, uid, 'Change', args); //TODO HISTORY
     await achievementsProcessing.calculateBallsForUser(userId, user.Faculty);
+    messageBus.emit('message_' + user.Faculty);
 };
 
 module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REFACTOR TO STREAM
@@ -58,7 +64,7 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
 
         if ( user.Achievement.length > 0) {
             const fio = getFIO(user);
-            info.push({
+            info.push({ // TODO REFACTOR SCHEMA
                 Id: user._id,
                 userId: user.id,
                 user: fio,
@@ -74,27 +80,28 @@ module.exports.getUsersForAdmin = async function(faculty, checked) { // TODO REF
     return info;
 };
 
-module.exports.changeAchievementStatus = async function(userId, achId, action) {
+module.exports.changeAchievementStatus = async function(userId, achId, action, requesterId) {
     const userPromise = db.findUserByInnerId(userId);
-    let user;
-    if (action === 'Accept') {
-        const achievementPromise = db.findAchieveById(achId);
-        const [userInner, achievement] = await Promise.all([userPromise, achievementPromise]);
-        const checkResult = await db.validateAchievement(achievement, userInner);
-        user = userInner;
-        if (!checkResult) {
-            throw new TypeError();
-        }
-        await db.changeAchieveStatus(achId, action === 'Accept');
-    } else {
-        const changePromise = db.changeAchieveStatus(achId, action === 'Accept');
-        const [userInner, changeResult] = await Promise.all([userPromise, changePromise]);
-        user = userInner;
+    const achievementPromise = db.findAchieveById(achId);
+    const [user, achievement] = await Promise.all([userPromise, achievementPromise]);
+
+    if (user.id === requesterId) {
+        throw new TypeError('Forbidden operation');
     }
+
+    if (action === 'Accept') {
+        const checkResult = await db.validateAchievement(achievement, user);
+        if (!checkResult) {
+            throw new TypeError('Invalid achievement');
+        }
+    }
+
+    await db.changeAchieveStatus(achId, action === 'Accept');
 
     await achievementsProcessing.calculateBallsForUser(user.id, user.Faculty);
     notifyService.notifyUserAboutNewAchieveStatus(user.id, achId).then();
-    // await history.writeToHistory(req, req.body.Id, u.id, 'Success');
+    messageBus.emit('message_' + user.Faculty);
+    historyNotes.writeToHistory(requesterId, userId, achId, action).then();
 };
 
 module.exports.getRating = async function(faculty) {
@@ -124,8 +131,6 @@ module.exports.getAdmins = async function(facultyName, userId) { // TODO securit
 module.exports.getStatisticsForFaculty = async function(facultyName) { // TODO refactor
     const students = await db.getUsersWithAllInfo(facultyName, true);
 
-    let articlesIndexCol = 3;
-    if (facultyName === 'Физфак') articlesIndexCol = 2;
     let achCount = 0;
     const critsCounts = {};
     const critsBalls = {};
@@ -199,6 +204,46 @@ module.exports.getconfitmationsStatistics = async function() {
 
 module.exports.purgeConfirmations = async function() {
     return db.purgeConfirmations();
+};
+
+
+const EventEmitter = require('events').EventEmitter; // TODO вынести в синглетон (?)
+const messageBus = new EventEmitter();
+module.exports.subscribeForUsersUpdate = async function(faculty, checked, req, res) {
+    let responded = false;
+    // eslint-disable-next-line prefer-const
+    let timer;
+
+    const listener = function(res) {
+        messageBus.once('message_' + faculty, function() {
+            responded = true;
+            if (timer) {
+                clearTimeout(timer);
+            }
+            try {
+                res.status(200).json({status: 'ok'});
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+        });
+    };
+
+    req.on('abort', function() {
+        messageBus.removeListener('message_' + faculty, listener);
+        if (timer) {
+            clearTimeout(timer);
+        }
+    });
+
+    listener(res);
+    timer = setTimeout(() => {
+        if (!responded) {
+            messageBus.removeListener('message_' + faculty, listener);
+            try {
+                res.status(204).json({status: 'aborted'});
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+        }
+    }, 30000);
 };
 
 

@@ -56,11 +56,30 @@ module.exports.calculateBallsForUser = async function(id, faculty) {
     }
 };
 
+function getBallWithShift(shift, array) {
+    const newShift = shift < array.length ? shift : array.length - 1;
+    return array[newShift];
+}
+
+function preSortAchievements(a, b) {
+    const dif = b.balls[0] - a.balls[0];
+    if (dif !== 0) return dif;
+
+    const length = Math.max(a.balls.length, b.balls.length);
+    for (let i = 0; i < length; i++) {
+        const dif = getBallWithShift(i, b.balls) - getBallWithShift(i, a.balls);
+        if (dif < 0) return 1;
+    }
+    return dif;
+}
+
 const calculateBallsForCriterion = function(achievements) {
     for (let i = 0; i < achievements.length; i++) {
         achievements[i].ach.preliminaryBall = undefined;
         achievements[i].ach.ball = undefined;
     }
+
+    achievements = achievements.sort(preSortAchievements);
 
     for (let i = 0; i < achievements.length; i++) {
         const [bestAchievement, bestBall] = findBestAchievement(achievements, i, false);
@@ -96,10 +115,9 @@ function findBestAchievement(achievements, step, isPreliminary) {
     for (let achNum = 1; achNum < candidates.length; achNum++) {
         const currentCandidate = candidates[achNum];
         const achievementBallsArray = currentCandidate.balls;
-        const shift = step < achievementBallsArray.length ? step : achievementBallsArray.length - 1;
 
-        const currentBall = trimNumber(achievementBallsArray[shift]);
-        const currentMaxCandidateBall = trimNumber(candidateForMax.balls[shift]);
+        const currentBall = trimNumber(getBallWithShift(step, achievementBallsArray));
+        const currentMaxCandidateBall = trimNumber(getBallWithShift(step, candidateForMax.balls));
 
         if (currentBall > currentMaxCandidateBall) {
             candidateForMax = currentCandidate;
@@ -117,8 +135,7 @@ function findBestAchievement(achievements, step, isPreliminary) {
             }
         }
     }
-    const shift = step < candidateForMax.balls.length ? step : candidateForMax.balls.length - 1;
-    return [candidateForMax, candidateForMax.balls[shift]];
+    return [candidateForMax, getBallWithShift(step, candidateForMax.balls)];
 }
 
 const trimNumber = function(num) {

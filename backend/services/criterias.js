@@ -32,6 +32,7 @@ module.exports.uploadCriterias = async function(filePath, facultyName) {
 const checkCriteriasDifference = async function(newCriterias, facultyName) {
     const oldCriterias = await db.getCriteriasObject(facultyName);
     const differences = [];
+    if (!oldCriterias) return [];
     const checkLevel = (oldLevel, newLevel, path) => {
         const oldKeys = Object.keys(oldLevel).filter((x) => isNaN(Number(x)));
         const newKeys = Object.keys(newLevel).filter((x) => isNaN(Number(x)));
